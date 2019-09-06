@@ -1,0 +1,18 @@
+    <%
+def requestContext = _ctx.getRequestContext();
+def jsManager = requestContext.getJavascriptManager();
+
+if (uicomponent.isDisplayed()) {
+  def showPinInput = uicomponent.canPinNews();
+  jsManager.require("SHARED/NewsActivityComposer","NewsActivityComposer")
+	       .addScripts("NewsActivityComposer.init($showPinInput) ;");
+%>
+
+<div id="newsActivityComposer"></div>
+
+<%
+} else {
+  jsManager.require("SHARED/NewsActivityComposer","NewsActivityComposer")
+  	       .addScripts("NewsActivityComposer.destroy() ;");
+}
+%>

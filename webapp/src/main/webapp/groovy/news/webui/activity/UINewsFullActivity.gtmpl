@@ -1,0 +1,110 @@
+<!-- Full details news Activity -->
+<%
+  import org.exoplatform.portal.webui.util.Util;
+  import org.exoplatform.social.core.service.LinkProvider;
+  import org.exoplatform.social.core.space.model.Space;
+  import org.exoplatform.social.webui.Utils;
+
+  import org.apache.commons.lang.StringEscapeUtils;
+
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.social.core.manager.IdentityManager;
+  import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+  import org.exoplatform.social.core.identity.model.Identity;
+
+  import java.time.format.DateTimeFormatter;
+  import java.time.format.FormatStyle;
+  import java.time.LocalDateTime;
+  import java.util.TimeZone;
+
+  import java.util.Date;
+
+  def pcontext = Util.getPortalRequestContext();
+
+  def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
+
+  def activity = uicomponent.getActivity();
+
+  def news = uicomponent.getNews();
+
+if (activity && news) {
+
+  def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
+
+  def authorFullName = uicomponent.getUserFullName(news.author);
+  def updaterFullName = uicomponent.getUserFullName(news.updater);
+  def authorProfileURL = uicomponent.getUserProfileURL(news.author);
+  def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
+  def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+  def postedDate = LocalDateTime.ofInstant(news.creationDate.toInstant(), TimeZone.getDefault().toZoneId());
+  def newsPostedDate = postedDate.format(mediumDateFormat);
+  def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
+  def newsUpdatedDate = updatedDate.format(mediumDateFormat);
+
+  def labelReadMore = _ctx.appRes("activity.news.readMore");
+  def labelWrittenBy = _ctx.appRes("activity.news.writtenBy");
+  def labelPublicationDate = _ctx.appRes("activity.news.publicationDate");
+  def labelUpdatedBy = _ctx.appRes("activity.news.lastUpdatedBy");
+  def labelUpdatedDate = _ctx.appRes("activity.news.lastUpdatedDate");
+  def spaceURL = uicomponent.getSpaceURL();
+  def spaceGroupId = uicomponent.getSpaceGroupId();
+
+  def activityLink = uicomponent.getActivityPermalink(activity.id);
+
+  StringBuffer illustrationURL = new StringBuffer();
+  if(news.illustration == null){
+    illustrationURL.append("/news/images/newsImageDefault.png");
+  } else {
+    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
+  }
+
+  def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
+  def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
+  def newsBody = news.body.replaceAll("`", "\\\\`");
+
+  def showEditButton = uicomponent.canEditNews(activity);
+
+  //params for init UIActivity javascript object
+  def params = """ {
+    activityId: '${activity.id}',
+    newsId: '${news.id}',
+    news: {
+      title: '${newsTitle}',
+      summary: `${newsSummary}`,
+      body: `${newsBody}`,
+      illustrationURL: '${illustrationURL}',
+      authorFullName: '${authorFullName}',
+      authorProfileURL: '${authorProfileURL}',
+      postedDate: '${newsPostedDate}',
+      updaterFullName: '${updaterFullName}',
+      updaterProfileURL: '${updaterProfileURL}',
+      updatedDate: '${newsUpdatedDate}',
+      titleLink: '${activityLink}'
+    },
+    showEditButton:'$showEditButton',
+    spaceURL:'$spaceURL',
+    spaceGroupId: '$spaceGroupId'
+  } """
+
+  jsManager.require("SHARED/jquery", "jq")
+           .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
+           .require("SHARED/social-ui-activity", "activity").addScripts("activity.onLoad($params);")
+           .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
+%>
+
+<div class="activityStream uiNewsActivity" id="activityContainer${activity.id}">
+  <div class="boxContainer" id="boxContainer">
+  <div id="ContextBox${activity.id}" class="uiBox contentBox">
+    <div id="ActivityContextBox${activity.id}">
+
+      <div id="newsDetails"></div>
+
+    </div><!--end #ActivityContextBox${activity.id}-->
+  </div> <!--end ContextBox${activity.id}-->
+  </div> <!-- #boxContainer-->
+</div><!--activityStream-->
+<% } else { %> <!-- activity deleted -->
+<% uiform.begin() %>
+<div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
+<% uiform.end() %>
+<% } %>

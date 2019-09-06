@@ -1,0 +1,81 @@
+<%
+  import org.apache.commons.lang.StringEscapeUtils;
+
+  import org.exoplatform.portal.webui.util.Util;
+  import org.exoplatform.social.core.identity.model.Identity;
+  import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+  import org.exoplatform.social.core.service.LinkProvider;
+
+  import java.time.format.DateTimeFormatter;
+  import java.time.format.FormatStyle;
+  import java.time.LocalDateTime;
+  import java.util.TimeZone;
+  import java.util.Date;
+
+  public String getProfileFullName(String userName) {
+    String profileFullName = "";
+    Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
+    if(identity != null && identity.getProfile() != null) {
+      profileFullName = identity.getProfile().getFullName();
+    }
+    return StringEscapeUtils.escapeHtml(profileFullName);
+  }
+
+  def pcontext = Util.getPortalRequestContext();
+
+  def newsNode = uicomponent.getNode();
+  def newsId = newsNode.getUUID();
+  def title = newsNode.getProperty("exo:title").getString();
+  def summary = newsNode.getProperty("exo:summary").getString();
+  def body = newsNode.getProperty("exo:body").getString();
+  def author = newsNode.getProperty("exo:author").getString();
+  def updater = newsNode.getProperty("exo:lastModifier").getString();
+  def creationDate = newsNode.getProperty("exo:dateCreated").getDate();
+  def updateDate = newsNode.getProperty("exo:dateModified").getDate();
+
+  StringBuffer illustrationURL = new StringBuffer();
+  if(newsNode.hasNode("illustration")) {
+    illustrationURL.append("/rest/v1/news/").append(newsId).append("/illustration");
+  } else {
+    illustrationURL.append("/news/images/newsImageDefault.png");
+  }
+
+  def authorFullName = getProfileFullName(author);
+  def updaterFullName = author.equals(updater) ? authorFullName : getProfileFullName(updater);
+  def authorProfileURL = LinkProvider.getUserProfileUri(author);
+  def updaterProfileURL = author.equals(updater) ? authorProfileURL : LinkProvider.getUserProfileUri(updater);
+  def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+  def postedDate = LocalDateTime.ofInstant(creationDate.toInstant(), TimeZone.getDefault().toZoneId());
+  def newsPostedDate = postedDate.format(mediumDateFormat);
+  def updatedDate = LocalDateTime.ofInstant(updateDate.toInstant(), TimeZone.getDefault().toZoneId());
+  def newsUpdatedDate = updatedDate.format(mediumDateFormat);
+
+  def newsTitle = title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
+  def newsSummary = summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
+  def newsBody = body.replaceAll("`", "\\\\`");
+
+  def params = """ {
+    newsId: '${newsId}',
+    news: {
+      title: '${newsTitle}',
+      summary: `${newsSummary}`,
+      body: `${newsBody}`,
+      illustrationURL: '${illustrationURL}',
+      authorFullName: '${authorFullName}',
+      authorProfileURL: '${authorProfileURL}',
+      postedDate: '${newsPostedDate}',
+      updaterFullName: '${updaterFullName}',
+      updaterProfileURL: '${updaterProfileURL}',
+      updatedDate: '${newsUpdatedDate}'
+    },
+    showEditButton: false
+  } """
+%>
+
+<div id="newsDetails"></div>
+
+<script>
+  require(['SHARED/newsDetails'], function(newsDetails) {
+    newsDetails.init(<%=params%>);
+  });
+</script>

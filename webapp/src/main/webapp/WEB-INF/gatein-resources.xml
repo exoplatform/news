@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2011 eXo Platform SAS.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
+                  xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
+
+  <portal-skin>
+    <skin-name>Default</skin-name>
+    <skin-module>news</skin-module>
+    <css-path>/css/news.css</css-path>
+    <css-priority>1</css-priority>
+  </portal-skin>
+
+  <portal-skin>
+    <skin-name>Enterprise</skin-name>
+    <skin-module>news</skin-module>
+    <css-path>/css/news.css</css-path>
+    <css-priority>1</css-priority>
+  </portal-skin>
+
+  <module>
+    <name>suggesterComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/suggesterComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>suggester</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>modalComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/modalComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>fileDropComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/fileDropComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>filedrop</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>NewsActivityComposer</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsActivityComposer.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>fileDropComponent</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>newsDetails</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsDetails.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>fileDropComponent</module>
+    </depends>
+    <depends>
+      <module>suggesterComponent</module>
+    </depends>
+    <depends>
+      <module>modalComponent</module>
+    </depends>
+  </module>
+  
+  <module>
+    <name>NewsActivity</name>
+    <script>
+      <path>/js/webui/UINewsActivity.js</path>
+    </script>
+    <depends>
+      <module>socialUtil</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+  </module>
+
+  <module>
+    <name>Carousel</name>
+    <script>
+      <path>/js/Carousel.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+  </module>
+
+</gatein-resources>

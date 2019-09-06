@@ -1,0 +1,45 @@
+#
+# Default excludes
+#
+
+# Binaries
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.war
+*.ear
+*.sar
+*.class
+
+# Maven 
+target/
+pom.xml.versionsBackup
+
+# Npm
+node_modules/
+
+# IntelliJ project files 
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# eclipse project file
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS
+.DS_Store
+
+# Misc
+*.swp
+transaction.log
+rebel-remote.xml
+rebel.xml

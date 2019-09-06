@@ -1,0 +1,9 @@
+<%
+import org.exoplatform.social.webui.Utils;
+def isFullViewMode = (Utils.getActivityID() != null);
+if(isFullViewMode) {
+  _ctx.include("war:/groovy/news/webui/activity/UISharedNewsFullActivity.gtmpl");
+} else {
+  _ctx.include("war:/groovy/news/webui/activity/UISharedNewsStreamActivity.gtmpl");
+} 
+%>

@@ -1,0 +1,542 @@
+@images-path: "/news/images";
+
+@baseColorDark: #333333;
+@primaryColor: #2f5e92;
+@globalLoadingBorder: #333;
+@colorIconPrimary: @primaryColor;
+@header-popup-bg: #484848;
+
+
+/*============== Activity News ====================*/
+
+.activityStream.uiNewsActivity {
+    .newsRibbon {
+        background-image: url("@{images-path}/ribbon-news.png");
+        background-repeat: no-repeat;
+        position: absolute;
+        width: 73px;
+        height: 73px;
+        left: auto;
+        right: 0px;
+        bottom: 0px;
+    }
+
+    .newsImage {
+        float: left;
+        max-width: 150px;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+
+    .newsDetails {
+      ul {
+        margin: 0 0 10px 25px;
+
+        li {
+          list-style-position: inside;
+          list-style-type: disc;
+        }
+      }
+
+      .newsTitle {
+        padding-bottom: 10px;
+        font-weight: bold;
+
+        a {
+          color: @baseColorDark;
+        }
+      }
+
+      .newsBody {
+        text-align: justify;
+        .readMore {
+          font-weight: bold;
+          padding-left: 3px;
+        }
+      }
+    }
+
+    .confirmPinMessage {
+      position: absolute;
+      width: 100%;
+      z-index: 2;
+      top: -10px;
+    }
+}
+
+/*============== Full Activity News ====================*/
+
+.newsDetails-description {
+    padding: 25px 15px;
+    background-color: #FFFFFF;
+
+    #newsActivityEditComposer {
+      float: right;
+
+      &.completeWidth {
+        width: 100%;
+        float: none;
+        margin-left: 0px;
+      }
+    }
+
+    #newsShareActivity {
+      float: right;
+      margin-left: 10px;
+    }
+
+    #newsShareButton, #newsEditButton {
+       border: none;
+       padding: 9px 10px;
+       i {
+          font-size: 24px;
+       }
+    }
+
+    .newsDetails {
+        img {
+           float: left;
+           max-width: 150px;
+           margin-right: 20px;
+           margin-bottom: 20px;
+           border: 1px dashed lightgray;
+         }
+        .news-top-information {
+            .news-header-content {
+                .newsTitle {
+                    .newsTitleLink {
+                        color:  @primaryColor;
+                        font-size: 16px;
+                        letter-spacing: .5px;
+                    }
+                }
+                .newsInformation {
+                    display: flex;
+                    padding-left: 7px;
+
+                    .newsAuthor {
+                        padding-right: 30px;
+                    }
+
+                    .newsUpdater {
+                        padding-left: 30px;
+                        border-left: 2px solid #CCCCCC;
+                    }
+
+                    .newsInformationLabel {
+                        font-style: italic;
+                    }
+
+                    .newsInformationValue {
+                        font-weight: bold;
+                    }
+
+                    a {
+                        color: @globalLoadingBorder;
+                        &:hover {
+                         color: @primaryColor;
+                        }
+                    }
+                }
+            }
+        }
+
+        .summary {
+            padding-top: 20px;
+            padding-left: 20px;
+            font-style: italic;
+            font-size: 14px;
+        }
+    }
+
+    .newsBody {
+        padding-top: 20px;
+        letter-spacing: .1px;
+        line-height: 1.7em;
+        font-size: 14px;
+    }
+}
+
+.uiSharedNewsActivity {
+  .sharedNewsTitle {
+    padding: 0px 15px 20px 15px;
+  }
+  .sharedNewsDetails {
+    margin: 0px 15px 10px 13px;
+    border: 2px solid #f8f8f8;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    padding: 10px;
+    display: flow-root;
+  }
+}
+
+/*============== News Composer =============== */
+
+.uiIconSocUINewsActivityComposer:before {
+	content: "\e62a";
+	font-size: 14px;
+}
+
+.uiIconSocUINewsActivityComposer:hover,
+.actionIcon:hover .uiIconSocUINewsActivityComposer {
+	color: @colorIconPrimary;
+}
+
+#newsActivityEditComposer.newsComposer #newsForm .newsFormButtons {
+  justify-content: flex-end;
+}
+
+.newsComposer {
+    .createNews {
+        padding-top: 15px;
+        padding-left: 10px;
+        font-weight: bold;
+        font-size: 17px;
+    }
+    #newsForm {
+        padding: 20px 10px;
+        margin-bottom: 30px;
+        .newsFormWrapper {
+            .formInputGroup {
+                display: flex;
+                label {
+                    flex: 0 1 150px;
+                }
+                input[type="text"] {
+                    flex: 0 1 100%;
+                    margin-bottom: 0;
+                }
+                textarea {
+                    flex: 0 1 100%;
+                    margin-bottom: 0;
+                }
+            }
+        }
+        #cke_newsContent {
+            border: solid 2px #e1e8ee;
+            flex: 0 1 100%;
+            margin-bottom: 0;
+        }
+        .newsFormInputAttachement {
+            display: inline-flex;
+            width: 100%;
+        }
+        .newsFormInput {
+            flex: 1 1 80%;
+        }
+        .newsFormAttachement {
+            align-items: center;
+            border-radius: 5px;
+            border: 2px dashed #e6e6e6;
+            display: flex;
+            flex: 1 1 20%;
+            font-size: 14px;
+            justify-content: center;
+            margin-left: 15px;
+            text-align: center;
+            .control-group.attachments {
+                .attachFile {
+                    display: none;
+                }
+            }
+            .dropZone {
+                label {
+                    i {
+                        display: block;
+                        font-size: 35px;
+                    }
+                }
+            }
+            .abortFile {
+                height: 0;
+            }
+        }
+        #newsSummary {
+            margin-top: 10px;
+        }
+        #UINewsSummaryDescription {
+            color: @header-popup-bg;
+            font-size: 12px;
+            font-style: italic;
+            margin-left: 135px;
+            padding-top: 5px;
+            i {
+                color: @header-popup-bg;
+                &:before {
+                    content: "\e767";
+                    font-size: 14px;
+                }
+            }
+        }
+        .newsFormButtons {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .pinArticleContent {
+            padding-left: 125px;
+        }
+        .pinArticleLabel {
+            margin-left: 4px;
+            margin-top: 2px;
+        }
+        .newsFormActions {
+            align-items: center;
+            display: flex;
+
+            #newsUpdateAndPost, #cancelEdit {
+              margin-left: 10px
+            }
+        }
+        #newsPost {
+            padding: 5px 12px;
+        }
+        #newsPlus {
+            padding: 4px 12px;
+            margin-right: 10px;
+            .uiIconSimplePlus {
+                &:before {
+                    content: "\e74b";
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+    .formInputGroup.formNewsContent {
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+    .control-group.attachments {
+        margin-bottom: 0;
+        width: 100%;
+    }
+    .dropZone {
+        img {
+            height: 100px;
+        }
+        .abortFile {
+            i {
+                background: #ffffff;
+                color: #ff0000;
+                right: -6px;
+                top: -15px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1025px) {
+  #newsActivityComposer #newsForm .dropZone img {
+    height: 80px;
+  }
+}
+
+/*============== News Share Popup =============== */
+
+#newsShareActivity {
+    .uiPopup {
+        position: fixed;
+        top: 400px;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        width: 800px;
+        height: 500px;
+        .popupContent {
+            height: 85%;
+        }
+    }
+    .newsShareForm {
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+        height: 90%;
+        label {
+            font-weight: bold;
+        }
+        .shareButtons {
+            align-self: flex-end;
+            #newsShareButton:hover {
+                background-color: #fff;
+            }
+            #newsShareButton {
+                position: absolute;
+                top: 25px;
+                right: 25px;
+                border-color: #fff;
+                padding: 0;
+                .uiIconShare {
+                    font-size: 25px;
+                }
+            }
+        }
+        .newsShareDescription {
+            flex: 2;
+            width: 100%;
+        }
+        .shareSpaces input {
+            width: 100%;
+            margin-bottom: 50px;
+        }
+        .newsTitle {
+            margin-bottom: 25px;
+        }
+        .shareSpaces > * {
+            margin-bottom: 15px;
+        }
+    }
+    .selectize-dropdown-content .optionItem {
+        .optionAvatar {
+            display: inline-block;
+            white-space: nowrap;
+            margin-right: 5px;
+        }
+
+        .optionName {
+            display: inline-block;
+            white-space: nowrap;
+        }
+    }
+
+    .alert {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 1000;
+
+      ul {
+        margin: 3px 0 0px 60px;
+
+        li {
+          list-style: unset;
+        }
+      }
+    }
+
+    .fade-leave-active {
+      transition: opacity 1s
+    }
+
+    .fade-leave-to {
+      opacity: 0
+    }
+}
+
+/*============== Home pinned news =============== */
+
+@-webkit-keyframes fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-o-keyframes fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.newsPin {
+    margin: 0!important;
+    .uiBox {
+        .title {
+            background: white;
+            font-weight: bold;
+            letter-spacing: .5px;
+        }
+        .newsUiContentBox {
+          overflow-x: hidden;
+
+          .prevNewsWrapper {
+              position: absolute;
+              top: 50%;
+              left: 15px;
+              .prevItems {
+                cursor: pointer;
+                font-size: 20px;
+              }
+          }
+          .nextNewsWrapper {
+              position: absolute;
+              right: 15px;
+              top: 50%;
+              .nextItems {
+                cursor: pointer;
+                font-size: 20px;
+              }
+          }
+          .rowContent {
+              width: 90%;
+              margin: auto;
+              .newsColumn2 {
+                  .carouselItems {
+                      animation: fadein 2s;
+                      -moz-animation: fadein 2s; /* Firefox */
+                      -webkit-animation: fadein 2s; /* Safari and Chrome */
+                      -o-animation: fadein 2s; /* Opera */
+                      .media-content {
+                          .newsPinContent {
+                              display: flex;
+                              flex-wrap: wrap;
+                              width: 100%;
+                              .newsPinIllustration {
+                                  height: 80px;
+                                  background-position: 50%;
+                                  background-size: cover;
+                                  background-repeat: no-repeat;
+                                  flex: 1 1 35%;
+                                  margin-right: 10px;
+                                  border-radius: 6px;
+                              }
+                              .media-body {
+                                  flex: 1 1 60%;
+
+                                  .summary {
+                                    max-height: 60px;
+                                    overflow-y: hidden;
+                                  }
+                              }
+                          }
+                          .newsPinTitle {
+                              padding-bottom: 10px;
+                              .dateAndMail {
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+
+                                .newsOwner {
+                                  padding-left: 10px;
+                                }
+                                span {
+                                  font-size: 13px;
+                                  font-style: italic;
+                                }
+                                i {
+                                  font-size: 14px;
+                                  margin-right: 4px;
+                                  color: #578dc9;
+                                }
+                              }
+                              .heading a {
+                                display: block;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                overflow: hidden;
+                              }
+                          }
+
+                      }
+                  }
+              }
+          }
+
+        }
+    }
+}

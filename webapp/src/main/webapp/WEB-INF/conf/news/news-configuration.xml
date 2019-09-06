@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2003-2011 eXo Platform SAS.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<configuration
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+
+  <component>
+    <key>org.exoplatform.news.NewsService</key>
+    <type>org.exoplatform.news.NewsServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.news.rest.NewsRestResourcesV1</type>
+  </component>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
+    <component-plugin>
+      <name>add.news.nodeType</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
+      <init-params>
+        <values-param>
+          <name>autoCreatedInNewRepository</name>
+          <description>Node types configuration file for News</description>
+          <value>war:/conf/news/jcr/news-nodetypes.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.webui.ext.UIExtensionManager</target-component>
+    <component-plugin>
+      <name>add.action</name>
+      <set-method>registerUIExtensionPlugin</set-method>
+      <type>org.exoplatform.webui.ext.UIExtensionPlugin</type>
+      <init-params>
+        <object-param>
+          <name>News Activity</name>
+          <object type="org.exoplatform.social.webui.activity.UIActivityExtension">
+            <field name="type"><string>org.exoplatform.social.webui.activity.BaseUIActivity</string></field>
+            <field name="name"><string>news</string></field>
+            <field name="component"><string>org.exoplatform.news.webui.activity.UINewsActivity</string></field>
+            <field name="activityBuiderClass"><string>org.exoplatform.news.webui.activity.UINewsActivityBuilder</string></field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>add.action</name>
+      <set-method>registerUIExtensionPlugin</set-method>
+      <type>org.exoplatform.webui.ext.UIExtensionPlugin</type>
+      <init-params>
+        <object-param>
+          <name>News Composer</name>
+          <object type="org.exoplatform.webui.ext.UIExtension">
+            <field name="type"><string>org.exoplatform.social.webui.composer.UIActivityComposer</string></field>
+            <field name="name"><string>NEWS_ACTIVITY_COMPOSER</string></field>
+            <field name="component"><string>org.exoplatform.news.webui.composer.UINewsActivityComposer</string></field>
+            <field name="rank"><int>1</int></field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>add.action</name>
+      <set-method>registerUIExtensionPlugin</set-method>
+      <type>org.exoplatform.webui.ext.UIExtensionPlugin</type>
+      <init-params>
+        <object-param>
+          <name>Shared News Activity</name>
+          <object type="org.exoplatform.social.webui.activity.UIActivityExtension">
+            <field name="type"><string>org.exoplatform.social.webui.activity.BaseUIActivity</string></field>
+            <field name="name"><string>shared_news</string></field>
+            <field name="component"><string>org.exoplatform.news.webui.activity.UISharedNewsActivity</string></field>
+            <field name="activityBuiderClass"><string>org.exoplatform.news.webui.activity.UINewsActivityBuilder</string></field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.resources.ResourceBundleService</target-component>
+    <component-plugin>
+      <name>Document Composer Plugin Resource Bundle</name>
+      <set-method>addResourceBundle</set-method>
+      <type>org.exoplatform.services.resources.impl.BaseResourceBundlePlugin</type>
+      <init-params>
+        <values-param>
+          <name>classpath.resources</name>
+          <description>The resources that start with the following package name should be load from file system</description>
+          <value>locale.portlet.news.News</value>
+        </values-param>
+        <values-param>
+          <name>portal.resource.names</name>
+          <description>The resources that start with the following package name should be load from file system</description>
+          <value>locale.portlet.news.News</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.commons.addons.AddOnService</target-component>
+    <component-plugin>
+      <name>addPlugin</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.commons.addons.AddOnPluginImpl</type>
+      <description>add application Config</description>
+      <init-params>
+        <value-param>
+          <name>priority</name>
+          <value>5</value>
+        </value-param>
+        <value-param>
+          <name>containerName</name>
+          <value>top-social-container</value>
+        </value-param>
+        <object-param>
+          <name>News</name>
+          <description>News</description>
+          <object type="org.exoplatform.commons.addons.PortletModel">
+            <field name="contentId">
+              <string>presentation/ContentListViewerByQueryPortlet</string>
+            </field>
+            <field name="portletPrefs">
+              <map type="java.util.HashMap">
+                <entry>
+                  <key><string>folderPath</string></key>
+                  <value><string>repository:collaboration:/sites</string></value>
+                </entry>
+                <entry>
+                  <key><string>workspace</string></key>
+                  <value><string>collaboration</string></value>
+                </entry>
+                <entry>
+                  <key><string>orderType</string></key>
+                  <value><string>ASC</string></value>
+                </entry>
+                <entry>
+                  <key><string>formViewTemplatePath</string></key>
+                  <value><string>/exo:ecm/views/templates/content-list-viewer/list/NewsPin.gtmpl</string></value>
+                </entry>
+                <entry>
+                  <key><string>basePath</string></key>
+                  <value><string>detail</string></value>
+                </entry>
+                <entry>
+                  <key><string>itemsPerPage</string></key>
+                  <value><string>100</string></value>
+                </entry>
+                <entry>
+                  <key><string>sharedCache</string></key>
+                  <value><string>false</string></value>
+                </entry>
+                <entry>
+                  <key><string>query</string></key>
+                  <value><string>select * from exo:symlink where jcr:path like '/Application Data/News/Pinned/%'</string></value>
+                </entry>
+              </map>
+            </field>
+            <field name="permissions">
+              <collection type="java.util.ArrayList">
+                <value><string>*:/platform/users</string></value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+</configuration>

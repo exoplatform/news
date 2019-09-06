@@ -228,17 +228,11 @@
   } else {
     illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
   }
-  
-  def newsSpace = Utils.getSpaceService().getSpaceById(news.getSpaceId());
-  def visibility = newsSpace.getVisibility();
-  def registration = newsSpace.getRegistration();
+
   def labelPin = _ctx.appRes("activity.news.label.Pin");
   def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("activity.news.label.PinNews"));
-  def labelToPinThisActivity = _ctx.appRes("activity.news.label.PinMessage").replace("{0}", newsTitle);
   def labelCancelbutton = _ctx.appRes("activity.edit.news.cancel");
   def labelConfirmButn = _ctx.appRes("activity.news.confirm");
-  def labelVisibility = _ctx.appRes("activity.news.label.visibility").replace("{0}", visibility + "");
-  def labelMembership = _ctx.appRes("activity.news.label.membership").replace("{0}", registration + "");
   def labelConfirmPin =  _ctx.appRes("activity.news.label.confirmPin");
   def messageSuccessPin =  _ctx.appRes("activity.news.label.pin.success");
   def messageErrorPin =  _ctx.appRes("activity.news.label.pin.error");
@@ -290,7 +284,7 @@
                         <ul class="dropdown-menu pull-right" role="menu">
                           <% if (canPinNews) { %>
                         	  <li>
-                              <a href="javascript:void(0)" data-confirm="<span>${labelToPinThisActivity}<br/><span>${labelVisibility}<br/>${labelMembership}<br/></span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">${labelPin}</a>
+                              <a href="javascript:void(0)" data-confirm="<span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">${labelPin}</a>
                             </li>
                           <%
                             }

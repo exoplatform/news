@@ -1,5 +1,6 @@
 import './components/initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
+import router from './router/index.js';
 
 // getting language of the PLF 
 const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
@@ -24,6 +25,7 @@ export function init(showPin) {
   // init Vue app when locale ressources are ready
     newsActivityComposerApp = new Vue({
       el: '#newsActivityComposer',
+      router,
       data: function() {
         return {
           showPinInput: showPin,

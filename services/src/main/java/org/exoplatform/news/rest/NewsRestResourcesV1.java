@@ -5,13 +5,8 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -77,18 +72,19 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @ApiOperation(value = "Create a news",
           httpMethod = "POST",
           response = Response.class,
-          notes = "This creates the news if the authenticated user is a member of the space or a spaces super manager.")
+          notes = "This creates the news if the authenticated user is a member of the space or a spaces super manager. The news is created in draft status, unless the publicationState property is set to 'published'.")
   @ApiResponses(value = {
           @ApiResponse (code = 200, message = "News created"),
           @ApiResponse (code = 400, message = "Invalid query input"),
           @ApiResponse (code = 401, message = "User not authorized to create the news"),
           @ApiResponse (code = 500, message = "Internal server error")})
-  public Response createNews(@ApiParam(value = "News", required = true) News news) {
+  public Response createNews(@Context HttpServletRequest request,
+                             @ApiParam(value = "News", required = true) News news) {
     if (news == null || StringUtils.isEmpty(news.getSpaceId())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+    String authenticatedUser = request.getRemoteUser();
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
     if (space == null || (! spaceService.isMember(space, authenticatedUser) && ! spaceService.isSuperManager(authenticatedUser))) {
@@ -96,11 +92,61 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
 
     try {
-      News createdNews = newsService.createNews(news);
+      News createdNews;
+      if("published".equals(news.getPublicationState())) {
+        createdNews = newsService.createNews(news);
+      } else {
+        createdNews = newsService.createNewsDraft(news);
+      }
 
       return Response.ok(createdNews).build();
     } catch (Exception e) {
       LOG.error("Error when creating the news " + news.getTitle(), e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @RolesAllowed("users")
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Get news list",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This gets the list of news of the given author, in the given space, with the given publication state, if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News list returned"),
+          @ApiResponse (code = 401, message = "User not authorized to get the news list"),
+          @ApiResponse (code = 404, message = "News list not found"),
+          @ApiResponse (code = 500, message = "Internal server error") })
+  public Response getNews(@Context HttpServletRequest request,
+                          @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
+                          @ApiParam(value = "News space id", required = true) @QueryParam("spaceId") String spaceId,
+                          @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState) {
+    try {
+      String authenticatedUser = request.getRemoteUser();
+
+      if(StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      Space space = spaceService.getSpaceById(spaceId);
+      if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      List<News> news = new ArrayList<>();
+      if("draft".equals(publicationState)) {
+        List<News> drafts = newsService.getNewsDrafts(spaceId, author);
+        if(drafts != null) {
+          news = drafts;
+        }
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      return Response.ok(news).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news with params author=" + author + ", spaceId=" + spaceId + ", publicationState=" + publicationState, e);
       return Response.serverError().build();
     }
   }
@@ -121,6 +167,10 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   public Response getNews(@Context HttpServletRequest request,
                           @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
     try {
+      if (StringUtils.isBlank(id)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+
       News news = newsService.getNews(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
@@ -164,8 +214,9 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   public Response updateNews(@Context HttpServletRequest request,
                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
                              @ApiParam(value = "News", required = true) News updatedNews) {
+
     if (updatedNews == null) {
-      Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     try {
@@ -410,4 +461,45 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
   }
 
+  @DELETE
+  @Path("{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Delete news",
+          httpMethod = "DELETE",
+          response = Response.class,
+          notes = "This deletes the news",
+          consumes = "application/json"
+  )
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News deleted"),
+          @ApiResponse (code = 400, message = "Invalid query input"),
+          @ApiResponse (code = 401, message = "User not authorized to delete the news"),
+          @ApiResponse (code = 500, message = "Internal server error")})
+  public Response deleteNews(@Context HttpServletRequest request,
+                             @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+    try {
+      if (StringUtils.isBlank(id)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+
+      News news = newsService.getNews(id);
+      if (news == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      String authenticatedUser = request.getRemoteUser();
+
+      if(StringUtils.isBlank(news.getAuthor()) || !authenticatedUser.equals(news.getAuthor())) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      newsService.deleteNews(id);
+
+      return Response.ok().build();
+    } catch (Exception e) {
+      LOG.error("Error when deleting the news with id " + id, e);
+      return Response.serverError().build();
+    }
+  }
 }

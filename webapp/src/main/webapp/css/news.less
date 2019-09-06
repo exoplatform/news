@@ -344,6 +344,90 @@
   }
 }
 
+/*============== News Drafts =============== */
+
+.newsDrafts {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px 10px;
+  .drawer{
+    .content{
+      bottom: 0;
+    }
+  }
+
+  .draftSavingStatus {
+    margin-right: 7px;
+    font-style: italic;
+    padding: 10px;
+  }
+    #newsDraftsList {
+      .newsDraftEntry {
+        display: flex;
+        flex-direction: column;
+        .newsDetails {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          margin-bottom: 15px;
+
+          .draftTitle {
+            cursor: pointer;
+          }
+
+          .draftModifiedTime {
+            font-size: 13px;
+            color: #969592;
+          }
+          .draftIllustration{
+            height: 80px;
+          }
+        }
+        .draftButtons{
+          margin-left: auto;
+          .draftButton {
+            display: inline;
+            cursor: pointer;
+            font-weight: bold;
+            &.delete {
+              margin-left: 15px;
+              i, a {
+                color: #8a8a8a;
+              }
+            }
+          }
+        }
+
+        .deleteDraftConfirmation {
+          display: none;
+
+          .confirmationButtons {
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+
+            &.cancel {
+              color: #00000099;
+
+              &:hover {
+                color: #0c0c0c;
+                background-color: #f5f5f5;
+              }
+            }
+
+            &.delete:hover {
+              background-color: #ecfffd;
+            }
+          }
+
+          p {
+            display: inline;
+          }
+        }
+      }
+  }
+}
+
 /*============== News Share Popup =============== */
 
 #newsShareActivity {

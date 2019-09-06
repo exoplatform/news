@@ -14,6 +14,34 @@ export function getNewsById(id) {
   });
 }
 
+export function getNewsDrafts() {
+  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaceId=${newsConstants.SPACE_ID}&publicationState=draft`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error getting news draft list');
+    }
+  });
+}
+
+export function saveNews(news) {
+  return fetch(`${newsConstants.NEWS_API}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    method: 'POST',
+    body: JSON.stringify(news)
+  }).then((data) => {
+    return data.json();
+  });
+}
+
 export function importFileFromUrl(url) {
   return fetch(url, {
     headers: {
@@ -75,5 +103,12 @@ export function shareNews(newsId, activityId, sharedDescription, sharedSpaces) {
     },
     method: 'POST',
     body: JSON.stringify(sharedNews)
+  });
+}
+
+export function deleteDraft(newsId) {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}`, {
+    credentials: 'include',
+    method: 'DELETE'
   });
 }

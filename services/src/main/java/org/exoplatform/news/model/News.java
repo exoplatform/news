@@ -31,6 +31,8 @@ public class News {
 
   private String  spaceId;
 
+  private String publicationState;
+
   public String getId() {
     return id;
   }
@@ -141,5 +143,13 @@ public class News {
 
   public void setSpaceId(String spaceId) {
     this.spaceId = spaceId;
+  }
+
+  public String getPublicationState() {
+    return publicationState;
+  }
+
+  public void setPublicationState(String publicationState) {
+    this.publicationState = publicationState;
   }
 }

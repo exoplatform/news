@@ -25,14 +25,12 @@
     <skin-name>Default</skin-name>
     <skin-module>news</skin-module>
     <css-path>/css/news.css</css-path>
-    <css-priority>1</css-priority>
   </portal-skin>
 
   <portal-skin>
     <skin-name>Enterprise</skin-name>
     <skin-module>news</skin-module>
     <css-path>/css/news.css</css-path>
-    <css-priority>1</css-priority>
   </portal-skin>
 
   <module>

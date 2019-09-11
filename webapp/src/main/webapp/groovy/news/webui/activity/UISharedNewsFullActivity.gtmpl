@@ -129,7 +129,7 @@ if (activity && news) {
                  </div>
               <% } %>
 
-              <div id="newsBody" class="newsBody" class="fullDetailsBody">
+              <div id="newsBody" class="newsBody" class="fullDetailsBody clearfix">
                 ${newsBody}
               </div>
             </div>

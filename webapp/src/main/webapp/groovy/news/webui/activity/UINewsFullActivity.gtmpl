@@ -94,7 +94,7 @@ if (activity && news) {
 
 <div class="activityStream uiNewsActivity" id="activityContainer${activity.id}">
   <div class="boxContainer" id="boxContainer">
-  <div id="ContextBox${activity.id}" class="uiBox contentBox">
+  <div id="ContextBox${activity.id}" class="uiBox contentBox clearfix">
     <div id="ActivityContextBox${activity.id}">
 
       <div id="newsDetails"></div>

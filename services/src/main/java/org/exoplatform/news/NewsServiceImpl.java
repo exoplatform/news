@@ -101,6 +101,10 @@ public class NewsServiceImpl implements NewsService {
 
     postNewsActivity(news);
 
+    if (news.isPinned()) {
+      pinNews(newsId);
+    }
+
     return news;
   }
 

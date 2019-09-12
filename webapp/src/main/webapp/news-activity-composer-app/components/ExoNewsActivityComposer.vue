@@ -172,12 +172,23 @@ export default {
       });
     },
     postNews: function () {
+      if(this.pinArticle === true) {
+        const confirmText = this.$t('activity.news.label.confirmPin');
+        const captionText = this.$t('activity.news.label.PinNews');
+        const confirmButton = this.$t('activity.news.confirm');
+        const cancelButton = this.$t('activity.edit.news.cancel');
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.saveNews, label : confirmButton}], captionText, confirmText, cancelButton);
+      } else {
+        this.saveNews();
+      }
+    },
+    saveNews: function () {
       const news = {
         title: this.newsActivity.title,
         summary: this.newsActivity.summary,
         body: this.newsActivity.content,
         author: eXo.env.portal.userName,
-        pinned: false,
+        pinned: this.pinArticle,
         spaceId: eXo.env.portal.spaceId
       };
 
@@ -199,6 +210,7 @@ export default {
           refreshButton.click();
         }
       });
+
     }
   }
 };

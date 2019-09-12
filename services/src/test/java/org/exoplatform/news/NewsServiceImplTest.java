@@ -365,4 +365,142 @@ public class NewsServiceImplTest {
 
   }
 
+  @Test
+  public void shouldCreateNewsAndPinIt() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager);
+    News news = new News();
+    news.setTitle("new pinned news title");
+    news.setSummary("new pinned news summary");
+    news.setBody("new pinned news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+
+    Node node = mock(Node.class);
+    Node spaceRootNode = mock(Node.class);
+    Node spaceNewsRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node newsNode = mock(Node.class);
+    Space space = mock(Space.class);
+    Identity poster = mock(Identity.class);
+    Identity spaceIdentity = mock(Identity.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
+    when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
+    when(space.getGroupId()).thenReturn("spaceTest");
+    when(session.getItem("spacesspaceTest")).thenReturn(spaceRootNode);
+    when(spaceRootNode.hasNode("News")).thenReturn(true);
+    when(spaceRootNode.getNode("News")).thenReturn(spaceNewsRootNode);
+    when(dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, "2019/8/22")).thenReturn(newsFolderNode);
+    when(newsFolderNode.addNode(anyString(), anyString())).thenReturn(newsNode);
+    when(newsNode.getUUID()).thenReturn("id123");
+    when(node.getProperty(anyString())).thenReturn(property);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
+    when(space.getPrettyName()).thenReturn("spaceTest");
+    when(identityManager.getOrCreateIdentity("space", "spaceTest", false)).thenReturn(spaceIdentity);
+    when(poster.getId()).thenReturn("root");
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doNothing().when(newsServiceSpy).pinNews("id123");
+
+    // When
+    News createdNews = newsServiceSpy.createNews(news);
+
+    // Then
+    assertNotNull(createdNews);
+    verify(newsServiceSpy, times(1)).pinNews("id123");
+  }
+
+  @Test
+  public void shouldCreateNewsWithoutPinIt() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager);
+    News news = new News();
+    news.setTitle("new pinned news title");
+    news.setSummary("new pinned news summary");
+    news.setBody("new pinned news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(false);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+
+    Node node = mock(Node.class);
+    Node spaceRootNode = mock(Node.class);
+    Node spaceNewsRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node newsNode = mock(Node.class);
+    Space space = mock(Space.class);
+    Identity poster = mock(Identity.class);
+    Identity spaceIdentity = mock(Identity.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
+    when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
+    when(space.getGroupId()).thenReturn("spaceTest");
+    when(session.getItem("spacesspaceTest")).thenReturn(spaceRootNode);
+    when(spaceRootNode.hasNode("News")).thenReturn(true);
+    when(spaceRootNode.getNode("News")).thenReturn(spaceNewsRootNode);
+    when(dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, "2019/8/22")).thenReturn(newsFolderNode);
+    when(newsFolderNode.addNode(anyString(), anyString())).thenReturn(newsNode);
+    when(newsNode.getUUID()).thenReturn("id123");
+    when(node.getProperty(anyString())).thenReturn(property);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
+    when(space.getPrettyName()).thenReturn("spaceTest");
+    when(identityManager.getOrCreateIdentity("space", "spaceTest", false)).thenReturn(spaceIdentity);
+    when(poster.getId()).thenReturn("root");
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doNothing().when(newsServiceSpy).pinNews("id123");
+
+    // When
+    News createdNews = newsServiceSpy.createNews(news);
+
+    // Then
+    assertNotNull(createdNews);
+    verify(newsServiceSpy, times(0)).pinNews("id123");
+  }
+
 }

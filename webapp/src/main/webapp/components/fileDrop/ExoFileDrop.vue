@@ -2,14 +2,14 @@
   <div class="fileDrop">
     <div class="dropZone">
       <label v-if="files.length == 0" class="dropMsg" for="uploadedFile">
-        <i class="uiIcon uiIconUpload"></i> {{ $t('activity.composer.news.label.attachFile') }}
+        <i class="uiIcon uiIconUpload"></i> {{ $t('news.composer.label.attachFile') }}
       </label>
       <input id="uploadedFile" :value="selectedFile" type="file" class="attachFile"/>
       <div v-show="error" class="uploadError alert alert-error v-content">
         {{ error }}
       </div>
       <div v-if="files.length > 0" class="abortFile pull-right">
-        <a :title="$t('activity.composer.news.btn.cancel')" class="removeButton" href="#" rel="tooltip"
+        <a :title="$t('news.composer.btn.cancel')" class="removeButton" href="#" rel="tooltip"
            data-placement="top" @click="abortUpload(files[0].name)">
           <i class="uiIconRemove"></i>
         </a>
@@ -60,19 +60,19 @@ export default {
         switch (err) {
         case 'ErrorBrowserNotSupported':
         case 'BrowserNotSupported':
-          thiss.setErrorCode('activity.composer.news.error.BrowserNotSupported');
+          thiss.setErrorCode('news.composer.error.BrowserNotSupported');
           break;
         case 'ErrorTooManyFiles':
         case 'TooManyFiles':
-          thiss.setErrorCode('activity.composer.news.error.TooManyFiles', [newsConstants.MAX_UPLOAD_FILES]);
+          thiss.setErrorCode('news.composer.error.TooManyFiles', [newsConstants.MAX_UPLOAD_FILES]);
           break;
         case 'ErrorFileTooLarge':
         case 'FileTooLarge':
-          thiss.setErrorCode('activity.composer.news.error.FileTooLarge', [newsConstants.MAX_UPLOAD_SIZE]);
+          thiss.setErrorCode('news.composer.error.FileTooLarge', [newsConstants.MAX_UPLOAD_SIZE]);
           break;
         case 'ErrorFileTypeNotAllowed':
         case 'FileTypeNotAllowed':
-          thiss.setErrorCode('activity.composer.news.error.FileTypeNotAllowed');
+          thiss.setErrorCode('news.composer.error.FileTypeNotAllowed');
           break;
         }
       },
@@ -113,7 +113,7 @@ export default {
       },
       beforeEach: function () {
         if (thiss.files.length >= newsConstants.MAX_UPLOAD_FILES) {
-          thiss.setErrorCode('activity.composer.news.error.TooManyFiles', [newsConstants.MAX_UPLOAD_FILES]);
+          thiss.setErrorCode('news.composer.error.TooManyFiles', [newsConstants.MAX_UPLOAD_FILES]);
           return false;
         }
       },

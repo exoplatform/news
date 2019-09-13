@@ -41,11 +41,11 @@ if (activity && news) {
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
 
-  def labelReadMore = _ctx.appRes("activity.news.readMore");
-  def labelWrittenBy = _ctx.appRes("activity.news.writtenBy");
-  def labelPublicationDate = _ctx.appRes("activity.news.publicationDate");
-  def labelUpdatedBy = _ctx.appRes("activity.news.lastUpdatedBy");
-  def labelUpdatedDate = _ctx.appRes("activity.news.lastUpdatedDate");
+  def labelReadMore = _ctx.appRes("news.activity.readMore");
+  def labelWrittenBy = _ctx.appRes("news.activity.writtenBy");
+  def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
+  def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
+  def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");
   def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
 

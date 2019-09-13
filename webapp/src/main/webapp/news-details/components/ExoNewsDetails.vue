@@ -17,21 +17,21 @@
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
                   <div>
-                    <span class="newsInformationLabel">{{ $t('activity.news.writtenBy') }} :</span>
+                    <span class="newsInformationLabel">{{ $t('news.activity.writtenBy') }} :</span>
                     <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName"> {{ news.authorFullName }}</a>
                   </div>
                   <div>
-                    <span class="newsInformationLabel"> {{ $t('activity.news.publicationDate') }} :</span>
+                    <span class="newsInformationLabel"> {{ $t('news.activity.publicationDate') }} :</span>
                     <span class="newsInformationValue newsPostedDate"> {{ news.postedDate }}</span>
                   </div>
                 </div>
                 <div v-if="showUpdateInfo" class="newsUpdater">
                   <div>
-                    <span class="newsInformationLabel">{{ $t('activity.news.lastUpdatedBy') }} :</span>
+                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdatedBy') }} :</span>
                     <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
                   </div>
                   <div>
-                    <span class="newsInformationLabel">{{ $t('activity.news.lastUpdatedDate') }} :</span>
+                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdatedDate') }} :</span>
                     <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
                   </div>
                 </div>

@@ -1,13 +1,13 @@
 <template>
   <div id="newsActivityEditComposer" :class="{ completeWidth: showEditNews }" class="newsComposer" >
-    <a v-show="!showEditNews" id="newsEditButton" :data-original-title="$t('activity.edit.news.edit')" class="btn"
+    <a v-show="!showEditNews" id="newsEditButton" :data-original-title="$t('news.edit.edit')" class="btn"
        rel="tooltip"
        data-placement="bottom"
        @click="clickOnEditButton">
       <i class="uiIconEdit"></i>
     </a>
     <div v-show="showEditNews" class="completeWidth">
-      <p class="createNews">{{ $t("activity.edit.news.editNews") }}</p>
+      <p class="createNews">{{ $t("news.edit.editNews") }}</p>
       <form id="newsForm" :class="newsFormExtendedClass" class="newsForm">
 
         <div class="newsFormWrapper">
@@ -15,14 +15,14 @@
             <div class="newsFormInput">
 
               <div class="formInputGroup">
-                <label class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("activity.composer.news.title") }}
+                <label class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("news.composer.title") }}
                   * : </label>
-                <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="$t('activity.composer.news.placeholderTitleInput')" class="newsFormInput" type="text">
+                <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="$t('news.composer.placeholderTitleInput')" class="newsFormInput" type="text">
               </div>
 
               <div class="formInputGroup">
-                <label class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("activity.composer.news.summary") }} : </label>
-                <textarea id="newsSummary" v-model="news.summary" :maxlength="summaryMaxLength" :placeholder="$t('activity.composer.news.placeholderSummaryInput')" class="newsFormInput" type="text"/>
+                <label class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("news.composer.summary") }} : </label>
+                <textarea id="newsSummary" v-model="news.summary" :maxlength="summaryMaxLength" :placeholder="$t('news.composer.placeholderSummaryInput')" class="newsFormInput" type="text"/>
               </div>
             </div>
 
@@ -36,13 +36,13 @@
           </div>
           <p id="UINewsSummaryDescription" class="UINewsSummaryDescription">
             <i class="uiIconInformation"></i>
-            {{ $t("activity.composer.news.summaryDescription") }}
+            {{ $t("news.composer.summaryDescription") }}
           </p>
           <div class="formInputGroup formNewsContent">
-            <label class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("activity.composer.news.content") }}
+            <label class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("news.composer.content") }}
               * : </label>
             <textarea id="newsContent" v-model="news.body"
-                      :placeholder="$t('activity.composer.news.placeholderContentInput')" type="text"
+                      :placeholder="$t('news.composer.placeholderContentInput')" type="text"
                       class="newsFormInput" name="newsContent"></textarea>
           </div>
 
@@ -50,11 +50,11 @@
           <div class="newsFormColumn newsFormInputs">
             <div class="newsFormButtons">
               <div class="newsFormActions">
-                <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("activity.edit.news.update") }}
+                <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
                 </button>
-                <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("activity.edit.news.update.post") }}
+                <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
                 </button>
-                <button id="cancelEdit" class="btn cancelEdit" @click.prevent="cancelEdit"> {{ $t("activity.edit.news.cancel") }}
+                <button id="cancelEdit" class="btn cancelEdit" @click.prevent="cancelEdit"> {{ $t("news.edit.cancel") }}
                 </button>
               </div>
             </div>

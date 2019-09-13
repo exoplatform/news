@@ -6,27 +6,27 @@
       </div>
     </transition>
 
-    <a id="newsShareButton" :data-original-title="$t('activity.news.shareNews.share')" class="btn"
+    <a id="newsShareButton" :data-original-title="$t('news.share.share')" class="btn"
        rel="tooltip"
        data-placement="bottom"
        @click="showShareNewsPopup = true">
       <i class="uiIconShare"></i>
     </a>
-    <exo-news-modal :show="showShareNewsPopup" :title="$t('activity.news.shareNews.popupTitle')" @close="closeShareNewsPopup">
+    <exo-news-modal :show="showShareNewsPopup" :title="$t('news.share.popupTitle')" @close="closeShareNewsPopup">
       <div class="newsShareForm">
         <label class="newsTitle"> {{ newsTitleUnescaped }}</label>
         <div class="shareSpaces">
-          <label class="newsShareWith">{{ $t('activity.news.shareNews.shareWith') }}
+          <label class="newsShareWith">{{ $t('news.share.shareWith') }}
             <div class="control-group">
               <div class="controls">
-                <exo-suggester v-model="spaces" :options="suggesterOptions" :source-providers="[findSpaces]" :placeholder="$t('activity.news.shareNews.spaces.placeholder')" />
+                <exo-suggester v-model="spaces" :options="suggesterOptions" :source-providers="[findSpaces]" :placeholder="$t('news.share.spaces.placeholder')" />
               </div>
             </div>
         </label></div>
-        <textarea v-model="description" :placeholder="$t('activity.news.shareNews.sharedActivityPlaceholder')" class="newsShareDescription"></textarea>
+        <textarea v-model="description" :placeholder="$t('news.share.sharedActivityPlaceholder')" class="newsShareDescription"></textarea>
         <div class="shareButtons">
-          <button :disabled="shareDisabled" class="btn btn-primary" @click="shareNews">{{ $t('activity.news.shareNews.share') }}</button>
-          <button class="btn" @click="closeShareNewsPopup">{{ $t('activity.news.shareNews.cancel') }}</button>
+          <button :disabled="shareDisabled" class="btn btn-primary" @click="shareNews">{{ $t('news.share.share') }}</button>
+          <button class="btn" @click="closeShareNewsPopup">{{ $t('news.share.cancel') }}</button>
         </div>
       </div>
     </exo-news-modal>
@@ -108,7 +108,7 @@ export default {
       newsServices.shareNews(this.newsId, this.activityId, this.description, this.spaces)
         .then(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
-          let successMessage = this.$t('activity.news.shareNews.message.success').replace('{0}', `<b>${escapedNewsTitle}</b>`);
+          let successMessage = this.$t('news.share.message.success').replace('{0}', `<b>${escapedNewsTitle}</b>`);
           successMessage += '<ul>';
           this.spaces.forEach(space => successMessage += `<li>${this.spacesItems[space]}</li>`);
           successMessage += '</ul>';
@@ -119,7 +119,7 @@ export default {
         .then(() => this.closeShareNewsPopup())
         .catch(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
-          this.message = this.$t('activity.news.shareNews.message.error').replace('{0}', `<b>${escapedNewsTitle}</b>`);
+          this.message = this.$t('news.share.message.error').replace('{0}', `<b>${escapedNewsTitle}</b>`);
           this.messageType = 'error';
           this.showMessage = true;
         });

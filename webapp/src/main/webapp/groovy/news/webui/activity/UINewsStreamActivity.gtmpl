@@ -40,7 +40,7 @@
   def labelHideAllComments = _ctx.appRes("UIActivity.label.Hide_All_Comments");
   def labelShowPreviousComments = _ctx.appRes("UIActivity.label.Show_Previous_Comments");
 
-  def labelReadMore = _ctx.appRes("activity.news.readMore");
+  def labelReadMore = _ctx.appRes("news.activity.readMore");
 
   def labelOnePersonLikeThis=_ctx.appRes("UIActivity.label.One_Person_Like_This");
   def labelTwoPersonLikeThis=_ctx.appRes("UIActivity.label.Two_Person_Like_This");
@@ -229,13 +229,13 @@
     illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
   }
 
-  def labelPin = _ctx.appRes("activity.news.label.Pin");
-  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("activity.news.label.PinNews"));
-  def labelCancelbutton = _ctx.appRes("activity.edit.news.cancel");
-  def labelConfirmButn = _ctx.appRes("activity.news.confirm");
-  def labelConfirmPin =  _ctx.appRes("activity.news.label.confirmPin");
-  def messageSuccessPin =  _ctx.appRes("activity.news.label.pin.success");
-  def messageErrorPin =  _ctx.appRes("activity.news.label.pin.error");
+  def labelPin = _ctx.appRes("news.pin.label");
+  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("news.pin.action"));
+  def labelCancelbutton = _ctx.appRes("news.edit.cancel");
+  def labelConfirmButn = _ctx.appRes("news.pin.btn.confirm");
+  def labelConfirmPin =  _ctx.appRes("news.pin.confirm");
+  def messageSuccessPin =  _ctx.appRes("news.pin.success");
+  def messageErrorPin =  _ctx.appRes("news.pin.error");
 %>
 
 <div class="activityStream uiNewsActivity" id="activityContainer${activity.id}" style="position: relative;">

@@ -4,7 +4,7 @@
       <div class="newsDetails-header">
 
         <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title"></exo-news-share-activity>
-        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId"></exo-news-activity-edit-composer>
+        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId" :show-pin-input="showPinInput"></exo-news-activity-edit-composer>
 
         <div class="newsDetails">
           <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
@@ -78,6 +78,11 @@ export default {
       default: false
     },
     showShareButton: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    showPinInput: {
       type: Boolean,
       required: false,
       default: true

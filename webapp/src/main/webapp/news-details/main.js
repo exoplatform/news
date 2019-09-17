@@ -30,10 +30,11 @@ export function init(params) {
           news: params.news,
           newsId: params.newsId,
           activityId: params.activityId,
-          showEditButton: params.showEditButton
+          showEditButton: params.showEditButton,
+          showPinInput: params.showPinInput,
         };
       },
-      template: '<exo-news-details :news="news" :news-id="newsId" :activity-id="activityId" :show-edit-button="showEditButton"></exo-news-details>',
+      template: '<exo-news-details :news="news" :news-id="newsId" :activity-id="activityId" :show-edit-button="showEditButton" :show-pin-input="showPinInput"></exo-news-details>',
       i18n
     });
   });

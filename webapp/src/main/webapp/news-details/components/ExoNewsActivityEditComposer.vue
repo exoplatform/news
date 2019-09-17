@@ -49,6 +49,12 @@
 
           <div class="newsFormColumn newsFormInputs">
             <div class="newsFormButtons">
+              <div v-if="showPinInput" class="pinArticleContent">
+                <span class="uiCheckbox">
+                  <input id="pinArticle" v-model="news.pinned" type="checkbox" class="checkbox ">
+                  <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
+                </span>
+              </div>
               <div class="newsFormActions">
                 <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
                 </button>
@@ -75,6 +81,11 @@ export default {
     activityId: {
       type: String,
       required: true
+    },
+    showPinInput: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data() {
@@ -86,7 +97,8 @@ export default {
         body: '',
         summary: '',
         illustration: [],
-        spaceId: ''
+        spaceId: '',
+        pinned: false,
       },
       originalNews: {
         id: '',
@@ -95,7 +107,8 @@ export default {
         body: '',
         summary: '',
         illustration: [],
-        spaceId: ''
+        spaceId: '',
+        pinned: false,
       },
       SMARTPHONE_LANDSCAPE_WIDTH: 768,
       titleMaxLength: 150,
@@ -108,7 +121,7 @@ export default {
   computed: {
     updateDisabled: function () {
       const emptyMandatoryFields = !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
-      const noUpdatedField = !this.illustrationChanged && this.news.title === this.originalNews.title && this.news.summary === this.originalNews.summary && this.news.body === this.originalNews.body;
+      const noUpdatedField = !this.illustrationChanged && this.news.title === this.originalNews.title && this.news.summary === this.originalNews.summary && this.news.body === this.originalNews.body && this.news.pinned === this.originalNews.pinned;
       return emptyMandatoryFields || noUpdatedField;
     }
   },
@@ -159,9 +172,7 @@ export default {
       newsServices.clickOnEditButton(this.news.id);
     },
     updateNews: function () {
-      this.doUpdateNews().then(() => {
-        document.location.reload(true);
-      });
+      this.doUpdateNews();
     },
     updateAndPostNews: function () {
       this.doUpdateNews().then(() => {
@@ -182,11 +193,23 @@ export default {
       });
     },
     doUpdateNews: function() {
+      if(this.news.pinned === true && this.news.pinned !== this.originalNews.pinned) {
+        const confirmText = this.$t('news.pin.confirm');
+        const captionText = this.$t('news.pin.action');
+        const confirmButton = this.$t('news.pin.btn.confirm');
+        const cancelButton = this.$t('news.pin.btn.cancel');
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.editNews, label : confirmButton}], captionText, confirmText, cancelButton);
+      } else {
+        this.editNews();
+      }
+    },
+    editNews: function () {
       const updatedNews = {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
-        body: this.news.body
+        body: this.news.body,
+        pinned: this.news.pinned
       };
 
       if(this.news.illustration != null && this.news.illustration.length > 0) {
@@ -196,7 +219,10 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return newsServices.updateNews(updatedNews);
+      return newsServices.updateNews(updatedNews).then(() => {
+        document.location.reload(true);
+      });
+
     },
     cancelEdit: function () {
       this.showEditNews = false;
@@ -218,6 +244,7 @@ export default {
           this.news.title = newsData.title;
           this.news.summary = newsData.summary;
           this.news.body = newsData.body;
+          this.news.pinned = newsData.pinned;
           this.originalNews = JSON.parse(JSON.stringify(this.news));
           if(newsData.illustrationURL) {
             newsServices.importFileFromUrl(newsData.illustrationURL)

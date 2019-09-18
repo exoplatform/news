@@ -17,4 +17,6 @@ public interface NewsService {
   void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception;
   
   void pinNews(String newsId) throws Exception;
+
+  void unpinNews(String newsId) throws Exception;
 }

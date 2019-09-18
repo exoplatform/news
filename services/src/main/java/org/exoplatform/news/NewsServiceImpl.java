@@ -438,4 +438,42 @@ public class NewsServiceImpl implements NewsService {
 
     return news;
   }
+
+  public void unpinNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+    News news = getNews(newsId);
+    if (news == null) {
+      throw new Exception("Unable to find a news with an id equal to: " + newsId);
+    }
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    newsNode.setProperty("exo:pinned", false);
+    newsNode.save();
+
+    Node pinnedRootNode = getPinnedNewsFolder();
+    if (pinnedRootNode == null) {
+      throw new Exception("Unable to find the root pinned folder: /Application Data/News/pinned");
+    }
+    Calendar newsCreationCalendar = Calendar.getInstance();
+    newsCreationCalendar.setTime(news.getCreationDate());
+    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(pinnedRootNode, getNodeRelativePath(newsCreationCalendar));
+    if (newsFolderNode == null) {
+      throw new Exception("Unable to find the parent node of the current pinned node");
+    }
+    Node pinnedNode = newsFolderNode.getNode(newsNode.getName());
+    if (pinnedNode == null) {
+      throw new Exception("Unable to find the current pinned node");
+    }
+    pinnedNode.remove();
+    newsFolderNode.save();
+
+  }
 }

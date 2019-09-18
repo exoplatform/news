@@ -12,7 +12,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +39,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.jaxrs.PATCH;
 
 @Path("v1/news")
 @Api(tags = "v1/news", value = "v1/news", description = "Managing news")
@@ -330,47 +330,82 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
     return Response.status(Response.Status.OK).build();
   }
-  
-  @PUT
-  @Path("{id}/pin")
+
+  @PATCH
+  @Path("{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Pin a news", httpMethod = "PUT", response = Response.class, notes = "This pins a news by updating the isPinned attribute of a news")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News pinned"),
+  @ApiOperation(value = "Update a news", httpMethod = "PATCH", response = Response.class, notes = "This updates the sent fields of a news")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
       @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to pin the news"),
+      @ApiResponse(code = 401, message = "User not authorized to update the news"),
       @ApiResponse(code = 500, message = "Internal server error") })
-  public Response pinNews(@Context HttpServletRequest request,
-                          @ApiParam(value = "Node news id", required = true) @PathParam("id") String id) {
+  public Response patchNews(@Context HttpServletRequest request,
+                            @ApiParam(value = "News id", required = true) @PathParam("id") String id,
+                            @ApiParam(value = "News", required = true) News updatedNews) {
+    if (updatedNews == null) {
+      Response.status(Response.Status.BAD_REQUEST).build();
+    }
 
     try {
       News news = newsService.getNews(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-
       String authenticatedUser = request.getRemoteUser();
       Space space = spaceService.getSpaceById(news.getSpaceId());
       if (space == null) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-      boolean canPinNews = currentIdentity.isMemberOf(space.getGroupId(), REDACTOR_MEMBERSHIP_NAME)
-          || currentIdentity.isMemberOf(space.getGroupId(), MANAGER_MEMBERSHIP_NAME)
-          || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-          || spaceService.isSuperManager(authenticatedUser);
-      if (!canPinNews) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+
+      if (updatedNews.isPinned() != news.isPinned()) {
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(space.getGroupId(), REDACTOR_MEMBERSHIP_NAME)
+            || currentIdentity.isMemberOf(space.getGroupId(), MANAGER_MEMBERSHIP_NAME)
+            || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+            || spaceService.isSuperManager(authenticatedUser);
+
+        if (!canPinOrUnpinNews) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        news.setPinned(updatedNews.isPinned());
+        if (news.isPinned()) {
+          newsService.pinNews(id);
+        } else {
+          newsService.unpinNews(id);
+        }
       }
 
-      if (!news.isPinned()) {
-        newsService.pinNews(id);
+      boolean isUpdatedTitle = (updatedNews.getTitle() != null) && !updatedNews.getTitle().equals(news.getTitle());
+      boolean isUpdatedSummary = (updatedNews.getSummary() != null) && !updatedNews.getSummary().equals(news.getSummary());
+      boolean isUpdatedBody = (updatedNews.getBody() != null) && !updatedNews.getBody().equals(news.getBody());
+      boolean isUpdatedIllustration =
+                                    (updatedNews.getUploadId() != null) && !updatedNews.getUploadId().equals(news.getUploadId());
+
+      if (isUpdatedTitle || isUpdatedSummary || isUpdatedBody || isUpdatedIllustration) {
+        if (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        if (isUpdatedTitle) {
+          news.setTitle(updatedNews.getTitle());
+        }
+        if (isUpdatedSummary) {
+          news.setSummary(updatedNews.getSummary());
+        }
+        if (isUpdatedBody) {
+          news.setBody(updatedNews.getBody());
+        }
+        if (isUpdatedIllustration) {
+          news.setUploadId(updatedNews.getUploadId());
+        }
+        newsService.updateNews(news);
       }
+
       return Response.ok().build();
 
     } catch (Exception e) {
-      LOG.error("Error when trying to pin the news " + id, e);
+      LOG.error("Error when trying to update the news " + id, e);
       return Response.serverError().build();
     }
   }

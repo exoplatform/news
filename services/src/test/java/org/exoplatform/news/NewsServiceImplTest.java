@@ -3,6 +3,8 @@ package org.exoplatform.news;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -44,7 +46,9 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -95,6 +99,9 @@ public class NewsServiceImplTest {
 
   @Mock
   HTMLUploadImageProcessor imageProcessor;
+  
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Test
   public void shouldGetNodeWhenNewsExists() throws Exception {
@@ -503,4 +510,302 @@ public class NewsServiceImplTest {
     verify(newsServiceSpy, times(0)).pinNews("id123");
   }
 
+  @Test
+  public void shouldUnPinNews() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node pinnedRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+    Node pinnedNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setSummary("unpinned summary");
+    news.setBody("unpinned body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    when(newsFolderNode.getNode("unpinned")).thenReturn(pinnedNode);
+    when(newsNode.getName()).thenReturn("unpinned");
+    // When
+    newsServiceSpy.unpinNews("id123");
+
+    // Then
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(false));
+    verify(pinnedNode, times(1)).remove();
+    verify(newsFolderNode, times(1)).save();
+
+  }
+
+  @Test
+  public void shouldNotUnPinNewsAsNewsNodeIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setSummary("unpinned summary");
+    news.setBody("unpinned body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(null);
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
+
+    newsServiceSpy.unpinNews("id123");
+
+  }
+
+  @Test
+  public void shouldNotUnPinNewsAsNewsIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Mockito.doReturn(null).when(newsServiceSpy).getNews("id123");
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find a news with an id equal to: id123");
+
+    newsServiceSpy.unpinNews("id123");
+
+  }
+
+  @Test
+  public void shouldNotUnPinNewsAsPinnedRootNodeIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node newsFolderNode = mock(Node.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setSummary("unpinned summary");
+    news.setBody("unpinned body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(null);
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find the root pinned folder: /Application Data/News/pinned");
+
+    newsServiceSpy.unpinNews("id123");
+
+  }
+
+  @Test
+  public void shouldNotUnPinNewsAsNewsFolderNodeIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+    Node pinnedRootNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setSummary("unpinned summary");
+    news.setBody("unpinned body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(null);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find the parent node of the current pinned node");
+
+    newsServiceSpy.unpinNews("id123");
+
+  }
+
+  @Test
+  public void shouldNotUnPinNewsAsPinnedNodeIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager);
+
+    NewsService newsServiceSpy = Mockito.spy(newsService);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+    Node pinnedRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setSummary("unpinned summary");
+    news.setBody("unpinned body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(newsServiceSpy).getNews("id123");
+    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    when(newsFolderNode.getNode("unpinned")).thenReturn(null);
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find the current pinned node");
+
+    newsServiceSpy.unpinNews("id123");
+
+  }
 }

@@ -1,6 +1,10 @@
 <template>
   <div id="newsActivityComposer" :class="newsFormExtendedClass" class="uiBox newsComposer">
-    <p v-show="extendedForm" class="createNews">{{ $t("news.composer.createNews") }}</p>
+    <p v-show="extendedForm" class="createNews" style="display: inline;">{{ $t("news.composer.createNews") }}</p>
+    <div class="newsDrafts">
+      <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+      <exo-news-draft v-show="extendedForm" @selectedDraft="onSelectDraft"/>
+    </div>
     <form id="newsForm" :class="newsFormExtendedClass" class="newsForm" @submit.prevent="postNews">
 
       <div class="newsFormWrapper">
@@ -42,7 +46,7 @@
 
         <div class="newsFormColumn newsFormInputs">
           <div class="newsFormButtons">
-            <div v-if="showPinInput" class="pinArticleContent">
+            <div class="pinArticleContent">
               <span class="uiCheckbox">
                 <input id="pinArticle" v-model="pinArticle" type="checkbox" class="checkbox ">
                 <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
@@ -66,33 +70,34 @@
 </template>
 
 <script>
-import * as  newsActivityComposerServices from '../newsActivityComposerServices';
+import * as newsServices from '../../services/newsServices';
 
 export default {
-  props: {
-    showPinInput: {
-      type: Boolean,
-      required: false,
-      default: true
-    }
-  },
   data() {
     return {
       newsActivity: {
+        id: '',
         title: '',
         content: '',
         summary: '',
         illustration: []
       },
+      file: {
+        src: ''
+      },
       pinArticle: false,
       SMARTPHONE_LANDSCAPE_WIDTH: 768,
       titleMaxLength: 150,
       summaryMaxLength: 1000,
-      extendedForm: false,
+      autoSaveDelay: 1000,
+      extendedForm: this.$route.hash.split('/')['1']  === 'post' || this.$route.hash.split('/')['1']  === 'draft'  ? true : false ,
       extendFormButtonClass: 'uiIconSimplePlus',
       extendFormButtonTooltip: this.$t('news.composer.moreOptions'),
       newsFormExtendedClass: '',
       newsFormContentHeight: '',
+      showDraftNews: false,
+      saveDraft : '',
+      draftSavingStatus: ''
     };
   },
   computed: {
@@ -102,6 +107,150 @@ export default {
   },
   watch: {
     extendedForm: function() {
+      this.extendForm();
+      if(this.$route.fullPath.split('/')['1']  !== 'draft'){
+        this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
+      }
+    },
+    'newsActivity.title': function() { this.autoSave(); },
+    'newsActivity.summary': function() { this.autoSave(); },
+    'newsActivity.content': function() { this.autoSave(); },
+    'newsActivity.illustration': function() { this.autoSave(); }
+  },
+  created() {
+    const textarea = document.querySelector('#activityComposerTextarea');
+    const shareButton = document.querySelector('#ShareButton');
+    if (textarea && shareButton) {
+      textarea.style.display = 'none';
+      shareButton.style.display = 'none';
+    }
+    if(this.$route.hash.split('/')['2']) {
+      this.initNewsComposerData(this.$route.hash.split('/')['2']);
+    }
+  },
+  mounted() {
+    $('[rel="tooltip"]').tooltip();
+    this.initCKEditor();
+    this.extendForm();
+  },
+  beforeDestroy() {
+    const textarea = document.querySelector('#activityComposerTextarea');
+    const shareButton = document.querySelector('#ShareButton');
+    if (textarea && shareButton) {
+      textarea.style.display = 'block';
+      shareButton.style.display = 'block';
+    }
+  },
+  methods: {
+    initCKEditor: function() {
+      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar';
+      const windowWidth = $(window).width();
+      const windowHeight = $(window).height();
+      if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
+        // Disable suggester on smart-phone landscape
+        extraPlugins = 'simpleLink,selectImage';
+      }
+
+      // this line is mandatory when a custom skin is defined
+      CKEDITOR.basePath = '/commons-extension/ckeditor/';
+      const self = this;
+      const composerInput = $('textarea#newsContent');
+      composerInput.ckeditor({
+        customConfig: '/commons-extension/ckeditorCustom/config.js',
+        extraPlugins: extraPlugins,
+        removePlugins: 'image',
+        extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
+        height: this.newsFormContentHeight ,
+        on: {
+          change: function (evt) {
+            self.newsActivity.content = evt.editor.getData();
+          }
+        }
+      });
+    },
+    autoSave: function() {
+      clearTimeout(this.saveDraft);
+      this.saveDraft = setTimeout(() => {
+        this.draftSavingStatus = this.$t('news.composer.draft.savingDraftStatus');
+        Vue.nextTick(() => this.saveNewsDraft());
+      }, this.autoSaveDelay);
+    },
+    initNewsComposerData: function(draftId) {
+      newsServices.getNewsById(draftId)
+        .then((data) => {
+          if (data.ok) {return data.json();}
+        })
+        .then(newsDraftNode => {
+          if(newsDraftNode){
+            this.newsActivity.id = newsDraftNode.id;
+            this.newsActivity.title = newsDraftNode.title;
+            this.newsActivity.content = newsDraftNode.body;
+            this.newsActivity.summary = newsDraftNode.summary;
+            CKEDITOR.instances['newsContent'].setData(newsDraftNode.body);
+            if (newsDraftNode.illustrationURL) {
+              newsServices.importFileFromUrl(newsDraftNode.illustrationURL)
+                .then(resp => resp.blob())
+                .then(fileData => {
+                  const illustrationFile = new File([fileData], `illustration${draftId}`);
+                  const fileDetails = {
+                    id: null,
+                    uploadId: null,
+                    name: illustrationFile.name,
+                    size: illustrationFile.size,
+                    src: newsDraftNode.illustrationURL,
+                    progress: null,
+                    file: illustrationFile,
+                    finished: true,
+                  };
+                  this.newsActivity.illustration.push(fileDetails);
+                });
+            }
+          } else {
+            this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
+          }
+        });
+    },
+    postNews: function () {
+      if(this.pinArticle === true) {
+        const confirmText = this.$t('news.pin.confirm');
+        const captionText = this.$t('news.pin.action');
+        const confirmButton = this.$t('news.pin.btn.confirm');
+        const cancelButton = this.$t('news.edit.cancel');
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.saveNews, label : confirmButton}], captionText, confirmText, cancelButton);
+      } else {
+        this.saveNews();
+      }
+    },
+    saveNews: function () {
+      const news = {
+        id: this.newsActivity.id,
+        title: this.newsActivity.title,
+        summary: this.newsActivity.summary,
+        body: this.newsActivity.content,
+        author: eXo.env.portal.userName,
+        pinned: this.pinArticle,
+        spaceId: eXo.env.portal.spaceId,
+        publicationState: 'published'
+      };
+
+      if(this.newsActivity.illustration.length > 0) {
+        news.uploadId = this.newsActivity.illustration[0].uploadId;
+      }
+
+      newsServices.saveNews(news).then(() => {
+        // reset form
+        this.resetNewsActivity();
+        this.$emit('deleteDraft');
+        this.extendedForm = false;
+        // refresh activity stream
+        const refreshButton = document.querySelector('.uiActivitiesDisplay #RefreshButton');
+        if (refreshButton) {
+          refreshButton.click();
+        }
+        this.$router.push({name: 'NewsComposer', params:{action : 'post'}});
+      });
+    },
+    extendForm: function(){
       this.extendFormButtonClass = this.extendedForm ? 'uiIconMinimize' : 'uiIconSimplePlus';
       this.extendFormButtonTooltip = this.extendedForm ? this.$t('news.composer.lessOptions') : this.$t('news.composer.moreOptions');
       document.getElementById('UISpaceMenu').style.display = this.extendedForm ? 'none' : '';
@@ -120,97 +269,60 @@ export default {
       this.newsFormExtendedClass = this.extendedForm ? 'extended' : '';
       this.newsFormContentHeight = this.extendedForm ? '250' : '110';
       CKEDITOR.instances['newsContent'].resize('100%', this.newsFormContentHeight);
-    }
-  },
-  created() {
-    const textarea = document.querySelector('#activityComposerTextarea');
-    const shareButton = document.querySelector('#ShareButton');
-    if (textarea && shareButton) {
-      textarea.style.display = 'none';
-      shareButton.style.display = 'none';
-    }
-  },
-  mounted() {
-    $('[rel="tooltip"]').tooltip();
-    this.initCKEditor();
-  },
-  beforeDestroy() {
-    const textarea = document.querySelector('#activityComposerTextarea');
-    const shareButton = document.querySelector('#ShareButton');
-    if (textarea && shareButton) {
-      textarea.style.display = 'block';
-      shareButton.style.display = 'block';
-    }
-  },
-  methods: {
-    initCKEditor: function () {
-      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar';
-      const windowWidth = $(window).width();
-      const windowHeight = $(window).height();
-      if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
-        // Disable suggester on smart-phone landscape
-        extraPlugins = 'simpleLink,selectImage';
-      }
-
-      // this line is mandatory when a custom skin is defined
-      CKEDITOR.basePath = '/commons-extension/ckeditor/';
-
-      const self = this;
-
-      const composerInput = $('textarea#newsContent');
-      composerInput.ckeditor({
-        customConfig: '/commons-extension/ckeditorCustom/config.js',
-        extraPlugins: extraPlugins,
-        removePlugins: 'image',
-        extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
-        height: this.newsFormContentHeight ,
-        on: {
-          change: function (evt) {
-            self.newsActivity.content = evt.editor.getData();
-          }
-        }
-      });
     },
-    postNews: function () {
-      if(this.pinArticle === true) {
-        const confirmText = this.$t('activity.news.label.confirmPin');
-        const captionText = this.$t('activity.news.label.PinNews');
-        const confirmButton = this.$t('activity.news.confirm');
-        const cancelButton = this.$t('activity.edit.news.cancel');
-        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.saveNews, label : confirmButton}], captionText, confirmText, cancelButton);
-      } else {
-        this.saveNews();
-      }
-    },
-    saveNews: function () {
+    saveNewsDraft: function () {
       const news = {
         title: this.newsActivity.title,
         summary: this.newsActivity.summary,
         body: this.newsActivity.content,
         author: eXo.env.portal.userName,
-        pinned: this.pinArticle,
-        spaceId: eXo.env.portal.spaceId
+        pinned: false,
+        spaceId: eXo.env.portal.spaceId,
+        publicationState: ''
       };
-
-      if(this.newsActivity.illustration.length > 0) {
+      if (this.newsActivity.illustration.length > 0) {
         news.uploadId = this.newsActivity.illustration[0].uploadId;
+      } else {
+        news.uploadId = '';
       }
-
-      newsActivityComposerServices.saveNews(news).then(() => {
-        // reset form
-        this.newsActivity.title = '';
-        this.newsActivity.content = '';
-        CKEDITOR.instances['newsContent'].setData('');
-        this.pinArticle = false;
-        this.extendedForm = false;
-
-        // refresh activity stream
-        const refreshButton = document.querySelector('.uiActivitiesDisplay #RefreshButton');
-        if (refreshButton) {
-          refreshButton.click();
+      const draftExists = this.$route.hash.split('/')['2'] || this.$route.fullPath.split('/')['1'] === 'draft';
+      if (draftExists) {
+        if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
+          news.id = this.newsActivity.id;
+          newsServices.updateNews(news)
+            .then(() => this.$emit('updateDraft'))
+            .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+        } else {
+          newsServices.deleteDraft(this.newsActivity.id)
+            .then(() => this.$emit('deleteDraft'))
+            .then(() => this.$router.push({name: 'NewsComposer', params: {action: 'post'}}))
+            .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         }
-      });
-
+      } else if(this.newsActivity.title || this.newsActivity.content) {
+        news.publicationState = 'draft';
+        newsServices.saveNews(news).then((createdNews) => {
+          this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: createdNews.id}});
+          this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
+          this.newsActivity.id = createdNews.id;
+          this.$emit('createDraft');
+        });
+      } else {
+        this.draftSavingStatus = '';
+      }
+    },
+    onSelectDraft: function(draftId){
+      this.resetNewsActivity();
+      this.initNewsComposerData(draftId);
+      this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: draftId}});
+    },
+    resetNewsActivity: function(){
+      this.newsActivity.id = '';
+      this.newsActivity.title = '';
+      this.newsActivity.content = '';
+      this.newsActivity.summary = '';
+      this.newsActivity.illustration = [];
+      CKEDITOR.instances['newsContent'].setData('');
+      this.pinArticle = false;
     }
   }
 };

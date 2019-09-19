@@ -2,15 +2,11 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
+import javax.jcr.*;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +15,7 @@ import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
+import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.access.PermissionType;
 import org.exoplatform.services.jcr.core.ExtendedNode;
@@ -28,6 +25,9 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
+import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
+import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -67,15 +67,24 @@ public class NewsServiceImpl implements NewsService {
   private IdentityManager identityManager;
 
   private UploadService uploadService;
-  
+
   private LinkManager linkManager;
 
   private HTMLUploadImageProcessor imageProcessor;
 
+  private PublicationService publicationService;
+
+  private PublicationManager publicationManager;
+
+  private WCMPublicationService wCMPublicationService;
+
   public NewsServiceImpl(RepositoryService repositoryService, SessionProviderService sessionProviderService,
                          NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager dataDistributionManager,
                          SpaceService spaceService, ActivityManager activityManager, IdentityManager identityManager,
-                         UploadService uploadService, HTMLUploadImageProcessor imageProcessor, LinkManager linkManager) {
+                         UploadService uploadService, HTMLUploadImageProcessor imageProcessor, LinkManager linkManager,
+                         PublicationService publicationService,
+                         PublicationManager publicationManager,
+                         WCMPublicationService wCMPublicationService) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -86,23 +95,42 @@ public class NewsServiceImpl implements NewsService {
     this.imageProcessor = imageProcessor;
     this.linkManager = linkManager;
     this.dataDistributionType = dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE);
+    this.publicationService = publicationService;
+    this.publicationManager = publicationManager;
+    this.wCMPublicationService = wCMPublicationService;
   }
 
   /**
-   * Create a News
-   * A news is composed of an activity and a CMS node containing the data
+   * Create and publish a News
+   * A news is composed of an activity and a CMS node containing the data.
+   * If the given News has an id and that a draft already exists with this id, the draft is updated and published.
    * @param news The news to create
    * @throws RepositoryException
    */
   public News createNews(News news) throws Exception {
-    String newsId = createNewsNode(news);
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
 
-    news.setId(newsId);
+    try {
+      if(news.getId() == null) {
+        news = createNewsDraft(news);
+      } else {
+        updateNews(news);
+      }
+
+      Node newsNode = session.getNodeByUUID(news.getId());
+      publicationService.changeState(newsNode, "published",  new HashMap<>());
+    } finally {
+      if(session != null) {
+        session.logout();
+      }
+    }
 
     postNewsActivity(news);
 
     if (news.isPinned()) {
-      pinNews(newsId);
+      pinNews(news.getId());
     }
 
     return news;
@@ -164,21 +192,21 @@ public class NewsServiceImpl implements NewsService {
         session.logout();
       }
     }
-	}
+  }
 
   /**
    * Pin a news
-   * 
+   *
    * @param newsId The id of the news to be pinned
    * @throws Exception
    */
   public void pinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
+            repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
     News news = getNews(newsId);
     Node newsNode = session.getNodeByUUID(newsId);
     newsNode.setProperty("exo:pinned", true);
@@ -198,17 +226,17 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Get the root folder for pinned news
-   * 
+   *
    * @return the pinned folder node
    * @throws Exception
    */
   private Node getPinnedNewsFolder() throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
+            repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
     Node applicationDataNode = (Node) session.getItem(APPLICATION_DATA_PATH);
     Node newsRootNode;
     if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
@@ -272,64 +300,66 @@ public class NewsServiceImpl implements NewsService {
   }
 
   /**
-   * Create the exo:news node in CMS
-   * @param news
-   * @return
+   * Get news drafts
+   * @param  spaceId News space
+   * @param  author News drafts author
+   * @return The news drafts
    * @throws Exception
    */
-  private String createNewsNode(News news) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+  public List<News> getNewsDrafts(String spaceId, String author) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+    List<News> newsDrafts = new ArrayList<>();
+
+    try {
+      StringBuilder sqlQuery = new StringBuilder("SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = '")
+              .append(author).append("'").append("AND exo:spaceId='").append(spaceId).append("'");
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
+      NodeIterator it = query.execute().getNodes();
+      while (it.hasNext()) {
+        Node iterNode = it.nextNode();
+        newsDrafts.add(convertNodeToNews(iterNode));
+      }
+      return (newsDrafts);
+    } catch (ItemNotFoundException e) {
+      return null;
+    } finally {
+      if(session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  /**
+   * Delete news
+   * @param newsId the news id to delete
+   * @throws Exception
+   */
+  public void deleteNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+
     Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
             repositoryService.getCurrentRepository());
 
-    Node spaceNewsRootNode = getSpaceNewsRootNode(news, session);
-
-    Calendar now = Calendar.getInstance();
-    Calendar creationCalendar;
-    if(news.getCreationDate() != null) {
-      creationCalendar = Calendar.getInstance();
-      creationCalendar.setTime(news.getCreationDate());
-    } else {
-      creationCalendar = now;
-      news.setCreationDate(now.getTime());
+    try {
+      Node node = session.getNodeByUUID(newsId);
+      node.remove();
+      session.save();
+    } finally {
+      if(session != null) {
+        session.logout();
+      }
     }
-
-    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, getNodeRelativePath(creationCalendar));
-    Node newsNode = newsFolderNode.addNode(Utils.cleanString(news.getTitle()), "exo:news");
-    newsNode.addMixin("exo:datetime");
-    newsNode.setProperty("exo:title", news.getTitle());
-    newsNode.setProperty("exo:summary", news.getSummary());
-    newsNode.setProperty("exo:body", news.getBody());
-    newsNode.setProperty("exo:author", news.getAuthor());
-    newsNode.setProperty("exo:dateCreated", creationCalendar);
-    Calendar updateCalendar;
-    if(news.getUpdateDate() != null) {
-      updateCalendar = Calendar.getInstance();
-      updateCalendar.setTime(news.getUpdateDate());
-    } else {
-      updateCalendar = now;
-      news.setUpdateDate(updateCalendar.getTime());
-    }
-    newsNode.setProperty("exo:dateModified", updateCalendar);
-    newsNode.setProperty("exo:pinned", false);
-    newsNode.setProperty("exo:spaceId", news.getSpaceId());
-
-    spaceNewsRootNode.save();
-
-    newsNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsNode, "images"));
-    newsNode.save();
-
-    if(StringUtils.isNotEmpty(news.getUploadId())) {
-      attachIllustration(newsNode, news.getUploadId());
-    }
-    return newsNode.getUUID();
   }
 
   /**
    * Post the news activity in the given space
    * @param news The news to post as an activity
    */
-  private void postNewsActivity(News news) {
+  void postNewsActivity(News news) {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), false);
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -389,8 +419,8 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  private Node getSpaceNewsRootNode(News news, Session session) throws RepositoryException {
-    Space space = spaceService.getSpaceById(news.getSpaceId());
+  private Node getSpaceNewsRootNode(String spaceId, Session session) throws RepositoryException {
+    Space space = spaceService.getSpaceById(spaceId);
     String groupPath = nodeHierarchyCreator.getJcrPath(BasePath.CMS_GROUPS_PATH);
     String spaceParentPath = groupPath + space.getGroupId();
 
@@ -439,6 +469,7 @@ public class NewsServiceImpl implements NewsService {
     return news;
   }
 
+
   public void unpinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -475,5 +506,68 @@ public class NewsServiceImpl implements NewsService {
     pinnedNode.remove();
     newsFolderNode.save();
 
+  }
+
+  /**
+   * Create the exo:news draft node in CMS
+   * @param news
+   * @return News draft id
+   * @throws Exception
+   */
+  public News createNewsDraft(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+
+    Node spaceNewsRootNode = getSpaceNewsRootNode(news.getSpaceId(), session);
+
+    Calendar creationCalendar = Calendar.getInstance();
+    if(news.getCreationDate() != null) {
+      creationCalendar.setTime(news.getCreationDate());
+    } else {
+      news.setCreationDate(creationCalendar.getTime());
+    }
+    String newsNodeName = !news.getTitle().equals("") ? news.getTitle() : "Untitled";
+    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, getNodeRelativePath(creationCalendar));
+    Node newsDraftNode = newsFolderNode.addNode(Utils.cleanName(newsNodeName).trim(), "exo:news");
+    newsDraftNode.addMixin("exo:datetime");
+    newsDraftNode.setProperty("exo:title", news.getTitle());
+    newsDraftNode.setProperty("exo:summary", news.getSummary());
+    newsDraftNode.setProperty("exo:body", news.getBody());
+    newsDraftNode.setProperty("exo:author", news.getAuthor());
+    newsDraftNode.setProperty("exo:dateCreated", creationCalendar);
+    Calendar updateCalendar = Calendar.getInstance();
+    if(news.getUpdateDate() != null) {
+      updateCalendar.setTime(news.getUpdateDate());
+    } else {
+      news.setUpdateDate(updateCalendar.getTime());
+    }
+    newsDraftNode.setProperty("exo:dateModified", updateCalendar);
+    newsDraftNode.setProperty("exo:pinned", false);
+    newsDraftNode.setProperty("exo:spaceId", news.getSpaceId());
+
+
+    Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
+    String lifecycleName = wCMPublicationService.getWebpagePublicationPlugins()
+            .get(lifecycle.getPublicationPlugin())
+            .getLifecycleName();
+    if (newsDraftNode.canAddMixin("publication:authoring")) {
+      newsDraftNode.addMixin("publication:authoring");
+      newsDraftNode.setProperty("publication:lastUser", news.getAuthor());
+      newsDraftNode.setProperty("publication:lifecycle", lifecycle.getName());
+    }
+    publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
+    publicationService.changeState(newsDraftNode, "draft",  new HashMap<>());
+
+    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
+    spaceNewsRootNode.save();
+
+    if(StringUtils.isNotEmpty(news.getUploadId())) {
+      attachIllustration(newsDraftNode, news.getUploadId());
+    }
+
+    news.setId(newsDraftNode.getUUID());
+
+    return news;
   }
 }

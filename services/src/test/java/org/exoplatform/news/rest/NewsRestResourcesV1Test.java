@@ -19,6 +19,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.core.Request;
 
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
@@ -37,6 +38,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.exoplatform.news.NewsService;
+import org.exoplatform.news.model.News;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
+
+import java.util.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsRestResourcesV1Test {
@@ -229,12 +238,11 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
-
   @Test
   public void shouldGetOKWhenPinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -288,7 +296,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNotFoundWhenNewsIsNull() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -308,7 +316,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetUnauthorizedWhenPinNewsAndUserIsNotAuthorized() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -350,7 +358,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenPatchNewsAndUserIsAuthorized() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -395,7 +403,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenUnpinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -432,5 +440,405 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
- 
+  @Test
+  public void shouldGetBadRequestWhenUpdatingNewsAndUpdatedNewsIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.updateNews(request, "1", null);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetOKWhenSavingDraftsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.createNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetOkWhenCreateNewsWithPublishedState() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setPublicationState("published");
+    news.setSpaceId("1");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.createNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotAuthorizedWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.createNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenCreatingNewsDraftAndNewsIsNull() throws Exception {
+    // Given
+    News news = new News();
+    news.setId("1");
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.createNews(request, new News());
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNewsDraftWhenNewsDraftExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotAuthorizedWhenNewsDraftExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotFoundWhenNewsDraftNotExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+  @Test
+  public void shouldGetBadRequestWhenNewsDraftIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, null);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNewsDraftListWhenNewsDraftsExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    News news2 = new News();
+    news2.setId("2");
+    news2.setSpaceId("1");
+    List<News> newsDrafts = new ArrayList<>();
+    newsDrafts.add(news);
+    newsDrafts.add(news2);
+    when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(newsDrafts);
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotAuthorizedWhenNewsDraftsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    News news2 = new News();
+    news2.setId("2");
+    news2.setSpaceId("1");
+    List<News> newsDrafts = new ArrayList<>();
+    newsDrafts.add(news);
+    newsDrafts.add(news2);
+    when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(newsDrafts);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+  @Test
+  public void shouldGetNotAuthorizedWhenNewsDraftsExistsAndUserNotExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    News news2 = new News();
+    news2.setId("2");
+    news2.setSpaceId("1");
+    List<News> newsDrafts = new ArrayList<>();
+    newsDrafts.add(news);
+    newsDrafts.add(news2);
+    when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(newsDrafts);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "", "1", "draft");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNoTFoundWhenNoDraftsExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "");
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    List<News> news = (List<News>) response.getEntity();
+    assertNull(news);
+  }
+
+  @Test
+  public void shouldDeleteNewsWhenNewsExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setAuthor("john");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldNotDeleteNewsWhenUserIsNotDraftAuthor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setAuthor("mary");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotAuthorizedWhenDeletingNewsDraftThatExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotFoundWhenDeletingNewsDraftThatNotExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenDeletingNewsDraftWithIdNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(newsService.getNews(anyString())).thenReturn(null);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request, null);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
 }

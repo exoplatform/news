@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import * as newsServices from '../newsServices.js';
+import * as newsServices from '../../services/newsServices';
 
 export default {
   props: {

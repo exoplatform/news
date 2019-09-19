@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import * as  newsServices from '../newsServices';
+import * as  newsServices from '../../services/newsServices';
 
 export default {
   props: {

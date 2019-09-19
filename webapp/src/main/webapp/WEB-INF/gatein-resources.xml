@@ -52,17 +52,6 @@
   </module>
 
   <module>
-    <name>modalComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/modalComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-  </module>
-
-  <module>
     <name>fileDropComponent</name>
     <script>
       <minify>false</minify>
@@ -97,10 +86,19 @@
       <as>$</as>
     </depends>
     <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
       <module>fileDropComponent</module>
     </depends>
     <depends>
-      <module>extensionRegistry</module>
+      <module>suggesterComponent</module>
+    </depends>
+    <depends>
+      <module>modalComponent</module>
+    </depends>
+    <depends>
+      <module>suggesterComponent</module>
     </depends>
   </module>
 
@@ -156,6 +154,17 @@
     <depends>
       <module>jquery</module>
       <as>$</as>
+    </depends>
+  </module>
+
+  <module>
+    <name>modalComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/modalComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
     </depends>
   </module>
 

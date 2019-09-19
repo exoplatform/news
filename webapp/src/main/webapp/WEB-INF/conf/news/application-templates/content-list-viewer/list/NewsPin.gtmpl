@@ -158,7 +158,7 @@
                   %>
 	                  <div class="dateAndMail">
 	                    <span class="newsDate"><i class="uiIconAppcalendar uiIconAppCalendarPortlet uiIconDefaultApp"></i>$newsPostedDate</span>
-	                    <span class="newsOwner" rel="tooltip" data-placement="bottom" title="$itemOwner"><i class="uiIconProfile uiIconDefaultApp"></i><%= _ctx.appRes("UICLVPresentation.label.postedBy") %> : $itemOwner</span>
+	                    <span class="newsOwner" rel="tooltip" data-placement="bottom" title="$itemOwner"><i class="uiIconProfile uiIconDefaultApp"></i><%= _ctx.appRes("news.activity.postedBy") %> : $itemOwner</span>
 	                  </div>
 
 	                <%

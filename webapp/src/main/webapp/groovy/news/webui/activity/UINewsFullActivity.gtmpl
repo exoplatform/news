@@ -42,7 +42,6 @@ if (activity && news) {
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
-  def labelWrittenBy = _ctx.appRes("news.activity.writtenBy");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
   def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
   def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");

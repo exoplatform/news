@@ -17,7 +17,7 @@
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
                   <div>
-                    <span class="newsInformationLabel">{{ $t('news.activity.writtenBy') }} :</span>
+                    <span class="newsInformationLabel">{{ $t('news.activity.postedBy') }} :</span>
                     <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName"> {{ news.authorFullName }}</a>
                   </div>
                   <div>

@@ -158,7 +158,7 @@ export default {
       composerInput.ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
-        removePlugins: 'image',
+        removePlugins: 'image, confirmBeforeReload',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
         height: this.newsFormContentHeight ,
         on: {

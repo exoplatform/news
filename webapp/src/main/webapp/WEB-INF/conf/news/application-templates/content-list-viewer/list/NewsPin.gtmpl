@@ -126,6 +126,11 @@
               newsTitle = StringEscapeUtils.escapeHtml(viewNode.getProperty("exo:title").getString());
             }
 
+            def newsBody = "";
+            if(viewNode.hasProperty("exo:body")) {
+              newsBody = viewNode.getProperty("exo:body").getString();
+            }
+
             def itemOwner = "";
 
             if(viewNode.hasProperty("exo:author")) {
@@ -180,9 +185,16 @@
                       <div class="summary content-display">
                   <%
                       if (itemSummaryField != null) {
+
+                        if(itemSummary != null && !itemSummary.isEmpty()) {
                   %>
-                        <p>$itemSummary</p>
+                          <p>$itemSummary</p>
                   <%
+                        } else {
+                  %>
+                          <p>$newsBody</p>
+                  <%
+                        }
                       }
                   %>
                       </div>

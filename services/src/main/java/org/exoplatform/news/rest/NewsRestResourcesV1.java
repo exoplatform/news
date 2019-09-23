@@ -202,15 +202,11 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @Path("{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Create a news",
-          httpMethod = "PUT",
-          response = Response.class,
-          notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = {
-          @ApiResponse (code = 200, message = "News updated"),
-          @ApiResponse (code = 400, message = "Invalid query input"),
-          @ApiResponse (code = 401, message = "User not authorized to update the news"),
-          @ApiResponse (code = 500, message = "Internal server error")})
+  @ApiOperation(value = "Create a news", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "User not authorized to update the news"),
+      @ApiResponse(code = 500, message = "Internal server error") })
   public Response updateNews(@Context HttpServletRequest request,
                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
                              @ApiParam(value = "News", required = true) News updatedNews) {
@@ -221,14 +217,15 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
     try {
       News news = newsService.getNews(id);
-      if(news == null) {
+      if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
       String authenticatedUser = request.getRemoteUser();
 
       Space space = spaceService.getSpaceById(news.getSpaceId());
-      if (space == null || (! spaceService.isMember(space, authenticatedUser) && ! spaceService.isSuperManager(authenticatedUser))) {
+      if (space == null
+          || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
 
@@ -236,6 +233,22 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       news.setSummary(updatedNews.getSummary());
       news.setBody(updatedNews.getBody());
       news.setUploadId(updatedNews.getUploadId());
+
+      if (updatedNews.isPinned() != news.isPinned()) {
+        org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(space.getGroupId(), REDACTOR_MEMBERSHIP_NAME)
+            || currentIdentity.isMemberOf(space.getGroupId(), MANAGER_MEMBERSHIP_NAME)
+            || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+            || spaceService.isSuperManager(authenticatedUser);
+
+        if (!canPinOrUnpinNews) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        news.setPinned(updatedNews.isPinned());
+        if (news.isPinned()) {
+          newsService.pinNews(id);
+        }
+      }
 
       newsService.updateNews(news);
 

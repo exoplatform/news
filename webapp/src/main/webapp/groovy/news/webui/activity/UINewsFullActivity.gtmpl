@@ -62,6 +62,7 @@ if (activity && news) {
   def newsBody = news.body.replaceAll("`", "\\\\`");
 
   def showEditButton = uicomponent.canEditNews(activity);
+  def showPinInput = uicomponent.canPinNews();
 
   //params for init UIActivity javascript object
   def params = """ {
@@ -81,6 +82,7 @@ if (activity && news) {
       titleLink: '${activityLink}'
     },
     showEditButton:'$showEditButton',
+    showPinInput:'$showPinInput',
     spaceURL:'$spaceURL',
     spaceGroupId: '$spaceGroupId'
   } """

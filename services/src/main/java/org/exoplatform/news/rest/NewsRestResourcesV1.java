@@ -236,10 +236,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
       if (updatedNews.isPinned() != news.isPinned()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(space.getGroupId(), REDACTOR_MEMBERSHIP_NAME)
-            || currentIdentity.isMemberOf(space.getGroupId(), MANAGER_MEMBERSHIP_NAME)
-            || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-            || spaceService.isSuperManager(authenticatedUser);
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -408,7 +405,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
                             @ApiParam(value = "News id", required = true) @PathParam("id") String id,
                             @ApiParam(value = "News", required = true) News updatedNews) {
     if (updatedNews == null) {
-      Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     try {
@@ -424,10 +421,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
 
       if (updatedNews.isPinned() != news.isPinned()) {
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(space.getGroupId(), REDACTOR_MEMBERSHIP_NAME)
-            || currentIdentity.isMemberOf(space.getGroupId(), MANAGER_MEMBERSHIP_NAME)
-            || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-            || spaceService.isSuperManager(authenticatedUser);
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();

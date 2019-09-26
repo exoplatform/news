@@ -257,6 +257,9 @@ public class NewsRestResourcesV1Test {
 
     Identity currentIdentity = new Identity("john");
     ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
+    currentIdentity.setMemberships(memberships);
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
@@ -463,6 +466,9 @@ public class NewsRestResourcesV1Test {
 
     Identity currentIdentity = new Identity("john");
     ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
+    currentIdentity.setMemberships(memberships);
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
@@ -505,6 +511,9 @@ public class NewsRestResourcesV1Test {
 
     Identity currentIdentity = new Identity("john");
     ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
+    currentIdentity.setMemberships(memberships);
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).unpinNews("id123");
@@ -514,7 +523,6 @@ public class NewsRestResourcesV1Test {
     when(space.getGroupId()).thenReturn("space");
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
-
     // When
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
@@ -527,7 +535,6 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
-    when(newsService.getNews(anyString())).thenReturn(null);
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
@@ -537,6 +544,39 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
+  public void shouldGetBadRequestWhenPatchNewsAndUpdatedNewsIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "1", null);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
+  public void shouldGetUnauthorizedWhenPatchNewsAndUSpaceIsNull() throws Exception {
+    // Given
+    News news = new News();
+    news.setId("1");
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager,activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    when(newsService.getNews("1")).thenReturn(news);
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "1", new News());
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
   @Test

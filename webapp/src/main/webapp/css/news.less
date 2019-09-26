@@ -60,6 +60,7 @@
             margin-right: 15px;
         }
       }
+
     }
 
     .confirmPinMessage {
@@ -78,6 +79,7 @@
 
     #newsActivityEditComposer {
       float: right;
+      margin-left: 10px;
 
       &.completeWidth {
         width: 100%;
@@ -91,11 +93,21 @@
       margin-left: 10px;
     }
 
-    #newsShareButton, #newsEditButton {
+    #newsShareButton, #newsEditButton, #newsPinButton {
        border: none;
        padding: 9px 10px;
        i {
           font-size: 24px;
+       }
+    }
+
+    #newsPinButton {
+       float: right;
+       .uiIconPin {
+          margin-top: 2px;
+       }
+       .uiIconPin:before {
+          content: "\eb54";
        }
     }
 
@@ -526,6 +538,7 @@
     }
 }
 
+
 /*============== Home pinned news =============== */
 
 @-webkit-keyframes fadein {
@@ -642,3 +655,4 @@
         }
     }
 }
+

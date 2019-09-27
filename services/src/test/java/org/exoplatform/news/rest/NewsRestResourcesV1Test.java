@@ -962,4 +962,97 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
+
+  @Test
+  public void shouldGetNotFoundWhenShareNewsAndNewsIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    SharedNews sharedNews = new SharedNews();
+    sharedNews.setDescription("Description of shared news");
+    sharedNews.setSpacesNames(Arrays.asList("space1"));
+    sharedNews.setActivityId("2");
+
+    // When
+    Response response = newsRestResourcesV1.shareNews(request, "2", sharedNews);
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenShareNewsAndSpacesNamesOfSharedNewsIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    News news = new News();
+    news.setId("1");
+    when(request.getRemoteUser()).thenReturn("john");
+    Mockito.doReturn(news).when(newsService).getNews("1");
+
+    // When
+    Response response = newsRestResourcesV1.shareNews(request, "1", new SharedNews());
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenShareNewsAndNSpaceIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceByPrettyName(anyString())).thenReturn(null);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    SharedNews sharedNews = new SharedNews();
+    sharedNews.setDescription("Description of shared news");
+    sharedNews.setSpacesNames(Arrays.asList("space1"));
+    sharedNews.setActivityId("2");
+
+    // When
+    Response response = newsRestResourcesV1.shareNews(request, "1", sharedNews);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetUnauthorizedWhenShareNewsAndNewsExistsAndUserIsNotMemberOfTheSpaceAndUserIsNOtSuperManager() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    when(newsService.getNews(anyString())).thenReturn(news);
+    Space space1 = new Space();
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceByPrettyName(anyString())).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    SharedNews sharedNews = new SharedNews();
+    sharedNews.setDescription("Description of shared news");
+    sharedNews.setSpacesNames(Arrays.asList("space1"));
+    sharedNews.setActivityId("2");
+
+    // When
+    Response response = newsRestResourcesV1.shareNews(request, "1", sharedNews);
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
 }

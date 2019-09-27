@@ -1,21 +1,20 @@
 package org.exoplatform.news.webui.activity;
 
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.webui.Utils;
 import org.exoplatform.social.webui.activity.BaseUIActivity;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
-import org.exoplatform.webui.event.Event;
-import org.exoplatform.webui.event.EventListener;
 
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "war:/groovy/news/webui/activity/UINewsActivity.gtmpl", events = {
     @EventConfig(listeners = BaseUIActivity.LoadLikesActionListener.class),
@@ -34,6 +33,8 @@ public class UINewsActivity extends BaseUIActivity {
   private final static String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private final static String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+
+  private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private News news;
 
@@ -59,11 +60,16 @@ public class UINewsActivity extends BaseUIActivity {
   }
 
   public boolean canEditNews(ExoSocialActivity activity) {
-    String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    String authenticatedUser = currentIdentity.getUserId();
     Identity currentUser = CommonsUtils.getService(IdentityManager.class)
-            .getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser, true);
+                                       .getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser, true);
     String authenticatedUserId = currentUser.getId();
-    return authenticatedUserId.equals(activity.getPosterId());
+    SpaceService spaceService = Utils.getSpaceService();
+    Space currentSpace = spaceService.getSpaceById(news.getSpaceId());
+    return authenticatedUserId.equals(activity.getPosterId()) || spaceService.isSuperManager(authenticatedUser)
+        || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+        || currentIdentity.isMemberOf(currentSpace.getGroupId(), MANAGER_MEMBERSHIP_NAME);
   }
 
   public boolean canPinNews(ExoSocialActivity activity) {

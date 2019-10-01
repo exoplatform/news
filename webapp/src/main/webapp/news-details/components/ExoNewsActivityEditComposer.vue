@@ -169,6 +169,9 @@ export default {
       this.showEditNews = true;
       document.querySelector('#newsShareActivity').style.display = 'none';
       document.querySelector('.newsDetails').style.display = 'none';
+      if (this.showPinInput) {
+        document.querySelector('#pinNewsActivity').style.display = 'none';
+      }
       newsServices.clickOnEditButton(this.news.id);
     },
     updateNews: function () {
@@ -228,6 +231,9 @@ export default {
       this.showEditNews = false;
       document.querySelector('#newsShareActivity').style.display = '';
       document.querySelector('.newsDetails').style.display = '';
+      if (this.showPinInput) {
+        document.querySelector('#pinNewsActivity').style.display = '';
+      }
       this.news = JSON.parse(JSON.stringify(this.originalNews));
       CKEDITOR.instances['newsContent'].setData(this.news.body);
     },

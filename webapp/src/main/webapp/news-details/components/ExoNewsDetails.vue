@@ -92,5 +92,10 @@ export default {
       showUpdateInfo: this.news.postedDate !== this.news.updatedDate,
     };
   },
+  created() {
+    if(this.showPinInput) {
+      document.querySelector('#pinNewsActivity').style.display = '';
+    }
+  }
 };
 </script>

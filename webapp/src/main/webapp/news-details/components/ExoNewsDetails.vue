@@ -4,7 +4,7 @@
       <div class="newsDetails-header">
         <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title"></exo-news-share-activity>
         <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId"></exo-news-activity-edit-composer>
-        <exo-news-pin-activity v-if="showPinInput" :news-id="newsId"></exo-news-pin-activity>
+        <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-title="news.title" :news-pinned="news.pinned"></exo-news-pin-activity>
         <div class="newsDetails">
           <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
 

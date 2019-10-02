@@ -64,6 +64,8 @@ if (activity && news) {
   def showEditButton = uicomponent.canEditNews(activity);
   def showPinInput = uicomponent.canPinNews(activity);
 
+  def isPinned = news.pinned;
+
   //params for init UIActivity javascript object
   def params = """ {
     activityId: '${activity.id}',
@@ -72,6 +74,7 @@ if (activity && news) {
       title: '${newsTitle}',
       summary: `${newsSummary}`,
       body: `${newsBody}`,
+      pinned: $isPinned,
       illustrationURL: '${illustrationURL}',
       authorFullName: '${authorFullName}',
       authorProfileURL: '${authorProfileURL}',

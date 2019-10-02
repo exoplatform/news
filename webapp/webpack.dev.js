@@ -6,7 +6,7 @@ const webpackCommonConfig = require('./webpack.common.js');
 const app = 'news';
 
 // add the server path to your server location path
-const exoServerPath = "/home/exo/Source/News/plf-enterprise-tomcat-standalone-5.3.x-20190906.145941-336/platform-5.3.x-SNAPSHOT";
+const exoServerPath = "/home/exo/integration_19_08_2019/plf_news_last/plfent-5.3.x-news-20190830.200450-286/platform-5.3.x-news-SNAPSHOT";
 
 let config = merge(webpackCommonConfig, {
   output: {

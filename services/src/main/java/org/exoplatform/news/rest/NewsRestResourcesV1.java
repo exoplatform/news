@@ -244,6 +244,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         news.setPinned(updatedNews.isPinned());
         if (news.isPinned()) {
           newsService.pinNews(id);
+        } else {
+          newsService.unpinNews(id);
         }
       }
 

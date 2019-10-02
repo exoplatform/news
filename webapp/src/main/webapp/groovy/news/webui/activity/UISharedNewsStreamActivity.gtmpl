@@ -366,6 +366,7 @@
               </div>
           </div>
         </div>
+        <div class="newsRibbon"></div>
       </div>
 			<div class="actionBar clearfix ">
 				 <% def toggleDisplayCommentAction = uicomponent.event('ToggleDisplayCommentForm', null, false);

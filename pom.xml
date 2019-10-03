@@ -40,7 +40,7 @@
   </modules>
 
   <properties>
-    <org.exoplatform.platform.version>5.3.x-SNAPSHOT</org.exoplatform.platform.version>
+    <org.exoplatform.platform.version>6.0.x-SNAPSHOT</org.exoplatform.platform.version>
     <org.exoplatform.depmgt.version>16-SNAPSHOT</org.exoplatform.depmgt.version>
   </properties>
 

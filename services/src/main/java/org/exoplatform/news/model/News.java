@@ -13,6 +13,8 @@ public class News {
 
   private String  author;
 
+  private String  authorDisplayName;
+
   private String  updater;
 
   private String  uploadId;
@@ -30,6 +32,10 @@ public class News {
   private boolean pinned;
 
   private String  spaceId;
+
+  private String  spaceDisplayName;
+
+  private String  path;
 
   private String publicationState;
 
@@ -145,6 +151,10 @@ public class News {
     this.spaceId = spaceId;
   }
 
+  public String getPath() { return path; }
+
+  public void setPath(String path) { this.path = path; }
+
   public String getPublicationState() {
     return publicationState;
   }
@@ -152,4 +162,12 @@ public class News {
   public void setPublicationState(String publicationState) {
     this.publicationState = publicationState;
   }
+
+  public String getAuthorDisplayName() { return authorDisplayName; }
+
+  public void setAuthorDisplayName(String authorDisplayName) { this.authorDisplayName = authorDisplayName; }
+
+  public String getSpaceDisplayName() { return spaceDisplayName; }
+
+  public void setSpaceDisplayName(String spaceDisplayName) { this.spaceDisplayName = spaceDisplayName; }
 }

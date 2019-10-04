@@ -3,7 +3,7 @@
     <div class="newsDetails-description">
       <div class="newsDetails-header">
         <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title"></exo-news-share-activity>
-        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId" :show-pin-input="showPinInput"></exo-news-activity-edit-composer>
+        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId"></exo-news-activity-edit-composer>
         <exo-news-pin-activity v-if="showPinInput" :news-id="newsId"></exo-news-pin-activity>
         <div class="newsDetails">
           <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
@@ -96,6 +96,19 @@ export default {
     if(this.showPinInput) {
       document.querySelector('#pinNewsActivity').style.display = '';
     }
+  },
+  mounted() {
+    window.require(['SHARED/social-ui-profile'], function(socialProfile) {
+      const labels = {
+        StatusTitle: 'Loading...',
+        Connect: 'Connect',
+        Confirm: 'Confirm',
+        CancelRequest: 'Cancel Request',
+        RemoveConnection: 'Remove Connection',
+        Ignore: 'Ignore'
+      };
+      socialProfile.initUserProfilePopup('newsDetails', labels);
+    });
   }
 };
 </script>

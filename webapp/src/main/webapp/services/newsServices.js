@@ -14,6 +14,13 @@ export function getNewsById(id) {
   });
 }
 
+export function getNews() {
+  return fetch(`${newsConstants.NEWS_API}`, {
+    credentials: 'include',
+    method: 'GET',
+  });
+}
+
 export function getNewsDrafts() {
   return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaceId=${newsConstants.SPACE_ID}&publicationState=draft`, {
     headers: {

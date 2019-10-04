@@ -139,7 +139,7 @@ export default {
   },
   methods: {
     initCKEditor: function () {
-      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar';
+      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar,font';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -155,6 +155,12 @@ export default {
         extraPlugins: extraPlugins,
         removePlugins: 'image,confirmBeforeReload',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
+        toolbar : [
+          ['FontSize'],
+          ['Bold','Italic','RemoveFormat',],
+          ['-','NumberedList','BulletedList','Blockquote'],
+          ['-','simpleLink', 'selectImage'],
+        ] ,
         height: this.newsFormContentHeight,
         autoGrow_minHeight: this.newsFormContentHeight,
         on: {

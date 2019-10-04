@@ -42,7 +42,7 @@
             <span>{{ news.summary }}</span>
           </div>
 
-          <div id="newsBody" class="newsBody fullDetailsBody clearfix">
+          <div id="newsBody" class="fullDetailsBody clearfix">
             <span v-html="news.body"></span>
           </div>
         </div>

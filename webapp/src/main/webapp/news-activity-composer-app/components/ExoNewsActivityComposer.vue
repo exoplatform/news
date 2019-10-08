@@ -46,7 +46,7 @@
 
         <div class="newsFormColumn newsFormInputs">
           <div class="newsFormButtons">
-            <div v-if="showPinInput" class="pinArticleContent">
+            <div class="pinArticleContent">
               <span class="uiCheckbox">
                 <input id="pinArticle" v-model="pinArticle" type="checkbox" class="checkbox ">
                 <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
@@ -73,13 +73,6 @@
 import * as newsServices from '../../services/newsServices';
 
 export default {
-  props: {
-    showPinInput: {
-      type: Boolean,
-      required: false,
-      default: true
-    }
-  },
   data() {
     return {
       newsActivity: {

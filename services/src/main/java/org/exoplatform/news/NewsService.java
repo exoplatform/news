@@ -3,13 +3,14 @@ package org.exoplatform.news;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.social.core.space.model.Space;
-
 import java.util.List;
 
 public interface NewsService {
   News createNews(News news) throws Exception;
 
-  News getNews(String id) throws Exception;
+  News getNewsById(String id) throws Exception;
+
+  List<News> getNews() throws Exception;
 
   void updateNews(News news) throws Exception;
 

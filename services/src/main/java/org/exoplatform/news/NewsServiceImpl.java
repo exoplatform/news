@@ -25,6 +25,8 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.ecm.utils.text.Text;
+import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
@@ -40,6 +42,14 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
+
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 /**
  * Service managing News and storing them in ECMS
@@ -142,7 +152,7 @@ public class NewsServiceImpl implements NewsService {
    * @return The news with the given id
    * @throws Exception
    */
-  public News getNews(String id) throws Exception {
+  public News getNewsById(String id) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
     Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
@@ -155,6 +165,35 @@ public class NewsServiceImpl implements NewsService {
       return null;
     } finally {
       if(session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  /**
+   * Get all news
+   * @return all news
+   * @throws Exception
+   */
+  public List<News> getNews() throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession((repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName()),
+            repositoryService.getCurrentRepository());
+    List<News> listNews = new ArrayList<>();
+
+    try {
+      StringBuilder sqlQuery  = new StringBuilder("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%'");
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
+      NodeIterator it = query.execute().getNodes();
+      while (it.hasNext()) {
+        Node iterNode = it.nextNode();
+        listNews.add(convertNodeToNews(iterNode));
+
+      }
+      return listNews;
+    } finally {
+      if(session != null)   {
         session.logout();
       }
     }
@@ -179,6 +218,7 @@ public class NewsServiceImpl implements NewsService {
         newsNode.setProperty("exo:summary", news.getSummary());
         newsNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsNode, "images"));
         newsNode.setProperty("exo:dateModified", Calendar.getInstance());
+
         if(StringUtils.isNotEmpty(news.getUploadId())) {
           attachIllustration(newsNode, news.getUploadId());
         } else if("".equals(news.getUploadId())) {
@@ -186,6 +226,8 @@ public class NewsServiceImpl implements NewsService {
         }
 
         newsNode.save();
+
+        publicationService.changeState(newsNode, "published",  new HashMap<>());
       }
     } finally {
       if(session != null) {
@@ -202,12 +244,10 @@ public class NewsServiceImpl implements NewsService {
    */
   public void pinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(
-            repositoryService.getCurrentRepository()
-                    .getConfiguration()
-                    .getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
-    News news = getNews(newsId);
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),repositoryService.getCurrentRepository());
+    News news = getNewsById(newsId);
+
+
     Node newsNode = session.getNodeByUUID(newsId);
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
@@ -222,6 +262,48 @@ public class NewsServiceImpl implements NewsService {
     }
     ((ExtendedNode) newsNode).setPermission("*:/platform/users", new String[] { PermissionType.READ });
     linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
+
+    publicationService.changeState(newsNode, "published",  new HashMap<>());
+  }
+
+  public void unpinNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+            repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+    News news = getNewsById(newsId);
+    if (news == null) {
+      throw new Exception("Unable to find a news with an id equal to: " + newsId);
+    }
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    newsNode.setProperty("exo:pinned", false);
+    ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+    newsNode.save();
+
+    Node pinnedRootNode = getPinnedNewsFolder();
+    if (pinnedRootNode == null) {
+      throw new Exception("Unable to find the root pinned folder: /Application Data/News/pinned");
+    }
+    Calendar newsCreationCalendar = Calendar.getInstance();
+    newsCreationCalendar.setTime(news.getCreationDate());
+    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(pinnedRootNode, getNodeRelativePath(newsCreationCalendar));
+    if (newsFolderNode == null) {
+      throw new Exception("Unable to find the parent node of the current pinned node");
+    }
+    Node pinnedNode = newsFolderNode.getNode(newsNode.getName());
+    if (pinnedNode == null) {
+      throw new Exception("Unable to find the current pinned node");
+    }
+    pinnedNode.remove();
+    newsFolderNode.save();
+
+    publicationService.changeState(newsNode, "published",  new HashMap<>());
   }
 
   /**
@@ -402,14 +484,14 @@ public class NewsServiceImpl implements NewsService {
       resourceNode = illustrationNode.addNode("jcr:content", "nt:resource");
     }
     resourceNode.setProperty("jcr:mimeType", uploadedResource.getMimeType());
-    resourceNode.setProperty("jcr:lastModified", Calendar.getInstance());
+    Calendar now = Calendar.getInstance();
+    resourceNode.setProperty("jcr:lastModified", now);
+    resourceNode.setProperty("exo:dateModified", now);
     String fileDiskLocation = uploadedResource.getStoreLocation();
     try(InputStream inputStream = new FileInputStream(fileDiskLocation)) {
       resourceNode.setProperty("jcr:data", inputStream);
       newsNode.save();
     }
-
-    uploadService.removeUploadResource(uploadId);
   }
 
   private void removeIllustration(Node newsNode) throws Exception {
@@ -458,56 +540,43 @@ public class NewsServiceImpl implements NewsService {
     news.setUpdateDate(node.getProperty("exo:dateModified").getDate().getTime());
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    news.setPath(getPath(node));
 
     if(node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
       news.setIllustration(bytes);
-      news.setIllustrationUpdateDate(illustrationContentNode.getProperty("jcr:lastModified").getDate().getTime());
+      news.setIllustrationUpdateDate(illustrationContentNode.getProperty("exo:dateModified").getDate().getTime());
+    }
+
+    Space space = spaceService.getSpaceById(news.getSpaceId());
+    String spaceName = space.getDisplayName();
+    news.setSpaceDisplayName(spaceName);
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
+
+    if(identity != null && identity.getProfile() != null) {
+      news.setAuthorDisplayName(identity.getProfile().getFullName());
     }
 
     return news;
   }
 
+  private String getPath(Node node) throws Exception {
+    String nodePath = null;
+    NodeLocation nodeLocation = NodeLocation.getNodeLocationByNode(node);
 
-  public void unpinNews(String newsId) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
-    News news = getNews(newsId);
-    if (news == null) {
-      throw new Exception("Unable to find a news with an id equal to: " + newsId);
+    if(nodeLocation != null) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("/")
+              .append(nodeLocation.getRepository())
+              .append("/")
+              .append(nodeLocation.getWorkspace())
+              .append(node.getPath());
+      nodePath = Text.escapeIllegalJcrChars(sb.toString());
     }
 
-    Node newsNode = session.getNodeByUUID(newsId);
-    if (newsNode == null) {
-      throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
-    }
-    newsNode.setProperty("exo:pinned", false);
-    newsNode.save();
-
-    Node pinnedRootNode = getPinnedNewsFolder();
-    if (pinnedRootNode == null) {
-      throw new Exception("Unable to find the root pinned folder: /Application Data/News/pinned");
-    }
-    Calendar newsCreationCalendar = Calendar.getInstance();
-    newsCreationCalendar.setTime(news.getCreationDate());
-    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(pinnedRootNode, getNodeRelativePath(newsCreationCalendar));
-    if (newsFolderNode == null) {
-      throw new Exception("Unable to find the parent node of the current pinned node");
-    }
-    Node pinnedNode = newsFolderNode.getNode(newsNode.getName());
-    if (pinnedNode == null) {
-      throw new Exception("Unable to find the current pinned node");
-    }
-    pinnedNode.remove();
-    newsFolderNode.save();
-
+    return nodePath;
   }
-
   /**
    * Create the exo:news draft node in CMS
    * @param news

@@ -33,6 +33,29 @@
     <css-path>/css/news.css</css-path>
   </portal-skin>
 
+  <portlet>
+    <name>News</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/news.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+    </module>
+  </portlet>
+
   <module>
     <name>suggesterComponent</name>
     <script>

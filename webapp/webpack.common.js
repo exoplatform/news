@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 
@@ -10,7 +11,8 @@ let config = {
     modalComponent :'./src/main/webapp/components/modal/main.js',
     fileDropComponent :'./src/main/webapp/components/fileDrop/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
-    newsDetails :'./src/main/webapp/news-details/main.js'
+    newsDetails :'./src/main/webapp/news-details/main.js',
+    news :'./src/main/webapp/news/main.js'
   },
   module: {
     rules: [
@@ -58,7 +60,8 @@ let config = {
   },
   plugins: [
     // we use ExtractTextWebpackPlugin to extract the css code on a css file
-    new ExtractTextWebpackPlugin('css/news.css')
+    new ExtractTextWebpackPlugin('css/news.css'),
+    new webpack.IgnorePlugin(/SHARED\/.*/)
   ]
 };
 

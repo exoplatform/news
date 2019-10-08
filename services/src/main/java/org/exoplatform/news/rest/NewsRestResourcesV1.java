@@ -1,7 +1,6 @@
 package org.exoplatform.news.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -109,6 +108,37 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @GET
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Get all news",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This gets all news accessible by the authenticated user.")
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News returned"),
+          @ApiResponse (code = 401, message = "User not authorized to get the news"),
+          @ApiResponse (code = 404, message = "News not found"),
+          @ApiResponse (code = 500, message = "Internal server error") })
+  public Response getNews() {
+    try {
+      List<News> allNews = newsService.getNews();
+      if (allNews != null) {
+        for (News newsItem : allNews) {
+          if (newsItem.getIllustration() != null && newsItem.getIllustration().length > 0) {
+            newsItem.setIllustrationURL("/portal/rest/v1/news/" + newsItem.getId() + "/illustration");
+          } else {
+            newsItem.setIllustrationURL(null);
+          }
+          newsItem.setIllustration(null);
+        }
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      return Response.ok(allNews).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news", e);
+      return Response.serverError().build();
+    }
+  }
+
   @ApiOperation(value = "Get news list",
           httpMethod = "GET",
           response = Response.class,
@@ -164,23 +194,26 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           @ApiResponse (code = 401, message = "User not authorized to get the news"),
           @ApiResponse (code = 404, message = "News not found"),
           @ApiResponse (code = 500, message = "Internal server error") })
-  public Response getNews(@Context HttpServletRequest request,
+  public Response getNewsById(@Context HttpServletRequest request,
                           @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
     try {
+
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
-      News news = newsService.getNews(id);
+      News news = newsService.getNewsById(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-      String authenticatedUser = request.getRemoteUser();
+      if(!news.isPinned()) {
+        String authenticatedUser = request.getRemoteUser();
 
-      Space space = spaceService.getSpaceById(news.getSpaceId());
-      if (space == null || (! spaceService.isMember(space, authenticatedUser) && ! spaceService.isSuperManager(authenticatedUser))) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        Space space = spaceService.getSpaceById(news.getSpaceId());
+        if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
       }
 
       if(news.getIllustration() != null && news.getIllustration().length > 0) {
@@ -216,8 +249,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
 
     try {
-      News news = newsService.getNews(id);
-      if (news == null) {
+      News news = newsService.getNewsById(id);
+      if(news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
@@ -244,8 +277,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         news.setPinned(updatedNews.isPinned());
         if (news.isPinned()) {
           newsService.pinNews(id);
-        } else {
-          newsService.unpinNews(id);
         }
       }
 
@@ -273,7 +304,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
                             @ApiParam(value = "Shared News", required = true) SharedNews sharedNews) {
 
     try {
-      News news = newsService.getNews(id);
+      News news = newsService.getNewsById(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -327,16 +358,18 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   public Response getNewsIllustration(@Context Request request,
                                       @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
     try {
-      News news = newsService.getNews(id);
+      News news = newsService.getNewsById(id);
       if (news == null || news.getIllustration() == null || news.getIllustration().length == 0) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-      String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+      if(!news.isPinned()) {
+        String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
 
-      Space space = spaceService.getSpaceById(news.getSpaceId());
-      if (space == null || (! spaceService.isMember(space, authenticatedUser) && ! spaceService.isSuperManager(authenticatedUser))) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        Space space = spaceService.getSpaceById(news.getSpaceId());
+        if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
       }
 
       EntityTag eTag = new EntityTag(String.valueOf(news.getIllustrationUpdateDate().getTime()));
@@ -373,7 +406,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
     News news;
     try {
-      news = newsService.getNews(id);
+      news = newsService.getNewsById(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -411,7 +444,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
 
     try {
-      News news = newsService.getNews(id);
+      News news = newsService.getNewsById(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -492,7 +525,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
-      News news = newsService.getNews(id);
+      News news = newsService.getNewsById(id);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }

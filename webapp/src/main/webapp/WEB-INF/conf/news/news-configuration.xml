@@ -163,7 +163,7 @@
                 </entry>
                 <entry>
                   <key><string>basePath</string></key>
-                  <value><string>detail</string></value>
+                  <value><string>news/detail</string></value>
                 </entry>
                 <entry>
                   <key><string>itemsPerPage</string></key>

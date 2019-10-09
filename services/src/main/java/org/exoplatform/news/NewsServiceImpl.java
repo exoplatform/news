@@ -123,7 +123,7 @@ public class NewsServiceImpl implements NewsService {
             repositoryService.getCurrentRepository());
 
     try {
-      if(news.getId() == null) {
+      if(StringUtils.isEmpty(news.getId())) {
         news = createNewsDraft(news);
       } else {
         updateNews(news);
@@ -227,7 +227,9 @@ public class NewsServiceImpl implements NewsService {
 
         newsNode.save();
 
-        publicationService.changeState(newsNode, "published",  new HashMap<>());
+        if("published".equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, "published", new HashMap<>());
+        }
       }
     } finally {
       if(session != null) {

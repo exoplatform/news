@@ -3,7 +3,7 @@
     <p v-show="extendedForm" class="createNews" style="display: inline;">{{ $t("news.composer.createNews") }}</p>
     <div class="newsDrafts">
       <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-      <exo-news-draft v-show="extendedForm" @selectedDraft="onSelectDraft"/>
+      <exo-news-draft v-show="extendedForm" @draftSelected="onSelectDraft"/>
     </div>
     <form id="newsForm" :class="newsFormExtendedClass" class="newsForm" @submit.prevent="postNews">
 
@@ -96,6 +96,8 @@ export default {
       newsFormExtendedClass: '',
       newsFormContentHeight: '',
       showDraftNews: false,
+      postingNews: false,
+      savingDraft: false,
       saveDraft : '',
       draftSavingStatus: ''
     };
@@ -175,8 +177,14 @@ export default {
       });
     },
     autoSave: function() {
+      // if the News is being posted, no need to autosave anymore
+      if(this.postingNews) {
+        return;
+      }
+
       clearTimeout(this.saveDraft);
       this.saveDraft = setTimeout(() => {
+        this.savingDraft = true;
         this.draftSavingStatus = this.$t('news.composer.draft.savingDraftStatus');
         Vue.nextTick(() => this.saveNewsDraft());
       }, this.autoSaveDelay);
@@ -222,12 +230,26 @@ export default {
         const captionText = this.$t('news.pin.action');
         const confirmButton = this.$t('news.pin.btn.confirm');
         const cancelButton = this.$t('news.edit.cancel');
-        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.saveNews, label : confirmButton}], captionText, confirmText, cancelButton);
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label : confirmButton}], captionText, confirmText, cancelButton);
+      } else {
+        this.doPostNews();
+      }
+    },
+    doPostNews: function () {
+      this.postingNews = true;
+      // if the News draft is being saved, we have to wait until it is done before posting the News
+      if(this.savingDraft) {
+        this.$on('draftCreated', this.saveNews);
+        this.$on('draftUpdated', this.saveNews);
       } else {
         this.saveNews();
       }
     },
     saveNews: function () {
+      clearTimeout(this.saveDraft);
+      this.$off('draftCreated', this.saveNews);
+      this.$off('draftUpdated', this.saveNews);
+
       const news = {
         id: this.newsActivity.id,
         title: this.newsActivity.title,
@@ -246,7 +268,7 @@ export default {
       newsServices.saveNews(news).then(() => {
         // reset form
         this.resetNewsActivity();
-        this.$emit('deleteDraft');
+        this.$emit('draftDeleted');
         this.extendedForm = false;
         // refresh activity stream
         const refreshButton = document.querySelector('.uiActivitiesDisplay #RefreshButton');
@@ -254,6 +276,7 @@ export default {
           refreshButton.click();
         }
         this.$router.push({name: 'NewsComposer', params:{action : 'post'}});
+        this.postingNews = false;
       });
     },
     extendForm: function(){
@@ -296,21 +319,23 @@ export default {
         if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
           news.id = this.newsActivity.id;
           newsServices.updateNews(news)
-            .then(() => this.$emit('updateDraft'))
+            .then(() => this.$emit('draftUpdated'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         } else {
           newsServices.deleteDraft(this.newsActivity.id)
-            .then(() => this.$emit('deleteDraft'))
+            .then(() => this.$emit('draftDeleted'))
             .then(() => this.$router.push({name: 'NewsComposer', params: {action: 'post'}}))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         }
+        this.savingDraft = false;
       } else if(this.newsActivity.title || this.newsActivity.content) {
         news.publicationState = 'draft';
         newsServices.saveNews(news).then((createdNews) => {
           this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: createdNews.id}});
           this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
           this.newsActivity.id = createdNews.id;
-          this.$emit('createDraft');
+          this.savingDraft = false;
+          this.$emit('draftCreated');
         });
       } else {
         this.draftSavingStatus = '';

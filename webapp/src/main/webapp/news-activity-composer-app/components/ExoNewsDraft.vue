@@ -61,9 +61,9 @@ export default {
     };
   },
   created() {
-    this.$parent.$on('createDraft', this.loadNewsDrafts);
-    this.$parent.$on('updateDraft', this.loadNewsDrafts);
-    this.$parent.$on('deleteDraft', this.loadNewsDrafts);
+    this.$parent.$on('draftCreated', this.loadNewsDrafts);
+    this.$parent.$on('draftUpdated', this.loadNewsDrafts);
+    this.$parent.$on('draftDeleted', this.loadNewsDrafts);
     this.loadNewsDrafts();
   },
   methods: {
@@ -96,7 +96,7 @@ export default {
       $('body').css({overflow:'auto'});
     },
     selectedDraft: function (draftId) {
-      this.$emit('selectedDraft', draftId);
+      this.$emit('draftSelected', draftId);
       this.closeDraftNewsDrawer();
     },
     deleteDraft: function (draftIndex) {

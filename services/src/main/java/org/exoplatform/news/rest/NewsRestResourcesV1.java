@@ -108,37 +108,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @GET
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get all news",
-          httpMethod = "GET",
-          response = Response.class,
-          notes = "This gets all news accessible by the authenticated user.")
-  @ApiResponses(value = {
-          @ApiResponse (code = 200, message = "News returned"),
-          @ApiResponse (code = 401, message = "User not authorized to get the news"),
-          @ApiResponse (code = 404, message = "News not found"),
-          @ApiResponse (code = 500, message = "Internal server error") })
-  public Response getNews() {
-    try {
-      List<News> allNews = newsService.getNews();
-      if (allNews != null) {
-        for (News newsItem : allNews) {
-          if (newsItem.getIllustration() != null && newsItem.getIllustration().length > 0) {
-            newsItem.setIllustrationURL("/portal/rest/v1/news/" + newsItem.getId() + "/illustration");
-          } else {
-            newsItem.setIllustrationURL(null);
-          }
-          newsItem.setIllustration(null);
-        }
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      return Response.ok(allNews).build();
-    } catch (Exception e) {
-      LOG.error("Error when getting the news", e);
-      return Response.serverError().build();
-    }
-  }
-
   @ApiOperation(value = "Get news list",
           httpMethod = "GET",
           response = Response.class,
@@ -152,32 +121,54 @@ public class NewsRestResourcesV1 implements ResourceContainer {
                           @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
                           @ApiParam(value = "News space id", required = true) @QueryParam("spaceId") String spaceId,
                           @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState) {
-    try {
-      String authenticatedUser = request.getRemoteUser();
+    if(StringUtils.isNotEmpty(author) && StringUtils.isNotEmpty(spaceId)) {
+      try {
+        String authenticatedUser = request.getRemoteUser();
 
-      if(StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
-
-      Space space = spaceService.getSpaceById(spaceId);
-      if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
-
-      List<News> news = new ArrayList<>();
-      if("draft".equals(publicationState)) {
-        List<News> drafts = newsService.getNewsDrafts(spaceId, author);
-        if(drafts != null) {
-          news = drafts;
+        if (StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
 
-      return Response.ok(news).build();
-    } catch (Exception e) {
-      LOG.error("Error when getting the news with params author=" + author + ", spaceId=" + spaceId + ", publicationState=" + publicationState, e);
-      return Response.serverError().build();
+        Space space = spaceService.getSpaceById(spaceId);
+        if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        List<News> news = new ArrayList<>();
+        if ("draft".equals(publicationState)) {
+          List<News> drafts = newsService.getNewsDrafts(spaceId, author);
+          if (drafts != null) {
+            news = drafts;
+          }
+        } else {
+          return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(news).build();
+      } catch (Exception e) {
+        LOG.error("Error when getting the news with params author=" + author + ", spaceId=" + spaceId + ", publicationState=" + publicationState, e);
+        return Response.serverError().build();
+      }
+    } else {
+      try {
+        List<News> allNews = newsService.getNews();
+        if (allNews != null) {
+          for (News newsItem : allNews) {
+            if (newsItem.getIllustration() != null && newsItem.getIllustration().length > 0) {
+              newsItem.setIllustrationURL("/portal/rest/v1/news/" + newsItem.getId() + "/illustration");
+            } else {
+              newsItem.setIllustrationURL(null);
+            }
+            newsItem.setIllustration(null);
+          }
+        } else {
+          return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(allNews).build();
+      } catch (Exception e) {
+        LOG.error("Error when getting the news", e);
+        return Response.serverError().build();
+      }
     }
   }
 
@@ -266,6 +257,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       news.setSummary(updatedNews.getSummary());
       news.setBody(updatedNews.getBody());
       news.setUploadId(updatedNews.getUploadId());
+      news.setPublicationState(updatedNews.getPublicationState());
 
       if (updatedNews.isPinned() != news.isPinned()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();

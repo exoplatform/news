@@ -826,7 +826,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "", "1", "draft");
+    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft");
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1065,16 +1065,9 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews()).thenReturn(allNews);
-    byte[] illustrationNews1 = news1.getIllustration();
-    byte[] illustrationNews2 = news2.getIllustration();
-    byte[] illustrationNews3 = news3.getIllustration();
-
-    illustrationNews1 = null;
-    illustrationNews2 = null;
-    illustrationNews3 = null;
 
     //When
-    Response response = newsRestResourcesV1.getNews();
+    Response response = newsRestResourcesV1.getNews(null, null, null, null);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1087,7 +1080,7 @@ public class NewsRestResourcesV1Test {
     when(newsService.getNews()).thenReturn(null);
 
     //When
-    Response response = newsRestResourcesV1.getNews();
+    Response response = newsRestResourcesV1.getNews(null, null, null, null);
 
     //Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());

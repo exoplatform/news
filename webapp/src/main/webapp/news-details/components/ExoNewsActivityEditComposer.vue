@@ -218,7 +218,8 @@ export default {
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
         body: this.news.body,
-        pinned: this.news.pinned
+        pinned: this.news.pinned,
+        publicationState: 'published'
       };
 
       if(this.news.illustration != null && this.news.illustration.length > 0) {

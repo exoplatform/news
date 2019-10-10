@@ -8,11 +8,11 @@
         </div>
       </transition>
     </div>
-    <a id="newsPinButton" :data-original-title="$t('news.pin.action')" class="btn"
+    <a id="newsPinButton" :data-original-title="pinLabel" class="btn"
        rel="tooltip"
        data-placement="bottom"
-       @click="pinNews">
-      <i class="uiIconPin"> </i>
+       @click="confirmAction">
+      <i :class="[newsPinned ? 'uiIconUnpin' : '']" class="uiIconPin" > </i>
     </a>
   </div>
 </template>
@@ -25,28 +25,58 @@ export default {
       required: false,
       default: null
     },
+    newsTitle: {
+      type: String,
+      required: true,
+      default: null
+    },
+    newsPinned: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
   },
   data() {
     return {
       showPinMessage : false,
       messagePin : '',
+      pinLabel: '',
       successPin: true,
     };
   },
+  created() {
+    if(!this.newsPinned) {
+      this.pinLabel = this.$t('news.pin.action');
+    } else {
+      this.pinLabel = this.$t('news.unpin.action');
+    }
+  },
   methods: {
-    pinNews : function() {
-      const confirmText = this.$t('news.pin.confirm');
-      const captionText = this.$t('news.pin.action');
+    confirmAction : function() {
+      let confirmText = this.$t('news.pin.confirm');
+      let captionText = this.$t('news.pin.action');
       const confirmButton = this.$t('news.pin.btn.confirm');
       const cancelButton = this.$t('news.pin.btn.cancel');
-      eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.pinActivity, label : confirmButton}], captionText, confirmText, cancelButton);
+      if(this.newsPinned === true) {
+        confirmText = this.$t('news.unpin.confirm').replace('{0}', this.newsTitle);
+        captionText = this.$t('news.unpin.action');
+      }
+      eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label : confirmButton}], captionText, confirmText, cancelButton);
     },
-    pinActivity : function () {
+    updatePinnedField : function () {
       const pinMessageTime = 5000;
       const context = this;
-      const updatedNews = {
-        pinned: true,
-      };
+      let updatedNews = null;
+      if(this.newsPinned === false) {
+        updatedNews = {
+          pinned: true,
+        };
+      } else {
+        updatedNews = {
+          pinned: false,
+        };
+      }
+
       fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/${this.newsId}`,{
         headers: {
           'Content-Type': 'application/json'
@@ -56,7 +86,15 @@ export default {
         body: JSON.stringify(updatedNews)
       }).then (function() {
         context.showPinMessage = true;
-        context.messagePin = context.$t('news.pin.success');
+        if(context.newsPinned === false) {
+          context.messagePin = context.$t('news.pin.success');
+          context.pinLabel = context.$t('news.unpin.action');
+          context.newsPinned = true;
+        } else {
+          context.messagePin = context.$t('news.unpin.success');
+          context.pinLabel = context.$t('news.pin.action');
+          context.newsPinned = false;
+        }
         setTimeout(function () {
           context.showPinMessage = false;
         }, pinMessageTime);
@@ -64,7 +102,11 @@ export default {
         .catch (function() {
           context.showPinMessage = true;
           context.successPin = false;
-          context.messagePin = context.$t('news.pin.error');
+          if(context.newsPinned === false) {
+            context.messagePin = context.$t('news.pin.error');
+          } else {
+            context.messagePin = context.$t('news.unpin.error');
+          }
           setTimeout(function () {
             context.successPin = true;
             context.showPinMessage = false;

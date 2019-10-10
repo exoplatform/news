@@ -319,6 +319,51 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
+  
+  @Test
+  public void shouldGetOKWhenUpdatingAndUnpinNewsAndNewsExistsAndAndUserIsPublisher() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    News oldnews = new News();
+    oldnews.setTitle("unpinned");
+    oldnews.setSummary("unpinned summary");
+    oldnews.setBody("unpinned body");
+    oldnews.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    oldnews.setCreationDate(date1);
+    oldnews.setPinned(true);
+    oldnews.setId("id123");
+    oldnews.setSpaceId("space");
+
+    News updatedNews = new News();
+    updatedNews.setPinned(false);
+    oldnews.setTitle("pinned");
+
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
+    currentIdentity.setMemberships(memberships);
+    Space space = mock(Space.class);
+
+    Mockito.doNothing().when(newsService).unpinNews("id123");
+    Mockito.doNothing().when(newsService).updateNews(oldnews);
+    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("space");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    // When
+    Response response = newsRestResourcesV1.updateNews(request, "id123", updatedNews);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
 
   @Test
   public void shouldGetUnauthorizedWhenUpdatingAndPinNewsAndNewsExistsAndAndUserIsNotAuthorizedToPin() throws Exception {

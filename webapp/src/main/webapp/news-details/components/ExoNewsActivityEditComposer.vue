@@ -115,7 +115,7 @@ export default {
       summaryMaxLength: 1000,
       newsFormContentHeight: 330,
       showEditNews: false,
-      illustrationChanged: false
+      illustrationChanged: false,
     };
   },
   computed: {
@@ -202,11 +202,15 @@ export default {
       });
     },
     doUpdateNews: function() {
-      if(this.news.pinned === true && this.news.pinned !== this.originalNews.pinned) {
-        const confirmText = this.$t('news.pin.confirm');
-        const captionText = this.$t('news.pin.action');
+      if(this.news.pinned !== this.originalNews.pinned) {
+        let confirmText = this.$t('news.pin.confirm');
+        let captionText = this.$t('news.pin.action');
         const confirmButton = this.$t('news.pin.btn.confirm');
         const cancelButton = this.$t('news.pin.btn.cancel');
+        if(this.news.pinned === false) {
+          confirmText = this.$t('news.unpin.confirm').replace('{0}', this.news.title);
+          captionText = this.$t('news.unpin.action');
+        }
         eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.editNews, label : confirmButton}], captionText, confirmText, cancelButton);
       } else {
         this.editNews();
@@ -228,11 +232,12 @@ export default {
         // an empty uploadId means the illustration must be deleted
         updatedNews.uploadId = '';
       }
-
       return newsServices.updateNews(updatedNews).then(() => {
         document.location.reload(true);
-      });
-
+      })
+        .catch (function() {
+          document.location.reload(true);
+        });
     },
     cancelEdit: function () {
       this.showEditNews = false;

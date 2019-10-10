@@ -552,10 +552,17 @@ public class NewsServiceImpl implements NewsService {
     }
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
-    String spaceName = space.getDisplayName();
-    news.setSpaceDisplayName(spaceName);
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
+    if(space != null) {
+      String spaceName = space.getDisplayName();
+      news.setSpaceDisplayName(spaceName);
+      if(StringUtils.isNotEmpty(space.getGroupId())) {
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(space.getGroupId()
+                .split("/")[2]).append("/").append(space.getPrettyName());
+        news.setSpaceUrl(spaceUrl.toString());
+      }
+    }
 
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
     if(identity != null && identity.getProfile() != null) {
       news.setAuthorDisplayName(identity.getProfile().getFullName());
     }

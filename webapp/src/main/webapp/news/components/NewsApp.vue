@@ -14,8 +14,12 @@
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
-              <a :href="news.newsURL">{{ news.newsTitle }} </a>
+              <a :href="news.newsUrl">{{ news.newsTitle }} </a>
             </h3>
+            <div class="newsSpace">
+              <span class="newsSpaceLabel">Posted in </span>
+              <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">{{ news.spaceDisplayName }}</a>
+            </div>
           </div>
           <div class="newsItemContentDetails">
             <p class="newsSummary" v-html="news.newsText"></p>
@@ -75,7 +79,8 @@ export default {
               newsTitle: item.title,
               creationDate: newsCreatedDate,
               spaceDisplayName: item.spaceDisplayName,
-              newsURL: newsUrl,
+              spaceUrl: item.spaceUrl,
+              newsUrl: newsUrl,
               author: item.authorDisplayName,
               avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
               profileURL: `/portal/intranet/profile/${item.author}`,

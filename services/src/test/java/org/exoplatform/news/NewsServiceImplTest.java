@@ -146,7 +146,9 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(anyString())).thenReturn(node);
     when(node.getProperty(anyString())).thenReturn(property);
     when(property.getDate()).thenReturn(Calendar.getInstance());
-    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
 
     // When
     News news = newsService.getNewsById("1");
@@ -1123,6 +1125,7 @@ public class NewsServiceImplTest {
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getDisplayName()).thenReturn("Test news space");
+    when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
     when(identityManager.getOrCreateIdentity(anyString(),anyString(),anyBoolean())).thenReturn(poster);
 

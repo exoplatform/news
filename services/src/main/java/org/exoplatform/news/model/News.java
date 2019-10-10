@@ -35,6 +35,8 @@ public class News {
 
   private String  spaceDisplayName;
 
+  private String  spaceUrl;
+
   private String  path;
 
   private String publicationState;
@@ -151,6 +153,18 @@ public class News {
     this.spaceId = spaceId;
   }
 
+  public String getSpaceDisplayName() { return spaceDisplayName; }
+
+  public void setSpaceDisplayName(String spaceDisplayName) { this.spaceDisplayName = spaceDisplayName; }
+
+  public String getSpaceUrl() {
+    return spaceUrl;
+  }
+
+  public void setSpaceUrl(String spaceUrl) {
+    this.spaceUrl = spaceUrl;
+  }
+
   public String getPath() { return path; }
 
   public void setPath(String path) { this.path = path; }
@@ -166,8 +180,4 @@ public class News {
   public String getAuthorDisplayName() { return authorDisplayName; }
 
   public void setAuthorDisplayName(String authorDisplayName) { this.authorDisplayName = authorDisplayName; }
-
-  public String getSpaceDisplayName() { return spaceDisplayName; }
-
-  public void setSpaceDisplayName(String spaceDisplayName) { this.spaceDisplayName = spaceDisplayName; }
 }

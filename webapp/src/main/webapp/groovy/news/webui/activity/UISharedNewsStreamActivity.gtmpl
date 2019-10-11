@@ -163,9 +163,9 @@
    listPeopleBGClass = "displayNone";
   }
 
-  activityPostedTime = uicomponent.getPostedTimeString(_ctx, activity.postedTime);
+  activityPostedTime = uicomponent.getRelativeTimeLabel(_ctx, activity.postedTime);
   def postedTimeTooltip =	_ctx.appRes("UIActivity.label.PostedFrom").replace("{0}",activityPostedTime);
-  activityUpdatedTime =uicomponent.getPostedTimeString(_ctx,activity.updated.getTime());
+  activityUpdatedTime = uicomponent.getRelativeTimeLabel(_ctx,activity.updated.getTime());
   activityUpdatedTime =	_ctx.appRes("UIActivity.label.EditedFrom").replace("{0}",activityUpdatedTime);
   def spaceID;
   def ownerIdentity = uicomponent.ownerIdentity;
@@ -495,8 +495,8 @@
                    }
               }
 			  commentMessage = it.title;
-			  commentPostedTime = uicomponent.getPostedTimeString(_ctx, it.postedTime);
-              commentEditedTime = uicomponent.getPostedTimeString(_ctx, it.updated.getTime());
+			  commentPostedTime = uicomponent.getRelativeTimeLabel(_ctx, it.postedTime);
+        commentEditedTime = uicomponent.getRelativeTimeLabel(_ctx, it.updated.getTime());
 			  commentEditedTime = _ctx.appRes("UIActivity.label.EditedFrom").replace("{0}",commentEditedTime);
 			  commenterAvatarImgSrc = id.profile.avatarUrl;
 			  if (!commenterAvatarImgSrc) commenterAvatarImgSrc = LinkProvider.PROFILE_DEFAULT_AVATAR_URL;

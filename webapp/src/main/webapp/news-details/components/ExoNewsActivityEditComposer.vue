@@ -179,6 +179,7 @@ export default {
         document.querySelector('#pinNewsActivity').style.display = 'none';
       }
       newsServices.clickOnEditButton(this.news.id);
+      CKEDITOR.instances['newsContent'].document.$.body.innerHTML = this.news.body;
     },
     updateNews: function () {
       this.doUpdateNews();

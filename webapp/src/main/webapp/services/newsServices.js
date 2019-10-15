@@ -1,4 +1,5 @@
 import {newsConstants} from '../js/newsConstants.js';
+import anchorme from 'anchorme';
 
 export function getActivityById(id) {
   return fetch(`${newsConstants.SOCIAL_ACTIVITY_API}/${id}`, {
@@ -118,4 +119,37 @@ export function deleteDraft(newsId) {
     credentials: 'include',
     method: 'DELETE'
   });
+}
+
+export function linkify (newsSummary, newsContent) {
+  const newNewsContent = anchorme(newsContent,{
+    attributes:[
+      {
+        name:'target',
+        value:'_blank'
+      },
+    ],
+    exclude:function(UrlObj){
+      const newsBodyElem = CKEDITOR.instances['newsContent'].document.$.body;
+      const newsBodyP = newsBodyElem.querySelectorAll('p');
+      for(let indexp = 0; indexp < newsBodyP.length; indexp++) {
+        const links = newsBodyP[indexp].getElementsByTagName('a');
+        for(let index = 0; index < links.length; index++) {
+          if(links [index].innerText === UrlObj.raw) {
+            return true;
+          }
+        }
+      }
+
+    }
+  });
+  const newNewsSummary = anchorme(newsSummary,{
+    attributes:[
+      {
+        name:'target',
+        value:'_blank'
+      },
+    ]
+  });
+  return [newNewsSummary, newNewsContent];
 }

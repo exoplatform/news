@@ -256,7 +256,7 @@ export default {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
-
+      [this.newsActivity.summary, this.newsActivity.content] = newsServices.linkify(this.newsActivity.summary, this.newsActivity.content);
       const news = {
         id: this.newsActivity.id,
         title: this.newsActivity.title,

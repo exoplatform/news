@@ -186,6 +186,7 @@ export default {
     },
     updateAndPostNews: function () {
       this.doUpdateNews().then(() => {
+
         const activity = {
           id: this.activityId,
           title: '',
@@ -218,6 +219,7 @@ export default {
       }
     },
     editNews: function () {
+      [this.news.summary, this.news.body] = newsServices.linkify(this.news.summary, this.news.body);
       const updatedNews = {
         id: this.news.id,
         title: this.news.title,

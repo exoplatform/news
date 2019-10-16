@@ -37,7 +37,7 @@
           UINewsActivity.confirmAction(jElm, 'unpin');
         });
       }
-
+      $('.newsBody a').attr('target', '_blank');
     },
 
     confirmAction: function(jElm, action) {

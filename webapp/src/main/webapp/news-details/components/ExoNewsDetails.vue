@@ -109,6 +109,8 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
+    document.querySelector('#newsDetails #newsBody a').setAttribute('target', '_blank');
+
   }
 };
 </script>

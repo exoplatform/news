@@ -36,6 +36,10 @@
                   <span>{{ news.creationDate }}</span>
                 </p>
               </div>
+              <div class="share pull-right">
+                <exo-news-share-activity :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle">
+                </exo-news-share-activity>
+              </div>
             </div>
           </div>
         </div>
@@ -74,6 +78,7 @@ export default {
             const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
             const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
             result.push({
+              newsId: item.id,
               newsText: this.getNewsText(item.summary, item.body),
               newsIllustration: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
               newsTitle: item.title,

@@ -50,6 +50,9 @@
         <module>extensionRegistry</module>
       </depends>
       <depends>
+        <module>newsDetails</module>
+      </depends>
+      <depends>
         <module>jquery</module>
         <as>$</as>
       </depends>
@@ -73,6 +76,7 @@
       <module>suggester</module>
     </depends>
   </module>
+
 
   <module>
     <name>fileDropComponent</name>

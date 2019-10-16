@@ -21,12 +21,18 @@ import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
+import org.exoplatform.services.jcr.datamodel.NodeData;
+import org.exoplatform.services.jcr.impl.core.SessionImpl;
+import org.exoplatform.services.jcr.impl.core.version.VersionHistoryImpl;
+import org.exoplatform.services.jcr.impl.core.version.VersionImpl;
 import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ExtendedNode;
@@ -114,6 +120,9 @@ public class NewsServiceImplTest {
   PublicationServiceImpl publicationServiceImpl;
 
   @Mock
+  AuthoringPublicationPlugin authoringPublicationPlugin;
+
+  @Mock
   HTMLUploadImageProcessor imageProcessor;
   
   @Rule
@@ -144,6 +153,9 @@ public class NewsServiceImplTest {
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(anyString())).thenReturn(node);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(node.getSession()).thenReturn(session);
     when(node.getProperty(anyString())).thenReturn(property);
     when(property.getDate()).thenReturn(Calendar.getInstance());
     Space space = mock(Space.class);
@@ -850,10 +862,9 @@ public class NewsServiceImplTest {
     Lifecycle newsLifecycle = new Lifecycle();
     newsLifecycle.setName("newsLifecycle");
     newsLifecycle.setPublicationPlugin("Authoring publication");
-    AuthoringPublicationPlugin authoringPublicationPlugin = new AuthoringPublicationPlugin();
-    authoringPublicationPlugin.setName("Authoring publication");
-    Map<String, WebpagePublicationPlugin> publicationPlugins = new HashMap<String, WebpagePublicationPlugin>();
-    publicationPlugins.put("Authoring publication",authoringPublicationPlugin);
+    //authoringPublicationPlugin.setName("Authoring publication");
+    Map<String, WebpagePublicationPlugin> publicationPlugins = new HashMap<>();
+    publicationPlugins.put("Authoring publication", authoringPublicationPlugin);
 
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -1111,6 +1122,9 @@ public class NewsServiceImplTest {
     Node node2 = mock(Node.class);
     Node node3 = mock(Node.class);
 
+    when(node1.getSession()).thenReturn(session);
+    when(node2.getSession()).thenReturn(session);
+    when(node3.getSession()).thenReturn(session);
     when(it.nextNode()).thenReturn(node1).thenReturn(node2).thenReturn(node3);
     Property property = mock(Property.class);
     when(node1.getProperty(anyString())).thenReturn(property);
@@ -1138,7 +1152,7 @@ public class NewsServiceImplTest {
 
     // Then
     assertNotNull(newsList);
-    assertEquals(3,newsList.size());
+    assertEquals(3, newsList.size());
     verify(it, times(4)).hasNext();
     verify(it, times(3)).nextNode();
   }

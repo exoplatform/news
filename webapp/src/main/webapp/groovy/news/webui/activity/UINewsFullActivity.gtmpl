@@ -36,8 +36,11 @@ if (activity && news) {
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
   def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
-  def postedDate = LocalDateTime.ofInstant(news.creationDate.toInstant(), TimeZone.getDefault().toZoneId());
-  def newsPostedDate = postedDate.format(mediumDateFormat);
+  def newsPostedDate = "";
+  if(news.publicationDate != null) {
+    def postedDate = LocalDateTime.ofInstant(news.publicationDate.toInstant(), TimeZone.getDefault().toZoneId());
+    newsPostedDate = postedDate.format(mediumDateFormat);
+  }
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
 

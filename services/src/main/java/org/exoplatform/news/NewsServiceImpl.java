@@ -10,6 +10,7 @@ import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.cms.BasePath;
@@ -264,8 +265,6 @@ public class NewsServiceImpl implements NewsService {
     }
     ((ExtendedNode) newsNode).setPermission("*:/platform/users", new String[] { PermissionType.READ });
     linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
-
-    publicationService.changeState(newsNode, "published",  new HashMap<>());
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -304,8 +303,6 @@ public class NewsServiceImpl implements NewsService {
     }
     pinnedNode.remove();
     newsFolderNode.save();
-
-    publicationService.changeState(newsNode, "published",  new HashMap<>());
   }
 
   /**
@@ -540,6 +537,9 @@ public class NewsServiceImpl implements NewsService {
     news.setCreationDate(node.getProperty("exo:dateCreated").getDate().getTime());
     news.setUpdater(node.getProperty("exo:lastModifier").getString());
     news.setUpdateDate(node.getProperty("exo:dateModified").getDate().getTime());
+
+    news.setPublicationDate(getPublicationDate(node));
+
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     news.setPath(getPath(node));
@@ -570,22 +570,6 @@ public class NewsServiceImpl implements NewsService {
     return news;
   }
 
-  private String getPath(Node node) throws Exception {
-    String nodePath = null;
-    NodeLocation nodeLocation = NodeLocation.getNodeLocationByNode(node);
-
-    if(nodeLocation != null) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("/")
-              .append(nodeLocation.getRepository())
-              .append("/")
-              .append(nodeLocation.getWorkspace())
-              .append(node.getPath());
-      nodePath = Text.escapeIllegalJcrChars(sb.toString());
-    }
-
-    return nodePath;
-  }
   /**
    * Create the exo:news draft node in CMS
    * @param news
@@ -647,5 +631,39 @@ public class NewsServiceImpl implements NewsService {
     news.setId(newsDraftNode.getUUID());
 
     return news;
+  }
+
+  /**
+   * Return the date of the first published version of the node
+   * @param node The News node
+   * @return The first published version of the node
+   * @throws RepositoryException
+   */
+  private Date getPublicationDate(Node node) throws RepositoryException {
+    VersionNode versionNode = new VersionNode(node, node.getSession());
+    List<VersionNode> versions = versionNode.getChildren();
+    if(versions.size() > 1) {
+      versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
+      return versions.get(1).getCreatedTime().getTime();
+    }
+
+    return null;
+  }
+
+  private String getPath(Node node) throws Exception {
+    String nodePath = null;
+    NodeLocation nodeLocation = NodeLocation.getNodeLocationByNode(node);
+
+    if(nodeLocation != null) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("/")
+              .append(nodeLocation.getRepository())
+              .append("/")
+              .append(nodeLocation.getWorkspace())
+              .append(node.getPath());
+      nodePath = Text.escapeIllegalJcrChars(sb.toString());
+    }
+
+    return nodePath;
   }
 }

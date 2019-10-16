@@ -104,9 +104,11 @@
             def newsTitle = "";
             def itemLink = uicomponent.getURL(viewNode);
 
-            def itemDateCreated = viewNode.getProperty("exo:dateCreated").getDate();
-            def postedDate = LocalDateTime.ofInstant(itemDateCreated.toInstant(), TimeZone.getDefault().toZoneId());
-            def newsPostedDate = postedDate.format(mediumDateFormat);
+            def newsPostedDate = "";
+            if(viewNode.hasProperty("publication:liveDate")) {
+              def postedDate = LocalDateTime.ofInstant(viewNode.getProperty("publication:liveDate").getDate().toInstant(), TimeZone.getDefault().toZoneId());
+              newsPostedDate = postedDate.format(mediumDateFormat);
+            }
 
             def isShowImage = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_ILLUSTRATION);
             def imgSrc;

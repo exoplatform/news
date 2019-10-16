@@ -27,6 +27,8 @@ public class News {
 
   private Date    creationDate;
 
+  private Date    publicationDate;
+
   private Date    updateDate;
 
   private boolean pinned;
@@ -127,6 +129,14 @@ public class News {
 
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public Date getPublicationDate() {
+    return publicationDate;
+  }
+
+  public void setPublicationDate(Date publicationDate) {
+    this.publicationDate = publicationDate;
   }
 
   public Date getUpdateDate() {

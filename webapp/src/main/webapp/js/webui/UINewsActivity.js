@@ -120,7 +120,31 @@
             iconMessagePin.classList.remove('uiIconError');
           }, timeout);
         });
-    }
+    },
+
+    clickOnNews: function (newsId) {
+      const env = eXo.social.portal;
+      const baseRestUrl = `${env.context  }/${  env.rest  }/v1/news/${newsId}/click`;
+      $(`#seeMoreId${newsId}`).click(function () {
+        $.ajax({
+          url: baseRestUrl,
+          contentType: 'application/json',
+          type: 'POST',
+          data: JSON.stringify({'name': 'readMore'}),
+          cache: false,
+        });
+      });
+      $(`#titleId${newsId}`).click(function () {
+        $.ajax({
+          url: baseRestUrl,
+          contentType: 'application/json',
+          type: 'POST',
+          data: JSON.stringify({'name': 'title'}),
+          cache: false,
+        });
+      });
+
+    },
   };
 
   return UINewsActivity;

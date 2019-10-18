@@ -43,6 +43,8 @@ public class News {
 
   private String publicationState;
 
+  private Long    viewsCount;
+
   public String getId() {
     return id;
   }
@@ -190,4 +192,13 @@ public class News {
   public String getAuthorDisplayName() { return authorDisplayName; }
 
   public void setAuthorDisplayName(String authorDisplayName) { this.authorDisplayName = authorDisplayName; }
+
+  public Long getViewsCount() {
+    return viewsCount;
+  }
+
+  public void setViewsCount(Long viewsCount) {
+    this.viewsCount = viewsCount;
+  }
+
 }

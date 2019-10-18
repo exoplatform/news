@@ -121,6 +121,13 @@ export function deleteDraft(newsId) {
   });
 }
 
+export function incrementViewsNumberOfNews (newsId) {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}/view`, {
+    credentials: 'include',
+    method: 'POST',
+  });
+}
+
 export function linkify (newsSummary, newsContent) {
   const newNewsContent = anchorme(newsContent,{
     attributes:[

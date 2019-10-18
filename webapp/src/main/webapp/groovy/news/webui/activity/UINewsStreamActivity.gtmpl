@@ -122,7 +122,7 @@
   jsManager.require("SHARED/jquery", "jq")
            .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
            .require("SHARED/social-ui-activity", "activity").addScripts("activity.onLoad($params);")
-           .require("SHARED/social-ui-activity", "activity").addScripts("activity.clickOnNews($activity.id);")
+           .require("SHARED/NewsActivity", "newsActivity").addScripts("newsActivity.clickOnNews('$news.id');")
            .require("SHARED/NewsActivity", "newsActivity").addScripts("newsActivity.onLoad($params);");
 
   //make sures commentFormFocused is set to false to prevent any refresh to focus, only focus after post a comment
@@ -369,7 +369,7 @@
                 <img src="$illustrationURL" class="newsImage" alt="News"/>
                 <div class="newsDetails">
                     <div class="newsTitle">
-                        <a href="$activityLink" id="titleId${activity.id}">$newsTitle</a>
+                        <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
                     </div>
                     <div class="newsBody">
                          <%
@@ -384,7 +384,7 @@
                              }
                           %>
                         <% if(newsBody.length() > 300) { %>
-                            <span class="readMore"><a href="$activityLink" id="seeMoreId${activity.id}">${labelReadMore}</a></span>
+                            <span class="readMore"><a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a></span>
                         <% } %>
                     </div>
                 </div>

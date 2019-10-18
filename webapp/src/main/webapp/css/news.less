@@ -5,6 +5,7 @@
 @globalLoadingBorder: #333;
 @colorIconPrimary: @primaryColor;
 @header-popup-bg: #484848;
+@color-appNews-information: #676767;
 
 
 /*============== Activity News ====================*/
@@ -923,7 +924,7 @@
 
               }
               .newsDate {
-                color: #676767;
+                color: @color-appNews-information;
                 .iconPLFCalendar {
                   &:before {
                     content: "\e68c";
@@ -935,8 +936,15 @@
                   }
                 }
               }
+              .newsViews {
+                .viewsText {
+                  color: @color-appNews-information;
+                  font-size: 12px;
+                  padding-left: 7px;
+                }
+              }
               .newsOwner a {
-                color: #676767;
+                color: @color-appNews-information;
                 display: flex;
                 align-items: center;
                 font-size: 12px;

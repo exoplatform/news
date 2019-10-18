@@ -7,7 +7,7 @@ const app = 'news';
 
 // add the server path to your server location path
 
-const exoServerPath = "/home/thomas/exoplatform/bundles/plf-enterprise-tomcat-standalone-5.3.0-RC02/platform-5.3.0-RC02";
+const exoServerPath = "/home/exo/integration_19_08_2019/plf6/plf6/plfent-6.0.x-20191013.205148-91/platform-6.0.x-SNAPSHOT";
 
 
 let config = merge(webpackCommonConfig, {

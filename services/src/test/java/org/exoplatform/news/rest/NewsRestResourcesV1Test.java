@@ -1132,4 +1132,50 @@ public class NewsRestResourcesV1Test {
     List<News> news = (List<News>) response.getEntity();
     assertNull(news);
   }
+
+  @Test
+  public void shouldGetOKWhenViewNewsAndNewsExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setSpaceId("space1");
+    news.setViewsCount((long) 6);
+    when(newsService.getNewsById("1")).thenReturn(news);
+    Space space1 = new Space();
+    space1.setPrettyName("space1");
+    when(spaceService.getSpaceById("space1")).thenReturn(space1);
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    Mockito.doNothing().when(newsService).markAsRead(news,"john");
+
+    // When
+    Response response = newsRestResourcesV1.viewNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetNotFoundWhenViewNewsAndNewsIsNull() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 =
+                                            new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setViewsCount((long) 6);
+    when(newsService.getNewsById("1")).thenReturn(news);
+    Mockito.doNothing().when(newsService).markAsRead(news,"john");
+
+    // When
+    Response response = newsRestResourcesV1.viewNews(request, "2");
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
 }

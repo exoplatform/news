@@ -14,6 +14,8 @@ public interface NewsService {
 
   void updateNews(News news) throws Exception;
 
+  void markAsRead(News news, String userId) throws Exception;
+
   void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception;
   
   void pinNews(String newsId) throws Exception;

@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import * as  newsServices from '../../services/newsServices';
+
 export default {
 
   props: {
@@ -98,6 +100,7 @@ export default {
     }
   },
   mounted() {
+    this.updateViewsCount();
     window.require(['SHARED/social-ui-profile'], function(socialProfile) {
       const labels = {
         StatusTitle: 'Loading...',
@@ -110,7 +113,11 @@ export default {
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
     document.querySelector('#newsDetails #newsBody a').setAttribute('target', '_blank');
-
+  },
+  methods: {
+    updateViewsCount: function () {
+      newsServices.incrementViewsNumberOfNews(this.newsId);
+    }
   }
 };
 </script>

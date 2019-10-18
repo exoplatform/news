@@ -469,7 +469,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       boolean isUpdatedBody = (updatedNews.getBody() != null) && !updatedNews.getBody().equals(news.getBody());
       boolean isUpdatedIllustration =
                                     (updatedNews.getUploadId() != null) && !updatedNews.getUploadId().equals(news.getUploadId());
-
       if (isUpdatedTitle || isUpdatedSummary || isUpdatedBody || isUpdatedIllustration) {
         if (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -489,6 +488,38 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         newsService.updateNews(news);
       }
 
+      return Response.ok().build();
+
+    } catch (Exception e) {
+      LOG.error("Error when trying to update the news " + id, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @POST
+  @Path("{id}/view")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Update a news", httpMethod = "PUT", response = Response.class, notes = "This increments the views number of a news")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "User not authorized to update the news"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response viewNews(@Context HttpServletRequest request,
+                           @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+
+    try {
+      News news = newsService.getNewsById(id);
+      if (news == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+      if(!news.isPinned()) {
+        Space space = spaceService.getSpaceById(news.getSpaceId());
+        if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+      }
+      newsService.markAsRead(news, authenticatedUser);
       return Response.ok().build();
 
     } catch (Exception e) {

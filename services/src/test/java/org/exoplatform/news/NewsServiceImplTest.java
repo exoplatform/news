@@ -158,6 +158,7 @@ public class NewsServiceImplTest {
     when(node.getSession()).thenReturn(session);
     when(node.getProperty(anyString())).thenReturn(property);
     when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getLong()).thenReturn((long)10);
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
@@ -237,6 +238,7 @@ public class NewsServiceImplTest {
     news.setSummary("Updated summary");
     news.setBody("Updated body");
     news.setUploadId(null);
+    news.setViewsCount((long)10);
 
     // When
     newsService.updateNews(news);
@@ -286,6 +288,7 @@ public class NewsServiceImplTest {
     news.setSummary("Updated summary");
     news.setBody("Updated body");
     news.setUploadId("");
+    news.setViewsCount((long)10);
 
     // When
     newsService.updateNews(news);
@@ -1133,6 +1136,7 @@ public class NewsServiceImplTest {
     when(property.toString()).thenReturn("news ");
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getBoolean()).thenReturn(true);
+    when(property.getLong()).thenReturn((long)10);
     when(node1.hasNode("illustration")).thenReturn(false);
     when(node2.hasNode("illustration")).thenReturn(false);
     when(node3.hasNode("illustration")).thenReturn(false);
@@ -1198,6 +1202,182 @@ public class NewsServiceImplTest {
     assertEquals(0,newsList.size());
     verify(it, times(1)).hasNext();
     verify(it, times(0)).nextNode();
+  }
+
+  @Test
+  public void shouldIncrementViewsCountWhenUserIsNotInNewsViewers() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setId("id123");
+    news.setViewsCount((long) 5);
+    Node newsNode = mock(Node.class);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    Property property = mock(Property.class);
+    when(newsNode.hasNode("exo:viewers")).thenReturn(true);
+    when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(property.getString()).thenReturn("david,test,hedi");
+
+    // When
+    newsService.markAsRead(news, "root");
+
+    // Then
+    assertEquals(Long.valueOf(6), news.getViewsCount());
+    verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 6);
+    verify(newsNode, times(1)).setProperty("exo:viewers", "david,test,hedi,root");
+    verify(newsNode, times(1)).save();
+  }
+
+  @Test
+  public void shouldNotIncrementViewsCountWhenUserIsInNewsViewers() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setId("id123");
+    news.setViewsCount((long) 5);
+    Node newsNode = mock(Node.class);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    Property property = mock(Property.class);
+    when(newsNode.hasNode("exo:viewers")).thenReturn(true);
+    when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(property.getString()).thenReturn("david,test,hedi");
+
+    // When
+    newsService.markAsRead(news, "hedi");
+
+    // Then
+    assertEquals(Long.valueOf(5), news.getViewsCount());
+  }
+
+  @Test
+  public void shouldIncrementViewsCountWhenNewsViewersIsEmpty() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setId("id123");
+    news.setViewsCount((long) 5);
+    Node newsNode = mock(Node.class);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    Property property = mock(Property.class);
+    when(newsNode.hasNode("exo:viewers")).thenReturn(true);
+    when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(property.getString()).thenReturn("");
+
+    // When
+    newsService.markAsRead(news, "root");
+
+    // Then
+    assertEquals(Long.valueOf(6), news.getViewsCount());
+    verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 6);
+    verify(newsNode, times(1)).setProperty("exo:viewers", "root");
+    verify(newsNode, times(1)).save();
+  }
+
+  @Test
+  public void shouldIncrementViewsCountWhenNewsViewersIsEmptyAndViewsCountIsNull() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setId("id123");
+    Node newsNode = mock(Node.class);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    Property property = mock(Property.class);
+    when(newsNode.hasNode("exo:viewers")).thenReturn(true);
+    when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(property.getString()).thenReturn("");
+
+    // When
+    newsService.markAsRead(news, "root");
+
+    // Then
+    assertEquals(Long.valueOf(1), news.getViewsCount());
+    verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 1);
+    verify(newsNode, times(1)).setProperty("exo:viewers", "root");
+    verify(newsNode, times(1)).save();
   }
 
 }

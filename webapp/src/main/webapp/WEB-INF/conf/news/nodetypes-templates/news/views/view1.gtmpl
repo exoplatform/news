@@ -17,7 +17,7 @@
   import java.util.Date;
   import java.util.Comparator;
 
-  private String getProfileFullName(String userName) {
+  public String getProfileFullName(String userName) {
     String profileFullName = "";
     Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
     if(identity != null && identity.getProfile() != null) {
@@ -50,7 +50,12 @@
   def pcontext = Util.getPortalRequestContext();
 
   def newsNode = uicomponent.getNode();
-  def newsId = newsNode.getUUID();
+
+  //Retrieve the real newsId to use it in incrementing the number of views for this news
+  String uuid = newsNode.getProperty("jcr:frozenUuid").getString();
+  def originalNode = newsNode.getSession().getNodeByUUID(uuid);
+  def newsId = originalNode.getUUID();
+
   def title = newsNode.getProperty("exo:title").getString();
   def summary = newsNode.getProperty("exo:summary").getString();
   def body = newsNode.getProperty("exo:body").getString();
@@ -95,7 +100,7 @@
       postedDate: '${newsPostedDate}',
       updaterFullName: '${updaterFullName}',
       updaterProfileURL: '${updaterProfileURL}',
-      updatedDate: '${newsUpdatedDate}'
+      updatedDate: '${newsUpdatedDate}',
     },
     showEditButton: false
   } """

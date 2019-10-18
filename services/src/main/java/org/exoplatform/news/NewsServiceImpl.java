@@ -240,6 +240,57 @@ public class NewsServiceImpl implements NewsService {
   }
 
   /**
+   * Increment the number of views for a news
+   * @param userId The current user id
+   * @param news The news to be updated
+   * @throws Exception
+   */
+  public void markAsRead(News news, String userId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+
+    try {
+      Node newsNode = session.getNodeByUUID(news.getId());
+      if (newsNode == null) {
+        throw new Exception("Unable to find a node with an UUID equal to: " + news.getId());
+      }
+      if (!newsNode.hasProperty("exo:viewers")) {
+        newsNode.setProperty("exo:viewers", "");
+      }
+      String newsViewers = newsNode.getProperty("exo:viewers").getString();
+      boolean isCurrentUserInNewsViewers = false;
+      if (!newsViewers.isEmpty()) {
+        String[] newsViewersArray = newsViewers.split(",");
+        isCurrentUserInNewsViewers = Arrays.stream(newsViewersArray).anyMatch(userId::equals);
+      }
+      if (!isCurrentUserInNewsViewers) {
+        if (news.getViewsCount() == null) {
+          news.setViewsCount((long) 1);
+        } else {
+          news.setViewsCount(news.getViewsCount() + 1);
+        }
+        if (newsViewers.isEmpty()) {
+          newsViewers = newsViewers.concat(userId);
+        } else {
+          newsViewers = newsViewers.concat(",").concat(userId);
+        }
+        newsNode.setProperty("exo:viewsCount", news.getViewsCount());
+        newsNode.setProperty("exo:viewers", newsViewers);
+        newsNode.save();
+      }
+
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  /**
    * Pin a news
    *
    * @param newsId The id of the news to be pinned
@@ -543,6 +594,11 @@ public class NewsServiceImpl implements NewsService {
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     news.setPath(getPath(node));
+    if(!node.hasProperty("exo:viewsCount")) {
+      news.setViewsCount(0L);
+    } else {
+      news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
+    }
 
     if(node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
@@ -598,6 +654,8 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:body", news.getBody());
     newsDraftNode.setProperty("exo:author", news.getAuthor());
     newsDraftNode.setProperty("exo:dateCreated", creationCalendar);
+    newsDraftNode.setProperty("exo:viewsCount", 0);
+    newsDraftNode.setProperty("exo:viewers", "");
     Calendar updateCalendar = Calendar.getInstance();
     if(news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());

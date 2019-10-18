@@ -35,6 +35,10 @@
                   <i class="iconPLFCalendar"></i>
                   <span>{{ news.creationDate }}</span>
                 </p>
+                <p class="newsViews">
+                  <i class="uiIconWatch"></i>
+                  <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
+                </p>
               </div>
               <div class="share pull-right">
                 <exo-news-share-activity :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle">
@@ -89,6 +93,7 @@ export default {
               author: item.authorDisplayName,
               avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
               profileURL: `/portal/intranet/profile/${item.author}`,
+              viewsCount: item.viewsCount == null ? 0 : item.viewsCount ,
             });
 
           });
@@ -116,7 +121,7 @@ export default {
       }
 
       return text.length > this.NEWS_TEXT_MAX_LENGTH ? `${text.substring(0, this.NEWS_TEXT_MAX_LENGTH)}...` : text;
-    }
+    },
   }
 };
 </script>

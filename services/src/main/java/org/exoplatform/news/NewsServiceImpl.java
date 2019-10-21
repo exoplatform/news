@@ -564,8 +564,11 @@ public class NewsServiceImpl implements NewsService {
       if(spaceNewsRootNode.canAddMixin("exo:privilegeable")) {
         spaceNewsRootNode.addMixin("exo:privilegeable");
       }
-      ((ExtendedNode) spaceNewsRootNode).setPermission("*:/platform/administrators", PermissionType.ALL);
-      ((ExtendedNode) spaceNewsRootNode).setPermission("*:" + space.getGroupId(), PermissionType.ALL);
+      Map<String, String[]> permissions = new HashMap<>();
+      permissions.put("*:/platform/administrators", PermissionType.ALL);
+      permissions.put("*:" + space.getGroupId(), PermissionType.ALL);
+      ((ExtendedNode) spaceNewsRootNode).setPermissions(permissions);
+
       spaceRootNode.save();
     } else {
       spaceNewsRootNode = spaceRootNode.getNode(NEWS_NODES_FOLDER);

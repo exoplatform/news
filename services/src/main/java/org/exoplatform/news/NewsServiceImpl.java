@@ -183,7 +183,7 @@ public class NewsServiceImpl implements NewsService {
     List<News> listNews = new ArrayList<>();
 
     try {
-      StringBuilder sqlQuery  = new StringBuilder("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%'");
+      StringBuilder sqlQuery  = new StringBuilder("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC");
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
       NodeIterator it = query.execute().getNodes();

@@ -1114,7 +1114,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%'","sql")).thenReturn(query);
+    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC","sql")).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -1187,7 +1187,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%'","sql")).thenReturn(query);
+    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC","sql")).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);

@@ -119,6 +119,57 @@
       }
     }
   }
+    #newsShareButton, #newsEditButton, #newsPinButton {
+       border: none;
+       padding: 9px 10px;
+       i {
+          font-size: 24px;
+       }
+    }
+
+    #newsPinButton {
+       float: right;
+       .uiIconPin {
+          margin-top: 2px;
+       }
+       .uiIconPin:before {
+          content: "\eb54";
+       }
+       .uiIconUnpin:after {
+         content: "";
+         position: absolute;
+         width: 3px;
+         height: 141.421356%;
+         top: -20.710678%;
+         display: block;
+         background: #578dc9;
+         left: 50%;
+         transform: translate(-50%, 0) rotate(45deg);
+       }
+
+    }
+
+    .newsDetails {
+        .newsImage {
+           float: left;
+           max-width: 150px;
+           margin-right: 20px;
+           margin-bottom: 20px;
+           border: 1px dashed lightgray;
+         }
+        .news-top-information {
+            .news-header-content {
+                .newsTitle {
+                    .newsTitleLink {
+                        color:  @primaryColor;
+                        font-size: 16px;
+                        letter-spacing: .5px;
+                    }
+                }
+                .newsInformation {
+                    display: flex;
+                    flex-wrap: wrap;
+                    padding-left: 7px;
 
   #newsShareActivity {
     float: right;

@@ -225,6 +225,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @PUT
   @Path("{id}")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Create a news", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
@@ -274,9 +275,9 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         }
       }
 
-      newsService.updateNews(news);
+      news = newsService.updateNews(news);
 
-      return Response.ok().build();
+      return Response.ok(news).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
       return Response.serverError().build();

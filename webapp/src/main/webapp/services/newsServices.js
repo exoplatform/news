@@ -68,7 +68,7 @@ export function updateNews(news) {
     credentials: 'include',
     method: 'PUT',
     body: JSON.stringify(news)
-  });
+  }).then(resp => resp.json());
 }
 
 export function updateAndPostNewsActivity(activity) {

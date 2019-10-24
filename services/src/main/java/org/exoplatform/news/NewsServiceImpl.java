@@ -207,7 +207,7 @@ public class NewsServiceImpl implements NewsService {
    * @param news The new news
    * @throws Exception
    */
-  public void updateNews(News news) throws Exception {
+  public News updateNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
             repositoryService.getCurrentRepository());
@@ -217,7 +217,9 @@ public class NewsServiceImpl implements NewsService {
       if(newsNode != null) {
         newsNode.setProperty("exo:title", news.getTitle());
         newsNode.setProperty("exo:summary", news.getSummary());
-        newsNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsNode, "images"));
+        String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
+        news.setBody(processedBody);
+        newsNode.setProperty("exo:body", processedBody);
         newsNode.setProperty("exo:dateModified", Calendar.getInstance());
 
         if(StringUtils.isNotEmpty(news.getUploadId())) {
@@ -232,6 +234,8 @@ public class NewsServiceImpl implements NewsService {
           publicationService.changeState(newsNode, "published", new HashMap<>());
         }
       }
+
+      return news;
     } finally {
       if(session != null) {
         session.logout();
@@ -584,18 +588,18 @@ public class NewsServiceImpl implements NewsService {
     News news = new News();
 
     news.setId(node.getUUID());
-    news.setTitle(node.getProperty("exo:title").getString());
-    news.setSummary(node.getProperty("exo:summary").getString());
-    news.setBody(node.getProperty("exo:body").getString());
-    news.setAuthor(node.getProperty("exo:author").getString());
-    news.setCreationDate(node.getProperty("exo:dateCreated").getDate().getTime());
-    news.setUpdater(node.getProperty("exo:lastModifier").getString());
-    news.setUpdateDate(node.getProperty("exo:dateModified").getDate().getTime());
 
+
+    news.setTitle(getStringProperty(node, "exo:title"));
+    news.setSummary(getStringProperty(node, "exo:summary"));
+    news.setBody(getStringProperty(node, "exo:body"));
+    news.setAuthor(getStringProperty(node, "exo:author"));
+    news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
+    news.setUpdater(getStringProperty(node, "exo:lastModifier"));
+    news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPublicationDate(getPublicationDate(node));
-
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
-    news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    news.setSpaceId(getStringProperty(node, "exo:spaceId"));
     news.setPath(getPath(node));
     if(!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
@@ -627,6 +631,22 @@ public class NewsServiceImpl implements NewsService {
     }
 
     return news;
+  }
+
+  private String getStringProperty(Node node, String propertyName) throws RepositoryException {
+    if(node.hasProperty(propertyName)) {
+      return node.getProperty(propertyName).getString();
+    }
+
+    return "";
+  }
+
+  private Date getDateProperty(Node node, String propertyName) throws RepositoryException {
+    if(node.hasProperty(propertyName)) {
+      return node.getProperty(propertyName).getDate().getTime();
+    }
+
+    return null;
   }
 
   /**

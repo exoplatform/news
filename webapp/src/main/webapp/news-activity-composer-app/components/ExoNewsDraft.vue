@@ -2,7 +2,7 @@
   <div @keydown.esc="closeDraftNewsDrawer()">
     <button id="newsDraftButton"
             :disabled="newsDrafts.length == 0"
-            class="btn btn-primary"
+            class="btn"
             @click="openDraftNewsDrawer()">
       {{ $t("news.composer.draft", {0: newsDrafts.length}) }}
     </button>
@@ -93,7 +93,6 @@ export default {
         'right' : '-33%'
       });
       this.showDraftNews = false;
-      $('body').css({overflow:'auto'});
     },
     selectedDraft: function (draftId) {
       this.$emit('draftSelected', draftId);

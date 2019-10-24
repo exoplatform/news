@@ -1,20 +1,23 @@
 <template>
   <div class="fileDrop">
     <div class="dropZone">
-      <label v-if="files.length == 0" class="dropMsg" for="uploadedFile">
-        <i class="uiIcon uiIconUpload"></i> {{ $t('news.composer.label.attachFile') }}
+      <label :class="files.length >0 ? 'imageUploaded' : '' " class="dropMsg" for="uploadedFile">
+        <i class="uiIcon uiIconIllustrationUpload"></i>
+        <i class="uiIcon uiIconPlusCircled"></i>
       </label>
       <input id="uploadedFile" :value="selectedFile" type="file" class="attachFile"/>
       <div v-show="error" class="uploadError alert alert-error v-content">
         {{ error }}
       </div>
-      <div v-if="files.length > 0" class="abortFile pull-right">
-        <a :title="$t('news.composer.btn.cancel')" class="removeButton" href="#" rel="tooltip"
-           data-placement="top" @click="abortUpload(files[0].name)">
-          <i class="uiIconRemove"></i>
-        </a>
+      <div class="uploadedFile">
+        <div v-if="files.length > 0" class="abortFile">
+          <div :title="$t('news.composer.btn.cancel')" class="removeButton" href="#" rel="tooltip"
+               data-placement="top" @click="abortUpload(files[0].name)">
+            <i class="uiIconRemove"></i>
+          </div>
+        </div>
+        <img v-if="files.length > 0" :src="files[0].src">
       </div>
-      <img v-if="files.length > 0" :src="files[0].src">
     </div>
   </div>
 </template>

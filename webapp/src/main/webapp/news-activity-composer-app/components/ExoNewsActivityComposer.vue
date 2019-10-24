@@ -1,76 +1,71 @@
 <template>
   <div id="newsActivityComposer" :class="newsFormExtendedClass" class="uiBox newsComposer">
-    <p v-show="extendedForm" class="createNews" style="display: inline;">{{ $t("news.composer.createNews") }}</p>
-    <div class="newsDrafts">
-      <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-      <exo-news-draft v-show="extendedForm" @draftSelected="onSelectDraft"/>
-    </div>
-    <form id="newsForm" :class="newsFormExtendedClass" class="newsForm" @submit.prevent="postNews">
-
-      <div class="newsFormWrapper">
-        <div class="newsFormInputAttachement">
-          <div class="newsFormInput">
-
-            <div class="formInputGroup">
-              <label class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("news.composer.title") }}
-                * : </label>
-              <input id="newsTitle" v-model="newsActivity.title" :maxlength="titleMaxLength" :placeholder="$t('news.composer.placeholderTitleInput')" class="newsFormInput" type="text">
-            </div>
-
-            <div v-show="extendedForm" class="formInputGroup">
-              <label class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("news.composer.summary") }} : </label>
-              <textarea id="newsSummary" v-model="newsActivity.summary" :maxlength="summaryMaxLength" :placeholder="$t('news.composer.placeholderSummaryInput')" class="newsFormInput" type="text"/>
-            </div>
-          </div>
-
-          <div v-show="extendedForm" class="newsFormAttachement">
-            <div class="control-group attachments">
-              <div class="controls">
-                <exo-file-drop v-model="newsActivity.illustration"/>
-              </div>
-            </div>
+    <div class="newsComposerActions">
+      <div class="newsFormButtons">
+        <div class="newsFormLeftActions">
+          <a id="newsPlus" :data-original-title="extendFormButtonTooltip" :class="extendFormButtonClass"
+             rel="tooltip" data-placement="bottom"
+             @click="extendedForm = !extendedForm;">
+            {{ extendFormButtonValue }}
+            <i :class="extendFormIconClass"></i>
+          </a>
+          <div v-if="showPinInput" class="pinArticleContent">
+            <span class="uiCheckbox">
+              <input id="pinArticle" v-model="pinArticle" type="checkbox" class="checkbox ">
+              <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
+            </span>
           </div>
         </div>
-        <p v-show="extendedForm" id="UINewsSummaryDescription" class="UINewsSummaryDescription">
-          <i class="uiIconInformation"></i>
-          {{ $t("news.composer.summaryDescription") }}
-        </p>
-        <div class="formInputGroup formNewsContent">
-          <label class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("news.composer.content") }}
-            * : </label>
-          <textarea id="newsContent" v-model="newsActivity.content"
-                    :placeholder="$t('news.composer.placeholderContentInput')" type="text"
-                    class="newsFormInput" name="newsContent"></textarea>
-        </div>
-
-
-        <div class="newsFormColumn newsFormInputs">
-          <div class="newsFormButtons">
-            <div v-if="showPinInput" class="pinArticleContent">
-              <span class="uiCheckbox">
-                <input id="pinArticle" v-model="pinArticle" type="checkbox" class="checkbox ">
-                <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
-              </span>
-            </div>
-            <div class="newsFormActions">
-              <a id="newsPlus" :data-original-title="extendFormButtonTooltip" class="btn btn-primary"
-                 rel="tooltip" data-placement="bottom"
-                 @click="extendedForm = !extendedForm;">
-                <i :class="extendFormButtonClass"></i>
-              </a>
-              <button id="newsPost" :disabled="postDisabled" class="btn btn-primary"> {{ $t("news.composer.post") }}
-              </button>
-            </div>
+        <div class="newsFormRightActions">
+          <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+          <div v-show="extendedForm" class="newsDrafts">
+            <exo-news-draft @draftSelected="onSelectDraft"/>
           </div>
+          <button id="newsPost" :disabled="postDisabled" class="btn btn-primary" @click="postNews"> {{ $t("news.composer.post") }}
+          </button>
         </div>
       </div>
-
+      <div id="newsTop"></div>
+    </div>
+    <form id="newsForm" :class="newsFormExtendedClass" class="newsForm">
+      <div class="newsFormInput">
+        <div v-show="extendedForm" class="newsFormAttachment">
+          <div class="control-group attachments">
+            <div class="controls">
+              <exo-file-drop v-model="newsActivity.illustration" @change="autoSave"/>
+            </div>
+          </div>
+        </div>
+        <div class="formInputGroup newsTitle">
+          <label v-show="!extendedForm" class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("news.composer.title") }}*</label>
+          <input id="newsTitle" v-model="newsActivity.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
+        </div>
+        <div v-show="extendedForm" class="formInputGroup">
+          <label v-show="!extendedForm" class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("news.composer.summary") }}</label>
+          <textarea id="newsSummary"
+                    v-model="newsActivity.summary"
+                    :maxlength="summaryMaxLength"
+                    :placeholder="newsFormSummaryPlaceholder"
+                    class="newsFormInput">
+          </textarea>
+        </div>
+        <div class="formInputGroup">
+          <label v-show="!extendedForm" class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("news.composer.content") }}*</label>
+          <textarea id="newsContent"
+                    v-model="newsActivity.content"
+                    :placeholder="newsFormContentPlaceholder"
+                    class="newsFormInput"
+                    name="newsContent">
+          </textarea>
+        </div>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
 import * as newsServices from '../../services/newsServices';
+import autosize from 'autosize';
 
 export default {
   props: {
@@ -97,11 +92,17 @@ export default {
       titleMaxLength: 150,
       summaryMaxLength: 1000,
       autoSaveDelay: 1000,
-      extendedForm: this.$route.hash.split('/')['1']  === 'post' || this.$route.hash.split('/')['1']  === 'draft'  ? true : false ,
-      extendFormButtonClass: 'uiIconSimplePlus',
+      extendedForm: this.$route.hash.split('/')['1'] === 'post' || this.$route.hash.split('/')['1'] === 'draft' ? true : false,
+      extendFormButtonClass: 'btn btn-primary',
+      extendFormIconClass: 'uiIconSimplePlus',
       extendFormButtonTooltip: this.$t('news.composer.moreOptions'),
+      extendFormButtonValue: '',
       newsFormExtendedClass: '',
-      newsFormContentHeight: '',
+      newsFormTitlePlaceholder: `${this.$t('news.composer.placeholderTitleInput')}*`,
+      newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
+      newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
+      newsFormContentHeight: '250',
+      newsFormSummaryHeight: '80',
       showDraftNews: false,
       postingNews: false,
       savingDraft: false,
@@ -117,14 +118,14 @@ export default {
   watch: {
     extendedForm: function() {
       this.extendForm();
-      if(this.$route.fullPath.split('/')['1']  !== 'draft'){
+      const currentLocation = this.$route.fullPath.split('/')['1'];
+      if(currentLocation !== 'draft' && currentLocation !== 'post' && this.extendedForm){
         this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
       }
     },
-    'newsActivity.title': function() { this.autoSave(); },
-    'newsActivity.summary': function() { this.autoSave(); },
-    'newsActivity.content': function() { this.autoSave(); },
-    'newsActivity.illustration': function() { this.autoSave(); }
+    'newsActivity.title': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'newsActivity.summary': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'newsActivity.content': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } }
   },
   created() {
     const textarea = document.querySelector('#activityComposerTextarea');
@@ -139,7 +140,9 @@ export default {
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
-    this.initCKEditor();
+
+    autosize(document.querySelector('#newsSummary'));
+
     this.extendForm();
   },
   beforeDestroy() {
@@ -152,7 +155,11 @@ export default {
   },
   methods: {
     initCKEditor: function() {
-      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar,font';
+      if (typeof CKEDITOR.instances['newsContent'] !== 'undefined') {
+        CKEDITOR.instances['newsContent'].destroy(true);
+      }
+
+      let extraPlugins = 'simpleLink,selectImage,suggester,font,justify';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -160,22 +167,40 @@ export default {
         extraPlugins = 'simpleLink,selectImage';
       }
 
+      if(this.extendedForm) {
+        extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify';
+        CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
+      } else {
+        CKEDITOR.addCss('.cke_editable { font-size: 13px; }');
+      }
+
       // this line is mandatory when a custom skin is defined
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
+
       const self = this;
-      const composerInput = $('textarea#newsContent');
-      composerInput.ckeditor({
+      $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
-        removePlugins: 'image, confirmBeforeReload',
+        removePlugins: 'image,confirmBeforeReload,maximize,resize',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
-        toolbar : [
-          ['FontSize'],
-          ['Bold','Italic','RemoveFormat',],
-          ['-','NumberedList','BulletedList','Blockquote'],
-          ['-','simpleLink', 'selectImage'],
-        ] ,
-        height: this.newsFormContentHeight ,
+        toolbarLocation: 'top',
+        removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
+        toolbar: [
+          { name: 'format', items: ['Format'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'fontsize', items: ['FontSize'] },
+          { name: 'colors', items: [ 'TextColor' ] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage'] },
+        ],
+        format_tags: 'p;h1;h2;h3',
+        autoGrow_minHeight: this.newsFormContentHeight,
+        height: this.newsFormContentHeight,
+        bodyClass: 'newsContent',
+        sharedSpaces: {
+          top: 'newsTop'
+        },
         on: {
           change: function (evt) {
             self.newsActivity.content = evt.editor.getData();
@@ -205,8 +230,8 @@ export default {
           if(newsDraftNode){
             this.newsActivity.id = newsDraftNode.id;
             this.newsActivity.title = newsDraftNode.title;
-            this.newsActivity.content = newsDraftNode.body;
             this.newsActivity.summary = newsDraftNode.summary;
+            this.newsActivity.content = newsDraftNode.body;
             CKEDITOR.instances['newsContent'].setData(newsDraftNode.body);
             if (newsDraftNode.illustrationURL) {
               newsServices.importFileFromUrl(newsDraftNode.illustrationURL)
@@ -226,6 +251,7 @@ export default {
                   this.newsActivity.illustration.push(fileDetails);
                 });
             }
+            Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
           } else {
             this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
           }
@@ -287,11 +313,14 @@ export default {
       });
     },
     extendForm: function(){
-      this.extendFormButtonClass = this.extendedForm ? 'uiIconMinimize' : 'uiIconSimplePlus';
+      this.extendFormIconClass = this.extendedForm ? '' : 'uiIconSimplePlus';
+      this.extendFormButtonClass = this.extendedForm ? 'btn' : 'btn btn-primary';
+      this.extendFormButtonValue = this.extendedForm ? 'Cancel' : '';
       this.extendFormButtonTooltip = this.extendedForm ? this.$t('news.composer.lessOptions') : this.$t('news.composer.moreOptions');
       document.getElementById('UISpaceMenu').style.display = this.extendedForm ? 'none' : '';
       document.getElementById('ActivityComposerExt').style.display = this.extendedForm ? 'none' : '';
       document.getElementById('UISpaceActivitiesDisplay').style.display = this.extendedForm ? 'none' : '';
+      document.getElementById('UISpaceActivityStreamPortlet').style.padding = this.extendedForm ? '0' : '20px';
       const spaceHomePortletColumn = document.getElementsByClassName('SpaceHomePortletsTDContainer');
       if(spaceHomePortletColumn.length > 0) {
         spaceHomePortletColumn[0].style.display = this.extendedForm ? 'none' : '';
@@ -302,9 +331,16 @@ export default {
           portletContainer.style.display = this.extendedForm ? 'none' : '';
         }
       });
+      document.getElementsByClassName('LeftNavigationTDContainer')[0].style.display = this.extendedForm ? 'none' : '';
+      document.getElementsByClassName('UIToolbarContainer')[0].style.zIndex = this.extendedForm ? 'unset' : '1030';
+      document.getElementById('UIToolbarContainer').style.left = this.extendedForm ? '0px' : '250px';
       this.newsFormExtendedClass = this.extendedForm ? 'extended' : '';
       this.newsFormContentHeight = this.extendedForm ? '250' : '110';
-      CKEDITOR.instances['newsContent'].resize('100%', this.newsFormContentHeight);
+      document.body.style.overflow = this.extendedForm ? 'hidden' : 'auto';
+      this.initCKEditor();
+      if (!this.extendedForm){
+        this.$router.push('/');
+      }
     },
     saveNewsDraft: function () {
       const news = {
@@ -326,6 +362,16 @@ export default {
         if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
           news.id = this.newsActivity.id;
           newsServices.updateNews(news)
+            .then((updatedNews) => {
+              this.newsActivity.title = updatedNews.title;
+              if(this.newsActivity.summary !== updatedNews.summary) {
+                this.newsActivity.summary = updatedNews.summary;
+              }
+              if(this.newsActivity.content !== updatedNews.body) {
+                this.newsActivity.content = updatedNews.body;
+                CKEDITOR.instances['newsContent'].setData(updatedNews.body);
+              }
+            })
             .then(() => this.$emit('draftUpdated'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         } else {
@@ -335,7 +381,7 @@ export default {
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         }
         this.savingDraft = false;
-      } else if(this.newsActivity.title || this.newsActivity.content) {
+      } else if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
         news.publicationState = 'draft';
         newsServices.saveNews(news).then((createdNews) => {
           this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: createdNews.id}});
@@ -356,10 +402,9 @@ export default {
     resetNewsActivity: function(){
       this.newsActivity.id = '';
       this.newsActivity.title = '';
-      this.newsActivity.content = '';
       this.newsActivity.summary = '';
+      this.newsActivity.content = '';
       this.newsActivity.illustration = [];
-      CKEDITOR.instances['newsContent'].setData('');
       this.pinArticle = false;
     }
   }

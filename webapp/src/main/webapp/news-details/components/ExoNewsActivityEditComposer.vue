@@ -1,73 +1,62 @@
 <template>
-  <div id="newsActivityEditComposer" :class="{ completeWidth: showEditNews }" class="newsComposer" >
+  <div class="newsEditComponent">
     <a v-show="!showEditNews" id="newsEditButton" :data-original-title="$t('news.edit.edit')" class="btn"
        rel="tooltip"
        data-placement="bottom"
        @click="clickOnEditButton">
       <i class="uiIconEdit"></i>
     </a>
-    <div v-show="showEditNews" class="completeWidth">
-      <p class="createNews">{{ $t("news.edit.editNews") }}</p>
-      <form id="newsForm" :class="newsFormExtendedClass" class="newsForm">
-
-        <div class="newsFormWrapper">
-          <div class="newsFormInputAttachement">
-            <div class="newsFormInput">
-
-              <div class="formInputGroup">
-                <label class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("news.composer.title") }}
-                  * : </label>
-                <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="$t('news.composer.placeholderTitleInput')" class="newsFormInput" type="text">
-              </div>
-
-              <div class="formInputGroup">
-                <label class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("news.composer.summary") }} : </label>
-                <textarea id="newsSummary" v-model="news.summary" :maxlength="summaryMaxLength" :placeholder="$t('news.composer.placeholderSummaryInput')" class="newsFormInput" type="text"/>
-              </div>
-            </div>
-
-            <div class="newsFormAttachement">
-              <div class="control-group attachments">
-                <div class="controls">
-                  <exo-file-drop v-model="news.illustration"/>
-                </div>
-              </div>
+    <div id="newsActivityEditComposer" :class="{ completeWidth: showEditNews }" class="newsComposer extended" >
+      <div v-show="showEditNews" class="newsComposerActions">
+        <div class="newsFormButtons">
+          <div class="newsFormLeftActions">
+            <button id="cancelEdit" class="btn cancelEdit" @click.prevent="cancelEdit"> {{ $t("news.edit.cancel") }}
+            </button>
+            <div v-if="showPinInput" class="pinArticleContent">
+              <span class="uiCheckbox">
+                <input id="pinArticle" v-model="news.pinned" type="checkbox" class="checkbox ">
+                <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
+              </span>
             </div>
           </div>
-          <p id="UINewsSummaryDescription" class="UINewsSummaryDescription">
-            <i class="uiIconInformation"></i>
-            {{ $t("news.composer.summaryDescription") }}
-          </p>
-          <div class="formInputGroup formNewsContent">
-            <label class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("news.composer.content") }}
-              * : </label>
-            <textarea id="newsContent" v-model="news.body"
-                      :placeholder="$t('news.composer.placeholderContentInput')" type="text"
-                      class="newsFormInput" name="newsContent"></textarea>
+          <div class="newsFormRightActions">
+            <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
+            </button>
+            <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
+            </button>
           </div>
-
-
-          <div class="newsFormColumn newsFormInputs">
-            <div class="newsFormButtons">
-              <div v-if="showPinInput" class="pinArticleContent">
-                <span class="uiCheckbox">
-                  <input id="pinArticle" v-model="news.pinned" type="checkbox" class="checkbox ">
-                  <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
-                </span>
-              </div>
-              <div class="newsFormActions">
-                <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
-                </button>
-                <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
-                </button>
-                <button id="cancelEdit" class="btn cancelEdit" @click.prevent="cancelEdit"> {{ $t("news.edit.cancel") }}
-                </button>
-              </div>
-            </div>
-          </div>
-
         </div>
-
+        <div id="newsTop"></div>
+      </div>
+      <form v-show="showEditNews" id="newsForm" class="newsForm">
+        <div class="newsFormInput">
+          <div class="newsFormAttachment">
+            <div class="control-group attachments">
+              <div class="controls">
+                <exo-file-drop v-model="news.illustration"/>
+              </div>
+            </div>
+          </div>
+          <div class="formInputGroup newsTitle">
+            <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
+          </div>
+          <div class="formInputGroup">
+            <textarea id="newsSummary"
+                      v-model="news.summary"
+                      :maxlength="summaryMaxLength"
+                      :placeholder="newsFormSummaryPlaceholder"
+                      class="newsFormInput">
+            </textarea>
+          </div>
+          <div class="formInputGroup">
+            <textarea id="newsContent"
+                      v-model="news.body"
+                      :placeholder="newsFormContentPlaceholder"
+                      class="newsFormInput"
+                      name="newsContent">
+            </textarea>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -75,6 +64,7 @@
 
 <script>
 import * as  newsServices from '../../services/newsServices';
+import autosize from 'autosize';
 
 export default {
   props: {
@@ -114,6 +104,9 @@ export default {
       titleMaxLength: 150,
       summaryMaxLength: 1000,
       newsFormContentHeight: 330,
+      newsFormTitlePlaceholder: `${this.$t('news.composer.placeholderTitleInput')}*`,
+      newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
+      newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       showEditNews: false,
       illustrationChanged: false,
     };
@@ -135,34 +128,45 @@ export default {
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
+
+    autosize(document.querySelector('#newsSummary'));
+
     this.initCKEditor();
   },
   methods: {
     initCKEditor: function () {
-      let extraPlugins = 'simpleLink,selectImage,suggester,hideBottomToolbar,font';
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
+
+      CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
+
       // this line is mandatory when a custom skin is defined
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
-      const composerInput = $('textarea#newsContent');
-      composerInput.ckeditor({
+      $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
-        removePlugins: 'image,confirmBeforeReload',
+        removePlugins: 'image,confirmBeforeReload,maximize,resize',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
-        toolbar : [
-          ['FontSize'],
-          ['Bold','Italic','RemoveFormat',],
-          ['-','NumberedList','BulletedList','Blockquote'],
-          ['-','simpleLink', 'selectImage'],
-        ] ,
-        height: this.newsFormContentHeight,
-        autoGrow_minHeight: this.newsFormContentHeight,
+        toolbarLocation: 'top',
+        removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
+        toolbar: [
+          { name: 'format', items: ['Format'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'fontsize', items: ['FontSize'] },
+          { name: 'colors', items: [ 'TextColor' ] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage'] },
+        ],
+        sharedSpaces: {
+          top: 'newsTop'
+        },
         on: {
           change: function (evt) {
             self.news.body = evt.editor.getData();
@@ -179,7 +183,11 @@ export default {
         document.querySelector('#pinNewsActivity').style.display = 'none';
       }
       newsServices.clickOnEditButton(this.news.id);
-      CKEDITOR.instances['newsContent'].document.$.body.innerHTML = this.news.body;
+      CKEDITOR.instances['newsContent'].setData(this.news.body);
+      document.body.style.overflow= 'hidden';
+      document.getElementsByClassName('LeftNavigationTDContainer')[0].style.display ='none';
+      document.getElementsByClassName('UIToolbarContainer')[0].style.zIndex ='unset';
+      document.getElementById('UIToolbarContainer').style.left ='0px';
     },
     updateNews: function () {
       this.doUpdateNews();
@@ -251,6 +259,10 @@ export default {
       }
       this.news = JSON.parse(JSON.stringify(this.originalNews));
       CKEDITOR.instances['newsContent'].setData(this.news.body);
+      document.body.style.overflow= 'auto';
+      document.getElementsByClassName('LeftNavigationTDContainer')[0].style.display ='table-cell';
+      document.getElementsByClassName('UIToolbarContainer')[0].style.zIndex ='1030';
+      document.getElementById('UIToolbarContainer').style.left ='250px';
     },
     importActivityDetails: function () {
       this.news.activityId = this.activityId;
@@ -286,6 +298,7 @@ export default {
                 this.originalNews = JSON.parse(JSON.stringify(this.news));
               });
           }
+          Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
         });
     }
   },

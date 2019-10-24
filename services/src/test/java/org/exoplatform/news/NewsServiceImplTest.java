@@ -1075,7 +1075,7 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(anyString())).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    Mockito.doNothing().when(newsServiceSpy).updateNews(news);
+    Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
 

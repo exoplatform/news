@@ -210,7 +210,7 @@
 
   def newsTitle = StringEscapeUtils.escapeHtml(news.title);
 
-  def newsSummary = StringEscapeUtils.escapeHtml(news.summary);
+  def newsSummary = news.summary;
   if(newsSummary.length() > 300) {
     newsSummary = newsSummary.substring(0, 300) + '...';
   }

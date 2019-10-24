@@ -261,7 +261,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -307,7 +306,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -352,7 +350,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).unpinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -394,7 +391,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -467,7 +463,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -515,7 +510,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).pinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
@@ -560,7 +554,6 @@ public class NewsRestResourcesV1Test {
     Space space = mock(Space.class);
 
     Mockito.doNothing().when(newsService).unpinNews("id123");
-    Mockito.doNothing().when(newsService).updateNews(oldnews);
     when(newsService.getNewsById("id123")).thenReturn(oldnews);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");

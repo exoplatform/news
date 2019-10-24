@@ -12,7 +12,7 @@ public interface NewsService {
 
   List<News> getNews() throws Exception;
 
-  void updateNews(News news) throws Exception;
+  News updateNews(News news) throws Exception;
 
   void markAsRead(News news, String userId) throws Exception;
 

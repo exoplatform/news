@@ -1115,33 +1115,20 @@
                 font-weight: bold;
                 font-style: italic;
               }
-              .newsDate {
-                color: @color-appNews-information;
-                .iconPLFCalendar {
-                  &:before {
-                    content: "\e68c";
-                    font-family: 'PLF-FONT-ICONS' !important;
-                    font-style: normal;
-                    padding-right: 10px;
-                    font-size: 16px;
-                    color: #476a9c;
-                  }
-                }
+            }
+
+            .newsItemContentDetails {
+              padding-left: 15px;
+              .newsSummary {
+                font-size: 14px;
+                color: #545454;
+                letter-spacing: 0.1px;
               }
-              .newsViews {
-                .viewsText {
-                  color: @color-appNews-information;
-                  font-size: 12px;
-                  padding-left: 7px;
-                }
-              }
-              .newsOwner a {
-                color: @color-appNews-information;
+              .newsItemInfo {
                 display: flex;
                 align-items: center;
                 width: 100%;
                 justify-content: space-between;
-
                 .newsLeftInfo {
                   display: flex;
                   align-items: center;
@@ -1152,12 +1139,10 @@
                     margin-bottom: 0;
                     font-style: italic;
                     font-size: 13px;
-
                   }
 
                   .newsDate {
-                    color: #676767;
-
+                    color: @color-appNews-information;
                     .iconPLFCalendar {
                       &:before {
                         content: "\e68c";
@@ -1169,9 +1154,15 @@
                       }
                     }
                   }
-
+                  .newsViews {
+                    .viewsText {
+                      color: @color-appNews-information;
+                      font-size: 12px;
+                      padding-left: 7px;
+                    }
+                  }
                   .newsOwner a {
-                    color: #676767;
+                    color: @color-appNews-information;
                     display: flex;
                     align-items: center;
                     font-size: 12px;
@@ -1190,7 +1181,6 @@
                       box-shadow: 1px 1px 4px #d6d6d6;
                     }
                   }
-
                 }
 
                 .share.pull-right a#newsShareButton {

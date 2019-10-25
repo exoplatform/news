@@ -2,15 +2,28 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.jcr.*;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.ecm.jcr.model.VersionNode;
+import org.exoplatform.ecm.utils.text.Text;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.cms.BasePath;
@@ -26,7 +39,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-import org.exoplatform.ecm.utils.text.Text;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
@@ -45,23 +58,23 @@ import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import java.util.ArrayList;
-import java.util.List;
-
-
 
 /**
  * Service managing News and storing them in ECMS
  */
 public class NewsServiceImpl implements NewsService {
 
-  public static final String NEWS_NODES_FOLDER = "News";
+  public static final String       NEWS_NODES_FOLDER               = "News";
 
-  public static final String PINNED_NEWS_NODES_FOLDER = "Pinned";
+  public static final String       PINNED_NEWS_NODES_FOLDER        = "Pinned";
 
-  public static final String APPLICATION_DATA_PATH = "/Application Data";
+  public static final String       APPLICATION_DATA_PATH           = "/Application Data";
+
+  private static final String      MANAGER_MEMBERSHIP_NAME         = "manager";
+
+  private static final String      PUBLISHER_MEMBERSHIP_NAME       = "publisher";
+
+  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private RepositoryService repositoryService;
 
@@ -405,16 +418,6 @@ public class NewsServiceImpl implements NewsService {
     try {
       Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, sharedNews.getPoster(), false);
       for (Space space : spaces) {
-        // update news node permissions
-        Node newsNode = session.getNodeByUUID(sharedNews.getNewsId());
-        if (newsNode != null) {
-          if (newsNode.canAddMixin("exo:privilegeable")) {
-            newsNode.addMixin("exo:privilegeable");
-          }
-          ((ExtendedNode) newsNode).setPermission("*:" + space.getGroupId(), PermissionType.ALL);
-          newsNode.save();
-        }
-
         // create activity
         Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName(), false);
         ExoSocialActivity activity = new ExoSocialActivityImpl();
@@ -427,9 +430,26 @@ public class NewsServiceImpl implements NewsService {
         templateParams.put("sharedActivityId", sharedNews.getActivityId());
         activity.setTemplateParams(templateParams);
         activityManager.saveActivityNoReturn(spaceIdentity, activity);
+
+        // update news node permissions
+        Node newsNode = session.getNodeByUUID(sharedNews.getNewsId());
+        if (newsNode != null) {
+          if (newsNode.canAddMixin("exo:privilegeable")) {
+            newsNode.addMixin("exo:privilegeable");
+          }
+          ((ExtendedNode) newsNode).setPermission("*:" + space.getGroupId(), PermissionType.ALL);
+          if(activity.getId() != null) {
+            if (newsNode.hasProperty("exo:activities")) {
+              String activities = newsNode.getProperty("exo:activities").getString();
+              activities = activities.concat(";").concat(space.getId()).concat(":").concat(activity.getId());
+              newsNode.setProperty("exo:activities", activities);
+            }
+          }
+          newsNode.save();
+        }
       }
     } finally {
-      if(session != null) {
+      if (session != null) {
         session.logout();
       }
     }
@@ -495,7 +515,7 @@ public class NewsServiceImpl implements NewsService {
    * Post the news activity in the given space
    * @param news The news to post as an activity
    */
-  void postNewsActivity(News news) {
+  void postNewsActivity(News news) throws Exception {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), false);
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -511,6 +531,8 @@ public class NewsServiceImpl implements NewsService {
     activity.setTemplateParams(templateParams);
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
+
+    updateNewsActivities(activity, news);
   }
 
   private String getNodeRelativePath(Calendar now) {
@@ -599,7 +621,10 @@ public class NewsServiceImpl implements NewsService {
     news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPublicationDate(getPublicationDate(node));
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
-    news.setSpaceId(getStringProperty(node, "exo:spaceId"));
+    news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    if (node.hasProperty("exo:activities")) {
+      news.setActivities(node.getProperty("exo:activities").getString());
+    }
     news.setPath(getPath(node));
     if(!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
@@ -679,6 +704,7 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:dateCreated", creationCalendar);
     newsDraftNode.setProperty("exo:viewsCount", 0);
     newsDraftNode.setProperty("exo:viewers", "");
+    newsDraftNode.setProperty("exo:activities", "");
     Calendar updateCalendar = Calendar.getInstance();
     if(news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());
@@ -688,7 +714,6 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:dateModified", updateCalendar);
     newsDraftNode.setProperty("exo:pinned", false);
     newsDraftNode.setProperty("exo:spaceId", news.getSpaceId());
-
 
     Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
     String lifecycleName = wCMPublicationService.getWebpagePublicationPlugins()
@@ -747,4 +772,52 @@ public class NewsServiceImpl implements NewsService {
 
     return nodePath;
   }
+
+  /**
+   * Return a boolean that indicates if the current user can edit the news or not
+   * @param posterId the poster id of the news
+   * @param spaceId the space id of the news
+   * @return if the news can be edited
+   */
+  public boolean canEditNews(String posterId, String spaceId) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    String authenticatedUser = currentIdentity.getUserId();
+    Space currentSpace = spaceService.getSpaceById(spaceId);
+    return authenticatedUser.equals(posterId) || spaceService.isSuperManager(authenticatedUser)
+        || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+        || currentIdentity.isMemberOf(currentSpace.getGroupId(), MANAGER_MEMBERSHIP_NAME);
+  }
+
+  /**
+   * Return a boolean that indicates if the current user can pin the news or not
+   * @return if the news can be pinned
+   */
+  public boolean canPinNews() {
+    return ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  private void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
+    if (activity.getId() != null) {
+      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+      Session session = sessionProvider.getSession(
+                                                   repositoryService.getCurrentRepository()
+                                                                    .getConfiguration()
+                                                                    .getDefaultWorkspaceName(),
+                                                   repositoryService.getCurrentRepository());
+      try {
+        if (!StringUtils.isEmpty(news.getId())) {
+          Node newsNode = session.getNodeByUUID(news.getId());
+          if (newsNode.hasProperty("exo:activities")) {
+            newsNode.setProperty("exo:activities", news.getSpaceId().concat(":").concat(activity.getId()));
+            newsNode.save();
+          }
+        }
+      } finally {
+        if (session != null) {
+          session.logout();
+        }
+      }
+    }
+  }
+
 }

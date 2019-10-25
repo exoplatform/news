@@ -86,7 +86,8 @@ if (activity && news) {
       updaterProfileURL: '${updaterProfileURL}',
       updatedDate: '${newsUpdatedDate}',
       titleLink: '${activityLink}',
-      viewsCount: ${news.viewsCount}
+      viewsCount: ${news.viewsCount},
+      id: '${news.id}',
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,

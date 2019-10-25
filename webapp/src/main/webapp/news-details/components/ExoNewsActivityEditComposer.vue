@@ -33,7 +33,7 @@
           <div class="newsFormAttachment">
             <div class="control-group attachments">
               <div class="controls">
-                <exo-file-drop v-model="news.illustration"/>
+                <exo-file-drop v-model="newsIllustration"/>
               </div>
             </div>
           </div>
@@ -76,20 +76,15 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
+    news: {
+      type: Object,
+      required: false,
+      default: function() { return new Object(); }
+    },
   },
   data() {
     return {
-      news: {
-        id: '',
-        activityId: '',
-        title: '',
-        body: '',
-        summary: '',
-        illustration: [],
-        spaceId: '',
-        pinned: false,
-      },
       originalNews: {
         id: '',
         activityId: '',
@@ -109,6 +104,7 @@ export default {
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       showEditNews: false,
       illustrationChanged: false,
+      newsIllustration: []
     };
   },
   computed: {
@@ -119,12 +115,12 @@ export default {
     }
   },
   watch: {
-    'news.illustration': function() {
+    'newsIllustration': function() {
       this.illustrationChanged = true;
     }
   },
   created() {
-    this.importActivityDetails();
+    this.initNews();
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
@@ -194,19 +190,21 @@ export default {
     },
     updateAndPostNews: function () {
       this.doUpdateNews().then(() => {
+        if(this.activityId !== null && !this.activityId.isEmpty())
+        {
+          const activity = {
+            id: this.activityId,
+            title: '',
+            body: '',
+            type: 'news',
+            templateParams: {
+              newsId: this.news.id,
+            },
+            updateDate: new Date().getTime()
+          };
 
-        const activity = {
-          id: this.activityId,
-          title: '',
-          body: '',
-          type: 'news',
-          templateParams: {
-            newsId: this.news.id,
-          },
-          updateDate: new Date().getTime()
-        };
-
-        return newsServices.updateAndPostNewsActivity(activity);
+          return newsServices.updateAndPostNewsActivity(activity);
+        }
       }).then(() => {
         document.location.reload(true);
       });
@@ -237,8 +235,8 @@ export default {
         publicationState: 'published'
       };
 
-      if(this.news.illustration != null && this.news.illustration.length > 0) {
-        updatedNews.uploadId = this.news.illustration[0].uploadId;
+      if(this.newsIllustration != null && this.newsIllustration.length > 0) {
+        updatedNews.uploadId = this.newsIllustration[0].uploadId;
       } else if(this.originalNews.illustrationURL !== null) {
         // an empty uploadId means the illustration must be deleted
         updatedNews.uploadId = '';
@@ -264,42 +262,29 @@ export default {
       document.getElementsByClassName('UIToolbarContainer')[0].style.zIndex ='1030';
       document.getElementById('UIToolbarContainer').style.left ='250px';
     },
-    importActivityDetails: function () {
-      this.news.activityId = this.activityId;
-      newsServices.getActivityById(this.news.activityId)
-        .then(resp => resp.json())
-        .then(data => {
-          this.news.id = data.templateParams.newsId;
-          return newsServices.getNewsById(this.news.id);
-        })
-        .then(resp => resp.json())
-        .then(newsData => {
-          this.news.title = newsData.title;
-          this.news.summary = newsData.summary;
-          this.news.body = newsData.body;
-          this.news.pinned = newsData.pinned;
-          this.originalNews = JSON.parse(JSON.stringify(this.news));
-          if(newsData.illustrationURL) {
-            newsServices.importFileFromUrl(newsData.illustrationURL)
-              .then(resp => resp.blob())
-              .then(fileData => {
-                const illustrationFile = new File([fileData],`illustration${this.news.id}`);
-                const fileDetails = {
-                  id: null,
-                  uploadId: null,
-                  name: illustrationFile.name,
-                  size: illustrationFile.size,
-                  src: newsData.illustrationURL,
-                  progress: null,
-                  file: illustrationFile,
-                  finished: true,
-                };
-                this.news.illustration.push(fileDetails);
-                this.originalNews = JSON.parse(JSON.stringify(this.news));
-              });
-          }
-          Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
-        });
+    initNews: function () {
+      const context = this;
+      if(this.news.illustrationURL) {
+        newsServices.importFileFromUrl(this.news.illustrationURL)
+          .then(resp => resp.blob())
+          .then(fileData => {
+            const illustrationFile = new File([fileData],`illustration${this.news.id}`);
+            const fileDetails = {
+              id: null,
+              uploadId: null,
+              name: illustrationFile.name,
+              size: illustrationFile.size,
+              src: context.news.illustrationURL,
+              progress: null,
+              file: illustrationFile,
+              finished: true,
+            };
+            context.newsIllustration.push(fileDetails);
+            context.originalNews.illustration.push(fileDetails);
+            context.originalNews = JSON.parse(JSON.stringify(context.news));
+          });
+      }
+      Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
     }
   },
 };

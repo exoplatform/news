@@ -45,6 +45,8 @@ public class News {
 
   private Long    viewsCount;
 
+  private String  activities;
+
   public String getId() {
     return id;
   }
@@ -199,6 +201,14 @@ public class News {
 
   public void setViewsCount(Long viewsCount) {
     this.viewsCount = viewsCount;
+  }
+
+  public String getActivities() {
+    return activities;
+  }
+
+  public void setActivities(String activities) {
+    this.activities = activities;
   }
 
 }

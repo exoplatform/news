@@ -8,6 +8,12 @@
   import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
   import org.exoplatform.social.core.service.LinkProvider;
 
+
+  import org.exoplatform.commons.utils.CommonsUtils;
+  import org.exoplatform.social.webui.Utils;
+  import org.exoplatform.social.core.manager.IdentityManager;
+  import org.exoplatform.news.NewsService;
+
   import javax.jcr.RepositoryException;
 
   import java.time.format.DateTimeFormatter;
@@ -62,6 +68,19 @@
   def author = newsNode.getProperty("exo:author").getString();
   def updater = newsNode.getProperty("exo:lastModifier").getString();
   def updateDate = newsNode.getProperty("exo:dateModified").getDate();
+  def isPinned = originalNode.getProperty("exo:pinned").getBoolean();
+  def spaceId = newsNode.getProperty("exo:spaceId").getString();
+  def activityId = "";
+  if (originalNode.hasProperty("exo:activities")) {
+    def activities = originalNode.getProperty("exo:activities").getString();
+    def originalSpaceIdActivityId = activities.split(";")[0];
+    if (originalSpaceIdActivityId != null) {
+      def originalActivityId = originalSpaceIdActivityId.split(":")[1];
+      if (originalActivityId != null) {
+        activityId = originalActivityId;
+      }
+    }
+  }
 
   StringBuffer illustrationURL = new StringBuffer();
   if(newsNode.hasNode("illustration")) {
@@ -88,11 +107,17 @@
   def newsSummary = summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
   def newsBody = body.replaceAll("`", "\\\\`");
 
+  NewsService newsService = CommonsUtils.getService(NewsService.class);
+  def showEditButton = newsService.canEditNews(author, spaceId);
+  def showPinInput = newsService.canPinNews();
+
   def params = """ {
+    activityId: '${activityId}',
     newsId: '${newsId}',
     news: {
       title: '${newsTitle}',
       summary: `${newsSummary}`,
+      pinned: $isPinned,
       body: `${newsBody}`,
       illustrationURL: '${illustrationURL}',
       authorFullName: '${authorFullName}',
@@ -101,15 +126,38 @@
       updaterFullName: '${updaterFullName}',
       updaterProfileURL: '${updaterProfileURL}',
       updatedDate: '${newsUpdatedDate}',
+      id: '${newsId}',
     },
-    showEditButton: false
+    showEditButton: $showEditButton,
+    showPinInput: $showPinInput,
   } """
+
+  def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
+  jsManager.require("SHARED/jquery", "jq")
+             .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
+             .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
+
 %>
 
+<div>
+   <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+    <!--begin -->
+    <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+      <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+        <div class="popupHeader clearfix">
+          <a class="uiIconClose pull-right" title="Close"></a>
+          <span class="PopupTitle popupTitle"></span>
+        </div>
+        <div class="PopupContent popupContent">
+          <ul class="singleMessage popupMessage resizable">
+            <li>
+              <span class="confirmationIcon contentMessage"></span>
+            </li>
+          </ul>
+          <div class="uiAction uiActionBorder"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end -->
 <div id="newsDetails"></div>
-
-<script>
-  require(['SHARED/newsDetails'], function(newsDetails) {
-    newsDetails.init(<%=params%>);
-  });
-</script>
+</div>

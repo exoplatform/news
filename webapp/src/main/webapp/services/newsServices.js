@@ -1,13 +1,6 @@
 import {newsConstants} from '../js/newsConstants.js';
 import anchorme from 'anchorme';
 
-export function getActivityById(id) {
-  return fetch(`${newsConstants.SOCIAL_ACTIVITY_API}/${id}`, {
-    credentials: 'include',
-    method: 'GET',
-  });
-}
-
 export function getNewsById(id) {
   return fetch(`${newsConstants.NEWS_API}/${id}`, {
     credentials: 'include',

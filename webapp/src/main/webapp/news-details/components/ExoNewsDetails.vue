@@ -3,8 +3,8 @@
     <div class="newsDetails-description">
       <div class="newsDetails-header">
         <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title"></exo-news-share-activity>
-        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId" :show-pin-input="showPinInput"></exo-news-activity-edit-composer>
-        <exo-news-pin-activity v-if="showPinInput" :news-id="newsId"></exo-news-pin-activity>
+        <exo-news-activity-edit-composer v-if="showEditButton" :activity-id="activityId" :show-pin-input="showPinInput" :news="news"></exo-news-activity-edit-composer>
+        <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-title="news.title"></exo-news-pin-activity>
         <div class="newsDetails">
           <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
 
@@ -94,11 +94,6 @@ export default {
       showUpdateInfo: this.news.postedDate !== this.news.updatedDate,
     };
   },
-  created() {
-    if(this.showPinInput) {
-      document.querySelector('#pinNewsActivity').style.display = '';
-    }
-  },
   mounted() {
     this.updateViewsCount();
     window.require(['SHARED/social-ui-profile'], function(socialProfile) {
@@ -112,7 +107,13 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
-    document.querySelector('#newsDetails #newsBody a').setAttribute('target', '_blank');
+    const linkContentElements = document.querySelector('#newsDetails #newsBody a');
+    if (linkContentElements) {
+      linkContentElements.setAttribute('target', '_blank');
+    }
+    if(this.showPinInput) {
+      document.querySelector('#pinNewsActivity').style.display = '';
+    }
   },
   methods: {
     updateViewsCount: function () {

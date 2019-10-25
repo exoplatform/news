@@ -157,6 +157,10 @@
     <depends>
       <module>modalComponent</module>
     </depends>
+    <depends>
+      <module>commons-editor</module>
+      <as>editor</as>
+    </depends>
   </module>
   
   <module>

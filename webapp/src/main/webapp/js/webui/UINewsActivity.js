@@ -69,7 +69,7 @@
         pinned: true,
       };
       UINewsActivity.updatePinnedField(news, nodeNewsId, activityId, messagePinBodyElm, successPinMessage, errorPinMessage);
-    },
+      },
 
     unpinActivity : function () {
       const jElm = $('.currentUnpinActivity:first');
@@ -107,6 +107,7 @@
           messagePinDiv.style.display='none';
           messagePinAlert.classList.remove('alert-success');
           iconMessagePin.classList.remove('uiIconSuccess');
+          UINewsActivity.updateActivityStream();
         }, timeout);
       })
         .catch (function() {
@@ -118,8 +119,16 @@
             messagePinDiv.style.display='none';
             messagePinAlert.classList.remove('alert-error');
             iconMessagePin.classList.remove('uiIconError');
+            UINewsActivity.updateActivityStream();
           }, timeout);
         });
+    },
+
+    updateActivityStream: function(){
+      const refreshButton = document.querySelector('.uiActivitiesDisplay #RefreshButton');
+      if (refreshButton) {
+        refreshButton.click();
+      }
     },
 
     clickOnNews: function (newsId) {

@@ -513,12 +513,19 @@
         }
         .abortFile {
           height: 0;
-          i {
-            background: #ffffff;
-            color: #ff0000;
-            right: 13px;
-            top: 0;
+          i.uiIconRemove {
+            background: #000;
+            opacity: .5;
+            top: 7px;
+            color: #fff;
+            padding: 7px;
+            right: 15px;
+            font-size: 15px;
             border-radius: 50%;
+            cursor: pointer;
+            &:before {
+              content: "\e799";
+            }
           }
         }
         .uiIconIllustrationUpload:before {

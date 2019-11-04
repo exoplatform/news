@@ -44,7 +44,7 @@ if (activity && news) {
   }
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-  def showUpdateInfo = !postedDate.equals(updatedDate);
+  def showUpdateInfo = !newsPostedDate.equals(updatedDate);
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPostedBy = _ctx.appRes("news.activity.postedBy");

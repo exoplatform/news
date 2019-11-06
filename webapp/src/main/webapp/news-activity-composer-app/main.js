@@ -1,11 +1,10 @@
 import './components/initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
-import router from './router/index.js';
 
-// getting language of the PLF 
+// getting language of the PLF
 const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
 
-// should expose the locale ressources as REST API 
+// should expose the locale resources as REST API
 const url = `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
 
 // get overrided components if exists
@@ -19,19 +18,21 @@ if (extensionRegistry) {
 }
 
 let newsActivityComposerApp;
-// getting locale ressources
 export function init(showPin) {
+  // getting locale resources
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
-  // init Vue app when locale ressources are ready
+    // init Vue app when locale resources are ready
     newsActivityComposerApp = new Vue({
-      el: '#newsActivityComposer',
-      router,
+      el: '#NewsComposerApp',
       data: function() {
         return {
-          showPinInput: showPin,
+          newsId: getURLQueryParam('newsId'),
+          spaceId: getURLQueryParam('spaceId'),
+          activityId: getURLQueryParam('activityId'),
+          showPinInput: showPin
         };
       },
-      template: '<exo-news-activity-composer :show-pin-input="showPinInput"></exo-news-activity-composer>',
+      template: '<exo-news-activity-composer :news-id="newsId" :space-id="spaceId" :activity-id="activityId" :show-pin-input="showPinInput"></exo-news-activity-composer>',
       i18n
     });
   });
@@ -40,5 +41,12 @@ export function init(showPin) {
 export function destroy() {
   if(newsActivityComposerApp) {
     newsActivityComposerApp.$destroy();
+  }
+}
+
+function getURLQueryParam(paramName) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if(urlParams.has(paramName)) {
+    return urlParams.get(paramName);
   }
 }

@@ -49,6 +49,12 @@
 import * as newsServices from '../../services/newsServices';
 
 export default {
+  props: {
+    spaceId: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       showDraftNews: false,
@@ -68,7 +74,7 @@ export default {
   },
   methods: {
     loadNewsDrafts: function() {
-      newsServices.getNewsDrafts().then(
+      newsServices.getNewsDrafts(this.spaceId).then(
         (data) => {
           this.newsDrafts = data.sort((draft1, draft2) => draft2.updateDate.time - draft1.updateDate.time);
           data.map((draft) => {

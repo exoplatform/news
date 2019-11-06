@@ -33,6 +33,14 @@
             <page-reference>portal::intranet::news</page-reference>
 
             <node>
+                <uri>news/editor</uri>
+                <name>editor</name>
+                <label>#{portal.intranet.newsEditor}</label>
+                <visibility>SYSTEM</visibility>
+                <page-reference>portal::intranet::newsComposer</page-reference>
+            </node>
+
+            <node>
                 <uri>news/detail</uri>
                 <name>detail</name>
                 <label>#{portal.intranet.newsDetail}</label>

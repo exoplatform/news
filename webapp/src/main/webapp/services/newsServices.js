@@ -15,8 +15,8 @@ export function getNews() {
   });
 }
 
-export function getNewsDrafts() {
-  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaceId=${newsConstants.SPACE_ID}&publicationState=draft`, {
+export function getNewsDrafts(spaceId) {
+  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaceId=${spaceId}&publicationState=draft`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -152,4 +152,17 @@ export function linkify (newsSummary, newsContent) {
     ]
   });
   return [newNewsSummary, newNewsContent];
+}
+
+export function getSpaceById(id) {
+  return fetch(`${newsConstants.SOCIAL_SPACE_API}/${id}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error(`Error getting space with id ${id}`);
+    }
+  });
 }

@@ -808,8 +808,10 @@ public class NewsServiceImpl implements NewsService {
         if (!StringUtils.isEmpty(news.getId())) {
           Node newsNode = session.getNodeByUUID(news.getId());
           if (newsNode.hasProperty("exo:activities")) {
-            newsNode.setProperty("exo:activities", news.getSpaceId().concat(":").concat(activity.getId()));
+            String updatedNewsActivities = news.getSpaceId().concat(":").concat(activity.getId());
+            newsNode.setProperty("exo:activities", updatedNewsActivities);
             newsNode.save();
+            news.setActivities(updatedNewsActivities);
           }
         }
       } finally {

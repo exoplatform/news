@@ -52,15 +52,10 @@ public class UINewsActivityComposer extends UIActivityComposer {
   
   private final static String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private IdentityManager identityManager;
-
   private ExoFeatureService featureService;
 
   public UINewsActivityComposer() {
-    identityManager = CommonsUtils.getService(IdentityManager.class);
     featureService = CommonsUtils.getService(ExoFeatureService.class);
-
-    setReadyForPostingActivity(true);
   }
 
   @Override
@@ -82,48 +77,6 @@ public class UINewsActivityComposer extends UIActivityComposer {
   }
 
   @Override
-  protected ExoSocialActivity onPostActivity(UIComposer.PostContext postContext, String postedMessage) throws Exception {
-    ExoSocialActivity activity = null;
-    if (postedMessage.equals("")) {
-      WebuiRequestContext requestContext = WebuiRequestContext.getCurrentInstance();
-      UIApplication uiApplication = requestContext.getUIApplication();
-      uiApplication.addMessage(new ApplicationMessage("UIComposer.msg.error.Empty_Message", null, ApplicationMessage.WARNING));
-      return activity;
-    }
-    if (postContext == UIComposer.PostContext.SPACE) {
-      UISpaceActivitiesDisplay uiDisplaySpaceActivities = (UISpaceActivitiesDisplay) getActivityDisplay();
-      Space space = uiDisplaySpaceActivities.getSpace();
-
-      Identity spaceIdentity = Utils.getIdentityManager().getOrCreateIdentity(SpaceIdentityProvider.NAME,
-              space.getPrettyName(),
-              false);
-      activity = new ExoSocialActivityImpl(Utils.getViewerIdentity().getId(),
-              SpaceActivityPublisher.SPACE_APP_ID,
-              postedMessage,
-              null);
-      activity.setType(UINewsActivity.ACTIVITY_TYPE);
-      Utils.getActivityManager().saveActivityNoReturn(spaceIdentity, activity);
-    } else if (postContext == UIComposer.PostContext.USER) {
-      UIUserActivitiesDisplay uiUserActivitiesDisplay = (UIUserActivitiesDisplay) getActivityDisplay();
-      Identity ownerIdentity = Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME,
-              uiUserActivitiesDisplay.getOwnerName(),
-              false);
-      activity = new ExoSocialActivityImpl(Utils.getViewerIdentity().getId(),
-              PeopleService.PEOPLE_APP_ID,
-              postedMessage,
-              null);
-      activity.setType(UINewsActivity.ACTIVITY_TYPE);
-      //
-      Utils.getActivityManager().saveActivityNoReturn(ownerIdentity, activity);
-
-      if (uiUserActivitiesDisplay.getSelectedDisplayMode() == UIUserActivitiesDisplay.DisplayMode.MY_SPACE) {
-        uiUserActivitiesDisplay.setSelectedDisplayMode(UIUserActivitiesDisplay.DisplayMode.ALL_ACTIVITIES);
-      }
-    }
-    return activity;
-  }
-
-  @Override
   protected void onPostActivity(UIComposer.PostContext postContext, UIComponent source, WebuiRequestContext requestContext, String postedMessage) throws Exception {
 
   }
@@ -140,33 +93,6 @@ public class UINewsActivityComposer extends UIActivityComposer {
 
   @Override
   protected void onActivate(Event<UIActivityComposer> event) {
-    String userIdentityId = null;
-    ConversationState conversationState = ConversationState.getCurrent();
-    if (conversationState != null && conversationState.getIdentity() != null) {
-      String userId = conversationState.getIdentity().getUserId();
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, userId, false);
-      if(identity != null) {
-        userIdentityId = identity.getId();
-      }
-    }
-
-    Space space = getCurrentSpace();
-
-    LOG.info("service=news operation=display_news_composer parameters=\"space_name:{},space_id:{},user_id:{}\"",
-            space != null ? space.getPrettyName() : null,
-            space != null ? space.getId() : null,
-            userIdentityId);
-
-    setReadyForPostingActivity(true);
-  }
-
-  public boolean canPinNews() {
-    Space space = getCurrentSpace();
-    if (space == null) {
-      return false;
-    }
-    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-    return currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   private Space getCurrentSpace() {

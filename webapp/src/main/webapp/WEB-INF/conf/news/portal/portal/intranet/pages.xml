@@ -46,6 +46,27 @@
   </page>
 
   <page>
+    <name>newsComposer</name>
+    <title>News Composer</title>
+    <access-permissions>*:/platform/users</access-permissions>
+    <edit-permission>*:/platform/administrators</edit-permission>
+    <container id="NewsDetailContainer" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+      <access-permissions>*:/platform/users</access-permissions>
+      <portlet-application>
+        <portlet>
+          <application-ref>news</application-ref>
+          <portlet-ref>NewsComposer</portlet-ref>
+        </portlet>
+        <title>News Composer</title>
+        <access-permissions>Everyone</access-permissions>
+        <show-info-bar>false</show-info-bar>
+        <show-application-state>false</show-application-state>
+        <show-application-mode>false</show-application-mode>
+      </portlet-application>
+    </container>
+  </page>
+
+  <page>
     <name>newsDetail</name>
     <title>News</title>
     <access-permissions>*:/platform/users</access-permissions>

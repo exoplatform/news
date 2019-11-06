@@ -71,14 +71,6 @@
     z-index: 2;
     top: -10px;
   }
-
-  .confirmPinMessageEditForm {
-    position: absolute;
-    width: 100%;
-    z-index: 2;
-    bottom: 10px;
-  }
-
 }
 
 .confirmPinMessage {
@@ -95,29 +87,6 @@
   background-color: #FFFFFF;
   .newsEditComponent {
     float: right;
-    #newsActivityEditComposer {
-      float: right;
-      margin-left: 10px;
-      width: auto;
-      left: 0;
-      top: 60px;
-
-      &.completeWidth {
-        width: 100%;
-        float: none;
-        margin-left: 0px;
-      }
-
-      .newsFormButtons {
-        background-color: #fff;
-
-        .newsFormRightActions {
-          #newsEdit {
-            margin: 0 10px;
-          }
-        }
-      }
-    }
   }
 
   #newsShareActivity {
@@ -259,209 +228,151 @@
 
 /*============== News Composer =============== */
 
-.uiIconSocUINewsActivityComposer:before {
-  content: "\e62a";
-  font-size: 14px;
-}
+.uiComposer {
+  .ActivityComposerExtItem.UINewsActivityComposer {
+    display: none;
+  }
 
-.uiIconSocUINewsActivityComposer:hover,
-.actionIcon:hover .uiIconSocUINewsActivityComposer {
-  color: @colorIconPrimary;
+  .share-buttons-down {
+    display: flex;
+
+    .newsEditorComposerLink {
+      margin-left: auto;
+      margin-right: 70px;
+      margin-top: 15px;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  }
 }
 
 .newsComposer {
   display: flex;
-  flex-direction: column-reverse;
-  position: relative;
+  position: fixed;
   width: 100%;
-  .newsComposerActions{
-  .newsFormButtons {
-    margin-bottom: 20px;
-    margin-right: 22px;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
+  height: 100%;
+  flex-direction: column;
+  left: 0;
+  top: 0;
+  background: #FFFFFF;
+  z-index: 10000;
 
-    #newsPlus {
-      margin-right: 10px;
-      padding: 4px 12px;
-
-      .uiIconSimplePlus {
-        &:before {
-          content: "\e74b";
-          font-size: 14px;
-        }
-      }
-    }
-    .newsFormLeftActions {
-      display: flex;
-      flex-direction: row-reverse;
-      flex: 1 1 100%;
-      justify-content: space-between;
-      .pinArticleContent {
-        padding-left: 160px;
-      }
-    }
+  .btn[disabled] {
+    border: 1px transparent;
   }
-    #newsPost{
+
+  .newsComposerActions {
+    .newsFormButtons {
+      margin-bottom: 20px;
+      margin-right: 22px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+
+      .newsFormLeftActions {
+        display: flex;
+        flex-direction: row-reverse;
+        flex: 1 1 100%;
+        justify-content: space-between;
+      }
+    }
+    #newsPost {
       padding: 5px 12px;
     }
-    .draftSavingStatus{
+    .draftSavingStatus {
       position: absolute;
       right: 24px;
       top: 9px;
     }
   }
-  #newsForm {
-    padding-top: 40px;
-    .formInputGroup {
-      display: flex;
-    }
-    #cke_newsContent {
-      border: solid 2px #e1e8ee;
-      flex: 0 1 100%;
-      margin-bottom: 0;
-      &.cke_focus {
-        border: solid 2px #e1e8ee;
+
+  .newsComposerActions {
+    width: 100%;
+    z-index: 10;
+    background-color: #FFFFFF;
+    .newsFormButtons {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px;
+      margin: 0;
+
+      .newsFormLeftActions {
+        display: inline-flex;
+        flex-direction: row;
+        flex: auto;
+        justify-content: normal;
+        .newsFormTitle {
+          padding: 9px 0 9px 5px;
+        }
+      }
+
+      .pinArticleContent {
+        padding: 9px 0;
+        margin-right: 40px;
+
+        .pinArticleLabel {
+          margin-left: 4px;
+          margin-top: 2px;
+        }
+      }
+
+      .newsFormRightActions {
+        display: inline-flex;
+        padding-right: 30px;
+
+        .draftSavingStatus {
+          margin-right: 7px;
+          font-style: italic;
+          padding-top: 10px;
+        }
+
+        button {
+          margin-left: 10px;
+        }
+      }
+
+      .draftSavingStatus {
+        position: unset;
+      }
+
+      #newsPost {
+        padding: 10px 20px;
       }
     }
+  }
+
+  #newsTop {
+    display: block;
+    box-shadow: 0 3px 5px hsla(0, 1%, 43%, 0.8);
+    z-index: 10;
+    .cke_top {
+      height: auto;
+    }
+    .cke_toolbox{
+      flex-flow: wrap;
+      background-color: #fafafa;
+      border-bottom: 0;
+    }
+    .cke_shared{
+      border: 0;
+    }
+  }
+
+  #newsForm {
+    padding: 2px 0;
+    margin-bottom: 55px;
+    overflow: auto;
+    z-index: 5;
+    background-color: #eeeeee;
+
     .newsFormInput {
       display: flex;
       flex-direction: column;
       margin: 0 20px;
       background-color: white;
-      .formInputGroup{
-        display: inline-flex;
-        padding: 10px 0;
-        label {
-          font-weight: bold;
-          flex: 0 1 150px;
-          padding: 12px;
-        }
-        input[type="text"] {
-          flex: 0 1 100%;
-          margin-bottom: 0;
-          border-radius: 0px;
-        }
-        textarea {
-          flex: 0 1 100%;
-          margin-bottom: 0;
-        }
-      }
-    }
 
-    #newsSummary {
-      margin: 0;
-      padding: 20px;
-      font-size: 18px;
-      font-style: italic;
-      border: none;
-      resize: none;
-    }
-    #UINewsSummaryDescription {
-      color: @header-popup-bg;
-      font-size: 12px;
-      font-style: italic;
-      margin-left: 135px;
-      padding-top: 5px;
-      i {
-        color: @header-popup-bg;
-        &:before {
-          content: "\e767";
-          font-size: 14px;
-        }
-      }
-    }
-    .newsFormActions {
-      align-items: center;
-      display: flex;
-
-      #newsUpdateAndPost, #cancelEdit {
-        margin-left: 10px
-      }
-    }
-  }
-  #newsTop{
-    display: none;
-  }
-  &.extended {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    .newsComposerActions {
-      width: 100%;
-      z-index: 10;
-      .newsFormButtons {
-        display: inline-flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        width: 100%;
-        padding: 10px;
-        margin: 0;
-
-        .newsFormLeftActions {
-          display: inline-flex;
-          padding-left: 2%;
-          flex-direction: row;
-          flex: auto;
-          justify-content: normal;
-          #newsPlus{
-            padding: 9px 20px;
-          }
-          .pinArticleContent {
-            padding: 9px 0;
-          }
-          .pinArticleLabel {
-            margin-left: 4px;
-            margin-top: 2px;
-          }
-        }
-
-        .newsFormRightActions {
-          display: inline-flex;
-          padding-right: 30px;
-
-          .draftSavingStatus {
-            margin-right: 7px;
-            font-style: italic;
-            padding-top: 10px;
-          }
-        }
-
-        .draftSavingStatus {
-          position: unset;
-        }
-
-        #newsPost {
-          padding: 10px 20px;
-        }
-      }
-    }
-    #newsForm {
-      padding: 2px 0;
-      margin-bottom: 55px;
-      overflow: auto;
-      z-index: 5;
-      background-color: #eeeeee;
-      .formInputGroup {
-        margin: 0 22%;
-        padding: 10px 0;
-        input[type="text"] {
-          border-color: transparent;
-          padding: 0 20px;
-          font-size: 24px;
-        }
-        textarea {
-          border-color: transparent;
-        }
-        textarea:focus {
-          border-color: transparent;
-        }
-      }
-      #cke_newsContent {
-        border-color: transparent;
-      }
       .newsFormAttachment {
         font-size: 14px;
         text-align: center;
@@ -534,29 +445,42 @@
           content: "\ea08";
         }
       }
-    }
-    #newsTop {
-      display: block;
-      box-shadow: 0 3px 5px hsla(0, 1%, 43%, 0.8);
-      z-index: 10;
-      .cke_top {
-        height: auto;
+
+      .formInputGroup {
+        display: flex;
+        margin: 0 22%;
+        padding: 10px 0;
+        label {
+          font-weight: bold;
+          flex: 0 1 150px;
+          padding: 12px;
+        }
+        input[type="text"] {
+          flex: 0 1 100%;
+          margin-bottom: 0;
+          border-radius: 0px;
+          border-color: transparent;
+          padding: 0 20px;
+          font-size: 24px;
+        }
+        textarea {
+          flex: 0 1 100%;
+          margin: 0;
+          padding: 20px;
+          font-size: 18px;
+          border: none;
+          resize: none;
+
+          &#newsSummary {
+            font-style: italic;
+          }
+        }
+        #cke_newsContent {
+          border-color: transparent;
+          flex: 0 1 100%;
+          margin-bottom: 0;
+        }
       }
-      .cke_toolbox{
-        flex-flow: wrap;
-        background-color: #fafafa;
-        border-bottom: 0;
-      }
-      .cke_shared{
-        border: 0;
-      }
-    }
-  }
-  .formInputGroup.formNewsContent {
-    margin-bottom: 20px;
-    margin-top: 10px;
-    .newsFormContentLabel{
-      padding-top: 23px;
     }
   }
 }
@@ -573,7 +497,6 @@
 .newsDrafts {
   display: flex;
   justify-content: flex-end;
-  margin: 0px 10px;
   .drawer{
     .content{
       bottom: 0;
@@ -1220,50 +1143,57 @@
     /*
 
 
-    ======================News app responsive version==========================*/
+======================Responsive version==========================*/
 
-    @media screen and (max-width: 520px) {
-      .newsApp {
-        .newsListItems {
-          .newsItem {
-            border-bottom: 1px dashed #dcdcdc;
+@media screen and (max-width: 480px) {
+  .uiComposer .share-buttons-down .newsEditorComposerLink {
+    margin-right: 0;
+    margin-top: 10px;
+  }
+}
 
-            &:last-child {
-              border-bottom: none;
+@media screen and (max-width: 520px) {
+  .newsApp {
+    .newsListItems {
+      .newsItem {
+        border-bottom: 1px dashed #dcdcdc;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .newsItemContent {
+          .newsItemContentHeader {
+            display: block;
+
+            h3 {
+              padding-left: 0;
+
+              a {
+                color: #3c3c3c;
+                transition: all .4s ease-in-out 0s;
+              }
             }
 
-            .newsItemContent {
-              .newsItemContentHeader {
-                display: block;
+            p {
+              border-bottom: none;
+            }
+          }
 
-                h3 {
-                  padding-left: 0;
+          .newsItemContentDetails {
+            padding-left: 0;
 
-                  a {
-                    color: #3c3c3c;
-                    transition: all .4s ease-in-out 0s;
-                  }
-                }
+            .newsItemInfo {
+              display: block;
 
-                p {
-                  border-bottom: none;
-                }
-              }
-
-              .newsItemContentDetails {
-                padding-left: 0;
-
-                .newsItemInfo {
-                  display: block;
-
-                  .newsRightInfo {
-                    padding-top: 20px;
-                  }
-                }
+              .newsRightInfo {
+                padding-top: 20px;
               }
             }
           }
         }
       }
     }
+  }
+}
 

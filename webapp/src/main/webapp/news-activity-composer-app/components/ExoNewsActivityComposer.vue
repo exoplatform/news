@@ -1,58 +1,57 @@
 <template>
-  <div id="newsActivityComposer" :class="newsFormExtendedClass" class="uiBox newsComposer">
+  <div id="newsActivityComposer" class="uiBox newsComposer">
     <div class="newsComposerActions">
       <div class="newsFormButtons">
         <div class="newsFormLeftActions">
-          <a id="newsPlus" :data-original-title="extendFormButtonTooltip" :class="extendFormButtonClass"
-             rel="tooltip" data-placement="bottom"
-             @click="extendedForm = !extendedForm;">
-            {{ extendFormButtonValue }}
-            <i :class="extendFormIconClass"></i>
-          </a>
-          <div v-if="showPinInput" class="pinArticleContent">
-            <span class="uiCheckbox">
-              <input id="pinArticle" v-model="pinArticle" type="checkbox" class="checkbox ">
-              <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
-            </span>
-          </div>
+          <img src="/news/images/newIcon.png" />
+          <span class="newsFormTitle">{{ newsFormTitle }}</span>
         </div>
-        <div class="newsFormRightActions">
+        <div v-if="showPinInput" class="pinArticleContent">
+          <span class="uiCheckbox">
+            <input id="pinArticle" v-model="news.pinned" type="checkbox" class="checkbox ">
+            <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
+          </span>
+        </div>
+        <div v-if="!editMode" class="newsFormRightActions">
           <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-          <div v-show="extendedForm" class="newsDrafts">
-            <exo-news-draft @draftSelected="onSelectDraft"/>
+          <div class="newsDrafts">
+            <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
           </div>
           <button id="newsPost" :disabled="postDisabled" class="btn btn-primary" @click="postNews"> {{ $t("news.composer.post") }}
+          </button>
+        </div>
+        <div v-if="editMode" class="newsFormRightActions">
+          <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
+          </button>
+          <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
           </button>
         </div>
       </div>
       <div id="newsTop"></div>
     </div>
-    <form id="newsForm" :class="newsFormExtendedClass" class="newsForm">
+    <form id="newsForm" class="newsForm">
       <div class="newsFormInput">
-        <div v-show="extendedForm" class="newsFormAttachment">
+        <div class="newsFormAttachment">
           <div class="control-group attachments">
             <div class="controls">
-              <exo-file-drop v-model="newsActivity.illustration" @change="autoSave"/>
+              <exo-file-drop v-model="news.illustration" @change="autoSave"/>
             </div>
           </div>
         </div>
         <div class="formInputGroup newsTitle">
-          <label v-show="!extendedForm" class="newsFormLabel newsFormTitleLabel" for="newsTitle">{{ $t("news.composer.title") }}*</label>
-          <input id="newsTitle" v-model="newsActivity.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
+          <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
         </div>
-        <div v-show="extendedForm" class="formInputGroup">
-          <label v-show="!extendedForm" class="newsFormLabel newsFormSummaryLabel" for="newsSummary"> {{ $t("news.composer.summary") }}</label>
+        <div class="formInputGroup">
           <textarea id="newsSummary"
-                    v-model="newsActivity.summary"
+                    v-model="news.summary"
                     :maxlength="summaryMaxLength"
                     :placeholder="newsFormSummaryPlaceholder"
                     class="newsFormInput">
           </textarea>
         </div>
         <div class="formInputGroup">
-          <label v-show="!extendedForm" class="newsFormLabel newsFormContentLabel" for="newsContent">{{ $t("news.composer.content") }}*</label>
           <textarea id="newsContent"
-                    v-model="newsActivity.content"
+                    v-model="news.content"
                     :placeholder="newsFormContentPlaceholder"
                     class="newsFormInput"
                     name="newsContent">
@@ -60,6 +59,26 @@
         </div>
       </div>
     </form>
+
+    <!-- The following bloc is needed in order to display the pin confirmation popup -->
+    <!--begin -->
+    <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+      <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+        <div class="popupHeader clearfix">
+          <a class="uiIconClose pull-right" title="Close"></a>
+          <span class="PopupTitle popupTitle"></span>
+        </div>
+        <div class="PopupContent popupContent">
+          <ul class="singleMessage popupMessage resizable">
+            <li>
+              <span class="confirmationIcon contentMessage"></span>
+            </li>
+          </ul>
+          <div class="uiAction uiActionBorder"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end -->
   </div>
 </template>
 
@@ -69,6 +88,20 @@ import autosize from 'autosize';
 
 export default {
   props: {
+    newsId: {
+      type: String,
+      required: false,
+      default: null
+    },
+    spaceId: {
+      type: String,
+      required: true
+    },
+    activityId: {
+      type: String,
+      required: false,
+      default: null
+    },
     showPinInput: {
       type: Boolean,
       required: false,
@@ -77,66 +110,77 @@ export default {
   },
   data() {
     return {
-      newsActivity: {
+      news: {
         id: '',
+        activityId: '',
         title: '',
-        content: '',
+        body: '',
         summary: '',
-        illustration: []
+        illustration: [],
+        spaceId: '',
+        pinned: false,
+      },
+      originalNews: {
+        id: '',
+        activityId: '',
+        title: '',
+        body: '',
+        summary: '',
+        illustration: [],
+        spaceId: '',
+        pinned: false,
       },
       file: {
         src: ''
       },
-      pinArticle: false,
       SMARTPHONE_LANDSCAPE_WIDTH: 768,
       titleMaxLength: 150,
       summaryMaxLength: 1000,
       autoSaveDelay: 1000,
-      extendedForm: this.$route.hash.split('/')['1'] === 'post' || this.$route.hash.split('/')['1'] === 'draft' ? true : false,
-      extendFormButtonClass: 'btn btn-primary',
-      extendFormIconClass: 'uiIconSimplePlus',
-      extendFormButtonTooltip: this.$t('news.composer.moreOptions'),
-      extendFormButtonValue: '',
-      newsFormExtendedClass: '',
+      newsFormTitle: '',
       newsFormTitlePlaceholder: `${this.$t('news.composer.placeholderTitleInput')}*`,
       newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',
+      initIllustrationDone: false,
       showDraftNews: false,
       postingNews: false,
       savingDraft: false,
       saveDraft : '',
-      draftSavingStatus: ''
+      draftSavingStatus: '',
+      illustrationChanged: false
     };
   },
   computed: {
+    editMode: function() {
+      return this.newsId !== null;
+    },
     postDisabled: function () {
-      return !this.newsActivity.title || !this.newsActivity.title.trim() || !this.newsActivity.content || !this.newsActivity.content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+      return !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+    },
+    updateDisabled: function () {
+      const emptyMandatoryFields = !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+      const noUpdatedField = !this.illustrationChanged && this.news.title === this.originalNews.title && this.news.summary === this.originalNews.summary && this.news.body === this.originalNews.body && this.news.pinned === this.originalNews.pinned;
+      return emptyMandatoryFields || noUpdatedField;
     }
   },
   watch: {
-    extendedForm: function() {
-      this.extendForm();
-      const currentLocation = this.$route.fullPath.split('/')['1'];
-      if(currentLocation !== 'draft' && currentLocation !== 'post' && this.extendedForm){
-        this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
+    'news.title': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'news.summary': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'news.body': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'news.illustration': function() {
+      if(this.initIllustrationDone) {
+        this.illustrationChanged = true;
+        this.autoSave();
       }
-    },
-    'newsActivity.title': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
-    'newsActivity.summary': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
-    'newsActivity.content': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } }
+    }
   },
   created() {
-    const textarea = document.querySelector('#activityComposerTextarea');
-    const shareButton = document.querySelector('#ShareButton');
-    if (textarea && shareButton) {
-      textarea.style.display = 'none';
-      shareButton.style.display = 'none';
+    if(this.newsId) {
+      this.initNewsComposerData(this.newsId);
     }
-    if(this.$route.hash.split('/')['2']) {
-      this.initNewsComposerData(this.$route.hash.split('/')['2']);
-    }
+    this.displayFormTitle();
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
@@ -159,7 +203,7 @@ export default {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
 
-      let extraPlugins = 'simpleLink,selectImage,suggester,font,justify';
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -167,12 +211,7 @@ export default {
         extraPlugins = 'simpleLink,selectImage';
       }
 
-      if(this.extendedForm) {
-        extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify';
-        CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
-      } else {
-        CKEDITOR.addCss('.cke_editable { font-size: 13px; }');
-      }
+      CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
 
       // this line is mandatory when a custom skin is defined
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
@@ -203,12 +242,65 @@ export default {
         },
         on: {
           change: function (evt) {
-            self.newsActivity.content = evt.editor.getData();
+            self.news.body = evt.editor.getData();
           }
         }
       });
     },
+    displayFormTitle: function() {
+      if(!this.editMode) {
+        newsServices.getSpaceById(this.spaceId).then(space => {
+          this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+        });
+      } else {
+        this.newsFormTitle = this.$t('news.edit.editNews');
+      }
+    },
+    initNewsComposerData: function(newsId) {
+      newsServices.getNewsById(newsId)
+        .then((data) => {
+          if (data.ok) {return data.json();}
+        })
+        .then(fetchedNode => {
+          if(fetchedNode){
+            this.news.id = fetchedNode.id;
+            this.news.title = fetchedNode.title;
+            this.news.summary = fetchedNode.summary;
+            this.news.body = fetchedNode.body;
+            this.news.pinned = fetchedNode.pinned;
+            CKEDITOR.instances['newsContent'].setData(fetchedNode.body);
+            if (fetchedNode.illustrationURL) {
+              newsServices.importFileFromUrl(fetchedNode.illustrationURL)
+                .then(resp => resp.blob())
+                .then(fileData => {
+                  const illustrationFile = new File([fileData], `illustration${newsId}`);
+                  const fileDetails = {
+                    id: null,
+                    uploadId: null,
+                    name: illustrationFile.name,
+                    size: illustrationFile.size,
+                    src: fetchedNode.illustrationURL,
+                    progress: null,
+                    file: illustrationFile,
+                    finished: true,
+                  };
+                  this.news.illustration.push(fileDetails);
+                  this.originalNews.illustration.push(fileDetails);
+                })
+                .then(() => this.initIllustrationDone = true);
+            } else {
+              this.initIllustrationDone = true;
+            }
+            this.originalNews = JSON.parse(JSON.stringify(this.news));
+            Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
+          }
+        });
+    },
     autoSave: function() {
+      // No draft saving in edit mode for the moment
+      if(this.editMode) {
+        return;
+      }
       // if the News is being posted, no need to autosave anymore
       if(this.postingNews) {
         return;
@@ -221,44 +313,8 @@ export default {
         Vue.nextTick(() => this.saveNewsDraft());
       }, this.autoSaveDelay);
     },
-    initNewsComposerData: function(draftId) {
-      newsServices.getNewsById(draftId)
-        .then((data) => {
-          if (data.ok) {return data.json();}
-        })
-        .then(newsDraftNode => {
-          if(newsDraftNode){
-            this.newsActivity.id = newsDraftNode.id;
-            this.newsActivity.title = newsDraftNode.title;
-            this.newsActivity.summary = newsDraftNode.summary;
-            this.newsActivity.content = newsDraftNode.body;
-            CKEDITOR.instances['newsContent'].setData(newsDraftNode.body);
-            if (newsDraftNode.illustrationURL) {
-              newsServices.importFileFromUrl(newsDraftNode.illustrationURL)
-                .then(resp => resp.blob())
-                .then(fileData => {
-                  const illustrationFile = new File([fileData], `illustration${draftId}`);
-                  const fileDetails = {
-                    id: null,
-                    uploadId: null,
-                    name: illustrationFile.name,
-                    size: illustrationFile.size,
-                    src: newsDraftNode.illustrationURL,
-                    progress: null,
-                    file: illustrationFile,
-                    finished: true,
-                  };
-                  this.newsActivity.illustration.push(fileDetails);
-                });
-            }
-            Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
-          } else {
-            this.$router.push({name: 'NewsComposer', params: {action: 'post'}});
-          }
-        });
-    },
     postNews: function () {
-      if(this.pinArticle === true) {
+      if(this.news.pinned === true) {
         const confirmText = this.$t('news.pin.confirm');
         const captionText = this.$t('news.pin.action');
         const confirmButton = this.$t('news.pin.btn.confirm');
@@ -282,111 +338,86 @@ export default {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
-      [this.newsActivity.summary, this.newsActivity.content] = newsServices.linkify(this.newsActivity.summary, this.newsActivity.content);
+      [this.news.summary, this.news.body] = newsServices.linkify(this.news.summary, this.news.body);
       const news = {
-        id: this.newsActivity.id,
-        title: this.newsActivity.title,
-        summary: this.newsActivity.summary,
-        body: this.newsActivity.content,
+        id: this.news.id,
+        title: this.news.title,
+        summary: this.news.summary,
+        body: this.news.body,
         author: eXo.env.portal.userName,
-        pinned: this.pinArticle,
-        spaceId: eXo.env.portal.spaceId,
+        pinned: this.news.pinned,
+        spaceId: this.spaceId,
         publicationState: 'published'
       };
 
-      if(this.newsActivity.illustration.length > 0) {
-        news.uploadId = this.newsActivity.illustration[0].uploadId;
+      if(this.news.illustration.length > 0) {
+        news.uploadId = this.news.illustration[0].uploadId;
       }
 
-      newsServices.saveNews(news).then(() => {
-        // reset form
-        this.resetNewsActivity();
-        this.$emit('draftDeleted');
-        this.extendedForm = false;
-        // refresh activity stream
-        const refreshButton = document.querySelector('.uiActivitiesDisplay #RefreshButton');
-        if (refreshButton) {
-          refreshButton.click();
-        }
-        this.$router.push({name: 'NewsComposer', params:{action : 'post'}});
+      newsServices.saveNews(news).then((createdNews) => {
         this.postingNews = false;
+        let createdNewsActivity = null;
+        if(createdNews.activities) {
+          const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
+          if(createdNewsActivities.length > 1) {
+            createdNewsActivity = createdNewsActivities[1];
+          }
+        }
+
+        if(createdNewsActivity) {
+          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+        } else {
+          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+        }
       });
     },
     extendForm: function(){
-      this.extendFormIconClass = this.extendedForm ? '' : 'uiIconSimplePlus';
-      this.extendFormButtonClass = this.extendedForm ? 'btn' : 'btn btn-primary';
-      this.extendFormButtonValue = this.extendedForm ? 'Cancel' : '';
-      this.extendFormButtonTooltip = this.extendedForm ? this.$t('news.composer.lessOptions') : this.$t('news.composer.moreOptions');
-      document.getElementById('UISpaceMenu').style.display = this.extendedForm ? 'none' : '';
-      document.getElementById('ActivityComposerExt').style.display = this.extendedForm ? 'none' : '';
-      document.getElementById('UISpaceActivitiesDisplay').style.display = this.extendedForm ? 'none' : '';
-      document.getElementById('UISpaceActivityStreamPortlet').style.padding = this.extendedForm ? '0' : '20px';
-      const spaceHomePortletColumn = document.getElementsByClassName('SpaceHomePortletsTDContainer');
-      if(spaceHomePortletColumn.length > 0) {
-        spaceHomePortletColumn[0].style.display = this.extendedForm ? 'none' : '';
-      }
-      const portletsContainers = document.getElementById('UIPage').getElementsByClassName('PORTLET-FRAGMENT');
-      Array.from(portletsContainers).forEach(portletContainer => {
-        if(portletContainer.getElementsByClassName('uiSpaceActivityStreamPortlet').length === 0) {
-          portletContainer.style.display = this.extendedForm ? 'none' : '';
-        }
-      });
-      document.getElementsByClassName('LeftNavigationTDContainer')[0].style.display = this.extendedForm ? 'none' : '';
-      document.getElementsByClassName('UIToolbarContainer')[0].style.zIndex = this.extendedForm ? 'unset' : '1030';
-      document.getElementById('UIToolbarContainer').style.left = this.extendedForm ? '0px' : '250px';
-      this.newsFormExtendedClass = this.extendedForm ? 'extended' : '';
-      this.newsFormContentHeight = this.extendedForm ? '250' : '110';
-      document.body.style.overflow = this.extendedForm ? 'hidden' : 'auto';
+      document.body.style.overflow = 'hidden';
+
       this.initCKEditor();
-      if (!this.extendedForm){
-        this.$router.push('/');
-      }
     },
     saveNewsDraft: function () {
       const news = {
-        title: this.newsActivity.title,
-        summary: this.newsActivity.summary,
-        body: this.newsActivity.content,
+        title: this.news.title,
+        summary: this.news.summary,
+        body: this.news.body,
         author: eXo.env.portal.userName,
         pinned: false,
-        spaceId: eXo.env.portal.spaceId,
+        spaceId: this.spaceId,
         publicationState: ''
       };
-      if (this.newsActivity.illustration.length > 0) {
-        news.uploadId = this.newsActivity.illustration[0].uploadId;
+      if (this.news.illustration.length > 0) {
+        news.uploadId = this.news.illustration[0].uploadId;
       } else {
         news.uploadId = '';
       }
-      const draftExists = this.$route.hash.split('/')['2'] || this.$route.fullPath.split('/')['1'] === 'draft';
-      if (draftExists) {
-        if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
-          news.id = this.newsActivity.id;
+      if (this.news.id) {
+        if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
+          news.id = this.news.id;
           newsServices.updateNews(news)
             .then((updatedNews) => {
-              this.newsActivity.title = updatedNews.title;
-              if(this.newsActivity.summary !== updatedNews.summary) {
-                this.newsActivity.summary = updatedNews.summary;
+              this.news.title = updatedNews.title;
+              if(this.news.summary !== updatedNews.summary) {
+                this.news.summary = updatedNews.summary;
               }
-              if(this.newsActivity.content !== updatedNews.body) {
-                this.newsActivity.content = updatedNews.body;
+              if(this.news.body !== updatedNews.body) {
+                this.news.body = updatedNews.body;
                 CKEDITOR.instances['newsContent'].setData(updatedNews.body);
               }
             })
             .then(() => this.$emit('draftUpdated'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         } else {
-          newsServices.deleteDraft(this.newsActivity.id)
+          newsServices.deleteDraft(this.news.id)
             .then(() => this.$emit('draftDeleted'))
-            .then(() => this.$router.push({name: 'NewsComposer', params: {action: 'post'}}))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         }
         this.savingDraft = false;
-      } else if(this.newsActivity.title || this.newsActivity.summary || this.newsActivity.content || this.newsActivity.illustration.length > 0) {
+      } else if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
         news.publicationState = 'draft';
         newsServices.saveNews(news).then((createdNews) => {
-          this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: createdNews.id}});
           this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
-          this.newsActivity.id = createdNews.id;
+          this.news.id = createdNews.id;
           this.savingDraft = false;
           this.$emit('draftCreated');
         });
@@ -397,15 +428,84 @@ export default {
     onSelectDraft: function(draftId){
       this.resetNewsActivity();
       this.initNewsComposerData(draftId);
-      this.$router.push({name: 'NewsDraft', params: {action: 'draft', nodeId: draftId}});
     },
     resetNewsActivity: function(){
-      this.newsActivity.id = '';
-      this.newsActivity.title = '';
-      this.newsActivity.summary = '';
-      this.newsActivity.content = '';
-      this.newsActivity.illustration = [];
-      this.pinArticle = false;
+      this.news.id = '';
+      this.news.title = '';
+      this.news.summary = '';
+      this.news.body = '';
+      this.news.pinned = false;
+      CKEDITOR.instances['newsContent'].setData('');
+      this.news.illustration = [];
+    },
+    updateNews: function () {
+      this.confirmAndUpdateNews().then(() => {
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+      }).catch (function() {
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+      });
+    },
+    updateAndPostNews: function () {
+      const self = this;
+      this.confirmAndUpdateNews().then(() => {
+        if(self.activityId)
+        {
+          const activity = {
+            id: self.activityId,
+            title: '',
+            body: '',
+            type: 'news',
+            templateParams: {
+              newsId: self.news.id,
+            },
+            updateDate: new Date().getTime()
+          };
+
+          return newsServices.updateAndPostNewsActivity(activity);
+        }
+      }).then(() => {
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+      }).catch (function() {
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+      });
+    },
+    confirmAndUpdateNews: function() {
+      if(this.news.pinned !== this.originalNews.pinned) {
+        let confirmText = this.$t('news.pin.confirm');
+        let captionText = this.$t('news.pin.action');
+        const confirmButton = this.$t('news.pin.btn.confirm');
+        const cancelButton = this.$t('news.pin.btn.cancel');
+        if(this.news.pinned === false) {
+          confirmText = this.$t('news.unpin.confirm').replace('{0}', this.news.title);
+          captionText = this.$t('news.unpin.action');
+        }
+        const self = this;
+        return new Promise(function(resolve) {
+          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews().then(resolve()); }, label : confirmButton}], captionText, confirmText, cancelButton);
+        });
+      } else {
+        return this.doUpdateNews();
+      }
+    },
+    doUpdateNews: function () {
+      [this.news.summary, this.news.body] = newsServices.linkify(this.news.summary, this.news.body);
+      const updatedNews = {
+        id: this.news.id,
+        title: this.news.title,
+        summary: this.news.summary != null ? this.news.summary : '',
+        body: this.news.body,
+        pinned: this.news.pinned,
+        publicationState: 'published'
+      };
+
+      if(this.news.illustration != null && this.news.illustration.length > 0) {
+        updatedNews.uploadId = this.news.illustration[0].uploadId;
+      } else if(this.originalNews.illustrationURL !== null) {
+        // an empty uploadId means the illustration must be deleted
+        updatedNews.uploadId = '';
+      }
+
+      return newsServices.updateNews(updatedNews);
     }
   }
 };

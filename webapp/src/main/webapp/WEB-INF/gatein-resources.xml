@@ -34,6 +34,45 @@
   </portal-skin>
 
   <portlet>
+    <name>NewsComposer</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/newsActivityComposer.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commons-editor</module>
+        <as>editor</as>
+      </depends>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+      <depends>
+        <module>fileDropComponent</module>
+      </depends>
+      <depends>
+        <module>modalComponent</module>
+      </depends>
+      <depends>
+        <module>suggesterComponent</module>
+      </depends>
+      <depends>
+        <module>socialUtil</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
     <name>News</name>
     <module>
       <script>
@@ -58,6 +97,13 @@
       </depends>
     </module>
   </portlet>
+
+  <module>
+    <name>newsComposerIntegration</name>
+    <script>
+      <path>/js/newsComposerIntegration.js</path>
+    </script>
+  </module>
 
   <module>
     <name>suggesterComponent</name>
@@ -93,39 +139,6 @@
     </depends>
     <depends>
       <module>filedrop</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>NewsActivityComposer</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/newsActivityComposer.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-    <depends>
-      <module>eXoVueI18n</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-      <as>$</as>
-    </depends>
-    <depends>
-      <module>extensionRegistry</module>
-    </depends>
-    <depends>
-      <module>fileDropComponent</module>
-    </depends>
-    <depends>
-      <module>suggesterComponent</module>
-    </depends>
-    <depends>
-      <module>modalComponent</module>
-    </depends>
-    <depends>
-      <module>suggesterComponent</module>
     </depends>
   </module>
 

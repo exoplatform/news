@@ -11,7 +11,7 @@
       </div>
       <div class="uploadedFile">
         <div v-if="files.length > 0" class="abortFile">
-          <div :title="$t('news.composer.btn.cancel')" class="removeButton" href="#" rel="tooltip"
+          <div :title="$t('news.composer.btn.remove')" class="removeButton" href="#" rel="tooltip"
                data-placement="top" @click="abortUpload(files[0].name)">
             <i class="uiIconRemove"></i>
           </div>

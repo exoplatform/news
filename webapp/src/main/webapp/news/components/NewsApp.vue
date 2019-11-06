@@ -78,7 +78,7 @@ export default {
           data.forEach((item) => {
             let newsUrl = '';
             const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
-            newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${item.path}`;
+            newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${encodeURI(item.path)}`;
             const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
             const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
             result.push({

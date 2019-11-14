@@ -63,6 +63,21 @@
       img.pull-left {
         margin-right: 15px;
       }
+      .video {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.24%;
+        margin-bottom: 10px;
+
+        iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
   }
 
@@ -189,6 +204,21 @@
       }
       img.pull-left {
         margin-right: 15px;
+      }
+      .video {
+        position: relative;
+        width: 60%;
+        height: 0;
+        padding-bottom: 33.74%;
+        margin: 15px auto;
+
+        iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
       }
     }
 
@@ -492,6 +522,90 @@
   }
 }
 
+.videoDialog {
+  .cke_dialog {
+    width: auto;
+
+    .cke_dialog_body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px;
+
+      .cke_dialog_title {
+        line-height: 20px;
+        background-color: #FFFFFF;
+        padding: 0px;
+      }
+
+      .uiIconClose {
+        top: 15px;
+        right: 15px;
+        width: 30px;
+        height: 30px;
+      }
+
+      .uiIconClose:before {
+        font-family: 'PLF-FONT-ICONS';
+        content: "\e937";
+        color: #a8b3c5;
+        font-size: 30px;
+      }
+
+      .cke_dialog_contents {
+        height: ~"calc( 100% - 35px )";
+        width: auto;
+
+        .cke_dialog_contents_body {
+          overflow: hidden;
+          display: table-cell;
+          max-width: 100vw;
+          padding: 5px 0px 0px 0px;
+
+          .cke_dialog_ui_input_text {
+            position: relative;
+          }
+
+          .videoURL {
+            height: 35px;
+            min-width: 95%;
+            width: 100%;
+            max-width: calc(100vw - 140px);
+            line-height: 30px;
+          }
+
+          .uiIconVideoURLOk, .uiIconVideoURLNok {
+            line-height: 35px;
+            position: absolute;
+            top: 0px;
+            right: 8px;
+          }
+
+          .uiIconVideoURLOk:before {
+            content: "\e9c6";
+            color: #2EB58C;
+
+          }
+
+          .uiIconVideoURLNok:before {
+            content: "\e9cf";
+            color: #BC4343;
+          }
+        }
+
+        .cke_dialog_footer {
+          border: none;
+          padding: 0;
+          text-align: right;
+
+          .cke_dialog_footer_buttons {
+            margin: 5px 0px 0px 0px;
+          }
+        }
+      }
+    }
+  }
+}
 
 @media screen and (max-width: 1025px) {
   #newsActivityComposer #newsForm .dropZone img {

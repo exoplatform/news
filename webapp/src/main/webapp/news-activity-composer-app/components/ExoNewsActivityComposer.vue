@@ -158,7 +158,7 @@ export default {
       return this.newsId !== null;
     },
     postDisabled: function () {
-      return !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+      return !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
     },
     updateDisabled: function () {
       const emptyMandatoryFields = !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
@@ -204,7 +204,9 @@ export default {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
 
-      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify';
+      CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -222,7 +224,7 @@ export default {
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
         removePlugins: 'image,confirmBeforeReload,maximize,resize',
-        extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]',
+        allowedContent: true,
         toolbarLocation: 'top',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
         toolbar: [
@@ -232,12 +234,13 @@ export default {
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
           { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
         ],
         format_tags: 'p;h1;h2;h3',
         autoGrow_minHeight: this.newsFormContentHeight,
         height: this.newsFormContentHeight,
         bodyClass: 'newsContent',
+        dialog_noConfirmCancel: true,
         sharedSpaces: {
           top: 'newsTop'
         },

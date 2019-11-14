@@ -1,0 +1,1 @@
+<%=_ctx.appRes("news.notification.description",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE)%>

@@ -25,5 +25,6 @@
   <import>war:/conf/news/news-configuration.xml</import>
   <import>war:/conf/news/news-templates-configuration.xml</import>
   <import>war:/conf/news/portal-configuration.xml</import>
+  <import>war:/conf/news/notification/configuration.xml</import>
 
 </configuration>

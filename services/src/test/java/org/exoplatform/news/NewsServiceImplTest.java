@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
@@ -30,6 +31,13 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 
+import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.command.NotificationCommand;
+import org.exoplatform.commons.api.notification.command.NotificationExecutor;
+import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -53,12 +61,14 @@ import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.Lifecy
 import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
@@ -69,10 +79,14 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore("javax.management.*")
 public class NewsServiceImplTest {
 
   @Mock
@@ -178,18 +192,18 @@ public class NewsServiceImplTest {
   public void shouldGetNullWhenNewsDoesNotExist() throws Exception {
     // Given
     NewsService newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl);
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -429,7 +443,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCreateNewsAndPinIt() throws Exception {
+  public void shouldCreateNewsDraftAndPinIt() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
@@ -498,6 +512,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(createdNewsDraft);
     // When
     News createdNews = newsServiceSpy.createNews(news);
 
@@ -1018,13 +1033,12 @@ public class NewsServiceImplTest {
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
-
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news);
 
     // When
     newsServiceSpy.createNews(news);
 
     // Then
-    verify(session, times(1)).getNodeByUUID(news.getId());
     verify(newsServiceSpy, times(1)).createNews(news);
     verify(newsServiceSpy, times(0)).updateNews(news);
   }
@@ -1065,6 +1079,7 @@ public class NewsServiceImplTest {
     news.setTitle("title");
     news.setSummary("summary");
     news.setBody("body");
+    news.setActivities("1:38");
     news.setAuthor("john");
     String sDate1 = "10/09/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1079,17 +1094,18 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(anyString())).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
-
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news);
 
     // When
     newsServiceSpy.createNews(news);
 
     // Then
-    verify(session, times(1)).getNodeByUUID(news.getId());
     verify(newsServiceSpy, times(1)).updateNews(news);
+    verify(newsServiceSpy, times(1)).sendNotification(news);
   }
 
   @Test
@@ -1251,6 +1267,42 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 6);
     verify(newsNode, times(1)).setProperty("exo:viewers", "david,test,hedi,root");
     verify(newsNode, times(1)).save();
+  }
+
+  @Test
+  public void shouldGetExceptionWhenNewsDoesNotExists() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setId("id123");
+    news.setViewsCount((long) 5);
+    when(session.getNodeByUUID("id123")).thenReturn(null);
+    exceptionRule.expect(Exception.class);
+    exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
+
+    // When
+    newsService.markAsRead(news, "root");
   }
 
   @Test
@@ -1656,6 +1708,374 @@ public class NewsServiceImplTest {
 
     // Then
     assertEquals(true, canPinNews);
+
+  }
+
+  @Test
+  public void shouldPostNewsActivity() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setAuthor("root");
+    news.setSpaceId("1");
+    news.setId("id123");
+    Identity poster = new Identity("root");
+    Identity spaceIdentity = new Identity("1");
+    spaceIdentity.setRemoteId("space1");
+    spaceIdentity.setProviderId("space");
+    Space space = new Space();
+    space.setId("1");
+    space.setPrettyName("space1");
+    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity("space", "space1", false)).thenReturn(spaceIdentity);
+    when(spaceService.getSpaceById("1")).thenReturn(space);
+
+    // When
+    newsService.postNewsActivity(news);
+
+    // Then
+    ArgumentCaptor<Identity> identityCaptor = ArgumentCaptor.forClass(Identity.class);
+    ArgumentCaptor<ExoSocialActivity> activityCaptor = ArgumentCaptor.forClass(ExoSocialActivity.class);
+    verify(activityManager, times(1)).saveActivityNoReturn(identityCaptor.capture(), activityCaptor.capture());
+    Identity identityCaptorValue = identityCaptor.getValue();
+    assertEquals(SpaceIdentityProvider.NAME, identityCaptorValue.getProviderId());
+    assertEquals("space1", identityCaptorValue.getRemoteId());
+    ExoSocialActivity activityCaptorValue = activityCaptor.getValue();
+    assertEquals("news", activityCaptorValue.getType());
+    assertEquals(1, activityCaptorValue.getTemplateParams().size());
+    assertEquals("id123", activityCaptorValue.getTemplateParams().get("newsId"));
+  }
+
+  @Test
+  public void shouldUpdateNewsActivities() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    News news = new News();
+    news.setAuthor("root");
+    news.setSpaceId("1");
+    news.setId("id123");
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setId("38");
+    Identity poster = new Identity("root");
+    Identity spaceIdentity = new Identity("1");
+    spaceIdentity.setRemoteId("space1");
+    spaceIdentity.setProviderId("space");
+    Space space = new Space();
+    space.setId("1");
+    space.setPrettyName("space1");
+    Node newsNode = mock(Node.class);
+    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity("space", "space1", false)).thenReturn(spaceIdentity);
+    when(spaceService.getSpaceById("1")).thenReturn(space);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    when(newsNode.hasProperty("exo:activities")).thenReturn(true);
+    // When
+    newsService.updateNewsActivities(activity, news);
+
+    // Then
+    assertEquals("1:38", news.getActivities());
+    verify(newsNode, times(1)).setProperty("exo:activities", "1:38");
+    verify(newsNode, times(1)).save();
+  }
+
+  @Test
+  public void shouldGetAllNewsDraftNodesWhenExists() throws Exception {
+    // Given
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    QueryManager qm = mock(QueryManager.class);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(workSpace.getQueryManager()).thenReturn(qm);
+    Query query = mock(Query.class);
+    String queryString =
+                       "SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = 'root'AND exo:spaceId='1'";
+    when(qm.createQuery(queryString, "sql")).thenReturn(query);
+    QueryResult queryResult = mock(QueryResult.class);
+    when(query.execute()).thenReturn(queryResult);
+    NodeIterator it = mock(NodeIterator.class);
+    when(queryResult.getNodes()).thenReturn(it);
+    when(it.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+
+    Node node1 = mock(Node.class);
+    Node node2 = mock(Node.class);
+    Node node3 = mock(Node.class);
+
+    when(node1.getSession()).thenReturn(session);
+    when(node2.getSession()).thenReturn(session);
+    when(node3.getSession()).thenReturn(session);
+    when(it.nextNode()).thenReturn(node1).thenReturn(node2).thenReturn(node3);
+    Property property1 = mock(Property.class);
+    Property property2 = mock(Property.class);
+    Property property3 = mock(Property.class);
+    when(node1.getProperty("exo:title")).thenReturn(property1);
+    when(node1.hasProperty("exo:title")).thenReturn(true);
+    when(node2.getProperty("exo:title")).thenReturn(property2);
+    when(node2.hasProperty("exo:title")).thenReturn(true);
+    when(node3.getProperty("exo:title")).thenReturn(property3);
+    when(node3.hasProperty("exo:title")).thenReturn(true);
+    when(property1.getString()).thenReturn("title1");
+    when(property2.getString()).thenReturn("title2");
+    when(property3.getString()).thenReturn("title3");
+    when(property1.getDate()).thenReturn(Calendar.getInstance());
+    when(property2.getDate()).thenReturn(Calendar.getInstance());
+    when(property3.getDate()).thenReturn(Calendar.getInstance());
+    when(node1.getProperty("exo:pinned")).thenReturn(property1);
+    when(node2.getProperty("exo:pinned")).thenReturn(property2);
+    when(node3.getProperty("exo:pinned")).thenReturn(property3);
+    when(node1.getProperty("exo:spaceId")).thenReturn(property1);
+    when(node2.getProperty("exo:spaceId")).thenReturn(property2);
+    when(node3.getProperty("exo:spaceId")).thenReturn(property3);
+    when(node1.hasProperty("exo:activities")).thenReturn(false);
+    when(node2.hasProperty("exo:activities")).thenReturn(false);
+    when(node3.hasProperty("exo:activities")).thenReturn(false);
+    when(node1.hasProperty("exo:viewsCount")).thenReturn(false);
+    when(node2.hasProperty("exo:viewsCount")).thenReturn(false);
+    when(node3.hasProperty("exo:viewsCount")).thenReturn(false);
+    when(property1.getBoolean()).thenReturn(true);
+    when(property2.getBoolean()).thenReturn(true);
+    when(property3.getBoolean()).thenReturn(true);
+    when(property1.getLong()).thenReturn((long) 10);
+    when(property2.getLong()).thenReturn((long) 10);
+    when(property3.getLong()).thenReturn((long) 10);
+    when(node1.hasNode("illustration")).thenReturn(false);
+    when(node2.hasNode("illustration")).thenReturn(false);
+    when(node3.hasNode("illustration")).thenReturn(false);
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getDisplayName()).thenReturn("Test news space");
+    when(space.getGroupId()).thenReturn("/spaces/test_news_space");
+    Identity poster = mock(Identity.class);
+    when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
+
+    Profile p1 = new Profile(poster);
+    p1.setProperty("fullName", "root root");
+
+    when(poster.getProfile()).thenReturn(p1);
+    // When
+    List<News> newsList = newsService.getNewsDrafts("1", "root");
+
+    // Then
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    verify(it, times(4)).hasNext();
+    verify(it, times(3)).nextNode();
+    assertEquals("title1", newsList.get(0).getTitle());
+    assertEquals("title2", newsList.get(1).getTitle());
+    assertEquals("title3", newsList.get(2).getTitle());
+  }
+
+  @Test
+  public void shouldNotSendNotificationAsContentSpaceIsNull() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setAuthor("root");
+    news.setSpaceId("1");
+    news.setActivities("1:38");  
+    when(spaceService.getSpaceById("1")).thenReturn(null);
+    exceptionRule.expect(NullPointerException.class);
+    exceptionRule.expectMessage("Cannot find a space with id 1, it may not exist");
+
+    newsService.sendNotification(news);
+
+  }
+
+  @Test
+  public void shouldNotSendNotificationAsNewsNodeDoesNotExist() throws Exception {
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+
+    News news = new News();
+    news.setTitle("unpinned");
+    news.setAuthor("root");
+    news.setId("id123");
+    news.setSpaceId("1");
+    news.setActivities("1:38");
+
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    space1.setGroupId("space1");
+
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
+    when(session.getNodeByUUID("id123")).thenReturn(null);
+    exceptionRule.expect(ItemNotFoundException.class);
+    exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
+
+    newsService.sendNotification(news);
+
+  }
+
+  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class })
+  @Test
+  public void shouldSendNotification() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl);
+
+    News news = new News();
+    news.setTitle("title");
+    news.setAuthor("root");
+    news.setId("id123");
+    news.setSpaceId("1");
+    news.setActivities("1:38");
+
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setDisplayName("space1");
+    space1.setGroupId("space1");
+
+    Node newsNode = mock(Node.class);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    when(newsNode.hasNode("illustration")).thenReturn(true);
+    PowerMockito.mockStatic(PropertyManager.class);
+    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
+
+    PowerMockito.mockStatic(LinkProvider.class);
+    when(LinkProvider.getSingleActivityUrl("38")).thenReturn("portal/intranet/activity?id=38");
+    PowerMockito.mockStatic(NotificationContextImpl.class);
+    NotificationContext ctx = mock(NotificationContext.class);
+    NotificationExecutor executor = mock(NotificationExecutor.class);
+    ArgumentLiteral<String> CONTENT_TITLE = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
+
+    ArgumentLiteral<String> CONTENT_AUTHOR = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
+
+    ArgumentLiteral<String> CONTENT_SPACE = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
+
+    ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
+
+    ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
+
+    ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
+
+    when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
+    when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
+    when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
+    when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
+    when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
+    when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
+
+    when(ctx.getNotificationExecutor()).thenReturn(executor);
+    PowerMockito.mockStatic(PluginKey.class);
+    PluginKey plugin = mock(PluginKey.class);
+    when(PluginKey.key("PostNewsNotificationPlugin")).thenReturn(plugin);
+    NotificationCommand notificationCommand = mock(NotificationCommand.class);
+    when(ctx.makeCommand(plugin)).thenReturn(notificationCommand);
+    NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
+    when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
+    when(notificationExecutor.execute(ctx)).thenReturn(true);
+
+    // When
+    newsService.sendNotification(news);
+
+    // Then
+    verify(notificationExecutor, times(1)).execute(ctx);
 
   }
 

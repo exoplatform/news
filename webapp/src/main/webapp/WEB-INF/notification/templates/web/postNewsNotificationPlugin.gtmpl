@@ -1,0 +1,20 @@
+<li class="$READ clearfix" data-id="$NOTIFICATION_ID">
+  <div class="media">
+    <a href="$ACTIVITY_LINK">
+      <div class="avatarXSmall pull-left" style="width: 36px;">
+        <img src="$ILLUSTRATION_URL" />
+      </div>
+      <%
+        String creator = "<span class=\"notification_author\">" + CONTENT_AUTHOR + "</span>";
+		String spaceName = "<span class=\"notification_space\">" + CONTENT_SPACE + "</span>";
+		def notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+      %>
+      <div class="media-body" style="padding-left: 3px;">
+        <div class="contentSmall">
+        <div class="status" style="margin-left: 7px; color: #333333;">$notificationDescription</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <span class="remove-item" data-rest=""><i class="uiIconClose uiIconLightGray"></i></span>
+</li>

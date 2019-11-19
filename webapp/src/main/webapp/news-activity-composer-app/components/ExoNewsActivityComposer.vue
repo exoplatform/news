@@ -338,7 +338,7 @@ export default {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
-      [this.news.summary, this.news.body] = newsServices.linkify(this.news.summary, this.news.body);
+      this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       const news = {
         id: this.news.id,
         title: this.news.title,
@@ -488,7 +488,7 @@ export default {
       }
     },
     doUpdateNews: function () {
-      [this.news.summary, this.news.body] = newsServices.linkify(this.news.summary, this.news.body);
+      this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       const updatedNews = {
         id: this.news.id,
         title: this.news.title,

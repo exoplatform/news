@@ -39,7 +39,7 @@
           </div>
 
           <div v-if="news.summary" id="newsSummary" class="summary">
-            <span>{{ news.summary }}</span>
+            <span v-html="linkifiedSummary"></span>
           </div>
 
           <div id="newsBody" class="fullDetailsBody clearfix">
@@ -93,6 +93,11 @@ export default {
     return {
       showUpdateInfo: this.news.postedDate !== this.news.updatedDate,
     };
+  },
+  computed: {
+    linkifiedSummary : function() {
+      return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
+    }
   },
   mounted() {
     this.updateViewsCount();

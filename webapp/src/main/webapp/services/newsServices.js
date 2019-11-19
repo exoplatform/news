@@ -121,16 +121,27 @@ export function incrementViewsNumberOfNews (newsId) {
   });
 }
 
-export function linkify (newsSummary, newsContent) {
-  const newNewsContent = anchorme(newsContent,{
+export function linkifyText(text) {
+  return anchorme(text, {
+    attributes:[
+      {
+        name:'target',
+        value:'_blank'
+      },
+    ]
+  });
+}
+
+export function linkifyHTML(html, ckeditorInstanceName) {
+  return anchorme(html,{
     attributes:[
       {
         name:'target',
         value:'_blank'
       },
     ],
-    exclude:function(UrlObj){
-      const newsBodyElem = CKEDITOR.instances['newsContent'].document.$.body;
+    exclude:function(UrlObj) {
+      const newsBodyElem = CKEDITOR.instances[ckeditorInstanceName].document.$.body;
       const newsBodyP = newsBodyElem.querySelectorAll('p');
       for(let indexp = 0; indexp < newsBodyP.length; indexp++) {
         const links = newsBodyP[indexp].getElementsByTagName('a');
@@ -143,15 +154,6 @@ export function linkify (newsSummary, newsContent) {
 
     }
   });
-  const newNewsSummary = anchorme(newsSummary,{
-    attributes:[
-      {
-        name:'target',
-        value:'_blank'
-      },
-    ]
-  });
-  return [newNewsSummary, newNewsContent];
 }
 
 export function getSpaceById(id) {
@@ -165,4 +167,10 @@ export function getSpaceById(id) {
       throw new Error(`Error getting space with id ${id}`);
     }
   });
+}
+
+export function escapeHTML(unsafeText) {
+  const div = document.createElement('div');
+  div.innerText = unsafeText;
+  return div.innerHTML;
 }

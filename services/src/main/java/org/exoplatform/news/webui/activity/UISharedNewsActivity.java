@@ -1,11 +1,14 @@
 package org.exoplatform.news.webui.activity;
 
+import java.util.Map;
+
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.webui.activity.BaseUIActivity;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
-
-import java.util.Map;
 
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "war:/groovy/news/webui/activity/UISharedNewsActivity.gtmpl", events = {
     @EventConfig(listeners = BaseUIActivity.LoadLikesActionListener.class),
@@ -25,6 +28,16 @@ public class UISharedNewsActivity extends UINewsActivity {
     Map<String, String> templateParams = this.getActivity().getTemplateParams();
     if(templateParams != null) {
       return templateParams.get("sharedActivityId");
+    } else {
+      return null;
+    }
+  }
+
+  public String getPosterFullName() {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    Identity poster = identityManager.getIdentity(this.getActivity().getUserId(), true);
+    if (poster != null) {
+      return poster.getProfile().getFullName();
     } else {
       return null;
     }

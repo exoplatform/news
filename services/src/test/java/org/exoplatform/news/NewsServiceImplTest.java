@@ -42,6 +42,7 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.news.connector.NewsSearchConnector;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -332,7 +333,7 @@ public class NewsServiceImplTest {
   @Test
   public void shouldShareNewsWhenNewsExists() throws Exception {
     // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
             sessionProviderService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -369,9 +370,11 @@ public class NewsServiceImplTest {
     sharedNews.setSpacesNames(Arrays.asList("space1"));
     sharedNews.setActivityId("2");
     sharedNews.setNewsId("1");
+    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.SHARE_NEWS_CONTEXT));
 
     // When
-    newsService.shareNews(sharedNews, Arrays.asList(space1));
+    newsServiceSpy.shareNews(sharedNews, Arrays.asList(space1));
 
     // Then
     ArgumentCaptor<Identity> identityCaptor = ArgumentCaptor.forClass(Identity.class);
@@ -525,7 +528,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(createdNewsDraft);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(createdNewsDraft, NotificationConstants.POST_NEWS_CONTEXT);
     // When
     News createdNews = newsServiceSpy.createNews(news);
 
@@ -1055,7 +1058,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
 
     // When
     newsServiceSpy.createNews(news);
@@ -1121,14 +1124,14 @@ public class NewsServiceImplTest {
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published",new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
 
     // When
     newsServiceSpy.createNews(news);
 
     // Then
     verify(newsServiceSpy, times(1)).updateNews(news);
-    verify(newsServiceSpy, times(1)).sendNotification(news);
+    verify(newsServiceSpy, times(1)).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
   }
 
   @Test
@@ -1983,7 +1986,7 @@ public class NewsServiceImplTest {
     exceptionRule.expect(NullPointerException.class);
     exceptionRule.expectMessage("Cannot find a space with id 1, it may not exist");
 
-    newsService.sendNotification(news);
+    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
 
   }
 
@@ -2029,11 +2032,11 @@ public class NewsServiceImplTest {
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
 
-    newsService.sendNotification(news);
+    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
 
   }
 
-  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class })
+  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class})
   @Test
   public void shouldSendNotification() throws Exception {
     // Given
@@ -2095,6 +2098,8 @@ public class NewsServiceImplTest {
     ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
+    
+    ArgumentLiteral<String> CONTEXT = new ArgumentLiteral<String>(String.class, "CONTEXT");
 
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
     when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
@@ -2103,6 +2108,7 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
+    when(ctx.append(CONTEXT, "POST NEWS")).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);
     PowerMockito.mockStatic(PluginKey.class);
@@ -2113,9 +2119,12 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
 
     // When
-    newsService.sendNotification(news);
+    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);

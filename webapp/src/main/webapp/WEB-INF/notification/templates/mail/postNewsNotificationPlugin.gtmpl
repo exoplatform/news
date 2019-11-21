@@ -7,7 +7,15 @@
 <tr>
 <td  height="45" valign="middle" style="margin:0;height:45px;font-weight:bold;vertical-align:middle;;background-color: #efefef;font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif;color:#2f5e92;font-size:18px;text-align:center">
 <a href="#" style="text-decoration: none; color: #2f5e92; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif; font-size: 18px;">
-<%=_ctx.appRes("news.notification.title",CONTENT_SPACE)%>
+<%
+def title = "";
+if (CONTEXT.equals("POST NEWS")) {
+    title =  _ctx.appRes("news.notification.title",CONTENT_SPACE);
+} else if (CONTEXT.equals("SHARE NEWS")) {
+    title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
+}
+%>
+$title
 </a>
 						</td>
 </tr>
@@ -35,10 +43,14 @@
 <td align="left" bgcolor="#ffffff" width="90%" align="top" style="width: 90%; background-color: #ffffff; padding: 0 0; vertical-align: top;">
 <p style="margin: 0 0 10px; color: #333333; font-size: 13px; line-height: 18px;">
 <%
-String creator = "<span style=\"color: #578dc9; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
 String spaceName = "<span style=\"font-weight: bold;\">" + CONTENT_SPACE + "</span>";
-def notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
-def msg = _ctx.appRes("news.notification.message",CONTENT_TITLE);
+String creator = "<span style=\"color: #578dc9; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
+def notificationDescription = "";
+if (CONTEXT.equals("POST NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+} else if (CONTEXT.equals("SHARE NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
+}
 
 %>
 

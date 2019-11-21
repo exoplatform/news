@@ -34,6 +34,7 @@ if (activity && news) {
 
   def authorFullName = uicomponent.getUserFullName(news.author);
   def updaterFullName = uicomponent.getUserFullName(news.updater);
+  def posterFullName = uicomponent.getPosterFullName();
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
   def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
@@ -51,6 +52,7 @@ if (activity && news) {
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
   def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
   def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");
+  def labelSharedBy = _ctx.appRes("news.share.shareBy");
   def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
@@ -88,8 +90,15 @@ if (activity && news) {
     <div id="ActivityContextBox${activity.id}">
       <div class="newsDetails-description">
         <div class="newsDetails-header">
-
-          <div class="sharedNewsTitle">${activity.title}</div>
+          <%
+            String activityTitle="";
+            if (activity.title && !activity.title.isEmpty()) {
+              activityTitle = "<span> <i>"+ "\"" + activity.title + "\""+ "</i> </span>";
+            }
+          %>
+          <div><span class="sharedAuthor"> $labelSharedBy $posterFullName </span> </div>
+          <div class="sharedNewsTitle" style="padding-top: 8px;">$activityTitle</div>
+          <hr>
           <div class="sharedNewsDetails">
             <img src="$illustrationURL" class="newsImage illustrationPicture" alt="News"/>
             <div class="newsDetails">

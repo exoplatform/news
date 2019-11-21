@@ -1,1 +1,9 @@
-<%=_ctx.appRes("news.notification.description",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE)%>
+<%
+def notificationDescription = "";
+if (CONTEXT.equals("POST NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE);
+} else if (CONTEXT.equals("SHARE NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description.share",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE);
+}
+%>
+$notificationDescription

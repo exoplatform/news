@@ -22,17 +22,20 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 
 
 @TemplateConfigs(templates = {
-    @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl")})
 public class WebTemplateProvider extends TemplateProvider {
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
 
   public WebTemplateProvider(InitParams initParams) {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(ShareNewsNotificationPlugin.ID), new TemplateBuilder());
   }
 
   private class TemplateBuilder extends AbstractTemplateBuilder {
@@ -49,6 +52,7 @@ public class WebTemplateProvider extends TemplateProvider {
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
       String illustrationUrl = notification.getValueOwnerParameter(NotificationConstants.ILLUSTRATION_URL);
       String activityLink = notification.getValueOwnerParameter(NotificationConstants.ACTIVITY_LINK);
+      String context = notification.getValueOwnerParameter(NotificationConstants.CONTEXT);
 
       EntityEncoder encoder = HTMLEntityEncoder.getInstance();
       templateContext.put("CONTENT_TITLE", encoder.encode(contentTitle));
@@ -56,6 +60,7 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
+      templateContext.put("CONTEXT", encoder.encode(context));
       templateContext.put("READ",
                           Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"
                                                                                                                                 : "unread");

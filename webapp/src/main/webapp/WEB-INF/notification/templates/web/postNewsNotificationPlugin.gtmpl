@@ -5,9 +5,15 @@
         <img src="$ILLUSTRATION_URL" />
       </div>
       <%
-        String creator = "<span class=\"notification_author\">" + CONTENT_AUTHOR + "</span>";
 		String spaceName = "<span class=\"notification_space\">" + CONTENT_SPACE + "</span>";
-		def notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+		String creator = "<span class=\"notification_author\">" + CONTENT_AUTHOR + "</span>";
+		def notificationDescription = "";
+        if (CONTEXT.equals("POST NEWS")) {
+          notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+        } else if (CONTEXT.equals("SHARE NEWS")) {
+          notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
+        }
+
       %>
       <div class="media-body" style="padding-left: 3px;">
         <div class="contentSmall">

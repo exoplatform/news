@@ -41,6 +41,8 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> ACTIVITY_LINK    = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
+  public static final ArgumentLiteral<String> CONTEXT          = new ArgumentLiteral<String>(String.class, "CONTEXT");
+
   private SpaceService                        spaceService;
 
   private UserHandler                         userhandler;
@@ -64,6 +66,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   @Override
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     String contentTitle = ctx.value(CONTENT_TITLE);
+    String context = ctx.value(CONTEXT);
     String contentAuthorUserName = ctx.value(CONTENT_AUTHOR);
     User contentAuthorUser;
     String contentAuthor = contentAuthorUserName;
@@ -93,6 +96,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
                            .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
                            .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
+                           .with(NotificationConstants.CONTEXT, context)
                            .key(getKey())
                            .end();
 

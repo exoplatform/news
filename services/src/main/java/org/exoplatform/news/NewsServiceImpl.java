@@ -25,8 +25,10 @@ import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
+import org.exoplatform.news.connector.NewsSearchConnector;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
@@ -44,10 +46,13 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
+import org.exoplatform.services.wcm.search.ResultNode;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -105,13 +110,19 @@ public class NewsServiceImpl implements NewsService {
 
   private WCMPublicationService wCMPublicationService;
 
+  private NewsSearchConnector newsSearchConnector;
+
+  private static final Log LOG = ExoLogger.getLogger(NewsServiceImpl.class);
+
+
   public NewsServiceImpl(RepositoryService repositoryService, SessionProviderService sessionProviderService,
                          NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager dataDistributionManager,
                          SpaceService spaceService, ActivityManager activityManager, IdentityManager identityManager,
                          UploadService uploadService, HTMLUploadImageProcessor imageProcessor, LinkManager linkManager,
                          PublicationService publicationService,
                          PublicationManager publicationManager,
-                         WCMPublicationService wCMPublicationService) {
+                         WCMPublicationService wCMPublicationService,
+                         NewsSearchConnector newsSearchConnector) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -125,6 +136,7 @@ public class NewsServiceImpl implements NewsService {
     this.publicationService = publicationService;
     this.publicationManager = publicationManager;
     this.wCMPublicationService = wCMPublicationService;
+    this.newsSearchConnector = newsSearchConnector;
   }
 
   /**
@@ -132,7 +144,7 @@ public class NewsServiceImpl implements NewsService {
    * A news is composed of an activity and a CMS node containing the data.
    * If the given News has an id and that a draft already exists with this id, the draft is updated and published.
    * @param news The news to create
-   * @throws RepositoryException
+   * @throws Exception
    */
   public News createNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
@@ -624,6 +636,9 @@ public class NewsServiceImpl implements NewsService {
     news.setUpdater(getStringProperty(node, "exo:lastModifier"));
     news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPublicationDate(getPublicationDate(node));
+    if (node.hasProperty("publication:currentState")) {
+      news.setPublicationState(node.getProperty("publication:currentState").getString());
+    }
     news.setPinned(node.getProperty("exo:pinned").getBoolean());
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     if (node.hasProperty("exo:activities")) {
@@ -641,6 +656,7 @@ public class NewsServiceImpl implements NewsService {
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
       news.setIllustration(bytes);
       news.setIllustrationUpdateDate(illustrationContentNode.getProperty("exo:dateModified").getDate().getTime());
+      news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration");
     }
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -877,4 +893,38 @@ public class NewsServiceImpl implements NewsService {
   private String getActivityPermalink(String activityId) {
     return LinkProvider.getSingleActivityUrl(activityId);
   }
+
+  /**
+   * Search news with the given text
+   * @param text The text to be searched
+   */
+  public List<News> searchNews(String text, String lang) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+    SearchContext context = new SearchContext(null, null);
+    context.lang(lang);
+    try {
+      List<News> newsList = new ArrayList<>();
+      List<ResultNode> resultNode = newsSearchConnector.search(context, text, 0, 0, "relevancy", "desc");
+      resultNode.forEach(res -> {
+        try {
+          News news = convertNodeToNews(res.getNode());
+          if (news.getPublicationState().equals("published")){
+            newsList.add(news);
+          }
+        } catch (Exception e) {
+          LOG.error("Error while processing search result in News", e);
+        }
+      });
+      return newsList;
+    }
+    finally {
+      if(session != null) {
+        session.logout();
+      }
+    }
+  }
+
 }

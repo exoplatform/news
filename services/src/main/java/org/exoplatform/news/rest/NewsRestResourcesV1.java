@@ -154,11 +154,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         List<News> allNews = newsService.getNews();
         if (allNews != null) {
           for (News newsItem : allNews) {
-            if (newsItem.getIllustration() != null && newsItem.getIllustration().length > 0) {
-              newsItem.setIllustrationURL("/portal/rest/v1/news/" + newsItem.getId() + "/illustration");
-            } else {
-              newsItem.setIllustrationURL(null);
-            }
             newsItem.setIllustration(null);
           }
         } else {
@@ -206,13 +201,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
       }
-
-      if(news.getIllustration() != null && news.getIllustration().length > 0) {
-        news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration");
-      } else {
-        news.setIllustrationURL(null);
-      }
-      // do not send the illustration by default since it can be heavy
       news.setIllustration(null);
 
       return Response.ok(news).build();
@@ -567,6 +555,47 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       return Response.ok().build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news with id " + id, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("/search")
+  @RolesAllowed("users")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Search news",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This search news"
+  )
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News list returned"),
+          @ApiResponse (code = 400, message = "Invalid query input"),
+          @ApiResponse (code = 401, message = "User not authorized to search news"),
+          @ApiResponse (code = 500, message = "Internal server error")})
+  public Response searchNews (@Context HttpServletRequest request,
+                              @ApiParam(value = "search text", required = true) @QueryParam("text") String text){
+    try {
+      if (StringUtils.isBlank(text)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      String lang = request.getLocale().getLanguage();
+      List<News> result =  newsService.searchNews(text,lang);
+      if (result != null) {
+        for (News newsItem : result) {
+          newsItem.setIllustration(null);
+        }
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      return Response.ok(result).build();
+    } catch (Exception e) {
+      LOG.error("Error when searching news with text " + text, e);
       return Response.serverError().build();
     }
   }

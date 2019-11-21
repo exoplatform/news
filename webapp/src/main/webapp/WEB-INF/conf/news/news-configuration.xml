@@ -31,6 +31,18 @@
     <type>org.exoplatform.news.rest.NewsRestResourcesV1</type>
   </component>
 
+  <component>
+    <key>org.exoplatform.news.connector.NewsSearchConnector</key>
+    <type>org.exoplatform.news.connector.NewsSearchConnector</type>
+    <init-params>
+      <properties-param>
+        <name>constructor.params</name>
+        <property name="searchType" value="News"/>
+        <property name="displayName" value="News"/>
+      </properties-param>
+    </init-params>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
     <component-plugin>

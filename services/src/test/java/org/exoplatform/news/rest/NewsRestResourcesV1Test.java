@@ -317,7 +317,7 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
-  
+
   @Test
   public void shouldGetOKWhenUpdatingAndUnpinNewsAndNewsExistsAndAndUserIsPublisher() throws Exception {
     // Given
@@ -581,7 +581,7 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
-  
+
   @Test
   public void shouldGetBadRequestWhenPatchNewsAndUpdatedNewsIsNull() throws Exception {
     // Given
@@ -595,7 +595,7 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
-  
+
   @Test
   public void shouldGetUnauthorizedWhenPatchNewsAndUSpaceIsNull() throws Exception {
     // Given
@@ -1090,7 +1090,7 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
-  
+
   @Test
   public void shouldGetAllPublishedNewsWhenExist() throws Exception{
     //Given

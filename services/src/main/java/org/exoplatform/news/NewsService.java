@@ -3,6 +3,7 @@ package org.exoplatform.news;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.social.core.space.model.Space;
+
 import java.util.List;
 
 public interface NewsService {
@@ -32,4 +33,5 @@ public interface NewsService {
 
   public boolean canPinNews();
 
+  List<News> searchNews(String searchText, String lang) throws Exception;
 }

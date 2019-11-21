@@ -169,6 +169,14 @@ export function getSpaceById(id) {
   });
 }
 
+export function searchNews(searchText) {
+  return fetch(`${newsConstants.NEWS_API}/search?text=${searchText}&site=${newsConstants.PORTAL_NAME}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then(resp =>  resp.json());
+}
 export function escapeHTML(unsafeText) {
   const div = document.createElement('div');
   div.innerText = unsafeText;

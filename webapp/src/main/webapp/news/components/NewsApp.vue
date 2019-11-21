@@ -5,9 +5,17 @@
         <h3 class="newsAppToolBarTitle">
           {{ $t('news.app.title') }}
         </h3>
+        <div class="inputNewsSearchWrapper">
+          <input
+            id="searchInput"
+            v-model="searchText"
+            :placeholder="$t('news.app.searchPlaceholder')"
+            type="text"
+            class="searchProductsInput mr-3">
+        </div>
       </div>
     </div>
-    <div id="newsListItems" class="newsListItems">
+    <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
         <div :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsItemIllustration">
         </div>
@@ -49,6 +57,10 @@
         </div>
       </div>
     </div>
+    <div v-else class="articleNotFound">
+      <span class="iconNotFound"></span>
+      <h3>{{ notFoundMessage }}</h3>
+    </div>
   </div>
 </template>
 
@@ -56,12 +68,37 @@
 import * as  newsServices from '../../services/newsServices';
 export default {
   name: 'NewsApp',
-  data:() =>( {
-    newsList: {},
-    errors: [],
-    showDropDown: false,
-    NEWS_TEXT_MAX_LENGTH: 300
-  }),
+  data() {
+    return {
+      newsList: [],
+      errors: [],
+      showDropDown: false,
+      NEWS_TEXT_MAX_LENGTH: 300,
+      searchText: null,
+      searchNews: '',
+      searchDelay: 300,
+      notFoundMessage: this.$t('news.app.noNews'),
+    };},
+  watch: {
+    searchText() {
+      if(this.searchText && this.searchText.trim().length) {
+        clearTimeout(this.searchNews);
+        this.searchNews = setTimeout(() => {
+          const searchTerm = this.searchText.trim().toLowerCase();
+          newsServices.searchNews(searchTerm).then(data => {
+            if(data.length){
+              this.initNewsList(data);
+            } else {
+              this.newsList = [];
+              this.notFoundMessage = this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
+            }
+          });
+        }, this.searchDelay);
+      } else {
+        this.getNewsList();
+      }
+    },
+  },
   created() {
     this.getNewsList();
   },
@@ -70,35 +107,7 @@ export default {
       newsServices.getNews()
         .then(resp => resp.json())
         .then((data) => {
-          const result = [];
-          const language= eXo.env.portal.language ;
-          const local = `${language}-${language.toUpperCase()}`;
-          const options = {year: 'numeric',month: 'short',day: 'numeric'};
-
-          data.forEach((item) => {
-            let newsUrl = '';
-            const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
-            newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${encodeURI(item.path)}`;
-            const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
-            const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
-            result.push({
-              newsId: item.id,
-              newsText: this.getNewsText(item.summary, item.body),
-              newsIllustration: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
-              newsTitle: item.title,
-              creationDate: newsCreatedDate,
-              spaceDisplayName: item.spaceDisplayName,
-              spaceUrl: item.spaceUrl,
-              newsUrl: newsUrl,
-              author: item.authorDisplayName,
-              avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
-              profileURL: `/portal/intranet/profile/${item.author}`,
-              viewsCount: item.viewsCount == null ? 0 : item.viewsCount ,
-            });
-
-          });
-          this.newsList = result;
-
+          this.initNewsList(data);
           window.require(['SHARED/social-ui-profile'], function(socialProfile) {
             const labels = {
               StatusTitle: 'Loading...',
@@ -122,6 +131,36 @@ export default {
 
       return text.length > this.NEWS_TEXT_MAX_LENGTH ? `${text.substring(0, this.NEWS_TEXT_MAX_LENGTH)}...` : text;
     },
+    initNewsList(data){
+      const result = [];
+      const language= eXo.env.portal.language ;
+      const local = `${language}-${language.toUpperCase()}`;
+      const options = {year: 'numeric',month: 'short',day: 'numeric'};
+
+      data.forEach((item) => {
+        let newsUrl = '';
+        const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
+        newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${item.path}`;
+        const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
+        const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
+        result.push({
+          newsId: item.id,
+          newsText: this.getNewsText(item.summary, item.body),
+          newsIllustration: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
+          newsTitle: item.title,
+          creationDate: newsCreatedDate,
+          spaceDisplayName: item.spaceDisplayName,
+          spaceUrl: item.spaceUrl,
+          newsUrl: newsUrl,
+          author: item.authorDisplayName,
+          avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
+          profileURL: `/portal/intranet/profile/${item.author}`,
+          viewsCount: item.viewsCount == null ? 0 : item.viewsCount ,
+        });
+
+      });
+      this.newsList = result;
+    }
   }
 };
 </script>

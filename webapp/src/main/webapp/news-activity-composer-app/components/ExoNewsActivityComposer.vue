@@ -149,7 +149,8 @@ export default {
       savingDraft: false,
       saveDraft : '',
       draftSavingStatus: '',
-      illustrationChanged: false
+      illustrationChanged: false,
+      imagesURLs: new Map()
     };
   },
   computed: {
@@ -339,6 +340,7 @@ export default {
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
       this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
+      this.news.body = this.replaceImagesURLs(this.news.body);
       const news = {
         id: this.news.id,
         title: this.news.title,
@@ -380,7 +382,7 @@ export default {
       const news = {
         title: this.news.title,
         summary: this.news.summary,
-        body: this.news.body,
+        body: this.replaceImagesURLs(this.news.body),
         author: eXo.env.portal.userName,
         pinned: false,
         spaceId: this.spaceId,
@@ -401,8 +403,10 @@ export default {
                 this.news.summary = updatedNews.summary;
               }
               if(this.news.body !== updatedNews.body) {
-                this.news.body = updatedNews.body;
-                CKEDITOR.instances['newsContent'].setData(updatedNews.body);
+                // Images URLs may have been updated in body to transform temporary URLs to permanent URLs.
+                // Updated URLs are extracted here and re-applied on save.
+                // The goal is to avoid modifying the editor data, which can impact the editing experience.
+                this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, updatedNews.body);
               }
             })
             .then(() => this.$emit('draftUpdated'))
@@ -428,6 +432,35 @@ export default {
     onSelectDraft: function(draftId){
       this.resetNewsActivity();
       this.initNewsComposerData(draftId);
+    },
+    extractImagesURLsDiffs: function(originalHTMLString, updatedHTMLString) {
+      const imagesURLs = new Map();
+
+      const originalHTML = $(originalHTMLString);
+      const updatedHTML = $(updatedHTMLString);
+      const originalImages = originalHTML.find('img');
+      const updatedImages = updatedHTML.find('img');
+      originalImages.each(function(index, element) {
+        const originalImageURL = $(element).attr('src');
+        const updatedImageURL = $(updatedImages[index]).attr('src');
+        if(updatedImageURL !== originalImageURL) {
+          imagesURLs.set(originalImageURL, updatedImageURL);
+        }
+      });
+
+      return imagesURLs;
+    },
+    replaceImagesURLs: function(content) {
+      let updatedContent = content;
+      const specialCharactersRegex = /[-/\\^$*+?.()|[\]{}]/g;
+
+      this.imagesURLs.forEach(function(value, key) {
+        const escapedKey = key.replace(specialCharactersRegex, '\\$&');
+        const regex = new RegExp(`src="${escapedKey}"`);
+        updatedContent = updatedContent.replace(regex, `src="${value}"`);
+      });
+
+      return updatedContent;
     },
     resetNewsActivity: function(){
       this.news.id = '';

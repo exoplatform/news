@@ -8,7 +8,9 @@
   import org.exoplatform.social.webui.Utils;
 
   import org.apache.commons.lang.StringEscapeUtils;
-  import org.apache.commons.lang.StringUtils
+  import org.apache.commons.lang.StringUtils;
+
+  import org.htmlcleaner.HtmlCleaner;
 
   import static org.exoplatform.social.webui.activity.BaseUIActivity.TEMPLATE_PARAM_COMMENT;
 
@@ -210,17 +212,22 @@
 
   def newsTitle = StringEscapeUtils.escapeHtml(news.title);
 
+  def displayReadMore = false;
   def newsSummary = news.summary;
+  def newsBody = news.body;
+
   if(newsSummary) {
     if(newsSummary.length() > 300) {
       newsSummary = newsSummary.substring(0, 300) + '...';
     }
     newsSummary = StringEscapeUtils.escapeHtml(newsSummary);
-  }
-
-  def newsBody = news.body;
-  if(newsBody.length() > 300) {
-    newsBody = newsBody.substring(0, 300) + '...';
+    displayReadMore = true;
+  } else {
+    if(newsBody.length() > 300) {
+      newsBody = newsBody.substring(0, 300) + '...';
+      displayReadMore = true;
+    }
+    newsBody = new HtmlCleaner().clean(newsBody).getText();
   }
 
   def illustration = Utils.getActivityManager().getActivityFilesIds(activity).stream()
@@ -376,17 +383,17 @@
                     </div>
                     <div class="newsBody">
                          <%
-                           if (newsSummary){
+                           if (newsSummary) {
                          %>
                             $newsSummary
                          <%
-                          } else {
-                          %>
+                           } else {
+                         %>
                              $newsBody
-                          <%
-                             }
-                          %>
-                        <% if(newsBody.length() > 300) { %>
+                         <%
+                            }
+                         %>
+                        <% if(displayReadMore) { %>
                             <span class="readMore"><a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a></span>
                         <% } %>
                     </div>

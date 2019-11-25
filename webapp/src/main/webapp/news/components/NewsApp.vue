@@ -129,7 +129,13 @@ export default {
         text = newsBody;
       }
 
-      return text.length > this.NEWS_TEXT_MAX_LENGTH ? `${text.substring(0, this.NEWS_TEXT_MAX_LENGTH)}...` : text;
+      text = text.length > this.NEWS_TEXT_MAX_LENGTH ? `${text.substring(0, this.NEWS_TEXT_MAX_LENGTH)}...` : text;
+
+      const div = document.createElement('div');
+      div.innerHTML = text;
+      text = div.textContent || div.innerText || '';
+
+      return text;
     },
     initNewsList(data){
       const result = [];

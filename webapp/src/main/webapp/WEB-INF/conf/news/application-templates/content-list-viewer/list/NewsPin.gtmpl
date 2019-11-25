@@ -18,6 +18,8 @@
   import org.exoplatform.webui.application.WebuiRequestContext;
   import org.exoplatform.portal.webui.util.Util;
 
+  import org.htmlcleaner.HtmlCleaner;
+
   import java.time.format.DateTimeFormatter;
   import java.time.format.FormatStyle;
   import java.time.LocalDateTime;
@@ -131,6 +133,7 @@
             def newsBody = "";
             if(viewNode.hasProperty("exo:body")) {
               newsBody = viewNode.getProperty("exo:body").getString();
+              newsBody = new HtmlCleaner().clean(newsBody).getText();
             }
 
             def itemOwner = "";

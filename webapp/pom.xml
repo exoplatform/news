@@ -38,6 +38,13 @@
     <npm.version>6.1.0</npm.version>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>net.sourceforge.htmlcleaner</groupId>
+      <artifactId>htmlcleaner</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <finalName>news</finalName>
     <plugins>

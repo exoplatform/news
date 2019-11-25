@@ -137,18 +137,16 @@
       $(`#seeMoreId${newsId}`).click(function () {
         $.ajax({
           url: baseRestUrl,
-          contentType: 'application/json',
           type: 'POST',
-          data: JSON.stringify({'name': 'readMore'}),
+          data: 'readMore',
           cache: false,
         });
       });
       $(`#titleId${newsId}`).click(function () {
         $.ajax({
           url: baseRestUrl,
-          contentType: 'application/json',
           type: 'POST',
-          data: JSON.stringify({'name': 'title'}),
+          data: 'title',
           cache: false,
         });
       });

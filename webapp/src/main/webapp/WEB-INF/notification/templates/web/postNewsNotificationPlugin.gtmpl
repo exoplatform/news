@@ -7,11 +7,14 @@
       <%
 		String spaceName = "<span class=\"notification_space\">" + CONTENT_SPACE + "</span>";
 		String creator = "<span class=\"notification_author\">" + CONTENT_AUTHOR + "</span>";
+		String currentUser = "<span class=\"notification_author\">" + CURRENT_USER + "</span>";
 		def notificationDescription = "";
         if (CONTEXT.equals("POST NEWS")) {
           notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
         } else if (CONTEXT.equals("SHARE NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
+          notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
+        } else if (CONTEXT.equals("SHARE MY NEWS")) {
+          notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
         }
 
       %>

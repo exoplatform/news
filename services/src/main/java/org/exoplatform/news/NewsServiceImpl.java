@@ -18,13 +18,16 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
@@ -32,6 +35,7 @@ import org.exoplatform.news.connector.NewsSearchConnector;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.cms.BasePath;
@@ -435,7 +439,6 @@ public class NewsServiceImpl implements NewsService {
 
     try {
       Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, sharedNews.getPoster(), false);
-      News news = getNewsById(sharedNews.getNewsId());
       for (Space space : spaces) {
         // create activity
         Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName(), false);
@@ -465,7 +468,9 @@ public class NewsServiceImpl implements NewsService {
             }
           }
           newsNode.save();
+          News news = getNewsById(sharedNews.getNewsId());
           sendNotification(news, NotificationConstants.SHARE_NEWS_CONTEXT);
+          sendNotification(news, NotificationConstants.SHARE_MY_NEWS_CONTEXT);
         }
       }
     } finally {
@@ -878,15 +883,27 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     String contentTitle = news.getTitle();
+    String contentAuthor = news.getAuthor();
     String activityLink = getActivityPermalink(contentActivityId);
-    String contentSpaceName = contentSpace.getDisplayName();
     String baseUrl = PropertyManager.getProperty("gatein.email.domain.url");
+    if (context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
+      boolean isMember = spaceService.isMember(contentSpace, contentAuthor);
+      if (!isMember) {
+        activityLink = "/".concat(PortalContainer.getCurrentPortalContainerName())
+                          .concat("/g/:spaces:")
+                          .concat(contentSpace.getPrettyName())
+                          .concat("/")
+                          .concat(contentSpace.getDisplayName());
+      }
+    }
+    String contentSpaceName = contentSpace.getDisplayName();
     String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     // Send Notification
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTEXT, context)
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
-                                                     .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, currentUser)
+                                                     .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
+                                                     .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
@@ -897,8 +914,9 @@ public class NewsServiceImpl implements NewsService {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
     } else if (context.equals(NotificationConstants.SHARE_NEWS_CONTEXT)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareNewsNotificationPlugin.ID))).execute(ctx);
+    } else if (context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
+      ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
     }
-
   }
 
   private String getActivityPermalink(String activityId) {

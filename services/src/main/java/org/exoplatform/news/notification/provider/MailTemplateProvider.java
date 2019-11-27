@@ -19,6 +19,7 @@ import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
@@ -33,7 +34,8 @@ import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl")})
+    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = ShareMyNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl")})
 public class MailTemplateProvider extends TemplateProvider {
   protected static Log    log = ExoLogger.getLogger(MailTemplateProvider.class);
 
@@ -43,6 +45,7 @@ public class MailTemplateProvider extends TemplateProvider {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(ShareNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(ShareMyNewsNotificationPlugin.ID), new TemplateBuilder());
     this.identityManager = identityManager;
   }
 
@@ -56,6 +59,7 @@ public class MailTemplateProvider extends TemplateProvider {
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
       String contentAuthor = notification.getValueOwnerParameter("CONTENT_AUTHOR");
+      String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
       String baseUrl = PropertyManager.getProperty("gatein.email.domain.url");
@@ -67,6 +71,7 @@ public class MailTemplateProvider extends TemplateProvider {
       templateContext.put("CONTENT_TITLE", encoder.encode(contentTitle));
       templateContext.put(NotificationConstants.CONTENT_SPACE, encoder.encode(contentSpaceName));
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
+      templateContext.put("CURRENT_USER", currentUser);
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("CONTEXT", encoder.encode(context));
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));

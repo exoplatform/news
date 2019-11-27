@@ -17,18 +17,20 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
+import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
-import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
-import org.exoplatform.news.notification.utils.NotificationConstants;
 
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl")})
+    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = ShareMyNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl")})
 public class WebTemplateProvider extends TemplateProvider {
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
 
@@ -36,6 +38,7 @@ public class WebTemplateProvider extends TemplateProvider {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(ShareNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(ShareMyNewsNotificationPlugin.ID), new TemplateBuilder());
   }
 
   private class TemplateBuilder extends AbstractTemplateBuilder {
@@ -48,6 +51,7 @@ public class WebTemplateProvider extends TemplateProvider {
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
       String contentAuthor = notification.getValueOwnerParameter("CONTENT_AUTHOR");
+      String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
       String illustrationUrl = notification.getValueOwnerParameter(NotificationConstants.ILLUSTRATION_URL);
@@ -58,6 +62,7 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put("CONTENT_TITLE", encoder.encode(contentTitle));
       templateContext.put(NotificationConstants.CONTENT_SPACE, encoder.encode(contentSpaceName));
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
+      templateContext.put("CURRENT_USER", currentUser);
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
       templateContext.put("CONTEXT", encoder.encode(context));

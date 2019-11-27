@@ -43,6 +43,8 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> CONTEXT          = new ArgumentLiteral<String>(String.class, "CONTEXT");
 
+  public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
+
   private SpaceService                        spaceService;
 
   private UserHandler                         userhandler;
@@ -76,6 +78,15 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     } catch (Exception e) {
       LOG.error("An error occured when trying to retreive a user with username " + contentAuthorUserName + " " + e.getMessage(), e);
     }
+    String currentUserName = ctx.value(CURRENT_USER);
+    User currentUser;
+    String currentUserFullName = currentUserName;
+    try {
+      currentUser = userhandler.findUserByName(currentUserName);
+      currentUserFullName = currentUser.getFullName();
+    } catch (Exception e) {
+      LOG.error("An error occured when trying to retreive a user with username " + contentAuthorUserName + " " + e.getMessage(), e);
+    }
     String contentSpaceId = ctx.value(CONTENT_SPACE_ID);
     String contentSpaceName = ctx.value(CONTENT_SPACE);
     String illustrationUrl = ctx.value(ILLUSTRATION_URL);
@@ -83,16 +94,17 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
     List<String> receivers = new ArrayList<String>();
     try {
-      receivers = getReceivers(contentSpaceId, contentAuthorUserName);
+      receivers = getReceivers(contentSpaceId, currentUserName,context, contentAuthorUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
 
     return NotificationInfo.instance()
-                           .setFrom(contentAuthorUserName)
+                           .setFrom(currentUserName)
                            .with(NotificationConstants.CONTENT_TITLE, contentTitle)
                            .to(receivers)
                            .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
+                           .with(NotificationConstants.CURRENT_USER, currentUserFullName)
                            .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
                            .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
@@ -102,19 +114,26 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   }
 
-  private List<String> getReceivers(String contentSpaceId, String contentAuthorUserName) throws Exception {
-    Space space = spaceService.getSpaceById(contentSpaceId);
-    ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
-    User[] userArray = members.load(0, members.getSize());
-    List<User> receiverUsers = Arrays.stream(userArray)
-                                     .filter(u -> !u.getUserName().equals(contentAuthorUserName))
-                                     .collect(Collectors.toList());
-    List<String> receiversIds = new ArrayList<String>();
-    receiverUsers.forEach(u -> receiversIds.add(u.getUserName()));
-    // remove redondance
-    Set<String> receiversSet = new HashSet<String>(receiversIds);
-    // convert the set to List to be used after in to method
-    List<String> receivers = new ArrayList(receiversSet);
+  private List<String> getReceivers(String contentSpaceId, String currentUserName, String context, String newsAuthor) throws Exception {
+    List<String> receivers = null;
+    if (!context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
+      Space space = spaceService.getSpaceById(contentSpaceId);
+      ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
+      User[] userArray = members.load(0, members.getSize());
+      List<User> receiverUsers = Arrays.stream(userArray)
+                                       .filter(u -> !u.getUserName().equals(currentUserName))
+                                       .collect(Collectors.toList());
+      List<String> receiversIds = new ArrayList<String>();
+      receiverUsers.forEach(u -> receiversIds.add(u.getUserName()));
+      // remove redondance
+      Set<String> receiversSet = new HashSet<String>(receiversIds);
+      // convert the set to List to be used after in to method
+      receivers = new ArrayList(receiversSet);
+    } else {
+      receivers = new ArrayList<String>();
+      receivers.add(newsAuthor);
+    }
+
     return receivers;
   }
 }

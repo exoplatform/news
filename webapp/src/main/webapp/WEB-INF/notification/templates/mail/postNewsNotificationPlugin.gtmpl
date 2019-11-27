@@ -13,6 +13,8 @@ if (CONTEXT.equals("POST NEWS")) {
     title =  _ctx.appRes("news.notification.title",CONTENT_SPACE);
 } else if (CONTEXT.equals("SHARE NEWS")) {
     title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
+} else if (CONTEXT.equals("SHARE MY NEWS")) {
+    title =  _ctx.appRes("news.notification.title.share.myNews",CONTENT_SPACE);
 }
 %>
 $title
@@ -45,11 +47,14 @@ $title
 <%
 String spaceName = "<span style=\"font-weight: bold;\">" + CONTENT_SPACE + "</span>";
 String creator = "<span style=\"color: #578dc9; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
+String currentUser = "<span style=\"color: #578dc9; font-weight: bold;\">" + CURRENT_USER + "</span>";
 def notificationDescription = "";
 if (CONTEXT.equals("POST NEWS")) {
   notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
 } else if (CONTEXT.equals("SHARE NEWS")) {
   notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
+} else if (CONTEXT.equals("SHARE MY NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
 }
 
 %>

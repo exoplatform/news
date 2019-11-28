@@ -755,14 +755,12 @@ public class NewsServiceImpl implements NewsService {
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
     publicationService.changeState(newsDraftNode, "draft",  new HashMap<>());
-
     newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
     spaceNewsRootNode.save();
 
     if(StringUtils.isNotEmpty(news.getUploadId())) {
       attachIllustration(newsDraftNode, news.getUploadId());
     }
-
     news.setId(newsDraftNode.getUUID());
 
     return news;
@@ -777,9 +775,9 @@ public class NewsServiceImpl implements NewsService {
   private Date getPublicationDate(Node node) throws RepositoryException {
     VersionNode versionNode = new VersionNode(node, node.getSession());
     List<VersionNode> versions = versionNode.getChildren();
-    if(versions.size() > 1) {
+    if(!versions.isEmpty()) {
       versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
-      return versions.get(1).getCreatedTime().getTime();
+      return versions.get(0).getCreatedTime().getTime();
     }
 
     return null;

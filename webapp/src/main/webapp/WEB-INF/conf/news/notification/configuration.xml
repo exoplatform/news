@@ -88,7 +88,7 @@
     <component-plugin>
       <name>notification.plugins</name>
       <set-method>addPlugin</set-method>
-      <type>org.exoplatform.news.notification .plugin.ShareNewsNotificationPlugin</type>
+      <type>org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin</type>
       <description>Initial information for plugin ShareNewsNotificationPlugin</description>
       <init-params>
         <object-param>

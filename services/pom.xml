@@ -60,18 +60,8 @@
     </dependency>
     <dependency>
       <groupId>org.exoplatform.integration</groupId>
-      <artifactId>integ-social-ecms</artifactId>
+      <artifactId>integ-ecms-social</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ecms</groupId>
-      <artifactId>ecms-ext-authoring-services</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.social</groupId>
-      <artifactId>social-component-notification</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

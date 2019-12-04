@@ -91,7 +91,7 @@ export default {
   },
   data() {
     return {
-      showUpdateInfo: this.news.postedDate !== this.news.updatedDate,
+      showUpdateInfo: this.news.postedDate !== this.news.updatedDate || this.news.authorFullName !== this.news.updaterFullName,
     };
   },
   computed: {

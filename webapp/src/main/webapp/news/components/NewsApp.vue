@@ -14,6 +14,14 @@
             class="searchProductsInput mr-3">
         </div>
       </div>
+      <div class="newsAppToolbarRight">
+        <div class="NewsTypes">
+          <select id="NewsTypesSelectBox" v-model="newsFilter" name="NewsTypesSelectBox">
+            <option value="all" class="all">{{ $t('news.app.filter.all') }}</option>
+            <option value="pinned" class="pinned">{{ $t('news.app.filter.pinned') }}</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
@@ -74,30 +82,39 @@ export default {
       errors: [],
       showDropDown: false,
       NEWS_TEXT_MAX_LENGTH: 300,
-      searchText: null,
+      searchText: '',
       searchNews: '',
       searchDelay: 300,
       notFoundMessage: this.$t('news.app.noNews'),
-    };},
+      newsFilter: 'all',
+    };
+  },
   watch: {
     searchText() {
-      if(this.searchText && this.searchText.trim().length) {
+      if (this.searchText && this.searchText.trim().length) {
         clearTimeout(this.searchNews);
         this.searchNews = setTimeout(() => {
-          const searchTerm = this.searchText.trim().toLowerCase();
-          newsServices.searchNews(searchTerm).then(data => {
-            if(data.length){
-              this.initNewsList(data);
-            } else {
-              this.newsList = [];
-              this.notFoundMessage = this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
-            }
-          });
+          this.fetchNews();
         }, this.searchDelay);
       } else {
-        this.getNewsList();
+        if (this.newsFilter === 'pinned') {
+          this.getPinnedNews();
+        } else {
+          this.getNewsList();
+        }
       }
     },
+    newsFilter() {
+      if (this.searchText && this.searchText.trim().length) {
+        this.fetchNews();
+      } else {
+        if (this.newsFilter === 'pinned') {
+          this.getPinnedNews();
+        } else {
+          this.getNewsList();
+        }
+      }
+    }
   },
   created() {
     this.getNewsList();
@@ -108,24 +125,22 @@ export default {
         .then(resp => resp.json())
         .then((data) => {
           this.initNewsList(data);
-          window.require(['SHARED/social-ui-profile'], function(socialProfile) {
-            const labels = {
-              StatusTitle: 'Loading...',
-              Connect: 'Connect',
-              Confirm: 'Confirm',
-              CancelRequest: 'Cancel Request',
-              RemoveConnection: 'Remove Connection',
-              Ignore: 'Ignore'
-            };
-            socialProfile.initUserProfilePopup('newsListItems', labels);
-          });
-        }).catch( e =>
+        }).catch(e =>
+          this.errors.push(e)
+        );
+    },
+    getPinnedNews() {
+      newsServices.getPinnedNews(true)
+        .then(resp => resp.json())
+        .then((data) => {
+          this.initNewsList(data);
+        }).catch(e =>
           this.errors.push(e)
         );
     },
     getNewsText(newsSummary, newsBody) {
       let text = newsSummary;
-      if(!text) {
+      if (!text) {
         text = newsBody;
       }
 
@@ -137,11 +152,11 @@ export default {
 
       return text;
     },
-    initNewsList(data){
+    initNewsList(data) {
       const result = [];
-      const language= eXo.env.portal.language ;
+      const language = eXo.env.portal.language;
       const local = `${language}-${language.toUpperCase()}`;
-      const options = {year: 'numeric',month: 'short',day: 'numeric'};
+      const options = {year: 'numeric', month: 'short', day: 'numeric'};
 
       data.forEach((item) => {
         let newsUrl = '';
@@ -161,11 +176,34 @@ export default {
           author: item.authorDisplayName,
           avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
           profileURL: `/portal/intranet/profile/${item.author}`,
-          viewsCount: item.viewsCount == null ? 0 : item.viewsCount ,
+          viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
         });
 
       });
       this.newsList = result;
+      window.require(['SHARED/social-ui-profile'], function (socialProfile) {
+        const labels = {
+          StatusTitle: 'Loading...',
+          Connect: 'Connect',
+          Confirm: 'Confirm',
+          CancelRequest: 'Cancel Request',
+          RemoveConnection: 'Remove Connection',
+          Ignore: 'Ignore'
+        };
+        socialProfile.initUserProfilePopup('newsListItems', labels);
+      });
+    },
+    fetchNews(){
+      const searchTerm = this.searchText.trim().toLowerCase();
+      const pinned = this.newsFilter === 'pinned';
+      newsServices.searchNews(searchTerm,pinned).then(data => {
+        if (data.length) {
+          this.initNewsList(data);
+        } else {
+          this.newsList = [];
+          this.notFoundMessage = this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
+        }
+      });
     }
   }
 };

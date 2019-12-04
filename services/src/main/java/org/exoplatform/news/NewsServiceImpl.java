@@ -2,42 +2,34 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.search.data.SearchContext;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
 import org.exoplatform.news.connector.NewsSearchConnector;
+import org.exoplatform.news.connector.NewsSearchResult;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -51,14 +43,13 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
-import org.exoplatform.services.wcm.search.ResultNode;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -211,21 +202,20 @@ public class NewsServiceImpl implements NewsService {
    * @return all news
    * @throws Exception
    */
-  public List<News> getNews() throws Exception {
+  public List<News> getNews(NewsFilter filter) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession((repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName()),
             repositoryService.getCurrentRepository());
     List<News> listNews = new ArrayList<>();
-
+    NewsQueryBuilder queyBuilder = new NewsQueryBuilder();
     try {
-      StringBuilder sqlQuery  = new StringBuilder("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC");
+      StringBuilder sqlQuery  = queyBuilder.buildQuery(filter);
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
       NodeIterator it = query.execute().getNodes();
       while (it.hasNext()) {
         Node iterNode = it.nextNode();
         listNews.add(convertNodeToNews(iterNode));
-
       }
       return listNews;
     } finally {
@@ -923,35 +913,24 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Search news with the given text
-   * @param text The text to be searched
+   * @param filter news filter
+   * @param lang language
    */
-  public List<News> searchNews(String text, String lang) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+  public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
 
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
     SearchContext context = new SearchContext(null, null);
     context.lang(lang);
-    try {
-      List<News> newsList = new ArrayList<>();
-      List<ResultNode> resultNode = newsSearchConnector.search(context, text, 0, 0, "relevancy", "desc");
-      resultNode.forEach(res -> {
-        try {
-          News news = convertNodeToNews(res.getNode());
-          if (news.getPublicationState().equals("published")){
-            newsList.add(news);
-          }
-        } catch (Exception e) {
-          LOG.error("Error while processing search result in News", e);
-        }
-      });
-      return newsList;
-    }
-    finally {
-      if(session != null) {
-        session.logout();
+    List<News> newsList = new ArrayList<>();
+    List<SearchResult> searchResults = newsSearchConnector.search(filter, 0, 0, "relevancy", "desc");
+    searchResults.forEach(res -> {
+      try {
+        News news = convertNodeToNews(((NewsSearchResult)res).getNode());
+        newsList.add(news);
+      } catch (Exception e) {
+        LOG.error("Error while processing search result in News", e);
       }
-    }
+    });
+    return newsList;
   }
 
 }

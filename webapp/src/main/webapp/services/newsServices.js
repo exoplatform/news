@@ -30,6 +30,13 @@ export function getNewsDrafts(spaceId) {
   });
 }
 
+export function getPinnedNews(pinned) {
+  return fetch(`${newsConstants.NEWS_API}?pinned=${pinned}`, {
+    credentials: 'include',
+    method: 'GET',
+  });
+}
+
 export function saveNews(news) {
   return fetch(`${newsConstants.NEWS_API}`, {
     headers: {
@@ -169,8 +176,8 @@ export function getSpaceById(id) {
   });
 }
 
-export function searchNews(searchText) {
-  return fetch(`${newsConstants.NEWS_API}/search?text=${searchText}&site=${newsConstants.PORTAL_NAME}`, {
+export function searchNews(searchText, pinned) {
+  return fetch(`${newsConstants.NEWS_API}/search?text=${searchText}&site=${newsConstants.PORTAL_NAME}&pinned=${pinned}`, {
     headers: {
       'Content-Type': 'application/json'
     },

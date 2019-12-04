@@ -7,10 +7,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,10 +33,13 @@ import org.exoplatform.commons.api.notification.command.NotificationCommand;
 import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.PropertyManager;
 
 import org.exoplatform.news.connector.NewsSearchConnector;
+import org.exoplatform.news.connector.NewsSearchResult;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.utils.NotificationConstants;
@@ -58,7 +58,6 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
-import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
 import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManagerImpl;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
@@ -1162,7 +1161,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC","sql")).thenReturn(query);
+    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -1197,10 +1196,11 @@ public class NewsServiceImplTest {
 
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName","Sara Boutej");
+    NewsFilter newsFilter = new NewsFilter();
 
     when(poster.getProfile()).thenReturn(p1);
     // When
-    List<News> newsList =newsService.getNews();
+    List<News> newsList =newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);
@@ -1210,7 +1210,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldGetAllNewsNodesWhenDoesNotExists() throws Exception {
+  public void shouldGetNoNewsNodesWhenDoesNotExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
             sessionProviderService,
@@ -1236,15 +1236,16 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery("select * from exo:news WHERE publication:currentState = 'published' and jcr:path like '/Groups/spaces/%' order by exo:dateModified DESC","sql")).thenReturn(query);
+    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
     when(queryResult.getNodes()).thenReturn(it);
     when(it.hasNext()).thenReturn(false);
+    NewsFilter newsFilter = new NewsFilter();
 
     // When
-    List<News> newsList =newsService.getNews();
+    List<News> newsList =newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);
@@ -2327,7 +2328,122 @@ public class NewsServiceImplTest {
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);
+  }
 
+  @Test
+  public void shouldGetAllPinnedNewsNodesWhenExists() throws Exception {
+    // Given
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    QueryManager qm = mock(QueryManager.class);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(workSpace.getQueryManager()).thenReturn(qm);
+    Query query = mock(Query.class);
+    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
+    QueryResult queryResult = mock(QueryResult.class);
+    when(query.execute()).thenReturn(queryResult);
+    NodeIterator it = mock(NodeIterator.class);
+    when(queryResult.getNodes()).thenReturn(it);
+    when(it.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+
+    Node node1 = mock(Node.class);
+    Node node2 = mock(Node.class);
+    Node node3 = mock(Node.class);
+
+    when(node1.getSession()).thenReturn(session);
+    when(node2.getSession()).thenReturn(session);
+    when(node3.getSession()).thenReturn(session);
+    when(it.nextNode()).thenReturn(node1).thenReturn(node2).thenReturn(node3);
+    Property property = mock(Property.class);
+    when(node1.getProperty(anyString())).thenReturn(property);
+    when(node2.getProperty(anyString())).thenReturn(property);
+    when(node3.getProperty(anyString())).thenReturn(property);
+    when(property.toString()).thenReturn("news ");
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getBoolean()).thenReturn(true);
+    when(property.getLong()).thenReturn((long)10);
+    when(node1.hasNode("illustration")).thenReturn(false);
+    when(node2.hasNode("illustration")).thenReturn(false);
+    when(node3.hasNode("illustration")).thenReturn(false);
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getDisplayName()).thenReturn("Test news space");
+    when(space.getGroupId()).thenReturn("/spaces/test_news_space");
+    Identity poster = mock(Identity.class);
+    when(identityManager.getOrCreateIdentity(anyString(),anyString(),anyBoolean())).thenReturn(poster);
+
+    Profile p1 = new Profile(poster);
+    p1.setProperty("fullName","Sara Boutej");
+    NewsFilter newsFilter = new NewsFilter();
+    newsFilter.setPinnedNews(true);
+
+    when(poster.getProfile()).thenReturn(p1);
+    // When
+    List<News> newsList =newsService.getNews(newsFilter);
+
+    // Then
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    verify(it, times(4)).hasNext();
+    verify(it, times(3)).nextNode();
+  }
+
+  @Test
+  public void shouldGetNewsListsWhenSearching() throws Exception {
+    // Given
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+
+    String lang = "en";
+    String searchText = "Test";
+    NewsFilter filter  =new NewsFilter();
+    filter.setSearchText(searchText);
+    List<SearchResult> ret = new ArrayList<>();
+    NewsSearchResult searchResult = mock(NewsSearchResult.class);
+    ret.add(searchResult);
+    Mockito.doReturn(ret).when(newsSearchConnector).search(filter, 0, 0, "relevancy", "desc");
+
+    // When
+    List<News> newsList =newsService.searchNews(filter, lang);
+
+    // Then
+    assertNotNull(newsList);
+    assertEquals(1, newsList.size());
   }
 
 }

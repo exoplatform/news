@@ -32,7 +32,7 @@
   <description>News Services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.63</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.64</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>
@@ -58,6 +58,15 @@
       <groupId>org.exoplatform.integration</groupId>
       <artifactId>integ-social-ecms</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.exoplatform.ecms</groupId>
+      <artifactId>ecms-ext-authoring-services</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.exoplatform.social</groupId>
+      <artifactId>social-component-notification</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -78,15 +87,6 @@
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.ecms</groupId>
-      <artifactId>ecms-ext-authoring-services</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.social</groupId>
-      <artifactId>social-component-notification</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

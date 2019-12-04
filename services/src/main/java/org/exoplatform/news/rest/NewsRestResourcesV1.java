@@ -15,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.log.ExoLogger;
@@ -120,7 +121,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   public Response getNews(@Context HttpServletRequest request,
                           @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
                           @ApiParam(value = "News space id", required = true) @QueryParam("spaceId") String spaceId,
-                          @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState) {
+                          @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState,
+                          @ApiParam(value = "News pinned state", required = true) @QueryParam("pinned") Boolean pinned) {
     if(StringUtils.isNotEmpty(author) && StringUtils.isNotEmpty(spaceId)) {
       try {
         String authenticatedUser = request.getRemoteUser();
@@ -151,16 +153,21 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       }
     } else {
       try {
-        List<News> allNews = newsService.getNews();
-        if (allNews != null) {
-          for (News newsItem : allNews) {
-            newsItem.setIllustration(null);
-          }
-        } else {
-          return Response.status(Response.Status.NOT_FOUND).build();
+        NewsFilter newsFilter = new NewsFilter();
+        if (pinned != null && pinned) {
+          newsFilter.setPinnedNews(true);
         }
-        return Response.ok(allNews).build();
-      } catch (Exception e) {
+        newsFilter.setOrder("exo:dateModified");
+          List<News> allNews = newsService.getNews(newsFilter);
+          if (allNews != null && allNews.size() != 0) {
+            for (News newsItem : allNews) {
+              newsItem.setIllustration(null);
+            }
+          } else {
+            return Response.ok(allNews).build();
+          }
+          return Response.ok(allNews).build();
+      }catch (Exception e) {
         LOG.error("Error when getting the news", e);
         return Response.serverError().build();
       }
@@ -575,7 +582,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           @ApiResponse (code = 401, message = "User not authorized to search news"),
           @ApiResponse (code = 500, message = "Internal server error")})
   public Response searchNews (@Context HttpServletRequest request,
-                              @ApiParam(value = "search text", required = true) @QueryParam("text") String text){
+                              @ApiParam(value = "search text", required = true) @QueryParam("text") String text,
+                              @ApiParam(value = "News pinned state", required = true) @QueryParam("pinned") Boolean pinned){
     try {
       if (StringUtils.isBlank(text)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
@@ -585,7 +593,13 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       String lang = request.getLocale().getLanguage();
-      List<News> result =  newsService.searchNews(text,lang);
+      NewsFilter filter  =new NewsFilter();
+      filter.setSearchText(text);
+      if (pinned) {
+        filter.setPinnedNews(true);
+      }
+      filter.setOrder("jcr:score");
+      List<News> result =  newsService.searchNews(filter,lang);
       if (result != null) {
         for (News newsItem : result) {
           newsItem.setIllustration(null);

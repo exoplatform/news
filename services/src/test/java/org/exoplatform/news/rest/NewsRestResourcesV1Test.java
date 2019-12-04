@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
@@ -813,7 +814,7 @@ public class NewsRestResourcesV1Test {
 
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft");
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -840,7 +841,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft");
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", false);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -864,7 +865,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft");
+    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", false);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -882,7 +883,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "");
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "", false);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -1102,28 +1103,29 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    when(newsService.getNews()).thenReturn(allNews);
+    when(newsService.getNews(any())).thenReturn(allNews);
 
     //When
-    Response response = newsRestResourcesV1.getNews(null, null, null, null);
+    Response response = newsRestResourcesV1.getNews(null, null, null, null,false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
-  public void shouldGetNoTFoundWhenNoPublishedExists() throws Exception{
+  public void shouldGetEmptyListWhenNoPublishedExists() throws Exception{
     //Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
-    when(newsService.getNews()).thenReturn(null);
+    NewsFilter newsFilter = new NewsFilter();
+    when(newsService.getNews(newsFilter)).thenReturn(null);
 
     //When
-    Response response = newsRestResourcesV1.getNews(null, null, null, null);
+    Response response = newsRestResourcesV1.getNews(null, null, null, null, null);
 
     //Then
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     List<News> news = (List<News>) response.getEntity();
-    assertNull(news);
+    assertEquals(0, news.size());
   }
 
   @Test
@@ -1170,5 +1172,28 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetAllPinnedNewsWhenExist() throws Exception{
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, spaceService, identityManager, activityManager);
+    News news1 = new News();
+    news1.setPinned(true);
+    News news2 = new News();
+    news2.setPinned(true);
+    News news3 = new News();
+    news3.setPinned(true);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    when(newsService.getNews(any())).thenReturn(allNews);
+
+    //When
+    Response response = newsRestResourcesV1.getNews(null, null, null, null,true);
+
+    //Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 }

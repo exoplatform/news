@@ -1,0 +1,150 @@
+<%
+import org.exoplatform.wcm.webui.clv.UICLVPortlet;
+import org.exoplatform.wcm.webui.Utils;
+
+import org.htmlcleaner.HtmlCleaner;
+
+if (uicomponent.getUIPageIterator().getAvailable() > 0) {
+%>
+<div class="latestNews">
+    <%
+      def header = uicomponent.getHeader();
+      def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER) && header?.trim();
+      def isShowReadmore = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_READMORE);
+      def isShowImage = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_ILLUSTRATION);
+      def isShowSummary = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_SUMMARY);
+    %>
+
+    <div class="newsHeader">
+        <%
+        if(isShowHeader) {
+        %>
+        <div class="globalTitle">
+            <h3 class="newsTitleTop">$header</h3>
+        </div>
+         <%
+        }
+        %>
+    </div>
+    <div class="latestNewsContent">
+     <%
+      def currentPageData = uicomponent.getCurrentPageData();
+      def nodes = new ArrayList();
+
+      def nbOfNewsToDisplay = currentPageData.size() > 4 ? 4 : currentPageData.size();
+      for (int i=0 ; i < nbOfNewsToDisplay; i++) {
+        if(Utils.isViewable(currentPageData.get(i))) {
+          nodes.add(currentPageData.get(i));
+        }
+      }
+
+      def firstNewsNode = nodes.get(0);
+
+      def firstItemLink = uicomponent.getURL(firstNewsNode);
+      def firstImgSrc;
+      if(isShowImage) {
+        if(firstNewsNode.hasNode("illustration")) {
+          def firstImageNode= firstNewsNode.getNode("illustration");
+          firstImgSrc = "/portal/rest/v1/news/" + firstNewsNode.getUUID() + "/illustration";
+        } else {
+          firstImgSrc = "/news/images/newsImageDefault.png";
+        }
+      }
+      def firstItemTitle = uicomponent.getTitle(firstNewsNode);
+      def firstItemSummary = uicomponent.getSummary(firstNewsNode);
+      if(!firstItemSummary?.trim() && firstNewsNode.hasProperty("exo:body")) {
+        firstItemSummary = firstNewsNode.getProperty("exo:body").getString();
+        firstItemSummary = new HtmlCleaner().clean(firstItemSummary).getText();
+      }
+
+      %>
+    <div class="latestNewsLeft" onclick="window.location='$firstItemLink'">
+
+      <div class="backgroundLeft" style="background-image:url($firstImgSrc)">
+          <div class="overlay"></div>
+      </div>
+
+      <div class="ombre">
+      </div>
+      <div class="contentText">
+          <div class="contentTitle">
+              <a href="$firstItemLink">$firstItemTitle</a>
+          </div>
+          <div class="contentBody">
+              <div class="contentBodyText" >
+                <%
+                  if (isShowSummary) {
+                %>
+                  <div class="summary contentDisplay">
+                     <a href="$firstItemLink"><p>$firstItemSummary</p></a>
+                  </div>
+                <%
+                  }
+                %>
+              </div>
+
+              <% if (isShowReadmore) { %>
+                <span class="more" >
+                    <a href="$firstItemLink" class="readMoreNews slideReadMore">
+                    <span><%= _ctx.appRes("UICLVPresentation.label.readmore") %></span>
+                    </a>
+                </span>
+              <% } %>
+          </div>
+      </div>
+    </div>
+    <div class="latestNewsRight">
+    <%
+    if(nbOfNewsToDisplay > 1) {
+      for (int i=1 ; i <= nbOfNewsToDisplay-1 ; i++) {
+        def viewNode = nodes.get(i);
+        def itemLink = uicomponent.getURL(viewNode);
+        def imgSrc;
+        if(isShowImage) {
+            if(viewNode.hasNode("illustration")) {
+                def imageNode = viewNode.getNode("illustration");
+                imgSrc = "/portal/rest/v1/news/" + viewNode.getUUID() + "/illustration";
+            } else {
+                imgSrc = "/news/images/newsImageDefault.png";
+            }
+        }
+        def itemTitle = uicomponent.getTitle(viewNode);
+        def itemSummary = uicomponent.getSummary(viewNode);
+        if(!itemSummary?.trim() && viewNode.hasProperty("exo:body")) {
+          itemSummary = viewNode.getProperty("exo:body").getString();
+          itemSummary = new HtmlCleaner().clean(itemSummary).getText();
+        }
+      %>
+        <div class="newsLine">
+            <div class="newsImage" style="background-image:url($imgSrc)" onclick="window.location='$itemLink'">
+                <div class="overlay"></div>
+            </div>
+            <div class="rightText">
+                <div class="rightTitle">
+                    <a href="$itemLink">$itemTitle</a>
+                </div>
+                <div class="rightBody">
+                     <%
+                       if (isShowSummary) {
+                     %>
+                       <div class="summary contentDisplay">
+                          <a href="$itemLink"><p>$itemSummary</p></a>
+                       </div>
+                     <%
+                       }
+                     %>
+                </div>
+                <% if (isShowReadmore) { %>
+                  <div class="rightMore">
+                      <a href="$itemLink" class="readMoreNews"><span><%= _ctx.appRes("UICLVPresentation.label.readmore") %></span></a>
+                  </div>
+                <% } %>
+            </div>
+        </div>
+    <%
+         }
+       }
+    }
+    %>
+    </div>
+</div>

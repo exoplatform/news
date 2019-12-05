@@ -58,6 +58,23 @@
             </field>
           </object>
         </object-param>
+
+        <object-param>
+          <name>Latest News CLV template</name>
+          <description>Latest News CLV template</description>
+          <object type="org.exoplatform.services.cms.views.PortletTemplatePlugin$PortletTemplateConfig">
+            <field name="title">
+              <string>Latest News</string>
+            </field>
+            <field name="templateName">
+              <string>LatestNews.gtmpl</string>
+            </field>
+            <field name="category">
+              <string>list</string>
+            </field>
+          </object>
+        </object-param>
+
       </init-params>
     </component-plugin>
   </external-component-plugins>

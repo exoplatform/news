@@ -40,8 +40,8 @@
   </modules>
 
   <properties>
-    <org.exoplatform.platform.version>6.0.x-SNAPSHOT</org.exoplatform.platform.version>
-    <org.exoplatform.depmgt.version>17.x-SNAPSHOT</org.exoplatform.depmgt.version>
+    <org.exoplatform.platform.version>6.0.0-M10</org.exoplatform.platform.version>
+    <org.exoplatform.depmgt.version>17.0-M10</org.exoplatform.depmgt.version>
     <htmlcleaner.version>2.7</htmlcleaner.version>
   </properties>
 

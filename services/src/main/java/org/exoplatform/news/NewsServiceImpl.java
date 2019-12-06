@@ -29,6 +29,7 @@ import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
@@ -81,41 +82,46 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private RepositoryService repositoryService;
+  private RepositoryService        repositoryService;
 
-  private SessionProviderService sessionProviderService;
+  private SessionProviderService   sessionProviderService;
 
-  private NodeHierarchyCreator nodeHierarchyCreator;
+  private NodeHierarchyCreator     nodeHierarchyCreator;
 
-  private DataDistributionType dataDistributionType;
+  private DataDistributionType     dataDistributionType;
 
-  private SpaceService spaceService;
+  private SpaceService             spaceService;
 
-  private ActivityManager activityManager;
+  private ActivityManager          activityManager;
 
-  private IdentityManager identityManager;
+  private IdentityManager          identityManager;
 
-  private UploadService uploadService;
+  private UploadService            uploadService;
 
-  private LinkManager linkManager;
+  private LinkManager              linkManager;
 
   private HTMLUploadImageProcessor imageProcessor;
 
-  private PublicationService publicationService;
+  private PublicationService       publicationService;
 
-  private PublicationManager publicationManager;
+  private PublicationManager       publicationManager;
 
-  private WCMPublicationService wCMPublicationService;
+  private WCMPublicationService    wCMPublicationService;
 
-  private NewsSearchConnector newsSearchConnector;
+  private NewsSearchConnector      newsSearchConnector;
 
-  private static final Log LOG = ExoLogger.getLogger(NewsServiceImpl.class);
+  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
-
-  public NewsServiceImpl(RepositoryService repositoryService, SessionProviderService sessionProviderService,
-                         NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager dataDistributionManager,
-                         SpaceService spaceService, ActivityManager activityManager, IdentityManager identityManager,
-                         UploadService uploadService, HTMLUploadImageProcessor imageProcessor, LinkManager linkManager,
+  public NewsServiceImpl(RepositoryService repositoryService,
+                         SessionProviderService sessionProviderService,
+                         NodeHierarchyCreator nodeHierarchyCreator,
+                         DataDistributionManager dataDistributionManager,
+                         SpaceService spaceService,
+                         ActivityManager activityManager,
+                         IdentityManager identityManager,
+                         UploadService uploadService,
+                         HTMLUploadImageProcessor imageProcessor,
+                         LinkManager linkManager,
                          PublicationService publicationService,
                          PublicationManager publicationManager,
                          WCMPublicationService wCMPublicationService,
@@ -137,19 +143,23 @@ public class NewsServiceImpl implements NewsService {
   }
 
   /**
-   * Create and publish a News
-   * A news is composed of an activity and a CMS node containing the data.
-   * If the given News has an id and that a draft already exists with this id, the draft is updated and published.
+   * Create and publish a News A news is composed of an activity and a CMS node
+   * containing the data. If the given News has an id and that a draft already
+   * exists with this id, the draft is updated and published.
+   * 
    * @param news The news to create
    * @throws Exception
    */
   public News createNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
 
     try {
-      if(StringUtils.isEmpty(news.getId())) {
+      if (StringUtils.isEmpty(news.getId())) {
         news = createNewsDraft(news);
       } else {
         postNewsActivity(news);
@@ -158,7 +168,7 @@ public class NewsServiceImpl implements NewsService {
       }
 
     } finally {
-      if(session != null) {
+      if (session != null) {
         session.logout();
       }
     }
@@ -172,6 +182,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Get a news by id
+   * 
    * @param id Id of the news
    * @return The news with the given id
    * @throws Exception
@@ -199,13 +210,17 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Get all news
+   * 
    * @return all news
    * @throws Exception
    */
   public List<News> getNews(NewsFilter filter) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    Session session = sessionProvider.getSession((repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName()),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 (repositoryService.getCurrentRepository()
+                                                                   .getConfiguration()
+                                                                   .getDefaultWorkspaceName()),
+                                                 repositoryService.getCurrentRepository());
     List<News> listNews = new ArrayList<>();
     NewsQueryBuilder queyBuilder = new NewsQueryBuilder();
     try {
@@ -219,27 +234,31 @@ public class NewsServiceImpl implements NewsService {
       }
       return listNews;
     } finally {
-      if(session != null)   {
+      if (session != null) {
         session.logout();
       }
     }
   }
 
   /**
-   * Update a news
-   * If the uploadId of the news is null, the illustration is not updated.
-   * If the uploadId of the news is empty, the illustration is removed (if any).
+   * Update a news If the uploadId of the news is null, the illustration is not
+   * updated. If the uploadId of the news is empty, the illustration is removed
+   * (if any).
+   * 
    * @param news The new news
    * @throws Exception
    */
   public News updateNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
 
     try {
       Node newsNode = session.getNodeByUUID(news.getId());
-      if(newsNode != null) {
+      if (newsNode != null) {
         newsNode.setProperty("exo:title", news.getTitle());
         newsNode.setProperty("exo:summary", news.getSummary());
         String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
@@ -247,22 +266,22 @@ public class NewsServiceImpl implements NewsService {
         newsNode.setProperty("exo:body", processedBody);
         newsNode.setProperty("exo:dateModified", Calendar.getInstance());
 
-        if(StringUtils.isNotEmpty(news.getUploadId())) {
+        if (StringUtils.isNotEmpty(news.getUploadId())) {
           attachIllustration(newsNode, news.getUploadId());
-        } else if("".equals(news.getUploadId())) {
+        } else if ("".equals(news.getUploadId())) {
           removeIllustration(newsNode);
         }
 
         newsNode.save();
 
-        if("published".equals(news.getPublicationState())) {
+        if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
         }
       }
 
       return news;
     } finally {
-      if(session != null) {
+      if (session != null) {
         session.logout();
       }
     }
@@ -270,6 +289,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Increment the number of views for a news
+   * 
    * @param userId The current user id
    * @param news The news to be updated
    * @throws Exception
@@ -327,9 +347,12 @@ public class NewsServiceImpl implements NewsService {
    */
   public void pinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     News news = getNewsById(newsId);
-
 
     Node newsNode = session.getNodeByUUID(newsId);
     newsNode.setProperty("exo:pinned", true);
@@ -350,10 +373,10 @@ public class NewsServiceImpl implements NewsService {
   public void unpinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
-            repositoryService.getCurrentRepository()
-                    .getConfiguration()
-                    .getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     News news = getNewsById(newsId);
     if (news == null) {
       throw new Exception("Unable to find a news with an id equal to: " + newsId);
@@ -394,10 +417,10 @@ public class NewsServiceImpl implements NewsService {
   private Node getPinnedNewsFolder() throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
-            repositoryService.getCurrentRepository()
-                    .getConfiguration()
-                    .getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     Node applicationDataNode = (Node) session.getItem(APPLICATION_DATA_PATH);
     Node newsRootNode;
     if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
@@ -419,13 +442,17 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Share a news to a list of spaces
+   * 
    * @param sharedNews Data of the shared news
    * @param spaces List of spaces to share the news with
    */
   public void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
 
     try {
       Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, sharedNews.getPoster(), false);
@@ -450,7 +477,7 @@ public class NewsServiceImpl implements NewsService {
             newsNode.addMixin("exo:privilegeable");
           }
           ((ExtendedNode) newsNode).setPermission("*:" + space.getGroupId(), PermissionType.ALL);
-          if(activity.getId() != null) {
+          if (activity.getId() != null) {
             if (newsNode.hasProperty("exo:activities")) {
               String activities = newsNode.getProperty("exo:activities").getString();
               activities = activities.concat(";").concat(space.getId()).concat(":").concat(activity.getId());
@@ -472,21 +499,29 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Get news drafts
-   * @param  spaceId News space
-   * @param  author News drafts author
+   * 
+   * @param spaceId News space
+   * @param author News drafts author
    * @return The news drafts
    * @throws Exception
    */
   public List<News> getNewsDrafts(String spaceId, String author) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     List<News> newsDrafts = new ArrayList<>();
 
     try {
-      StringBuilder sqlQuery = new StringBuilder("SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = '")
-              .append(author).append("'").append("AND exo:spaceId='").append(spaceId).append("'");
+      StringBuilder sqlQuery =
+                             new StringBuilder("SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = '").append(author)
+                                                                                                                                    .append("'")
+                                                                                                                                    .append("AND exo:spaceId='")
+                                                                                                                                    .append(spaceId)
+                                                                                                                                    .append("'");
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
       NodeIterator it = query.execute().getNodes();
@@ -498,7 +533,7 @@ public class NewsServiceImpl implements NewsService {
     } catch (ItemNotFoundException e) {
       return null;
     } finally {
-      if(session != null) {
+      if (session != null) {
         session.logout();
       }
     }
@@ -506,21 +541,25 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Delete news
+   * 
    * @param newsId the news id to delete
    * @throws Exception
    */
   public void deleteNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
 
     try {
       Node node = session.getNodeByUUID(newsId);
       node.remove();
       session.save();
     } finally {
-      if(session != null) {
+      if (session != null) {
         session.logout();
       }
     }
@@ -528,6 +567,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Post the news activity in the given space
+   * 
    * @param news The news to post as an activity
    */
   void postNewsActivity(News news) throws Exception {
@@ -562,14 +602,14 @@ public class NewsServiceImpl implements NewsService {
 
     boolean illustrationExists = newsNode.hasNode("illustration");
     Node illustrationNode;
-    if(illustrationExists) {
+    if (illustrationExists) {
       illustrationNode = newsNode.getNode("illustration");
     } else {
       illustrationNode = newsNode.addNode("illustration", "nt:file");
     }
     illustrationNode.setProperty("exo:title", uploadedResource.getFileName());
     Node resourceNode;
-    if(illustrationExists) {
+    if (illustrationExists) {
       resourceNode = illustrationNode.getNode("jcr:content");
     } else {
       resourceNode = illustrationNode.addNode("jcr:content", "nt:resource");
@@ -579,14 +619,14 @@ public class NewsServiceImpl implements NewsService {
     resourceNode.setProperty("jcr:lastModified", now);
     resourceNode.setProperty("exo:dateModified", now);
     String fileDiskLocation = uploadedResource.getStoreLocation();
-    try(InputStream inputStream = new FileInputStream(fileDiskLocation)) {
+    try (InputStream inputStream = new FileInputStream(fileDiskLocation)) {
       resourceNode.setProperty("jcr:data", inputStream);
       newsNode.save();
     }
   }
 
   private void removeIllustration(Node newsNode) throws Exception {
-    if(newsNode.hasNode("illustration")) {
+    if (newsNode.hasNode("illustration")) {
       newsNode.getNode("illustration").remove();
       newsNode.save();
     }
@@ -600,9 +640,9 @@ public class NewsServiceImpl implements NewsService {
     Node spaceRootNode = (Node) session.getItem(spaceParentPath);
 
     Node spaceNewsRootNode;
-    if(!spaceRootNode.hasNode(NEWS_NODES_FOLDER)) {
+    if (!spaceRootNode.hasNode(NEWS_NODES_FOLDER)) {
       spaceNewsRootNode = spaceRootNode.addNode(NEWS_NODES_FOLDER, "nt:unstructured");
-      if(spaceNewsRootNode.canAddMixin("exo:privilegeable")) {
+      if (spaceNewsRootNode.canAddMixin("exo:privilegeable")) {
         spaceNewsRootNode.addMixin("exo:privilegeable");
       }
       Map<String, String[]> permissions = new HashMap<>();
@@ -618,14 +658,13 @@ public class NewsServiceImpl implements NewsService {
   }
 
   private News convertNodeToNews(Node node) throws Exception {
-    if(node == null) {
+    if (node == null) {
       return null;
     }
 
     News news = new News();
 
     news.setId(node.getUUID());
-
 
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
@@ -644,13 +683,13 @@ public class NewsServiceImpl implements NewsService {
       news.setActivities(node.getProperty("exo:activities").getString());
     }
     news.setPath(getPath(node));
-    if(!node.hasProperty("exo:viewsCount")) {
+    if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
 
-    if(node.hasNode("illustration")) {
+    if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
       news.setIllustration(bytes);
@@ -659,18 +698,20 @@ public class NewsServiceImpl implements NewsService {
     }
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
-    if(space != null) {
+    if (space != null) {
       String spaceName = space.getDisplayName();
       news.setSpaceDisplayName(spaceName);
-      if(StringUtils.isNotEmpty(space.getGroupId())) {
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(space.getGroupId()
-                .split("/")[2]).append("/").append(space.getPrettyName());
+      if (StringUtils.isNotEmpty(space.getGroupId())) {
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:")
+                                                    .append(space.getGroupId().split("/")[2])
+                                                    .append("/")
+                                                    .append(space.getPrettyName());
         news.setSpaceUrl(spaceUrl.toString());
       }
     }
 
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
-    if(identity != null && identity.getProfile() != null) {
+    if (identity != null && identity.getProfile() != null) {
       news.setAuthorDisplayName(identity.getProfile().getFullName());
     }
 
@@ -678,7 +719,7 @@ public class NewsServiceImpl implements NewsService {
   }
 
   private String getStringProperty(Node node, String propertyName) throws RepositoryException {
-    if(node.hasProperty(propertyName)) {
+    if (node.hasProperty(propertyName)) {
       return node.getProperty(propertyName).getString();
     }
 
@@ -686,7 +727,7 @@ public class NewsServiceImpl implements NewsService {
   }
 
   private Date getDateProperty(Node node, String propertyName) throws RepositoryException {
-    if(node.hasProperty(propertyName)) {
+    if (node.hasProperty(propertyName)) {
       return node.getProperty(propertyName).getDate().getTime();
     }
 
@@ -695,19 +736,23 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Create the exo:news draft node in CMS
+   * 
    * @param news
    * @return News draft id
    * @throws Exception
    */
   public News createNewsDraft(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
 
     Node spaceNewsRootNode = getSpaceNewsRootNode(news.getSpaceId(), session);
 
     Calendar creationCalendar = Calendar.getInstance();
-    if(news.getCreationDate() != null) {
+    if (news.getCreationDate() != null) {
       creationCalendar.setTime(news.getCreationDate());
     } else {
       news.setCreationDate(creationCalendar.getTime());
@@ -725,7 +770,7 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:viewers", "");
     newsDraftNode.setProperty("exo:activities", "");
     Calendar updateCalendar = Calendar.getInstance();
-    if(news.getUpdateDate() != null) {
+    if (news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());
     } else {
       news.setUpdateDate(updateCalendar.getTime());
@@ -736,8 +781,8 @@ public class NewsServiceImpl implements NewsService {
 
     Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
     String lifecycleName = wCMPublicationService.getWebpagePublicationPlugins()
-            .get(lifecycle.getPublicationPlugin())
-            .getLifecycleName();
+                                                .get(lifecycle.getPublicationPlugin())
+                                                .getLifecycleName();
     if (newsDraftNode.canAddMixin("publication:authoring")) {
       newsDraftNode.addMixin("publication:authoring");
       newsDraftNode.setProperty("publication:lastUser", news.getAuthor());
@@ -748,7 +793,7 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
     spaceNewsRootNode.save();
 
-    if(StringUtils.isNotEmpty(news.getUploadId())) {
+    if (StringUtils.isNotEmpty(news.getUploadId())) {
       attachIllustration(newsDraftNode, news.getUploadId());
     }
     news.setId(newsDraftNode.getUUID());
@@ -758,6 +803,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Return the date of the first published version of the node
+   * 
    * @param node The News node
    * @return The first published version of the node
    * @throws RepositoryException
@@ -777,13 +823,9 @@ public class NewsServiceImpl implements NewsService {
     String nodePath = null;
     NodeLocation nodeLocation = NodeLocation.getNodeLocationByNode(node);
 
-    if(nodeLocation != null) {
+    if (nodeLocation != null) {
       StringBuilder sb = new StringBuilder();
-      sb.append("/")
-              .append(nodeLocation.getRepository())
-              .append("/")
-              .append(nodeLocation.getWorkspace())
-              .append(node.getPath());
+      sb.append("/").append(nodeLocation.getRepository()).append("/").append(nodeLocation.getWorkspace()).append(node.getPath());
       nodePath = Text.escapeIllegalJcrChars(sb.toString());
     }
 
@@ -791,7 +833,9 @@ public class NewsServiceImpl implements NewsService {
   }
 
   /**
-   * Return a boolean that indicates if the current user can edit the news or not
+   * Return a boolean that indicates if the current user can edit the news or
+   * not
+   * 
    * @param posterId the poster id of the news
    * @param spaceId the space id of the news
    * @return if the news can be edited
@@ -807,6 +851,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Return a boolean that indicates if the current user can pin the news or not
+   * 
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
@@ -841,49 +886,18 @@ public class NewsServiceImpl implements NewsService {
 
   protected void sendNotification(News news, String context) throws Exception {
     String activities = news.getActivities();
-    String lastSpaceIdActivityId = activities.split(";")[activities.split(";").length-1];
+    String contentTitle = news.getTitle();
+    String contentAuthor = news.getAuthor();
+    String lastSpaceIdActivityId = activities.split(";")[activities.split(";").length - 1];
     String contentSpaceId = lastSpaceIdActivityId.split(":")[0];
     String contentActivityId = lastSpaceIdActivityId.split(":")[1];
     Space contentSpace = spaceService.getSpaceById(contentSpaceId);
+    boolean isMember = spaceService.isMember(contentSpace, contentAuthor);
     if (contentSpace == null) {
       throw new NullPointerException("Cannot find a space with id " + contentSpaceId + ", it may not exist");
     }
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
-    StringBuffer illustrationURL = new StringBuffer();
-    try {
-      Node newsNode = session.getNodeByUUID(news.getId());
-      if (newsNode == null) {
-        throw new ItemNotFoundException("Cannot find a node with UUID equals to " + news.getId() + ", it may not exist");
-      }
-      if (newsNode.hasNode("illustration")) {
-        illustrationURL.append("/rest/v1/news/").append(news.getId()).append("/illustration");
-      } else {
-        illustrationURL.append("/news/images/newsImageDefault.png");
-      }
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
-    String contentTitle = news.getTitle();
-    String contentAuthor = news.getAuthor();
-    String activityLink = getActivityPermalink(contentActivityId);
-    String baseUrl = PropertyManager.getProperty("gatein.email.domain.url");
-    if (context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
-      boolean isMember = spaceService.isMember(contentSpace, contentAuthor);
-      if (!isMember) {
-        activityLink = "/".concat(PortalContainer.getCurrentPortalContainerName())
-                          .concat("/g/:spaces:")
-                          .concat(contentSpace.getPrettyName())
-                          .concat("/")
-                          .concat(contentSpace.getDisplayName());
-      }
-    }
+    String illustrationURL = NotificationUtils.getNewsIllustration(news);
+    String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();
     String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
     // Send Notification
@@ -894,10 +908,8 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-                                                     .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
-                                                             baseUrl.concat(illustrationURL.toString()))
-                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
-                                                             baseUrl.concat(activityLink));
+                                                     .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.POST_NEWS_CONTEXT)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
     } else if (context.equals(NotificationConstants.SHARE_NEWS_CONTEXT)) {
@@ -905,10 +917,6 @@ public class NewsServiceImpl implements NewsService {
     } else if (context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
     }
-  }
-
-  private String getActivityPermalink(String activityId) {
-    return LinkProvider.getSingleActivityUrl(activityId);
   }
 
   /**

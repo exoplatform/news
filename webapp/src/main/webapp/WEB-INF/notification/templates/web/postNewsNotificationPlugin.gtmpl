@@ -15,6 +15,10 @@
           notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
         } else if (CONTEXT.equals("SHARE MY NEWS")) {
           notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+        } else if (CONTEXT.equals("LIKE MY NEWS")) {
+          notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+        } else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
+          notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
         }
 
       %>

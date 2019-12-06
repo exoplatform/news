@@ -14,6 +14,7 @@ import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -70,22 +71,19 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     String contentTitle = ctx.value(CONTENT_TITLE);
     String context = ctx.value(CONTEXT);
     String contentAuthorUserName = ctx.value(CONTENT_AUTHOR);
-    User contentAuthorUser;
     String contentAuthor = contentAuthorUserName;
     try {
-      contentAuthorUser = userhandler.findUserByName(contentAuthorUserName);
-      contentAuthor = contentAuthorUser.getFullName();
+      contentAuthor = NotificationUtils.getUserFullName(contentAuthorUserName);
     } catch (Exception e) {
-      LOG.error("An error occured when trying to retreive a user with username " + contentAuthorUserName + " " + e.getMessage(), e);
+      LOG.error("An error occured when trying to retreive a user with username " + contentAuthorUserName + " " + e.getMessage(),
+                e);
     }
     String currentUserName = ctx.value(CURRENT_USER);
-    User currentUser;
     String currentUserFullName = currentUserName;
     try {
-      currentUser = userhandler.findUserByName(currentUserName);
-      currentUserFullName = currentUser.getFullName();
+      currentUserFullName = NotificationUtils.getUserFullName(currentUserName);
     } catch (Exception e) {
-      LOG.error("An error occured when trying to retreive a user with username " + contentAuthorUserName + " " + e.getMessage(), e);
+      LOG.error("An error occured when trying to retreive a user with username " + currentUserName + " " + e.getMessage(), e);
     }
     String contentSpaceId = ctx.value(CONTENT_SPACE_ID);
     String contentSpaceName = ctx.value(CONTENT_SPACE);
@@ -94,7 +92,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
     List<String> receivers = new ArrayList<String>();
     try {
-      receivers = getReceivers(contentSpaceId, currentUserName,context, contentAuthorUserName);
+      receivers = getReceivers(contentSpaceId, currentUserName, context, contentAuthorUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
@@ -114,7 +112,10 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   }
 
-  private List<String> getReceivers(String contentSpaceId, String currentUserName, String context, String newsAuthor) throws Exception {
+  private List<String> getReceivers(String contentSpaceId,
+                                    String currentUserName,
+                                    String context,
+                                    String newsAuthor) throws Exception {
     List<String> receivers = null;
     if (!context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
       Space space = spaceService.getSpaceById(contentSpaceId);

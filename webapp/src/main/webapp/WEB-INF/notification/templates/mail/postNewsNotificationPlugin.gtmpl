@@ -15,6 +15,10 @@ if (CONTEXT.equals("POST NEWS")) {
     title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
 } else if (CONTEXT.equals("SHARE MY NEWS")) {
     title =  _ctx.appRes("news.notification.title.share.myNews",CONTENT_SPACE);
+} else if (CONTEXT.equals("LIKE MY NEWS")) {
+    title =  _ctx.appRes("news.notification.title.like.myNews",CONTENT_SPACE);
+} else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
+    title =  _ctx.appRes("news.notification.title.like.mySharedNews",CONTENT_SPACE);
 }
 %>
 $title
@@ -55,6 +59,10 @@ if (CONTEXT.equals("POST NEWS")) {
   notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
 } else if (CONTEXT.equals("SHARE MY NEWS")) {
   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+} else if (CONTEXT.equals("LIKE MY NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+} else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
+  notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
 }
 
 %>

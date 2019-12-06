@@ -59,8 +59,8 @@
       <artifactId>ecms-core-services</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.integration</groupId>
-      <artifactId>integ-ecms-social</artifactId>
+      <groupId>org.exoplatform.ecms</groupId>
+      <artifactId>ecms-social-integration</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

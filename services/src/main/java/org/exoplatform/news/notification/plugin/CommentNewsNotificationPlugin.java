@@ -10,12 +10,12 @@ import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-public class LikeNewsNotificationPlugin extends BaseNotificationPlugin {
+public class CommentNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log                                                        LOG                       =
-                                                                                      ExoLogger.getLogger(LikeNewsNotificationPlugin.class);
+                                                                                      ExoLogger.getLogger(CommentNewsNotificationPlugin.class);
 
   public final static String                                                      ID                        =
-                                                                                     "LikeNewsNotificationPlugin";
+                                                                                     "CommentNewsNotificationPlugin";
 
   public final static ArgumentLiteral<String>                                     CONTENT_TITLE             =
                                                                                                 new ArgumentLiteral<String>(String.class,
@@ -49,7 +49,7 @@ public class LikeNewsNotificationPlugin extends BaseNotificationPlugin {
                                                                                                             new ArgumentLiteral<String>(String.class,
                                                                                                                                         "POSTER_ACTIVITY_USER_NAME");
 
-  public LikeNewsNotificationPlugin(InitParams initParams) {
+  public CommentNewsNotificationPlugin(InitParams initParams) {
     super(initParams);
   }
 

@@ -1,15 +1,29 @@
 <%
 def notificationDescription = "";
-if (CONTEXT.equals("POST NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE);
-} else if (CONTEXT.equals("SHARE NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.share",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE);
-} else if (CONTEXT.equals("SHARE MY NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
-} else if (CONTEXT.equals("LIKE MY NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
-} else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
+switch(CONTEXT) {
+ case "POST NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+   break;
+ case "SHARE NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "SHARE MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "LIKE MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "LIKE MY SHARED NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "COMMENT MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "COMMENT MY SHARED NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ default:
+   break;
 }
 %>
 $notificationDescription

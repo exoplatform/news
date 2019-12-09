@@ -9,17 +9,31 @@
 <a href="#" style="text-decoration: none; color: #2f5e92; font-family: 'HelveticaNeue Bold', Helvetica, Arial, sans-serif; font-size: 18px;">
 <%
 def title = "";
-if (CONTEXT.equals("POST NEWS")) {
-    title =  _ctx.appRes("news.notification.title",CONTENT_SPACE);
-} else if (CONTEXT.equals("SHARE NEWS")) {
-    title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
-} else if (CONTEXT.equals("SHARE MY NEWS")) {
-    title =  _ctx.appRes("news.notification.title.share.myNews",CONTENT_SPACE);
-} else if (CONTEXT.equals("LIKE MY NEWS")) {
-    title =  _ctx.appRes("news.notification.title.like.myNews",CONTENT_SPACE);
-} else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
-    title =  _ctx.appRes("news.notification.title.like.mySharedNews",CONTENT_SPACE);
-}
+switch(CONTEXT) {
+ case "POST NEWS":
+   title =  _ctx.appRes("news.notification.title",CONTENT_SPACE);
+   break;
+ case "SHARE NEWS":
+   title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
+   break;
+ case "SHARE MY NEWS":
+   title =  _ctx.appRes("news.notification.title.share.myNews",CONTENT_SPACE);
+   break;
+ case "LIKE MY NEWS":
+   title =  _ctx.appRes("news.notification.title.like.myNews",CONTENT_SPACE);
+   break;
+ case "LIKE MY SHARED NEWS":
+   title =  _ctx.appRes("news.notification.title.like.mySharedNews",CONTENT_SPACE);
+   break;
+ case "COMMENT MY NEWS":
+   title =  _ctx.appRes("news.notification.title.comment.myNews",CONTENT_SPACE);
+   break;
+ case "COMMENT MY SHARED NEWS":
+   title =  _ctx.appRes("news.notification.title.comment.mySharedNews",CONTENT_SPACE);
+   break;
+ default:
+   break;
+ }
 %>
 $title
 </a>
@@ -53,16 +67,30 @@ String spaceName = "<span style=\"font-weight: bold;\">" + CONTENT_SPACE + "</sp
 String creator = "<span style=\"color: #578dc9; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
 String currentUser = "<span style=\"color: #578dc9; font-weight: bold;\">" + CURRENT_USER + "</span>";
 def notificationDescription = "";
-if (CONTEXT.equals("POST NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
-} else if (CONTEXT.equals("SHARE NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.share",creator,CONTENT_TITLE,spaceName);
-} else if (CONTEXT.equals("SHARE MY NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
-} else if (CONTEXT.equals("LIKE MY NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
-} else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
-  notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+switch(CONTEXT) {
+ case "POST NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+   break;
+ case "SHARE NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "SHARE MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "LIKE MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "LIKE MY SHARED NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "COMMENT MY NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ case "COMMENT MY SHARED NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   break;
+ default:
+   break;
 }
 
 %>

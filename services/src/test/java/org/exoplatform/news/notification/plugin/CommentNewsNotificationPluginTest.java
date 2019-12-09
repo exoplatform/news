@@ -44,7 +44,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
-public class LikeNewsNotificationPluginTest {
+public class CommentNewsNotificationPluginTest {
 
   @Mock
   private SpaceService           spaceService;
@@ -64,20 +64,20 @@ public class LikeNewsNotificationPluginTest {
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
       LinkProvider.class, PropertyManager.class })
   @Test
-  public void shouldMakeNotificationForLikeNewsContext() throws Exception {
+  public void shouldMakeNotificationForCommentNewsContext() throws Exception {
     // Given
-    LikeNewsNotificationPlugin linkPlugin = new LikeNewsNotificationPlugin(initParams);
+    CommentNewsNotificationPlugin linkPlugin = new CommentNewsNotificationPlugin(initParams);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_TITLE, "title")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
-                                                     .append(LikeNewsNotificationPlugin.CURRENT_USER, "root")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_SPACE, "space1")
-                                                     .append(LikeNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_TITLE, "title")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
+                                                     .append(CommentNewsNotificationPlugin.CURRENT_USER, "root")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_SPACE, "space1")
+                                                     .append(CommentNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080/rest/v1/news/id123/illustration")
-                                                     .append(LikeNewsNotificationPlugin.ACTIVITY_LINK,
+                                                     .append(CommentNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=39")
-                                                     .append(LikeNewsNotificationPlugin.CONTEXT,
-                                                             NotificationConstants.NOTIFICATION_CONTEXT.LIKE_MY_NEWS);
+                                                     .append(CommentNewsNotificationPlugin.CONTEXT,
+                                                             NotificationConstants.NOTIFICATION_CONTEXT.COMMENT_MY_NEWS);
 
     User currentUser = mock(User.class);
     OrganizationService orgService = mock(OrganizationService.class);
@@ -141,7 +141,7 @@ public class LikeNewsNotificationPluginTest {
     // Then
     assertEquals("root", notificationInfo.getFrom());
     assertEquals("", notificationInfo.getTitle());
-    assertEquals("LIKE MY NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
+    assertEquals("COMMENT MY NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
     assertEquals("http://localhost:8080/rest/v1/news/id123/illustration",
                  notificationInfo.getValueOwnerParameter("ILLUSTRATION_URL"));
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));

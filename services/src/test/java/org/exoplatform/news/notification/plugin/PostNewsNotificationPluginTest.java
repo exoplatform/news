@@ -11,6 +11,7 @@ import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
@@ -63,7 +64,7 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
-                                                     .append(PostNewsNotificationPlugin.CONTEXT, "POST NEWS");
+                                                     .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     User contentAuthorUser = mock(User.class);
     when(userhandler.findUserByName("root")).thenReturn(contentAuthorUser);
@@ -124,7 +125,7 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
-                                                     .append(PostNewsNotificationPlugin.CONTEXT, "POST NEWS");
+                                                     .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     User contentAuthorUser = mock(User.class);
     when(userhandler.findUserByName("root")).thenReturn(contentAuthorUser);
@@ -187,7 +188,7 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
-                                                     .append(PostNewsNotificationPlugin.CONTEXT, "POST NEWS");
+                                                     .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     when(userhandler.findUserByName("jean")).thenReturn(null);
 

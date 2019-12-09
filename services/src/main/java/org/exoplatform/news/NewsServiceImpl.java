@@ -2,22 +2,30 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.jcr.*;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
 import org.exoplatform.news.connector.NewsSearchConnector;
@@ -59,7 +67,6 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -164,7 +171,7 @@ public class NewsServiceImpl implements NewsService {
       } else {
         postNewsActivity(news);
         updateNews(news);
-        sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+        sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
       }
 
     } finally {
@@ -224,7 +231,7 @@ public class NewsServiceImpl implements NewsService {
     List<News> listNews = new ArrayList<>();
     NewsQueryBuilder queyBuilder = new NewsQueryBuilder();
     try {
-      StringBuilder sqlQuery  = queyBuilder.buildQuery(filter);
+      StringBuilder sqlQuery = queyBuilder.buildQuery(filter);
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
       NodeIterator it = query.execute().getNodes();
@@ -486,8 +493,8 @@ public class NewsServiceImpl implements NewsService {
           }
           newsNode.save();
           News news = getNewsById(sharedNews.getNewsId());
-          sendNotification(news, NotificationConstants.SHARE_NEWS_CONTEXT);
-          sendNotification(news, NotificationConstants.SHARE_MY_NEWS_CONTEXT);
+          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
+          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
         }
       }
     } finally {
@@ -789,7 +796,7 @@ public class NewsServiceImpl implements NewsService {
       newsDraftNode.setProperty("publication:lifecycle", lifecycle.getName());
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
-    publicationService.changeState(newsDraftNode, "draft",  new HashMap<>());
+    publicationService.changeState(newsDraftNode, "draft", new HashMap<>());
     newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
     spaceNewsRootNode.save();
 
@@ -811,7 +818,7 @@ public class NewsServiceImpl implements NewsService {
   private Date getPublicationDate(Node node) throws RepositoryException {
     VersionNode versionNode = new VersionNode(node, node.getSession());
     List<VersionNode> versions = versionNode.getChildren();
-    if(!versions.isEmpty()) {
+    if (!versions.isEmpty()) {
       versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
       return versions.get(0).getCreatedTime().getTime();
     }
@@ -884,7 +891,7 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  protected void sendNotification(News news, String context) throws Exception {
+  protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
     String contentAuthor = news.getAuthor();
@@ -910,17 +917,18 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
-    if (context.equals(NotificationConstants.POST_NEWS_CONTEXT)) {
+    if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
-    } else if (context.equals(NotificationConstants.SHARE_NEWS_CONTEXT)) {
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareNewsNotificationPlugin.ID))).execute(ctx);
-    } else if (context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
     }
   }
 
   /**
    * Search news with the given text
+   * 
    * @param filter news filter
    * @param lang language
    */
@@ -932,7 +940,7 @@ public class NewsServiceImpl implements NewsService {
     List<SearchResult> searchResults = newsSearchConnector.search(filter, 0, 0, "relevancy", "desc");
     searchResults.forEach(res -> {
       try {
-        News news = convertNodeToNews(((NewsSearchResult)res).getNode());
+        News news = convertNodeToNews(((NewsSearchResult) res).getNode());
         newsList.add(news);
       } catch (Exception e) {
         LOG.error("Error while processing search result in News", e);

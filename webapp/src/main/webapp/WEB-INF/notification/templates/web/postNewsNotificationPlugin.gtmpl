@@ -9,16 +9,30 @@
 		String creator = "<span class=\"notification_author\">" + CONTENT_AUTHOR + "</span>";
 		String currentUser = "<span class=\"notification_author\">" + CURRENT_USER + "</span>";
 		def notificationDescription = "";
-        if (CONTEXT.equals("POST NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
-        } else if (CONTEXT.equals("SHARE NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
-        } else if (CONTEXT.equals("SHARE MY NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
-        } else if (CONTEXT.equals("LIKE MY NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
-        } else if (CONTEXT.equals("LIKE MY SHARED NEWS")) {
-          notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+		switch(CONTEXT) {
+          case "POST NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+            break;
+          case "SHARE NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          case "SHARE MY NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          case "LIKE MY NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          case "LIKE MY SHARED NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          case "COMMENT MY NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          case "COMMENT MY SHARED NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+            break;
+          default:
+            break;
         }
 
       %>

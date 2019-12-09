@@ -42,7 +42,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> ACTIVITY_LINK    = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
-  public static final ArgumentLiteral<String> CONTEXT          = new ArgumentLiteral<String>(String.class, "CONTEXT");
+  public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT          = new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
 
   public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
 
@@ -69,7 +69,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   @Override
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     String contentTitle = ctx.value(CONTENT_TITLE);
-    String context = ctx.value(CONTEXT);
+    NotificationConstants.NOTIFICATION_CONTEXT context = ctx.value(CONTEXT);
     String contentAuthorUserName = ctx.value(CONTENT_AUTHOR);
     String contentAuthor = contentAuthorUserName;
     try {
@@ -106,7 +106,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
                            .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
                            .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
-                           .with(NotificationConstants.CONTEXT, context)
+                           .with(NotificationConstants.CONTEXT, context.getContext())
                            .key(getKey())
                            .end();
 
@@ -114,10 +114,10 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   private List<String> getReceivers(String contentSpaceId,
                                     String currentUserName,
-                                    String context,
+                                    NotificationConstants.NOTIFICATION_CONTEXT context,
                                     String newsAuthor) throws Exception {
     List<String> receivers = null;
-    if (!context.equals(NotificationConstants.SHARE_MY_NEWS_CONTEXT)) {
+    if (!context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
       Space space = spaceService.getSpaceById(contentSpaceId);
       ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
       User[] userArray = members.load(0, members.getSize());

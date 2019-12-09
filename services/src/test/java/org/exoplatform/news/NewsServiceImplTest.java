@@ -7,7 +7,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -373,8 +376,10 @@ public class NewsServiceImplTest {
     sharedNews.setActivityId("2");
     sharedNews.setNewsId("1");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.SHARE_NEWS_CONTEXT));
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.SHARE_MY_NEWS_CONTEXT));
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS));
+    Mockito.doNothing()
+           .when(newsServiceSpy)
+           .sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS));
 
     // When
     newsServiceSpy.shareNews(sharedNews, Arrays.asList(space1));
@@ -531,7 +536,9 @@ public class NewsServiceImplTest {
     Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(createdNewsDraft, NotificationConstants.POST_NEWS_CONTEXT);
+    Mockito.doNothing()
+           .when(newsServiceSpy)
+           .sendNotification(createdNewsDraft, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
     // When
     News createdNews = newsServiceSpy.createNews(news);
 
@@ -1060,7 +1067,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     // When
     newsServiceSpy.createNews(news);
@@ -1126,14 +1133,14 @@ public class NewsServiceImplTest {
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     // When
     newsServiceSpy.createNews(news);
 
     // Then
     verify(newsServiceSpy, times(1)).updateNews(news);
-    verify(newsServiceSpy, times(1)).sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    verify(newsServiceSpy, times(1)).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
   }
 
   @Test
@@ -1163,7 +1170,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
+    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -1197,12 +1204,12 @@ public class NewsServiceImplTest {
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
 
     Profile p1 = new Profile(poster);
-    p1.setProperty("fullName","Sara Boutej");
+    p1.setProperty("fullName", "Sara Boutej");
     NewsFilter newsFilter = new NewsFilter();
 
     when(poster.getProfile()).thenReturn(p1);
     // When
-    List<News> newsList =newsService.getNews(newsFilter);
+    List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);
@@ -1238,7 +1245,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
+    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -1247,7 +1254,7 @@ public class NewsServiceImplTest {
     NewsFilter newsFilter = new NewsFilter();
 
     // When
-    List<News> newsList =newsService.getNews(newsFilter);
+    List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);
@@ -1990,7 +1997,7 @@ public class NewsServiceImplTest {
     exceptionRule.expect(NullPointerException.class);
     exceptionRule.expectMessage("Cannot find a space with id 1, it may not exist");
 
-    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
   }
 
@@ -2041,7 +2048,7 @@ public class NewsServiceImplTest {
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
 
-    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
   }
 
@@ -2113,7 +2120,9 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
-    ArgumentLiteral<String> CONTEXT = new ArgumentLiteral<String>(String.class, "CONTEXT");
+    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
+                                                                        new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
+                                                                                                                                        "CONTEXT");
 
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
     when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
@@ -2122,7 +2131,7 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
-    when(ctx.append(CONTEXT, "POST NEWS")).thenReturn(ctx);
+    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);
     PowerMockito.mockStatic(PluginKey.class);
@@ -2138,7 +2147,7 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     // When
-    newsService.sendNotification(news, NotificationConstants.POST_NEWS_CONTEXT);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);
@@ -2214,7 +2223,9 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
-    ArgumentLiteral<String> CONTEXT = new ArgumentLiteral<String>(String.class, "CONTEXT");
+    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
+                                                                        new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
+                                                                                                                                        "CONTEXT");
 
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
     when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
@@ -2224,7 +2235,7 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
-    when(ctx.append(CONTEXT, "SHARE NEWS")).thenReturn(ctx);
+    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);
     PowerMockito.mockStatic(PluginKey.class);
@@ -2240,7 +2251,7 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     // When
-    newsService.sendNotification(news, NotificationConstants.SHARE_NEWS_CONTEXT);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);
@@ -2318,7 +2329,9 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
-    ArgumentLiteral<String> CONTEXT = new ArgumentLiteral<String>(String.class, "CONTEXT");
+    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
+                                                                        new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
+                                                                                                                                        "CONTEXT");
 
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
     when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
@@ -2328,7 +2341,7 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
-    when(ctx.append(CONTEXT, "SHARE MY NEWS")).thenReturn(ctx);
+    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);
     PowerMockito.mockStatic(PluginKey.class);
@@ -2344,7 +2357,7 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     // When
-    newsService.sendNotification(news, NotificationConstants.SHARE_MY_NEWS_CONTEXT);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);
@@ -2354,19 +2367,19 @@ public class NewsServiceImplTest {
   public void shouldGetAllPinnedNewsNodesWhenExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2377,7 +2390,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     Query query = mock(Query.class);
-    when(qm.createQuery(anyString(),anyString())).thenReturn(query);
+    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -2399,7 +2412,7 @@ public class NewsServiceImplTest {
     when(property.toString()).thenReturn("news ");
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getBoolean()).thenReturn(true);
-    when(property.getLong()).thenReturn((long)10);
+    when(property.getLong()).thenReturn((long) 10);
     when(node1.hasNode("illustration")).thenReturn(false);
     when(node2.hasNode("illustration")).thenReturn(false);
     when(node3.hasNode("illustration")).thenReturn(false);
@@ -2408,16 +2421,16 @@ public class NewsServiceImplTest {
     when(space.getDisplayName()).thenReturn("Test news space");
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
-    when(identityManager.getOrCreateIdentity(anyString(),anyString(),anyBoolean())).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
 
     Profile p1 = new Profile(poster);
-    p1.setProperty("fullName","Sara Boutej");
+    p1.setProperty("fullName", "Sara Boutej");
     NewsFilter newsFilter = new NewsFilter();
     newsFilter.setPinnedNews(true);
 
     when(poster.getProfile()).thenReturn(p1);
     // When
-    List<News> newsList =newsService.getNews(newsFilter);
+    List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);
@@ -2430,19 +2443,19 @@ public class NewsServiceImplTest {
   public void shouldGetNewsListsWhenSearching() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2451,7 +2464,7 @@ public class NewsServiceImplTest {
 
     String lang = "en";
     String searchText = "Test";
-    NewsFilter filter  =new NewsFilter();
+    NewsFilter filter = new NewsFilter();
     filter.setSearchText(searchText);
     List<SearchResult> ret = new ArrayList<>();
     NewsSearchResult searchResult = mock(NewsSearchResult.class);
@@ -2459,7 +2472,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(ret).when(newsSearchConnector).search(filter, 0, 0, "relevancy", "desc");
 
     // When
-    List<News> newsList =newsService.searchNews(filter, lang);
+    List<News> newsList = newsService.searchNews(filter, lang);
 
     // Then
     assertNotNull(newsList);

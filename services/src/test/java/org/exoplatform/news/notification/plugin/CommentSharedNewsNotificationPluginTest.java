@@ -44,7 +44,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
-public class LikeSharedNewsNotificationPluginTest {
+public class CommentSharedNewsNotificationPluginTest {
 
   @Mock
   private SpaceService           spaceService;
@@ -64,20 +64,20 @@ public class LikeSharedNewsNotificationPluginTest {
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
       LinkProvider.class, PropertyManager.class })
   @Test
-  public void shouldMakeNotificationForLikeSharedNewsContext() throws Exception {
+  public void shouldMakeNotificationForCommentSharedNewsContext() throws Exception {
     // Given
-    LikeSharedNewsNotificationPlugin linkPlugin = new LikeSharedNewsNotificationPlugin(initParams);
+    CommentSharedNewsNotificationPlugin linkPlugin = new CommentSharedNewsNotificationPlugin(initParams);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_TITLE, "title")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
-                                                     .append(LikeNewsNotificationPlugin.CURRENT_USER, "root")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_SPACE, "space1")
-                                                     .append(LikeNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_TITLE, "title")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
+                                                     .append(CommentNewsNotificationPlugin.CURRENT_USER, "root")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_SPACE, "space1")
+                                                     .append(CommentNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080/rest/v1/news/id123/illustration")
-                                                     .append(LikeNewsNotificationPlugin.ACTIVITY_LINK,
+                                                     .append(CommentNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=11")
-                                                     .append(LikeNewsNotificationPlugin.CONTEXT,
-                                                             NotificationConstants.NOTIFICATION_CONTEXT.LIKE_MY_SHARED_NEWS);
+                                                     .append(CommentNewsNotificationPlugin.CONTEXT,
+                                                             NotificationConstants.NOTIFICATION_CONTEXT.COMMENT_MY_SHARED_NEWS);
 
     User currentUser = mock(User.class);
     OrganizationService orgService = mock(OrganizationService.class);
@@ -141,7 +141,7 @@ public class LikeSharedNewsNotificationPluginTest {
     // Then
     assertEquals("root", notificationInfo.getFrom());
     assertEquals("", notificationInfo.getTitle());
-    assertEquals("LIKE MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
+    assertEquals("COMMENT MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
     assertEquals("http://localhost:8080/rest/v1/news/id123/illustration",
                  notificationInfo.getValueOwnerParameter("ILLUSTRATION_URL"));
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));
@@ -152,21 +152,21 @@ public class LikeSharedNewsNotificationPluginTest {
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
       LinkProvider.class, PropertyManager.class })
   @Test
-  public void shouldMakeNotificationForLikeSharedNewsContextWhenPosterActivityIsNotMemberInSharedSpace() throws Exception {
+  public void shouldMakeNotificationForCommentSharedNewsContextWhenPosterActivityIsNotMemberInSharedSpace() throws Exception {
     // Given
-    LikeNewsNotificationPlugin linkPlugin = new LikeNewsNotificationPlugin(initParams);
+    CommentSharedNewsNotificationPlugin linkPlugin = new CommentSharedNewsNotificationPlugin(initParams);
 
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_TITLE, "title")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
-                                                     .append(LikeNewsNotificationPlugin.CURRENT_USER, "root")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_SPACE, "space1")
-                                                     .append(LikeNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_TITLE, "title")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
+                                                     .append(CommentNewsNotificationPlugin.CURRENT_USER, "root")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_SPACE, "space1")
+                                                     .append(CommentNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080/rest/v1/news/id123/illustration")
-                                                     .append(LikeNewsNotificationPlugin.ACTIVITY_LINK,
+                                                     .append(CommentNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/g/:spaces:space1/space1")
-                                                     .append(LikeNewsNotificationPlugin.CONTEXT,
-                                                             NotificationConstants.NOTIFICATION_CONTEXT.LIKE_MY_SHARED_NEWS);
+                                                     .append(CommentNewsNotificationPlugin.CONTEXT,
+                                                             NotificationConstants.NOTIFICATION_CONTEXT.COMMENT_MY_SHARED_NEWS);
 
     User currentUser = mock(User.class);
     OrganizationService orgService = mock(OrganizationService.class);
@@ -232,7 +232,7 @@ public class LikeSharedNewsNotificationPluginTest {
     // Then
     assertEquals("root", notificationInfo.getFrom());
     assertEquals("", notificationInfo.getTitle());
-    assertEquals("LIKE MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
+    assertEquals("COMMENT MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
     assertEquals("http://localhost:8080/rest/v1/news/id123/illustration",
                  notificationInfo.getValueOwnerParameter("ILLUSTRATION_URL"));
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));
@@ -245,19 +245,19 @@ public class LikeSharedNewsNotificationPluginTest {
   @Test
   public void shouldMakeNotificationForLikeSharedNewsContextWhenNewsHasNoIllustrationAndAuthorIsNotMemberInSharedSpace() throws Exception {
     // Given
-    LikeNewsNotificationPlugin linkPlugin = new LikeNewsNotificationPlugin(initParams);
+    CommentSharedNewsNotificationPlugin linkPlugin = new CommentSharedNewsNotificationPlugin(initParams);
 
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_TITLE, "title")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
-                                                     .append(LikeNewsNotificationPlugin.CURRENT_USER, "root")
-                                                     .append(LikeNewsNotificationPlugin.CONTENT_SPACE, "space1")
-                                                     .append(LikeNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_TITLE, "title")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
+                                                     .append(CommentNewsNotificationPlugin.CURRENT_USER, "root")
+                                                     .append(CommentNewsNotificationPlugin.CONTENT_SPACE, "space1")
+                                                     .append(CommentNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080/news/images/newsImageDefault.png")
-                                                     .append(LikeNewsNotificationPlugin.ACTIVITY_LINK,
+                                                     .append(CommentNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/g/:spaces:space1/space1")
-                                                     .append(LikeNewsNotificationPlugin.CONTEXT,
-                                                             NotificationConstants.NOTIFICATION_CONTEXT.LIKE_MY_SHARED_NEWS);
+                                                     .append(CommentNewsNotificationPlugin.CONTEXT,
+                                                             NotificationConstants.NOTIFICATION_CONTEXT.COMMENT_MY_SHARED_NEWS);
 
     User currentUser = mock(User.class);
     OrganizationService orgService = mock(OrganizationService.class);
@@ -312,7 +312,7 @@ public class LikeSharedNewsNotificationPluginTest {
     when(posterActivity.getProfile()).thenReturn(profile1);
 
     when(spaceService.getSpaceByPrettyName("space1")).thenReturn(space1);
-    when(spaceService.isMember(space1, "jean")).thenReturn(false);
+    when(spaceService.isMember(space1, "test")).thenReturn(false);
     PowerMockito.mockStatic(LinkProvider.class);
     when(LinkProvider.getSingleActivityUrl("11")).thenReturn("portal/intranet/activity?id=11");
     // When
@@ -321,7 +321,7 @@ public class LikeSharedNewsNotificationPluginTest {
     // Then
     assertEquals("root", notificationInfo.getFrom());
     assertEquals("", notificationInfo.getTitle());
-    assertEquals("LIKE MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
+    assertEquals("COMMENT MY SHARED NEWS", notificationInfo.getValueOwnerParameter("CONTEXT"));
     assertEquals("http://localhost:8080/news/images/newsImageDefault.png",
                  notificationInfo.getValueOwnerParameter("ILLUSTRATION_URL"));
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));

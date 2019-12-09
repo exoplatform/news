@@ -229,6 +229,78 @@
         </object-param>
       </init-params>
     </component-plugin>
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin</type>
+      <description>Initial information for plugin CommentNewsNotificationPlugin</description>
+      <init-params>
+        <object-param>
+          <name>template.CommentNewsNotificationPlugin</name>
+          <description>The template for the plugin of the state updates of contents</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>CommentNewsNotificationPlugin</string>
+            </field>
+            <field name="order">
+              <string>6</string>
+            </field>
+            <field name="defaultConfig">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>daily</string>
+                </value>
+                <value>
+                  <string>Instantly</string>
+                </value>
+              </collection>
+            </field>
+            <field name="groupId">
+              <string>news</string>
+            </field>
+            <field name="bundlePath">
+              <string>locale.portlet.news.News_en</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin</type>
+      <description>Initial information for plugin CommentSharedNewsNotificationPlugin</description>
+      <init-params>
+        <object-param>
+          <name>template.CommentSharedNewsNotificationPlugin</name>
+          <description>The template for the plugin of the state updates of contents</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>CommentSharedNewsNotificationPlugin</string>
+            </field>
+            <field name="order">
+              <string>7</string>
+            </field>
+            <field name="defaultConfig">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>daily</string>
+                </value>
+                <value>
+                  <string>Instantly</string>
+                </value>
+              </collection>
+            </field>
+            <field name="groupId">
+              <string>news</string>
+            </field>
+            <field name="bundlePath">
+              <string>locale.portlet.news.News_en</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>
@@ -245,6 +317,7 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+
 
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>

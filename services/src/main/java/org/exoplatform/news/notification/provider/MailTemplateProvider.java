@@ -18,6 +18,8 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.LikeNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.LikeSharedNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
@@ -32,19 +34,20 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
-import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = ShareMyNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = LikeNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = LikeSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl")})
+    @TemplateConfig(pluginId = LikeSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = CommentNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
 public class MailTemplateProvider extends TemplateProvider {
   protected static Log    log = ExoLogger.getLogger(MailTemplateProvider.class);
 
   private IdentityManager identityManager;
-  
+
   public MailTemplateProvider(InitParams initParams, IdentityManager identityManager) {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
@@ -52,10 +55,12 @@ public class MailTemplateProvider extends TemplateProvider {
     this.templateBuilders.put(PluginKey.key(ShareMyNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(LikeNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(LikeSharedNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(CommentNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(CommentSharedNewsNotificationPlugin.ID), new TemplateBuilder());
     this.identityManager = identityManager;
   }
 
-  private class TemplateBuilder extends AbstractTemplateBuilder {
+  protected class TemplateBuilder extends AbstractTemplateBuilder {
     @Override
     protected MessageInfo makeMessage(NotificationContext ctx) {
       NotificationInfo notification = ctx.getNotificationInfo();
@@ -64,7 +69,7 @@ public class MailTemplateProvider extends TemplateProvider {
       String language = getLanguage(notification);
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
-      String contentAuthor = notification.getValueOwnerParameter("CONTENT_AUTHOR");
+      String contentAuthor = notification.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR);
       String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
@@ -73,7 +78,7 @@ public class MailTemplateProvider extends TemplateProvider {
       String activityLink = notification.getValueOwnerParameter(NotificationConstants.ACTIVITY_LINK);
       String context = notification.getValueOwnerParameter(NotificationConstants.CONTEXT);
 
-      EntityEncoder encoder = HTMLEntityEncoder.getInstance();
+      HTMLEntityEncoder encoder = HTMLEntityEncoder.getInstance();
       templateContext.put("CONTENT_TITLE", encoder.encode(contentTitle));
       templateContext.put(NotificationConstants.CONTENT_SPACE, encoder.encode(contentSpaceName));
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
@@ -93,10 +98,10 @@ public class MailTemplateProvider extends TemplateProvider {
                                                                        "EE, dd yyyy",
                                                                        new Locale(language),
                                                                        TimeConvertUtils.YEAR));
-    //Receiver
+      // Receiver
       Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notification.getTo(), true);
       templateContext.put("FIRST_NAME", encoder.encode(receiver.getProfile().getProperty(Profile.FIRST_NAME).toString()));
-      //Footer
+      // Footer
       templateContext.put("FOOTER_LINK", LinkProviderUtils.getRedirectUrl("notification_settings", receiver.getRemoteId()));
       String subject = TemplateUtils.processSubject(templateContext);
       String body = TemplateUtils.processGroovy(templateContext);

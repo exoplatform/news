@@ -25,8 +25,7 @@
     </div>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
-        <div :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsItemIllustration">
-        </div>
+        <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsItemIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
@@ -38,7 +37,9 @@
             </div>
           </div>
           <div class="newsItemContentDetails">
-            <p class="newsSummary" v-html="news.newsText"></p>
+            <a :href="news.newsUrl">
+              <p class="newsSummary" v-html="news.newsText"></p>
+            </a>
             <div class="newsItemInfo">
               <div class="newsLeftInfo">
                 <p class="newsOwner">

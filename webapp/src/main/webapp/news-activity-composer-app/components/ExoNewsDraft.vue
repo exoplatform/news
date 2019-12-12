@@ -87,17 +87,10 @@ export default {
     },
     openDraftNewsDrawer: function() {
       this.open = true;
-      $('.drawer').css({ 'right': '0px', 'left': '' }).animate({
-        'right' : '0px'
-      });
       this.showDraftNews = true;
-      $('body').css({overflow:'hidden'});
     },
     closeDraftNewsDrawer: function () {
       this.open = false;
-      $('.drawer').css({ 'right': '', 'left': '' }).animate({
-        'right' : '-33%'
-      });
       this.showDraftNews = false;
     },
     selectedDraft: function (draftId) {

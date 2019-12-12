@@ -117,7 +117,9 @@ public class NewsServiceImpl implements NewsService {
 
   private NewsSearchConnector      newsSearchConnector;
 
-  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
+  private NewsAttachmentsService newsAttachmentsService;
+
+  private static final Log LOG = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(RepositoryService repositoryService,
                          SessionProviderService sessionProviderService,
@@ -132,7 +134,8 @@ public class NewsServiceImpl implements NewsService {
                          PublicationService publicationService,
                          PublicationManager publicationManager,
                          WCMPublicationService wCMPublicationService,
-                         NewsSearchConnector newsSearchConnector) {
+                         NewsSearchConnector newsSearchConnector,
+                         NewsAttachmentsService newsAttachmentsService) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -147,6 +150,7 @@ public class NewsServiceImpl implements NewsService {
     this.publicationManager = publicationManager;
     this.wCMPublicationService = wCMPublicationService;
     this.newsSearchConnector = newsSearchConnector;
+    this.newsAttachmentsService = newsAttachmentsService;
   }
 
   /**
@@ -273,11 +277,15 @@ public class NewsServiceImpl implements NewsService {
         newsNode.setProperty("exo:body", processedBody);
         newsNode.setProperty("exo:dateModified", Calendar.getInstance());
 
+        // illustration
         if (StringUtils.isNotEmpty(news.getUploadId())) {
           attachIllustration(newsNode, news.getUploadId());
         } else if ("".equals(news.getUploadId())) {
           removeIllustration(newsNode);
         }
+
+        // attachments
+        news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
 
         newsNode.save();
 
@@ -572,6 +580,77 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
+  @Override
+  public News convertNodeToNews(Node node) throws Exception {
+    if(node == null) {
+      return null;
+    }
+
+    News news = new News();
+
+    Node originalNode;
+    // Retrieve the real news id if it is a frozen node
+    if(node.hasProperty("jcr:frozenUuid")) {
+      String uuid = node.getProperty("jcr:frozenUuid").getString();
+      originalNode = node.getSession().getNodeByUUID(uuid);
+      news.setId(originalNode.getUUID());
+    } else {
+      originalNode = node;
+      news.setId(node.getUUID());
+    }
+
+    news.setTitle(getStringProperty(node, "exo:title"));
+    news.setSummary(getStringProperty(node, "exo:summary"));
+    news.setBody(getStringProperty(node, "exo:body"));
+    news.setAuthor(getStringProperty(node, "exo:author"));
+    news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
+    news.setUpdater(getStringProperty(node, "exo:lastModifier"));
+    news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
+    news.setPublicationDate(getPublicationDate(node));
+    if (node.hasProperty("publication:currentState")) {
+      news.setPublicationState(node.getProperty("publication:currentState").getString());
+    }
+    news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
+    news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    if (originalNode.hasProperty("exo:activities")) {
+      news.setActivities(originalNode.getProperty("exo:activities").getString());
+    }
+    news.setPath(getPath(node));
+    if(!node.hasProperty("exo:viewsCount")) {
+      news.setViewsCount(0L);
+    } else {
+      news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
+    }
+
+    if(node.hasNode("illustration")) {
+      Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
+      byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
+      news.setIllustration(bytes);
+      news.setIllustrationUpdateDate(illustrationContentNode.getProperty("exo:dateModified").getDate().getTime());
+      news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration");
+    }
+
+    news.setAttachments(newsAttachmentsService.getNewsAttachments(node));
+
+    Space space = spaceService.getSpaceById(news.getSpaceId());
+    if(space != null) {
+      String spaceName = space.getDisplayName();
+      news.setSpaceDisplayName(spaceName);
+      if(StringUtils.isNotEmpty(space.getGroupId())) {
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(space.getGroupId()
+                .split("/")[2]).append("/").append(space.getPrettyName());
+        news.setSpaceUrl(spaceUrl.toString());
+      }
+    }
+
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
+    if(identity != null && identity.getProfile() != null) {
+      news.setAuthorDisplayName(identity.getProfile().getFullName());
+    }
+
+    return news;
+  }
+
   /**
    * Post the news activity in the given space
    * 
@@ -662,67 +741,6 @@ public class NewsServiceImpl implements NewsService {
       spaceNewsRootNode = spaceRootNode.getNode(NEWS_NODES_FOLDER);
     }
     return spaceNewsRootNode;
-  }
-
-  private News convertNodeToNews(Node node) throws Exception {
-    if (node == null) {
-      return null;
-    }
-
-    News news = new News();
-
-    news.setId(node.getUUID());
-
-    news.setTitle(getStringProperty(node, "exo:title"));
-    news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(getStringProperty(node, "exo:body"));
-    news.setAuthor(getStringProperty(node, "exo:author"));
-    news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
-    news.setUpdater(getStringProperty(node, "exo:lastModifier"));
-    news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
-    news.setPublicationDate(getPublicationDate(node));
-    if (node.hasProperty("publication:currentState")) {
-      news.setPublicationState(node.getProperty("publication:currentState").getString());
-    }
-    news.setPinned(node.getProperty("exo:pinned").getBoolean());
-    news.setSpaceId(node.getProperty("exo:spaceId").getString());
-    if (node.hasProperty("exo:activities")) {
-      news.setActivities(node.getProperty("exo:activities").getString());
-    }
-    news.setPath(getPath(node));
-    if (!node.hasProperty("exo:viewsCount")) {
-      news.setViewsCount(0L);
-    } else {
-      news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
-    }
-
-    if (node.hasNode("illustration")) {
-      Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
-      byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
-      news.setIllustration(bytes);
-      news.setIllustrationUpdateDate(illustrationContentNode.getProperty("exo:dateModified").getDate().getTime());
-      news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration");
-    }
-
-    Space space = spaceService.getSpaceById(news.getSpaceId());
-    if (space != null) {
-      String spaceName = space.getDisplayName();
-      news.setSpaceDisplayName(spaceName);
-      if (StringUtils.isNotEmpty(space.getGroupId())) {
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:")
-                                                    .append(space.getGroupId().split("/")[2])
-                                                    .append("/")
-                                                    .append(space.getPrettyName());
-        news.setSpaceUrl(spaceUrl.toString());
-      }
-    }
-
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
-    if (identity != null && identity.getProfile() != null) {
-      news.setAuthorDisplayName(identity.getProfile().getFullName());
-    }
-
-    return news;
   }
 
   private String getStringProperty(Node node, String propertyName) throws RepositoryException {

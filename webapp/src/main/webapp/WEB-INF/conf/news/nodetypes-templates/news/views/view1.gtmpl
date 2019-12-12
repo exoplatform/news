@@ -23,6 +23,8 @@
   import java.util.Date;
   import java.util.Comparator;
 
+  import groovy.json.JsonOutput;
+
   public String getProfileFullName(String userName) {
     String profileFullName = "";
     Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
@@ -53,27 +55,17 @@
     return null;
   }
 
+  NewsService newsService = CommonsUtils.getService(NewsService.class);
+
   def pcontext = Util.getPortalRequestContext();
 
   def newsNode = uicomponent.getNode();
 
-  //Retrieve the real newsId to use it in incrementing the number of views for this news
-  String uuid = newsNode.getProperty("jcr:frozenUuid").getString();
-  def originalNode = newsNode.getSession().getNodeByUUID(uuid);
-  def newsId = originalNode.getUUID();
+  def news = newsService.convertNodeToNews(newsNode);
 
-  def title = newsNode.getProperty("exo:title").getString();
-  def summary = newsNode.getProperty("exo:summary").getString();
-  def body = newsNode.getProperty("exo:body").getString();
-  def author = newsNode.getProperty("exo:author").getString();
-  def updater = newsNode.getProperty("exo:lastModifier").getString();
-  def updateDate = newsNode.getProperty("exo:dateModified").getDate();
-  def isPinned = originalNode.getProperty("exo:pinned").getBoolean();
-  def spaceId = newsNode.getProperty("exo:spaceId").getString();
   def activityId = "";
-  if (originalNode.hasProperty("exo:activities")) {
-    def activities = originalNode.getProperty("exo:activities").getString();
-    def originalSpaceIdActivityId = activities.split(";")[0];
+  if (news.activities) {
+    def originalSpaceIdActivityId = news.activities.split(";")[0];
     if (originalSpaceIdActivityId != null) {
       def originalActivityId = originalSpaceIdActivityId.split(":")[1];
       if (originalActivityId != null) {
@@ -83,16 +75,16 @@
   }
 
   StringBuffer illustrationURL = new StringBuffer();
-  if(newsNode.hasNode("illustration")) {
-    illustrationURL.append("/rest/v1/news/").append(newsId).append("/illustration");
+  if(news.illustration != null) {
+    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
   } else {
     illustrationURL.append("/news/images/newsImageDefault.png");
   }
 
-  def authorFullName = getProfileFullName(author);
-  def updaterFullName = author.equals(updater) ? authorFullName : getProfileFullName(updater);
-  def authorProfileURL = LinkProvider.getUserProfileUri(author);
-  def updaterProfileURL = author.equals(updater) ? authorProfileURL : LinkProvider.getUserProfileUri(updater);
+  def authorFullName = getProfileFullName(news.author);
+  def updaterFullName = news.author.equals(news.updater) ? authorFullName : getProfileFullName(news.updater);
+  def authorProfileURL = LinkProvider.getUserProfileUri(news.author);
+  def updaterProfileURL = news.author.equals(news.updater) ? authorProfileURL : LinkProvider.getUserProfileUri(news.updater);
   def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
   def newsPostedDate = "";
   def newsPublicationDate = getPublicationDate(newsNode);
@@ -100,33 +92,34 @@
     def postedDate = LocalDateTime.ofInstant(newsPublicationDate.toInstant(), TimeZone.getDefault().toZoneId());
     newsPostedDate = postedDate.format(mediumDateFormat);
   }
-  def updatedDate = LocalDateTime.ofInstant(updateDate.toInstant(), TimeZone.getDefault().toZoneId());
+  def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
 
-  def newsTitle = title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
-  def newsSummary = summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
-  def newsBody = body.replaceAll("`", "\\\\`");
+  def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
+  def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
+  def newsBody = news.body.replaceAll("`", "\\\\`");
+  def newsAttachments = news.attachments;
 
-  NewsService newsService = CommonsUtils.getService(NewsService.class);
-  def showEditButton = newsService.canEditNews(author, spaceId);
+  def showEditButton = newsService.canEditNews(news.author, news.spaceId);
   def showPinInput = newsService.canPinNews();
 
   def params = """ {
     activityId: '${activityId}',
-    newsId: '${newsId}',
+    newsId: '${news.id}',
     news: {
       title: '${newsTitle}',
       summary: `${newsSummary}`,
-      pinned: $isPinned,
+      pinned: ${news.pinned},
       body: `${newsBody}`,
       illustrationURL: '${illustrationURL}',
+      attachments: ${JsonOutput.toJson(newsAttachments)},
       authorFullName: '${authorFullName}',
       authorProfileURL: '${authorProfileURL}',
       postedDate: '${newsPostedDate}',
       updaterFullName: '${updaterFullName}',
       updaterProfileURL: '${updaterProfileURL}',
       updatedDate: '${newsUpdatedDate}',
-      id: '${newsId}',
+      id: '${news.id}',
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,
@@ -140,24 +133,24 @@
 %>
 
 <div>
-   <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
-    <!--begin -->
-    <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-      <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-        <div class="popupHeader clearfix">
-          <a class="uiIconClose pull-right" title="Close"></a>
-          <span class="PopupTitle popupTitle"></span>
-        </div>
-        <div class="PopupContent popupContent">
-          <ul class="singleMessage popupMessage resizable">
-            <li>
-              <span class="confirmationIcon contentMessage"></span>
-            </li>
-          </ul>
-          <div class="uiAction uiActionBorder"></div>
-        </div>
+  <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+  <!--begin -->
+  <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+    <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+      <div class="popupHeader clearfix">
+        <a class="uiIconClose pull-right" title="Close"></a>
+        <span class="PopupTitle popupTitle"></span>
+      </div>
+      <div class="PopupContent popupContent">
+        <ul class="singleMessage popupMessage resizable">
+          <li>
+            <span class="confirmationIcon contentMessage"></span>
+          </li>
+        </ul>
+        <div class="uiAction uiActionBorder"></div>
       </div>
     </div>
-    <!-- end -->
-<div id="newsDetails"></div>
+  </div>
+  <!-- end -->
+  <div id="newsDetails"></div>
 </div>

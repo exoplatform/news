@@ -23,14 +23,16 @@
 
   <portal-skin>
     <skin-name>Default</skin-name>
-    <skin-module>news</skin-module>
+    <skin-module>customModuleNews</skin-module>
     <css-path>/css/news.css</css-path>
+    <css-priority>11</css-priority>
   </portal-skin>
 
   <portal-skin>
     <skin-name>Enterprise</skin-name>
-    <skin-module>news</skin-module>
+    <skin-module>customModuleNews</skin-module>
     <css-path>/css/news.css</css-path>
+    <css-priority>11</css-priority>
   </portal-skin>
 
   <portlet>
@@ -45,6 +47,9 @@
       </depends>
       <depends>
         <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>
@@ -174,8 +179,11 @@
       <module>commons-editor</module>
       <as>editor</as>
     </depends>
+    <depends>
+      <module>documentPreview</module>
+    </depends>
   </module>
-  
+
   <module>
     <name>NewsActivity</name>
     <script>

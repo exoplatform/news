@@ -5,6 +5,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.social.core.space.model.Space;
 
+import javax.jcr.Node;
 import java.util.List;
 
 public interface NewsService {
@@ -23,6 +24,8 @@ public interface NewsService {
   void pinNews(String newsId) throws Exception;
 
   void unpinNews(String newsId) throws Exception;
+
+  News convertNodeToNews(Node node) throws Exception;
 
   News createNewsDraft(News news) throws Exception;
 

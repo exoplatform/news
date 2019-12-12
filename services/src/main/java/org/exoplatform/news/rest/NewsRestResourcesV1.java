@@ -1,5 +1,7 @@
 package org.exoplatform.news.rest;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -14,10 +16,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -52,17 +57,18 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
   private NewsService newsService;
 
+  private NewsAttachmentsService newsAttachmentsService;
+
   private SpaceService spaceService;
 
   private IdentityManager identityManager;
 
-  private ActivityManager activityManager;
-
-  public NewsRestResourcesV1(NewsService newsService, SpaceService spaceService, IdentityManager identityManager, ActivityManager activityManager) {
+  public NewsRestResourcesV1(NewsService newsService, NewsAttachmentsService newsAttachmentsService,
+                             SpaceService spaceService, IdentityManager identityManager) {
     this.newsService = newsService;
+    this.newsAttachmentsService = newsAttachmentsService;
     this.spaceService = spaceService;
     this.identityManager = identityManager;
-    this.activityManager=activityManager;
   }
 
   @POST
@@ -217,6 +223,96 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
   }
 
+  @GET
+  @Path("attachments/{attachmentId}")
+  @RolesAllowed("users")
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiOperation(value = "Get a news attachment",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News returned"),
+          @ApiResponse (code = 401, message = "User not authorized to get the news"),
+          @ApiResponse (code = 404, message = "News not found"),
+          @ApiResponse (code = 500, message = "Internal server error") })
+  public Response getNewsAttachmentById(@Context HttpServletRequest request,
+                              @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+    try {
+      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
+      if(attachment == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      return Response.ok(attachment).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news attachment " + attachmentId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("attachments/{attachmentId}/file")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Download a news attachment",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This downloads the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News returned"),
+          @ApiResponse (code = 401, message = "User not authorized to get the news"),
+          @ApiResponse (code = 404, message = "News not found"),
+          @ApiResponse (code = 500, message = "Internal server error") })
+  public Response getNewsAttachmentBinaryById(@Context HttpServletRequest request,
+                                              @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+    try {
+      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
+      if(attachment == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      InputStream stream = newsAttachmentsService.getNewsAttachmentStream(attachmentId);
+
+      Response.ResponseBuilder responseBuilder = Response.ok(stream, attachment.getMimetype());
+      responseBuilder.header("Content-Disposition", "attachment; filename=\"" + attachment.getName() + "\"");
+
+      return responseBuilder.build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news attachment " + attachmentId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("attachments/{attachmentId}/open")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Opens a news attachment",
+          httpMethod = "GET",
+          response = Response.class,
+          notes = "This opens the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = {
+          @ApiResponse (code = 200, message = "News returned"),
+          @ApiResponse (code = 401, message = "User not authorized to get the news"),
+          @ApiResponse (code = 404, message = "News not found"),
+          @ApiResponse (code = 500, message = "Internal server error") })
+  public Response openNewsAttachmentById(@Context HttpServletRequest request,
+                                         @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+    try {
+      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
+      if(attachment == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      String openUrl = newsAttachmentsService.getNewsAttachmentOpenUrl(attachmentId);
+
+      return Response.temporaryRedirect(URI.create(openUrl)).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news attachment " + attachmentId, e);
+      return Response.serverError().build();
+    }
+  }
+
+
   @PUT
   @Path("{id}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -253,6 +349,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       news.setSummary(updatedNews.getSummary());
       news.setBody(updatedNews.getBody());
       news.setUploadId(updatedNews.getUploadId());
+      news.setAttachments(updatedNews.getAttachments());
       news.setPublicationState(updatedNews.getPublicationState());
 
       if (updatedNews.isPinned() != news.isPinned()) {

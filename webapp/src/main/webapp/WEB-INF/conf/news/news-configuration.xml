@@ -28,6 +28,11 @@
   </component>
 
   <component>
+    <key>org.exoplatform.news.NewsAttachmentsService</key>
+    <type>org.exoplatform.news.NewsAttachmentsServiceImpl</type>
+  </component>
+
+  <component>
     <type>org.exoplatform.news.rest.NewsRestResourcesV1</type>
   </component>
 

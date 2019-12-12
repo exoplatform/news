@@ -45,6 +45,26 @@
           <div id="newsBody" class="fullDetailsBody clearfix">
             <span v-html="news.body"></span>
           </div>
+
+          <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
+            {{ $t('news.details.attachments.title') }} ({{ news.attachments ? news.attachments.length : 0 }})
+          </div>
+
+          <div v-show="news.attachments && news.attachments.length" class="newsAttachments">
+            <div v-for="attachedFile in news.attachments" :key="attachedFile.id" class="newsAttachment" @click="openPreview(attachedFile)">
+              <div class="fileType">
+                <i :class="getIconClassFromFileMimeType(attachedFile.mimetype)" class="uiIconFileTypeDefault"></i>
+              </div>
+              <div class="fileDetails">
+                <div class="fileDetails1">
+                  <div class="fileNameLabel" data-toggle="tooltip" rel="tooltip" data-placement="top">{{ attachedFile.name }}</div>
+                </div>
+                <div class="fileDetails2">
+                  <div class="fileSize">{{ getFormattedFileSize(attachedFile.size) }} {{ $t('news.file.size.mega') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -92,6 +112,7 @@ export default {
   data() {
     return {
       showUpdateInfo: this.news.postedDate !== this.news.updatedDate || this.news.authorFullName !== this.news.updaterFullName,
+      BYTES_IN_MB: 1048576,
     };
   },
   computed: {
@@ -123,6 +144,54 @@ export default {
   methods: {
     updateViewsCount: function () {
       newsServices.incrementViewsNumberOfNews(this.newsId);
+    },
+    getIconClassFromFileMimeType: function(fileMimeType) {
+      if(fileMimeType) {
+        const fileMimeTypeClass = fileMimeType.replace(/\./g, '').replace('/', '').replace('\\', '');
+        return `uiIconFileType${fileMimeTypeClass}`;
+      } else {
+        return '';
+      }
+    },
+    getFormattedFileSize(fileSize) {
+      const formattedSizePrecision = 2;
+      const sizeMB = fileSize / this.BYTES_IN_MB;
+      return sizeMB.toFixed(formattedSizePrecision);
+    },
+    openPreview(attachedFile) {
+      const self = this;
+      window.require(['SHARED/documentPreview'], function(documentPreview) {
+        documentPreview.init({
+          doc: {
+            id: attachedFile.id,
+            repository: 'repository',
+            workspace: 'collaboration',
+            title: attachedFile.name,
+            downloadUrl: `/rest/v1/news/attachments/${attachedFile.id}/file`,
+            openUrl: `/rest/v1/news/attachments/${attachedFile.id}/open`
+          },
+          showComments: false
+        });
+        self.hideDocPreviewComments();
+      });
+    },
+    /**
+     * Hack to hide the document preview comments panel because the document preview component
+     * does not allow to hide it through its API
+     * @returns {void} when the comments panel appeared and has been hidden
+     */
+    hideDocPreviewComments() {
+      const intervalCheck = 100;
+
+      const commentsPanel = document.querySelector('.uiDocumentPreview .commentArea');
+      const collapsedCommentsButton = document.querySelector('.uiDocumentPreview .resizeButton');
+      if(commentsPanel != null && collapsedCommentsButton != null) {
+        commentsPanel.style.display = 'none';
+        collapsedCommentsButton.style.display = 'none';
+        document.querySelector('.uiDocumentPreview').classList += ' collapsed';
+      } else {
+        setTimeout(this.hideDocPreviewComments, intervalCheck);
+      }
     }
   }
 };

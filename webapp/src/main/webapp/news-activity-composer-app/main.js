@@ -1,6 +1,13 @@
 import './components/initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
 
+Vue.use(Vuetify);
+
+const vuetify = new Vuetify({
+  dark: true,
+  iconfont: '',
+});
+
 // getting language of the PLF
 const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
 
@@ -33,7 +40,8 @@ export function init(showPin) {
         };
       },
       template: '<exo-news-activity-composer :news-id="newsId" :space-id="spaceId" :activity-id="activityId" :show-pin-input="showPinInput"></exo-news-activity-composer>',
-      i18n
+      i18n,
+      vuetify
     });
   });
 }

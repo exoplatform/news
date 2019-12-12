@@ -1,5 +1,6 @@
 <template>
-  <div id="newsActivityComposer" class="uiBox newsComposer">
+  <div id="newsActivityComposer" class="newsComposer">
+
     <div class="newsComposerActions">
       <div class="newsFormButtons">
         <div class="newsFormLeftActions">
@@ -29,6 +30,7 @@
       </div>
       <div id="newsTop"></div>
     </div>
+
     <form id="newsForm" class="newsForm">
       <div class="newsFormInput">
         <div class="newsFormAttachment">
@@ -59,6 +61,40 @@
         </div>
       </div>
     </form>
+
+    <div class="VuetifyApp">
+      <v-app>
+        <v-btn
+          class="attachmentsButton"
+          fixed
+          bottom
+          right
+          fab
+          x-large
+          @click="showAttachments = !showAttachments"
+        >
+          <i class="uiIconAttachment"></i>
+          <v-progress-circular
+            :class="uploading ? 'uploading' : ''"
+            indeterminate>
+            {{ news.attachments.length }}
+          </v-progress-circular>
+        </v-btn>
+      </v-app>
+    </div>
+    <div :class="showAttachments ? 'open' : ''" class="newsAttachments drawer" @keydown.esc="closeAttachments()">
+      <div class="attachmentsHeader header">
+        <span class="attachmentsTitle">{{ $t('news.composer.attachments.header') }}</span>
+        <a class="attachmentsCloseIcon" @click="closeAttachments()">×</a>
+      </div>
+      <div class="content">
+        <exo-files-selector v-model="news.attachments" @uploadingCountChanged="setUploadingCount"></exo-files-selector>
+      </div>
+      <div class="attachmentsFooter footer">
+        <a class="btn" @click="closeAttachments()">Close</a>
+      </div>
+    </div>
+    <div v-show="showAttachments" class="drawer-backdrop" @click="closeAttachments()"></div>
 
     <!-- The following bloc is needed in order to display the pin confirmation popup -->
     <!--begin -->
@@ -117,6 +153,7 @@ export default {
         body: '',
         summary: '',
         illustration: [],
+        attachments: [],
         spaceId: '',
         pinned: false,
       },
@@ -127,6 +164,7 @@ export default {
         body: '',
         summary: '',
         illustration: [],
+        attachments: [],
         spaceId: '',
         pinned: false,
       },
@@ -143,6 +181,7 @@ export default {
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',
+      initDone: false,
       initIllustrationDone: false,
       showDraftNews: false,
       postingNews: false,
@@ -150,7 +189,10 @@ export default {
       saveDraft : '',
       draftSavingStatus: '',
       illustrationChanged: false,
-      imagesURLs: new Map()
+      attachmentsChanged: false,
+      imagesURLs: new Map(),
+      showAttachments: false,
+      uploading: false
     };
   },
   computed: {
@@ -158,18 +200,39 @@ export default {
       return this.newsId !== null;
     },
     postDisabled: function () {
-      return !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
+      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
     },
     updateDisabled: function () {
-      const emptyMandatoryFields = !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
-      const noUpdatedField = !this.illustrationChanged && this.news.title === this.originalNews.title && this.news.summary === this.originalNews.summary && this.news.body === this.originalNews.body && this.news.pinned === this.originalNews.pinned;
-      return emptyMandatoryFields || noUpdatedField;
+      // disable update button while uploading an attachment
+      if(this.uploading) {
+        return true;
+      }
+      // disable update button if a mandatory field is empty
+      if(!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
+        return true;
+      }
+      // disable update button nothing has changed
+      if(!this.illustrationChanged && !this.attachmentsChanged
+                 && this.news.title === this.originalNews.title
+                 && this.news.summary === this.originalNews.summary
+                 && this.news.body === this.originalNews.body
+                 && this.news.pinned === this.originalNews.pinned) {
+        return true;
+      }
+
+      return false;
     }
   },
   watch: {
     'news.title': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
     'news.summary': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
     'news.body': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'news.attachments': function() {
+      if(this.initDone) {
+        this.attachmentsChanged = true;
+      }
+      this.autoSave();
+    },
     'news.illustration': function() {
       if(this.initIllustrationDone) {
         this.illustrationChanged = true;
@@ -180,8 +243,12 @@ export default {
   created() {
     if(this.newsId) {
       this.initNewsComposerData(this.newsId);
+    } else {
+      this.initDone = true;
     }
     this.displayFormTitle();
+
+
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
@@ -261,6 +328,7 @@ export default {
       }
     },
     initNewsComposerData: function(newsId) {
+      const self = this;
       newsServices.getNewsById(newsId)
         .then((data) => {
           if (data.ok) {return data.json();}
@@ -295,14 +363,20 @@ export default {
             } else {
               this.initIllustrationDone = true;
             }
+            this.news.attachments = fetchedNode.attachments;
             this.originalNews = JSON.parse(JSON.stringify(this.news));
-            Vue.nextTick(() => autosize.update(document.querySelector('#newsSummary')));
+            Vue.nextTick(() => {
+              autosize.update(document.querySelector('#newsSummary'));
+              self.initDone = true;
+            });
+          } else {
+            self.initDone = true;
           }
         });
     },
     autoSave: function() {
-      // No draft saving in edit mode for the moment
-      if(this.editMode) {
+      // No draft saving if init not done or in edit mode for the moment
+      if(!this.initDone || this.editMode) {
         return;
       }
       // if the News is being posted, no need to autosave anymore
@@ -350,6 +424,7 @@ export default {
         summary: this.news.summary,
         body: this.news.body,
         author: eXo.env.portal.userName,
+        attachments: this.news.attachments,
         pinned: this.news.pinned,
         spaceId: this.spaceId,
         publicationState: 'published'
@@ -387,6 +462,7 @@ export default {
         summary: this.news.summary,
         body: this.replaceImagesURLs(this.news.body),
         author: eXo.env.portal.userName,
+        attachments: [],
         pinned: false,
         spaceId: this.spaceId,
         publicationState: ''
@@ -396,6 +472,18 @@ export default {
       } else {
         news.uploadId = '';
       }
+
+      const uploadedPercent = 100;
+      this.news.attachments.forEach(attachment => {
+        if(attachment.id || attachment.uploadProgress === uploadedPercent) {
+          news.attachments.push({
+            id: attachment.id,
+            uploadId: attachment.uploadId,
+            name: attachment.name
+          });
+        }
+      });
+
       if (this.news.id) {
         if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
           news.id = this.news.id;
@@ -530,6 +618,7 @@ export default {
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
         body: this.news.body,
+        attachments: this.news.attachments,
         pinned: this.news.pinned,
         publicationState: 'published'
       };
@@ -542,6 +631,12 @@ export default {
       }
 
       return newsServices.updateNews(updatedNews);
+    },
+    closeAttachments: function() {
+      this.showAttachments = false;
+    },
+    setUploadingCount: function(uploadingCount) {
+      this.uploading = uploadingCount > 0;
     }
   }
 };

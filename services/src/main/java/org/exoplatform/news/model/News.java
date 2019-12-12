@@ -1,6 +1,7 @@
 package org.exoplatform.news.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class News {
   private String  id;
@@ -46,6 +47,8 @@ public class News {
   private Long    viewsCount;
 
   private String  activities;
+
+  private List<NewsAttachment> attachments;
 
   public String getId() {
     return id;
@@ -211,4 +214,11 @@ public class News {
     this.activities = activities;
   }
 
+  public List<NewsAttachment> getAttachments() {
+    return attachments;
+  }
+
+  public void setAttachments(List<NewsAttachment> attachments) {
+    this.attachments = attachments;
+  }
 }

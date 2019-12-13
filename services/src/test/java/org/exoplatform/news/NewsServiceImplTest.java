@@ -2072,6 +2072,9 @@ public class NewsServiceImplTest {
     space1.setId("1");
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("jean");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
 
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2378,7 +2381,7 @@ public class NewsServiceImplTest {
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
     when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
-    when(ctx.append(CURRENT_USER, "root")).thenReturn(ctx);
+    when(ctx.append(CURRENT_USER, "jean")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
@@ -2394,7 +2397,7 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("jean");
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
 

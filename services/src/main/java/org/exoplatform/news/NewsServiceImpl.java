@@ -910,9 +910,13 @@ public class NewsServiceImpl implements NewsService {
   }
 
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+    String contentAuthor = news.getAuthor();
+    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+    if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS) && contentAuthor.equals(currentUser)) {
+      return;
+    }
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
-    String contentAuthor = news.getAuthor();
     String lastSpaceIdActivityId = activities.split(";")[activities.split(";").length - 1];
     String contentSpaceId = lastSpaceIdActivityId.split(":")[0];
     String contentActivityId = lastSpaceIdActivityId.split(":")[1];
@@ -924,7 +928,7 @@ public class NewsServiceImpl implements NewsService {
     String illustrationURL = NotificationUtils.getNewsIllustration(news);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+
     // Send Notification
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTEXT, context)

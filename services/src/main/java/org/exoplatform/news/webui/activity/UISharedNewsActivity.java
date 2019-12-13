@@ -25,12 +25,7 @@ public class UISharedNewsActivity extends UINewsActivity {
   public static final String ACTIVITY_TYPE = "shared_news";
 
   public String getSharedActivityId() {
-    Map<String, String> templateParams = this.getActivity().getTemplateParams();
-    if(templateParams != null) {
-      return templateParams.get("sharedActivityId");
-    } else {
-      return null;
-    }
+    return this.getActivity().getId();
   }
 
   public String getPosterFullName() {

@@ -381,7 +381,6 @@ public class NewsServiceImplTest {
     sharedNews.setPoster("john");
     sharedNews.setDescription("Description of shared news");
     sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setActivityId("2");
     sharedNews.setNewsId("1");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
     Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS));
@@ -402,9 +401,8 @@ public class NewsServiceImplTest {
     ExoSocialActivity activityCaptorValue = activityCaptor.getValue();
     assertEquals("shared_news", activityCaptorValue.getType());
     assertEquals("Description of shared news", activityCaptorValue.getTitle());
-    assertEquals(2, activityCaptorValue.getTemplateParams().size());
+    assertEquals(1, activityCaptorValue.getTemplateParams().size());
     assertEquals("1", activityCaptorValue.getTemplateParams().get("newsId"));
-    assertEquals("2", activityCaptorValue.getTemplateParams().get("sharedActivityId"));
   }
 
   @Test

@@ -865,7 +865,7 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be edited
    */
   public boolean canEditNews(String posterId, String spaceId) {
-    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
     String authenticatedUser = currentIdentity.getUserId();
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || spaceService.isSuperManager(authenticatedUser)
@@ -879,7 +879,7 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
-    return ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
@@ -910,7 +910,7 @@ public class NewsServiceImpl implements NewsService {
 
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String contentAuthor = news.getAuthor();
-    String currentUser = ConversationState.getCurrent().getIdentity().getUserId();
+    String currentUser = getCurrentUserId();
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS) && contentAuthor.equals(currentUser)) {
       return;
     }
@@ -945,6 +945,16 @@ public class NewsServiceImpl implements NewsService {
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
     }
+  }
+
+  private org.exoplatform.services.security.Identity getCurrentIdentity() {
+    ConversationState conversationState = ConversationState.getCurrent();
+    return conversationState != null ? ConversationState.getCurrent().getIdentity() : null;
+  }
+
+  private String getCurrentUserId() {
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    return currentIdentity != null ? currentIdentity.getUserId() : null;
   }
 
   /**

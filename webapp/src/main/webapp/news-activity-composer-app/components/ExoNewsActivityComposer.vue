@@ -4,14 +4,16 @@
     <div class="newsComposerActions">
       <div class="newsFormButtons">
         <div class="newsFormLeftActions">
-          <img src="/news/images/newIcon.png" />
+          <img src="/news/images/newsImageDefault.png" />
           <span class="newsFormTitle">{{ newsFormTitle }}</span>
         </div>
-        <div v-if="showPinInput" class="pinArticleContent">
-          <span class="uiCheckbox">
-            <input id="pinArticle" v-model="news.pinned" type="checkbox" class="checkbox ">
-            <span class="pinArticleLabel">{{ $t("news.composer.pinArticle") }}</span>
-          </span>
+        <div v-if="showPinInput" class="pinArticleContent " @click="news.pinned">
+          <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" class="pinArticle"
+             rel="tooltip"
+             data-placement="bottom"
+             @click="news.pinned = !news.pinned">
+            <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
+          </a>
         </div>
         <div v-if="!editMode" class="newsFormRightActions">
           <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
@@ -121,7 +123,6 @@
 <script>
 import * as newsServices from '../../services/newsServices';
 import autosize from 'autosize';
-
 export default {
   props: {
     newsId: {
@@ -248,13 +249,10 @@ export default {
     }
     this.displayFormTitle();
 
-
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
-
     autosize(document.querySelector('#newsSummary'));
-
     this.extendForm();
   },
   beforeDestroy() {
@@ -270,9 +268,7 @@ export default {
       if (typeof CKEDITOR.instances['newsContent'] !== 'undefined') {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
-
       CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
-
       let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
@@ -280,12 +276,11 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
-
       CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
 
       // this line is mandatory when a custom skin is defined
-      CKEDITOR.basePath = '/commons-extension/ckeditor/';
 
+      CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
@@ -327,6 +322,7 @@ export default {
         this.newsFormTitle = this.$t('news.edit.editNews');
       }
     },
+
     initNewsComposerData: function(newsId) {
       const self = this;
       newsServices.getNewsById(newsId)
@@ -374,6 +370,7 @@ export default {
           }
         });
     },
+
     autoSave: function() {
       // No draft saving if init not done or in edit mode for the moment
       if(!this.initDone || this.editMode) {
@@ -383,7 +380,6 @@ export default {
       if(this.postingNews) {
         return;
       }
-
       clearTimeout(this.saveDraft);
       this.saveDraft = setTimeout(() => {
         this.savingDraft = true;
@@ -391,6 +387,7 @@ export default {
         Vue.nextTick(() => this.saveNewsDraft());
       }, this.autoSaveDelay);
     },
+
     postNews: function () {
       if(this.news.pinned === true) {
         const confirmText = this.$t('news.pin.confirm');
@@ -416,6 +413,7 @@ export default {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
+
       this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       this.news.body = this.replaceImagesURLs(this.news.body);
       const news = {
@@ -443,7 +441,6 @@ export default {
             createdNewsActivity = createdNewsActivities[1];
           }
         }
-
         if(createdNewsActivity) {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
         } else {
@@ -453,7 +450,6 @@ export default {
     },
     extendForm: function(){
       document.body.style.overflow = 'hidden';
-
       this.initCKEditor();
     },
     saveNewsDraft: function () {
@@ -524,6 +520,7 @@ export default {
       this.resetNewsActivity();
       this.initNewsComposerData(draftId);
     },
+
     extractImagesURLsDiffs: function(originalHTMLString, updatedHTMLString) {
       const imagesURLs = new Map();
 
@@ -531,6 +528,7 @@ export default {
       const updatedHTML = $(updatedHTMLString);
       const originalImages = originalHTML.find('img');
       const updatedImages = updatedHTML.find('img');
+
       originalImages.each(function(index, element) {
         const originalImageURL = $(element).attr('src');
         const updatedImageURL = $(updatedImages[index]).attr('src');
@@ -538,7 +536,6 @@ export default {
           imagesURLs.set(originalImageURL, updatedImageURL);
         }
       });
-
       return imagesURLs;
     },
     replaceImagesURLs: function(content) {
@@ -622,7 +619,6 @@ export default {
         pinned: this.news.pinned,
         publicationState: 'published'
       };
-
       if(this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;
       } else if(this.originalNews.illustrationURL !== null) {

@@ -140,7 +140,6 @@
 
   #newsShareActivity {
     float: right;
-    margin-left: 10px;
   }
 
   #newsShareButton, #newsEditButton, #newsPinButton {
@@ -155,22 +154,14 @@
     float: right;
     .uiIconPin {
       margin-top: 2px;
+      transform: rotate(30deg);
     }
     .uiIconPin:before {
       content: "\eb54";
     }
-    .uiIconUnpin:after {
-      content: "";
-      position: absolute;
-      width: 3px;
-      height: 141.421356%;
-      top: -20.710678%;
-      display: block;
-      background: #578dc9;
-      left: 50%;
-      transform: translate(-50%, 0) rotate(45deg);
+    .unpinned {
+      color: #c6c6c6;
     }
-
   }
 
   .newsDetails {
@@ -323,34 +314,9 @@
   }
 
   .newsComposerActions {
-    .newsFormButtons {
-      margin-bottom: 20px;
-      margin-right: 22px;
-      display: flex;
-      justify-content: space-between;
-      flex-direction: row;
-
-      .newsFormLeftActions {
-        display: flex;
-        flex-direction: row-reverse;
-        flex: 1 1 100%;
-        justify-content: space-between;
-      }
-    }
-    #newsPost {
-      padding: 5px 12px;
-    }
-    .draftSavingStatus {
-      position: absolute;
-      right: 24px;
-      top: 9px;
-    }
-  }
-
-  .newsComposerActions {
     width: 100%;
     z-index: 10;
-    background-color: #FFFFFF;
+
     .newsFormButtons {
       display: inline-flex;
       flex-wrap: wrap;
@@ -364,19 +330,38 @@
         flex-direction: row;
         flex: auto;
         justify-content: normal;
+        img {
+          height: 40px;
+        }
         .newsFormTitle {
           padding: 9px 0 9px 5px;
         }
       }
 
       .pinArticleContent {
-        padding: 9px 0;
+        padding-top: 0.5rem;
         margin-right: 40px;
+        cursor: pointer;
 
-        .pinArticleLabel {
-          margin-left: 4px;
-          margin-top: 2px;
+        #newsPinButton {
+          float: right;
+          .uiIconPin {
+            margin-top: 2px;
+            transform: rotate(30deg);
+            font-size: 24px;
+          }
+          .uiIconPin:before {
+            content: "\eb54";
+          }
+
+          .unpinned {
+            color: #c6c6c6;
+          }
         }
+      }
+
+      .draftSavingStatus {
+        position: unset;
       }
 
       .newsFormRightActions {
@@ -392,15 +377,19 @@
         button {
           margin-left: 10px;
         }
-      }
 
-      .draftSavingStatus {
-        position: unset;
+        #newsPost {
+          padding: 10px 20px;
+        }
       }
-
-      #newsPost {
-        padding: 10px 20px;
-      }
+    }
+    #newsPost {
+      padding: 5px 12px;
+    }
+    .draftSavingStatus {
+      position: absolute;
+      right: 24px;
+      top: 9px;
     }
   }
 
@@ -433,11 +422,12 @@
       flex-direction: column;
       margin: 0 20px;
       background-color: white;
+      color: grey;
 
       .newsFormAttachment {
         font-size: 14px;
         text-align: center;
-        flex: 1 1 170px;
+        flex: 1 1 235px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -478,7 +468,6 @@
             height: 250px;
           }
           .uploadedFile{
-            display: flex;
             justify-content: center;
             flex-direction: row-reverse;
           }
@@ -487,12 +476,12 @@
           height: 0;
           i.uiIconRemove {
             background: #000;
-            opacity: .5;
-            top: 7px;
+            opacity: 0.6;
+            margin-top: 195px;
             color: #fff;
-            padding: 7px;
-            right: 15px;
-            font-size: 15px;
+            padding: 8px;
+            font-size: 16px;
+            font-weight: bold;
             border-radius: 50%;
             cursor: pointer;
             &:before {

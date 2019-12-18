@@ -12,7 +12,7 @@
        rel="tooltip"
        data-placement="bottom"
        @click="confirmAction">
-      <i :class="[newsPinned ? 'uiIconUnpin' : '']" class="uiIconPin" > </i>
+      <i :class="[newsPinned ? '' : 'unpinned']" class="uiIconPin" > </i>
     </a>
   </div>
 </template>

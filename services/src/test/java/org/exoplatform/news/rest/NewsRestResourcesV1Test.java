@@ -3,8 +3,10 @@ package org.exoplatform.news.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -150,17 +152,33 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
-    News news = new News();
-    when(newsService.getNewsById(anyString())).thenReturn(news);
+    News existingNews = new News();
+    existingNews.setTitle("Title");
+    existingNews.setSummary("Summary");
+    existingNews.setBody("Body");
+    existingNews.setPublicationState("draft");
+    when(newsService.getNewsById(anyString())).thenReturn(existingNews);
+    News updatedNews = new News();
+    updatedNews.setTitle("Updated Title");
+    updatedNews.setSummary("Updated Summary");
+    updatedNews.setBody("Updated Body");
+    updatedNews.setPublicationState("published");
+    when(newsService.updateNews(any())).then(returnsFirstArg());
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "1", new News());
+    Response response = newsRestResourcesV1.updateNews(request, "1", updatedNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    News returnedNews = (News) response.getEntity();
+    assertNotNull(returnedNews);
+    assertEquals("Updated Title", returnedNews.getTitle());
+    assertEquals("Updated Summary", returnedNews.getSummary());
+    assertEquals("Updated Body", returnedNews.getBody());
+    assertEquals("published", returnedNews.getPublicationState());
   }
 
   @Test
@@ -287,21 +305,23 @@ public class NewsRestResourcesV1Test {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
-    News oldnews = new News();
-    oldnews.setTitle("unpinned");
-    oldnews.setSummary("unpinned summary");
-    oldnews.setBody("unpinned body");
-    oldnews.setUploadId(null);
+    News existingNews = new News();
+    existingNews.setTitle("unpinned title");
+    existingNews.setSummary("unpinned summary");
+    existingNews.setBody("unpinned body");
+    existingNews.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-    oldnews.setCreationDate(date1);
-    oldnews.setPinned(false);
-    oldnews.setId("id123");
-    oldnews.setSpaceId("space");
+    existingNews.setCreationDate(date1);
+    existingNews.setPinned(false);
+    existingNews.setId("id123");
+    existingNews.setSpaceId("space");
 
     News updatedNews = new News();
     updatedNews.setPinned(true);
-    oldnews.setTitle("pinned");
+    updatedNews.setTitle("pinned title");
+    updatedNews.setSummary("pinned summary");
+    updatedNews.setBody("pinned body");
 
     Identity currentIdentity = new Identity("john");
     ConversationState.setCurrent(new ConversationState(currentIdentity));
@@ -310,17 +330,24 @@ public class NewsRestResourcesV1Test {
     currentIdentity.setMemberships(memberships);
     Space space = mock(Space.class);
 
-    Mockito.doNothing().when(newsService).pinNews("id123");
-    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(newsService.getNewsById("id123")).thenReturn(existingNews);
+    when(newsService.updateNews(any())).then(returnsFirstArg());
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("space");
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
     // When
     Response response = newsRestResourcesV1.updateNews(request, "id123", updatedNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    News returnedNews = (News) response.getEntity();
+    assertNotNull(returnedNews);
+    assertEquals("pinned title", returnedNews.getTitle());
+    assertEquals("pinned summary", returnedNews.getSummary());
+    assertEquals("pinned body", returnedNews.getBody());
+    verify(newsService).pinNews("id123");
   }
 
   @Test
@@ -919,6 +946,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    verify(newsService).deleteNews("1");
   }
 
   @Test
@@ -945,6 +973,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    verify(newsService, never()).deleteNews("1");
   }
 
   @Test
@@ -966,6 +995,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    verify(newsService, never()).deleteNews("1");
   }
 
   @Test
@@ -984,6 +1014,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    verify(newsService, never()).deleteNews("1");
   }
 
   @Test
@@ -1002,6 +1033,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    verify(newsService, never()).deleteNews("1");
   }
 
   @Test

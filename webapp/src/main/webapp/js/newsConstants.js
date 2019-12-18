@@ -7,6 +7,7 @@ export const newsConstants = {
   SOCIAL_ACTIVITY_API: `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/activities`,
   SOCIAL_SPACE_API: `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/spaces`,
   SOCIAL_SPACES_SUGGESTION_API: `${eXo.env.portal.context}/${eXo.env.portal.rest}${eXo.env.portal.context}/social/spaces/suggest.json`,
+  SOCIAL_SPACES_SEARCH_API: `${eXo.env.portal.context}/${eXo.env.portal.rest}/space/user/searchSpace/`,
   SPACE_ID: eXo.env.portal.spaceId,
   HOST_NAME: window.location.host,
   UPLOAD_API: `${eXo.env.portal.context}/upload`,

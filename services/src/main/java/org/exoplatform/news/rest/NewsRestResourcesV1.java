@@ -118,66 +118,86 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   @ApiOperation(value = "Get news list",
           httpMethod = "GET",
           response = Response.class,
-          notes = "This gets the list of news of the given author, in the given space, with the given publication state, if the authenticated user is a member of the space or a spaces super manager.")
+          notes = "This gets the list of news with the given search text, of the given author, in the given space or spaces, with the given publication state, with the given pinned state if the authenticated user is a member of the spaces or a super manager.")
   @ApiResponses(value = {
-          @ApiResponse (code = 200, message = "News list returned"),
-          @ApiResponse (code = 401, message = "User not authorized to get the news list"),
-          @ApiResponse (code = 404, message = "News list not found"),
-          @ApiResponse (code = 500, message = "Internal server error") })
+          @ApiResponse(code = 200, message = "News list returned"),
+          @ApiResponse(code = 401, message = "User not authorized to get the news list"),
+          @ApiResponse(code = 404, message = "News list not found"),
+          @ApiResponse(code = 500, message = "Internal server error")})
   public Response getNews(@Context HttpServletRequest request,
                           @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
-                          @ApiParam(value = "News space id", required = true) @QueryParam("spaceId") String spaceId,
+                          @ApiParam(value = "News spaces", required = true) @QueryParam("spaces") String spaces,
                           @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState,
-                          @ApiParam(value = "News pinned state", required = true) @QueryParam("pinned") Boolean pinned) {
-    if(StringUtils.isNotEmpty(author) && StringUtils.isNotEmpty(spaceId)) {
-      try {
-        String authenticatedUser = request.getRemoteUser();
+                          @ApiParam(value = "News filter", required = true) @QueryParam("filter") String filter,
+                          @ApiParam(value = "search text", required = true) @QueryParam("text") String text) {
+    try {
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
 
-        if (StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
-          return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-
-        Space space = spaceService.getSpaceById(spaceId);
-        if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
-          return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-
-        List<News> news = new ArrayList<>();
-        if ("draft".equals(publicationState)) {
-          List<News> drafts = newsService.getNewsDrafts(spaceId, author);
+      List<News> news = new ArrayList<>();
+      //Get news drafts by space
+      if ("draft".equals(publicationState)) {
+        if (StringUtils.isNotEmpty(spaces)) {
+          Space space = spaceService.getSpaceById(spaces);
+          if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+          }
+          List<News> drafts = newsService.getNewsDrafts(spaces, author);
           if (drafts != null) {
             news = drafts;
           }
-        } else {
-          return Response.status(Response.Status.NOT_FOUND).build();
         }
-
-        return Response.ok(news).build();
-      } catch (Exception e) {
-        LOG.error("Error when getting the news with params author=" + author + ", spaceId=" + spaceId + ", publicationState=" + publicationState, e);
-        return Response.serverError().build();
-      }
-    } else {
-      try {
-        NewsFilter newsFilter = new NewsFilter();
-        if (pinned != null && pinned) {
-          newsFilter.setPinnedNews(true);
-        }
-        newsFilter.setOrder("exo:dateModified");
-          List<News> allNews = newsService.getNews(newsFilter);
-          if (allNews != null && allNews.size() != 0) {
-            for (News newsItem : allNews) {
-              newsItem.setIllustration(null);
+      } else if ("published".equals(publicationState)) {
+        List<String> spacesList = new ArrayList<>();
+        //Set spaces to search news in
+        if (StringUtils.isNotEmpty(spaces)) {
+          for (String space : spaces.split(",")) {
+            if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+              return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-          } else {
-            return Response.ok(allNews).build();
+            spacesList.add(space);
           }
-          return Response.ok(allNews).build();
-      }catch (Exception e) {
-        LOG.error("Error when getting the news", e);
-        return Response.serverError().build();
+        }
+        NewsFilter newsFilter = buildFilter(spacesList, filter, text);
+        //Set text to search news with
+        if (StringUtils.isNotEmpty(text)) {
+          String lang = request.getLocale().getLanguage();
+          news = newsService.searchNews(newsFilter, lang);
+        } else {
+          news = newsService.getNews(newsFilter);
+        }
+        if (news != null && news.size() != 0) {
+          for (News newsItem : news) {
+            newsItem.setIllustration(null);
+          }
+        }
+        return Response.ok(news).build();
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
       }
+      return Response.ok(news).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news with params author=" + author + ", spaces=" + spaces + ", publicationState=" + publicationState, e);
+      return Response.serverError().build();
     }
+  }
+
+  private NewsFilter buildFilter(List<String> spaces, String filter, String text) {
+    NewsFilter newsFilter = new NewsFilter();
+    newsFilter.setSpaces(spaces);
+    if (("pinned").equals(filter) && StringUtils.isNotEmpty(filter)) {
+      newsFilter.setPinnedNews(true);
+    }
+    //Set text to search news with
+    if (text != null && StringUtils.isNotEmpty(text)) {
+      newsFilter.setSearchText(text);
+      newsFilter.setOrder("jcr:score");
+    } else {
+      newsFilter.setOrder("exo:dateModified");
+    }
+    return newsFilter;
   }
 
   @GET
@@ -659,54 +679,6 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       return Response.ok().build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news with id " + id, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @GET
-  @Path("/search")
-  @RolesAllowed("users")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Search news",
-          httpMethod = "GET",
-          response = Response.class,
-          notes = "This search news"
-  )
-  @ApiResponses(value = {
-          @ApiResponse (code = 200, message = "News list returned"),
-          @ApiResponse (code = 400, message = "Invalid query input"),
-          @ApiResponse (code = 401, message = "User not authorized to search news"),
-          @ApiResponse (code = 500, message = "Internal server error")})
-  public Response searchNews (@Context HttpServletRequest request,
-                              @ApiParam(value = "search text", required = true) @QueryParam("text") String text,
-                              @ApiParam(value = "News pinned state", required = true) @QueryParam("pinned") Boolean pinned){
-    try {
-      if (StringUtils.isBlank(text)) {
-        return Response.status(Response.Status.BAD_REQUEST).build();
-      }
-      String authenticatedUser = request.getRemoteUser();
-      if (StringUtils.isBlank(authenticatedUser)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
-      String lang = request.getLocale().getLanguage();
-      NewsFilter filter  =new NewsFilter();
-      filter.setSearchText(text);
-      if (pinned) {
-        filter.setPinnedNews(true);
-      }
-      filter.setOrder("jcr:score");
-      List<News> result =  newsService.searchNews(filter,lang);
-      if (result != null) {
-        for (News newsItem : result) {
-          newsItem.setIllustration(null);
-        }
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      return Response.ok(result).build();
-    } catch (Exception e) {
-      LOG.error("Error when searching news with text " + text, e);
       return Response.serverError().build();
     }
   }

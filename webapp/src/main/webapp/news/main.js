@@ -1,4 +1,5 @@
 import '../css/news.less';
+import './components/initComponents.js';
 
 import NewsApp from './components/NewsApp.vue';
 import {newsConstants} from '../js/newsConstants';

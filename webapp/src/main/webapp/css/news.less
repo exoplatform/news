@@ -1296,15 +1296,6 @@
             align-items: center;
             margin-left: 40px;
             flex: 1 1 auto;
-
-            &:before {
-              content: "\EAF0";
-              font-family: 'PLF-FONT-ICONS' !important;
-              font-size: 22px;
-              color: #949494;
-              position: absolute;
-            }
-
             input, input:focus{
               width: 100%;
               padding-left: 32px;
@@ -1321,17 +1312,100 @@
 
         .newsAppToolbarRight {
           display: flex;
-          .NewsTypes{
-            #NewsTypesSelectBox{
-              width: 100%
+          .newsTypes{
+            .newsTypesSelectBox{
+              height: 100%;
+              >button{
+                height: 100%;
+              }
+            }
+            .dropdown-menu{
+              >li{
+                cursor: pointer;
+              }
             }
           }
-
           .newsAppFilterOptions {
-            position: relative;
-            min-width: 150px;
-            margin-right: 20px;
-
+            margin-left: 15px;
+            .uiIconFilter {
+              padding-right: 5px;
+              color: #949494;
+              &.filterApplied{
+                color: #578dc9;
+              }
+            }
+            .filterSpacesDrawer{
+              .drawer{
+                .content{
+                  .searchSpacesInput {
+                    display: flex;
+                    align-items: center;
+                    input, input:focus{
+                       width: 100%;
+                       padding-left: 32px;
+                       margin-top: 8px;
+                       box-shadow: none;
+                       border: none;
+                       border-bottom: 1px solid #ccc;
+                       border-radius: initial;
+                     }
+                  }
+                  .spacesList{
+                    .uiCheckbox{
+                      margin: 10px;
+                    }
+                    .spaceCheckbox{
+                      color: #4D5466;
+                      &:before{
+                        background: #ffffff;
+                        border: 1px solid #A7B4C2;
+                      }
+                      &:after{
+                        border-bottom: 2px solid @primaryColor;
+                        border-left: 2px solid @primaryColor;
+                        width: 6px;
+                        height: 3px;
+                      }
+                      >img{
+                        margin-left: 22px;
+                        border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                      }
+                    }
+                    .noSpacesFound{
+                      text-align: center;
+                    }
+                    .moreSpace{
+                      text-align: center;
+                      .loadMoreSpaces{
+                        cursor: pointer;
+                        display: flex;
+                        place-content: center;
+                        align-items: flex-end;
+                        >a{
+                          font-weight: bold;
+                        }
+                      }
+                    }
+                  }
+                  .noSpacesFound{
+                      margin: 15px;
+                      text-align: center;
+                      color: #848181;
+                      font-size: 18px;
+                      font-weight: bold;
+                  }
+                }
+                .footer{
+                  .btn{
+                    &.reset{
+                      float: left;
+                    }
+                  }
+                }
+              }
+            }
             .selectBox {
               position: relative;
               display: flex;
@@ -1340,19 +1414,6 @@
               select {
                 width: 100%;
                 font-weight: bold;
-              }
-
-              .filter-icon {
-                padding-right: 5px;
-                position: absolute;
-
-                &:before {
-                  content: "\e786";
-                  font-family: 'PLF-FONT-ICONS' !important;
-                  font-size: 14px;
-                  color: #949494;
-                }
-
               }
 
               .newsAppFilterOptionContent {
@@ -1578,6 +1639,15 @@
         h3{
           text-align: center;
           color: @textLightColor;
+        }
+      }
+      .uiIconSearchSpaces {
+        position: absolute;
+        top: unset;
+        &:before {
+          content: "\eaf0";
+          font-size: 22px;
+          color: #949494;
         }
       }
     }

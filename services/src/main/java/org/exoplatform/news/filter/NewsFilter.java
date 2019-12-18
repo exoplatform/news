@@ -1,5 +1,7 @@
 package org.exoplatform.news.filter;
 
+import java.util.List;
+
 public class NewsFilter {
 
   private boolean pinnedNews;
@@ -7,6 +9,8 @@ public class NewsFilter {
   private String searchText;
 
   private String order;
+
+  private List<String> spaces;
 
   public NewsFilter(){
   }
@@ -33,5 +37,13 @@ public class NewsFilter {
 
   public void setOrder(String order) {
     this.order = order;
+  }
+
+  public List<String> getSpaces() {
+    return spaces;
+  }
+
+  public void setSpaces(List<String> spaces) {
+    this.spaces = spaces;
   }
 }

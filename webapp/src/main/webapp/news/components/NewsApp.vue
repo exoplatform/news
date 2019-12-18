@@ -6,20 +6,29 @@
           {{ $t('news.app.title') }}
         </h3>
         <div class="inputNewsSearchWrapper">
+          <i class="uiIconSearchSpaces"></i>
           <input
             id="searchInput"
             v-model="searchText"
             :placeholder="$t('news.app.searchPlaceholder')"
             type="text"
-            class="searchProductsInput mr-3">
+            class="searchNewsInput mr-3">
         </div>
       </div>
       <div class="newsAppToolbarRight">
-        <div class="NewsTypes">
-          <select id="NewsTypesSelectBox" v-model="newsFilter" name="NewsTypesSelectBox">
-            <option value="all" class="all">{{ $t('news.app.filter.all') }}</option>
-            <option value="pinned" class="pinned">{{ $t('news.app.filter.pinned') }}</option>
-          </select>
+        <div class="newsTypes">
+          <div class="btn-group newsTypesSelectBox">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">{{ newsStatusLabel }}
+              <i class="uiIconMiniArrowDown uiIconLightGray"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a @click="newsFilter = 'all'">{{ $t('news.app.filter.all') }}</a></li>
+              <li><a @click="newsFilter = 'pinned'">{{ $t('news.app.filter.pinned') }}</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="newsAppFilterOptions">
+          <news-app-filter :search-text="searchText" :news-filter="newsFilter" @newsFilteredBySpaces="onFilterApplied"></news-app-filter>
         </div>
       </div>
     </div>
@@ -88,6 +97,9 @@ export default {
       searchDelay: 300,
       notFoundMessage: this.$t('news.app.noNews'),
       newsFilter: 'all',
+      newsSpaces: [],
+      spacesFilter: [],
+      newsStatusLabel: this.$t('news.app.filter.all')
     };
   },
   watch: {
@@ -106,6 +118,8 @@ export default {
       }
     },
     newsFilter() {
+      this.newsSpaces = [];
+      this.newsStatusLabel = this.newsFilter === 'pinned' ? this.$t('news.app.filter.pinned') : this.$t('news.app.filter.all');
       if (this.searchText && this.searchText.trim().length) {
         this.fetchNews();
       } else {
@@ -122,8 +136,7 @@ export default {
   },
   methods: {
     getNewsList() {
-      newsServices.getNews()
-        .then(resp => resp.json())
+      newsServices.getNews(this.spacesFilter, '' , '')
         .then((data) => {
           this.initNewsList(data);
         }).catch(e =>
@@ -131,8 +144,7 @@ export default {
         );
     },
     getPinnedNews() {
-      newsServices.getPinnedNews(true)
-        .then(resp => resp.json())
+      newsServices.getFilteredNews('pinned', this.spacesFilter)
         .then((data) => {
           this.initNewsList(data);
         }).catch(e =>
@@ -162,7 +174,7 @@ export default {
       data.forEach((item) => {
         let newsUrl = '';
         const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
-        newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${item.path}`;
+        newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${encodeURI(item.path)}`;
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         result.push({
@@ -179,7 +191,6 @@ export default {
           profileURL: `/portal/intranet/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
         });
-
       });
       this.newsList = result;
       window.require(['SHARED/social-ui-profile'], function (socialProfile) {
@@ -194,10 +205,9 @@ export default {
         socialProfile.initUserProfilePopup('newsListItems', labels);
       });
     },
-    fetchNews(){
+    fetchNews() {
       const searchTerm = this.searchText.trim().toLowerCase();
-      const pinned = this.newsFilter === 'pinned';
-      newsServices.searchNews(searchTerm,pinned).then(data => {
+      newsServices.searchNews(searchTerm, this.newsFilter, this.spacesFilter).then(data => {
         if (data.length) {
           this.initNewsList(data);
         } else {
@@ -205,6 +215,10 @@ export default {
           this.notFoundMessage = this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
         }
       });
+    },
+    onFilterApplied: function(newsList, selectedSpaces) {
+      this.spacesFilter = selectedSpaces;
+      this.initNewsList(newsList);
     }
   }
 };

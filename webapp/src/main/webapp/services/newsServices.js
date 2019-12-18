@@ -8,15 +8,8 @@ export function getNewsById(id) {
   });
 }
 
-export function getNews() {
-  return fetch(`${newsConstants.NEWS_API}`, {
-    credentials: 'include',
-    method: 'GET',
-  });
-}
-
 export function getNewsDrafts(spaceId) {
-  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaceId=${spaceId}&publicationState=draft`, {
+  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaces=${spaceId}&publicationState=draft`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -30,10 +23,31 @@ export function getNewsDrafts(spaceId) {
   });
 }
 
-export function getPinnedNews(pinned) {
-  return fetch(`${newsConstants.NEWS_API}?pinned=${pinned}`, {
+export function getFilteredNews(filter, spaces) {
+  return fetch(`${newsConstants.NEWS_API}?filter=${filter}&author=${newsConstants.userName}&spaces=${spaces}&publicationState=published`, {
     credentials: 'include',
     method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error getting filtered news list');
+    }
+  });
+}
+
+export function getNews(spaces, filter, searchText) {
+  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&text=${searchText}&spaces=${spaces}&publicationState=published&filter=${filter}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error getting news list');
+    }
   });
 }
 
@@ -91,12 +105,12 @@ export function clickOnEditButton(id) {
 }
 
 export function findUserSpaces(spaceName) {
-  return fetch(`${newsConstants.SOCIAL_SPACES_SUGGESTION_API}?conditionToSearch=${spaceName}&currentUser=${newsConstants.userName}&typeOfRelation=confirmed`,{
-    headers:{
+  return fetch(`${newsConstants.SOCIAL_SPACES_SUGGESTION_API}?conditionToSearch=${spaceName}&currentUser=${newsConstants.userName}&typeOfRelation=confirmed`, {
+    headers: {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then(resp =>  resp.json()).then(json => json.options);
+  }).then(resp => resp.json()).then(json => json.options);
 }
 
 export function shareNews(newsId, activityId, sharedDescription, sharedSpaces) {
@@ -105,8 +119,8 @@ export function shareNews(newsId, activityId, sharedDescription, sharedSpaces) {
     spacesNames: sharedSpaces,
     activityId: activityId
   };
-  return fetch(`${newsConstants.NEWS_API}/${newsId}/share`,{
-    headers:{
+  return fetch(`${newsConstants.NEWS_API}/${newsId}/share`, {
+    headers: {
       'Content-Type': 'application/json'
     },
     method: 'POST',
@@ -121,7 +135,7 @@ export function deleteDraft(newsId) {
   });
 }
 
-export function incrementViewsNumberOfNews (newsId) {
+export function incrementViewsNumberOfNews(newsId) {
   return fetch(`${newsConstants.NEWS_API}/${newsId}/view`, {
     credentials: 'include',
     method: 'POST',
@@ -130,30 +144,30 @@ export function incrementViewsNumberOfNews (newsId) {
 
 export function linkifyText(text) {
   return anchorme(text, {
-    attributes:[
+    attributes: [
       {
-        name:'target',
-        value:'_blank'
+        name: 'target',
+        value: '_blank'
       },
     ]
   });
 }
 
 export function linkifyHTML(html, ckeditorInstanceName) {
-  return anchorme(html,{
-    attributes:[
+  return anchorme(html, {
+    attributes: [
       {
-        name:'target',
-        value:'_blank'
+        name: 'target',
+        value: '_blank'
       },
     ],
-    exclude:function(UrlObj) {
+    exclude: function (UrlObj) {
       const newsBodyElem = CKEDITOR.instances[ckeditorInstanceName].document.$.body;
       const newsBodyP = newsBodyElem.querySelectorAll('p');
-      for(let indexp = 0; indexp < newsBodyP.length; indexp++) {
+      for (let indexp = 0; indexp < newsBodyP.length; indexp++) {
         const links = newsBodyP[indexp].getElementsByTagName('a');
-        for(let index = 0; index < links.length; index++) {
-          if(links [index].innerText === UrlObj.raw) {
+        for (let index = 0; index < links.length; index++) {
+          if (links [index].innerText === UrlObj.raw) {
             return true;
           }
         }
@@ -176,14 +190,33 @@ export function getSpaceById(id) {
   });
 }
 
-export function searchNews(searchText, pinned) {
-  return fetch(`${newsConstants.NEWS_API}/search?text=${searchText}&site=${newsConstants.PORTAL_NAME}&pinned=${pinned}`, {
+export function getUserSpaces(offset, limit) {
+  return fetch(`${newsConstants.SOCIAL_SPACE_API}?offset=${offset}&limit=${limit}&returnSize=true`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}
+
+export function searchNews(searchText, filter, spaces) {
+  return fetch(`${newsConstants.NEWS_API}/?author=${newsConstants.userName}&text=${searchText}&filter=${filter}&spaces=${spaces}&publicationState=published`, {
     headers: {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then(resp =>  resp.json());
+  }).then(resp => resp.json());
 }
+
+export function searchSpaces(searchText) {
+  return fetch(`${newsConstants.SOCIAL_SPACES_SEARCH_API}?fields=id,url,displayName,avatarUrl&keyword=${searchText}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then(resp => resp.json());
+}
+
 export function escapeHTML(unsafeText) {
   const div = document.createElement('div');
   div.innerText = unsafeText;

@@ -12,11 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -845,7 +841,7 @@ public class NewsRestResourcesV1Test {
 
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", false);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -872,7 +868,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", false);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -896,7 +892,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", false);
+    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", "", null);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -914,7 +910,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "", false);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "", "", null);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -1132,6 +1128,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllPublishedNewsWhenExist() throws Exception{
     //Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
     News news1 = new News();
     News news2 = new News();
     News news3 = new News();
@@ -1142,21 +1140,25 @@ public class NewsRestResourcesV1Test {
     when(newsService.getNews(any())).thenReturn(allNews);
 
     //When
-    Response response = newsRestResourcesV1.getNews(null, null, null, null,false);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","", null);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<News> news = (List<News>) response.getEntity();
+    assertEquals(3, news.size());
   }
 
   @Test
   public void shouldGetEmptyListWhenNoPublishedExists() throws Exception{
     //Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
     NewsFilter newsFilter = new NewsFilter();
     when(newsService.getNews(newsFilter)).thenReturn(null);
 
     //When
-    Response response = newsRestResourcesV1.getNews(null, null, null, null, null);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", null, null);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1214,6 +1216,195 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllPinnedNewsWhenExist() throws Exception{
     //Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news1 = new News();
+    news1.setPinned(true);
+    news1.setAuthor("john");
+    news1.setPublicationState("published");
+    News news2 = new News();
+    news2.setPinned(true);
+    news2.setAuthor("john");
+    news2.setPublicationState("published");
+    News news3 = new News();
+    news3.setPinned(true);
+    news3.setAuthor("john");
+    news3.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    when(newsService.getNews(any())).thenReturn(allNews);
+
+    //When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","pinned", null);
+
+    //Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<News> newsList = (List<News>) response.getEntity();
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    for (int i=0; i<newsList.size(); i++){
+      assertEquals(true, newsList.get(i).isPinned());
+      assertEquals("published", newsList.get(i).getPublicationState());
+      assertEquals("john", newsList.get(i).getAuthor());
+    }
+  }
+
+  @Test
+  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception{
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    String text = "search";
+    String spacesIds = "4,1";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState("published");
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState("published");
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+
+    //When
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","", text);
+
+    //Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<News> newsList = (List<News>) response.getEntity();
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    for (int i=0; i<newsList.size(); i++){
+      assertEquals("published", newsList.get(i).getPublicationState());
+      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(text, newsList.get(i).getTitle());
+      assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
+    }
+  }
+
+  @Test
+  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpace() throws Exception{
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    String text = "search";
+    String spaceId = "4";
+    News news1 = new News();
+    news1.setSpaceId(spaceId);
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState("published");
+    News news2 = new News();
+    news2.setSpaceId(spaceId);
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState("published");
+    News news3 = new News();
+    news3.setSpaceId(spaceId);
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+
+    //When
+    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published","", text);
+
+    //Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<News> newsList = (List<News>) response.getEntity();
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    for (int i=0; i<newsList.size(); i++){
+      assertEquals("published", newsList.get(i).getPublicationState());
+      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(text, newsList.get(i).getTitle());
+      assertEquals("4", newsList.get(i).getSpaceId());
+    }
+  }
+
+  @Test
+  public void shouldGetPinnedNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception{
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    String text = "search";
+    String spacesIds = "4,1";
+    News news1 = new News();
+    news1.setPinned(true);
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState("published");
+    News news2 = new News();
+    news2.setPinned(true);
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState("published");
+    News news3 = new News();
+    news3.setPinned(true);
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+
+    //When
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text);
+
+    //Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<News> newsList = (List<News>) response.getEntity();
+    assertNotNull(newsList);
+    assertEquals(3, newsList.size());
+    for (int i=0; i<newsList.size(); i++){
+      assertEquals(true, newsList.get(i).isPinned());
+      assertEquals("published", newsList.get(i).getPublicationState());
+      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(text, newsList.get(i).getTitle());
+      assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
+    }
+  }
+
+  @Test
+  public void shouldGetUnauthorizedWhenSearchingWithTextInNonMemberSpaces() throws Exception{
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    String text = "search";
+    String spacesIds = "4,1";
     News news1 = new News();
     news1.setPinned(true);
     News news2 = new News();
@@ -1225,11 +1416,13 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
+    when(spaceService.isMember(anyString(),any())).thenReturn(false);
 
     //When
-    Response response = newsRestResourcesV1.getNews(null, null, null, null,true);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text);
 
     //Then
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
+
 }

@@ -11,6 +11,8 @@ import javax.jcr.Session;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
@@ -67,6 +69,10 @@ public class LikeNewsNotificationPluginTest {
   public void shouldMakeNotificationForLikeNewsContext() throws Exception {
     // Given
     LikeNewsNotificationPlugin linkPlugin = new LikeNewsNotificationPlugin(initParams);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(LikeNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(LikeNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
@@ -82,7 +88,6 @@ public class LikeNewsNotificationPluginTest {
     User currentUser = mock(User.class);
     OrganizationService orgService = mock(OrganizationService.class);
     UserHandler userhandler = mock(UserHandler.class);
-    PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     when(orgService.getUserHandler()).thenReturn(userhandler);
     when(userhandler.findUserByName("root")).thenReturn(currentUser);

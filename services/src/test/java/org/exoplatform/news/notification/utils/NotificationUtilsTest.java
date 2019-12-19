@@ -10,6 +10,7 @@ import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -29,7 +30,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PowerMockIgnore("javax.management.*")
 public class NotificationUtilsTest {
 
-  @PrepareForTest({ PortalContainer.class, PropertyManager.class })
+  @PrepareForTest({ ExoContainerContext.class, PortalContainer.class, PropertyManager.class })
   @Test
   public void shouldGetTheSpaceUrlWhenTheUserIsNotMember() {
     // Given
@@ -38,6 +39,7 @@ public class NotificationUtilsTest {
     space1.setDisplayName("space1");
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
+    PowerMockito.mockStatic(ExoContainerContext.class);
     PowerMockito.mockStatic(PortalContainer.class);
     when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
     PowerMockito.mockStatic(PropertyManager.class);

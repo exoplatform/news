@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
@@ -54,6 +56,10 @@ public class PostNewsNotificationPluginTest {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "root")
@@ -83,7 +89,6 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -115,6 +120,10 @@ public class PostNewsNotificationPluginTest {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "root")
@@ -144,7 +153,6 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -178,6 +186,10 @@ public class PostNewsNotificationPluginTest {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
@@ -203,7 +215,6 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");

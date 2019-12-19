@@ -1,10 +1,9 @@
 package org.exoplatform.news.notification.provider;
 
+import static org.exoplatform.commons.api.notification.channel.template.TemplateProvider.CHANNEL_ID_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,9 +20,11 @@ import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.container.xml.ValueParam;
 import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.LikeNewsNotificationPlugin;
@@ -58,12 +59,14 @@ public class MailTemplateProviderTest {
   @Mock
   private IdentityManager identityManager;
 
-  @PrepareForTest({ PluginKey.class, NotificationPluginUtils.class, TemplateContext.class, PropertyManager.class,
+  @PrepareForTest({ CommonsUtils.class, PluginKey.class, NotificationPluginUtils.class, TemplateContext.class, PropertyManager.class,
       HTMLEntityEncoder.class, NotificationMessageUtils.class, TimeConvertUtils.class, LinkProviderUtils.class,
       TemplateUtils.class, NotificationContextImpl.class })
   @Test
   public void shoudIntantiateMailTemplate() {
     // Given
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(any())).thenReturn(null);
     PowerMockito.mockStatic(PluginKey.class);
     PluginKey plugin = mock(PluginKey.class);
     when(PluginKey.key(PostNewsNotificationPlugin.ID)).thenReturn(plugin);
@@ -73,6 +76,10 @@ public class MailTemplateProviderTest {
     when(PluginKey.key(LikeSharedNewsNotificationPlugin.ID)).thenReturn(plugin);
     when(PluginKey.key(CommentNewsNotificationPlugin.ID)).thenReturn(plugin);
     when(PluginKey.key(CommentSharedNewsNotificationPlugin.ID)).thenReturn(plugin);
+    ValueParam channelParam = new ValueParam();
+    channelParam.setName(CHANNEL_ID_KEY);
+    channelParam.setValue("MAIL_CHANNEL");
+    when(initParams.getValueParam(eq(CHANNEL_ID_KEY))).thenReturn(channelParam);
     MailTemplateProvider mailTemplate = new MailTemplateProvider(initParams, identityManager);
     TemplateBuilder templateBuilder = (TemplateBuilder) mailTemplate.getTemplateBuilder().get(plugin);
     PowerMockito.mockStatic(NotificationContextImpl.class);

@@ -16,8 +16,7 @@ import org.exoplatform.services.wcm.search.ResultNode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.jcr.*;
 import javax.jcr.query.*;
@@ -31,8 +30,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@RunWith(MockitoJUnitRunner.class)
 public class NewsSearchConnectorTest {
 
   public static final String searchType                           = "searchType";

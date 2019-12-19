@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.xml.InitParams;
@@ -53,6 +55,10 @@ public class ShareMyNewsNotificationPluginTest {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     ShareMyNewsNotificationPlugin newsPlugin = new ShareMyNewsNotificationPlugin(initParams, spaceService, orgService);
+
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "test")
@@ -75,7 +81,6 @@ public class ShareMyNewsNotificationPluginTest {
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
 
-    PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
 
     Space space = new Space();

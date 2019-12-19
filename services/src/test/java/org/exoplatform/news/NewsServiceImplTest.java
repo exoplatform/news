@@ -365,6 +365,9 @@ public class NewsServiceImplTest {
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(newsNode.getSession()).thenReturn(session);
     when(newsNode.getProperty(anyString())).thenReturn(property);
     when(activityManager.getActivity(anyString())).thenReturn(null);
     Identity spaceIdentity = new Identity(SpaceIdentityProvider.NAME, "space1");

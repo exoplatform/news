@@ -118,8 +118,11 @@ export default {
       }
     },
     newsFilter() {
+      window.history.pushState('', 'News' , this.setQueryParam('filter', this.newsFilter));
+
       this.newsSpaces = [];
       this.newsStatusLabel = this.newsFilter === 'pinned' ? this.$t('news.app.filter.pinned') : this.$t('news.app.filter.all');
+
       if (this.searchText && this.searchText.trim().length) {
         this.fetchNews();
       } else {
@@ -132,7 +135,13 @@ export default {
     }
   },
   created() {
-    this.getNewsList();
+    const filterQueryParam = this.getQueryParam('filter');
+    if(filterQueryParam) {
+      // set filter value, which will trigger news fetching
+      this.newsFilter = filterQueryParam;
+    } else {
+      this.getNewsList();
+    }
   },
   methods: {
     getNewsList() {
@@ -219,6 +228,16 @@ export default {
     onFilterApplied: function(newsList, selectedSpaces) {
       this.spacesFilter = selectedSpaces;
       this.initNewsList(newsList);
+    },
+    getQueryParam(paramName) {
+      const uri = window.location.search.substring(1);
+      const params = new URLSearchParams(uri);
+      return params.get(paramName);
+    },
+    setQueryParam(paramName, paramValue) {
+      const url = new URL(window.location);
+      url.searchParams.set(paramName, paramValue);
+      return url.href;
     }
   }
 };

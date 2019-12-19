@@ -1,10 +1,18 @@
 <%
-import org.exoplatform.wcm.webui.clv.UICLVPortlet;
-import org.exoplatform.wcm.webui.Utils;
+  import org.exoplatform.commons.utils.CommonsUtils;
+  import org.exoplatform.services.resources.ResourceBundleService;
+  import org.exoplatform.portal.webui.util.Util;
+  import org.exoplatform.wcm.webui.clv.UICLVPortlet;
+  import org.exoplatform.wcm.webui.Utils;
 
-import org.htmlcleaner.HtmlCleaner;
+  import org.htmlcleaner.HtmlCleaner;
 
-if (uicomponent.getUIPageIterator().getAvailable() > 0) {
+  if (uicomponent.getUIPageIterator().getAvailable() > 0) {
+
+    def siteName = Util.getPortalRequestContext().getPortalOwner();
+
+    ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
+    newsResourceBundle = resourceBundleService.getResourceBundle("locale.portlet.news.News", Util.getPortalRequestContext().getLocale());
 %>
 <div class="latestNews">
     <%
@@ -16,15 +24,18 @@ if (uicomponent.getUIPageIterator().getAvailable() > 0) {
     %>
 
     <div class="newsHeader">
-        <%
-        if(isShowHeader) {
-        %>
         <div class="globalTitle">
-            <h3 class="newsTitleTop">$header</h3>
+          <%
+            if(isShowHeader) {
+          %>
+              <h3 class="newsTitleTop">$header</h3>
+          <%
+            }
+          %>
         </div>
-         <%
-        }
-        %>
+        <div class="seeAllPinnedNews">
+          <a href="/portal/<%=siteName%>/news?filter=pinned"><%=newsResourceBundle.getString("news.pinned.seeAll")%></a>
+        </div>
     </div>
     <div class="latestNewsContent">
      <%

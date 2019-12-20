@@ -12,6 +12,8 @@ public class NewsFilter {
 
   private List<String> spaces;
 
+  private String author;
+
   public NewsFilter(){
   }
 
@@ -45,5 +47,13 @@ public class NewsFilter {
 
   public void setSpaces(List<String> spaces) {
     this.spaces = spaces;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(String author) {
+    this.author = author;
   }
 }

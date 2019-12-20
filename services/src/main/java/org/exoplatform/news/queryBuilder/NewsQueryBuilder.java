@@ -1,5 +1,6 @@
 package org.exoplatform.news.queryBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -32,6 +33,9 @@ public class NewsQueryBuilder {
               sqlQuery.append("exo:spaceId = '").append(spaces.get(i)).append("' OR ");
             }
             sqlQuery.append("exo:spaceId = '").append(spaces.get(spaces.size()-1)).append("') AND ");
+          }
+          if (StringUtils.isNotEmpty(filter.getAuthor())) {
+            sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");;
           }
           sqlQuery.append("publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY ").append(filter.getOrder()).append(" DESC");
         } else {

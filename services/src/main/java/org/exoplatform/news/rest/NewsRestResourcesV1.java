@@ -22,14 +22,12 @@ import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.model.SharedNews;
-import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
@@ -62,6 +60,10 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   private SpaceService spaceService;
 
   private IdentityManager identityManager;
+
+  private enum FilterType {
+    PINNED, MYPOSTED
+  }
 
   public NewsRestResourcesV1(NewsService newsService, NewsAttachmentsService newsAttachmentsService,
                              SpaceService spaceService, IdentityManager identityManager) {
@@ -160,7 +162,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
             spacesList.add(space);
           }
         }
-        NewsFilter newsFilter = buildFilter(spacesList, filter, text);
+        NewsFilter newsFilter = buildFilter(spacesList, filter, text, author);
         //Set text to search news with
         if (StringUtils.isNotEmpty(text)) {
           String lang = request.getLocale().getLanguage();
@@ -184,11 +186,24 @@ public class NewsRestResourcesV1 implements ResourceContainer {
     }
   }
 
-  private NewsFilter buildFilter(List<String> spaces, String filter, String text) {
+  private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author) {
     NewsFilter newsFilter = new NewsFilter();
     newsFilter.setSpaces(spaces);
-    if (("pinned").equals(filter) && StringUtils.isNotEmpty(filter)) {
-      newsFilter.setPinnedNews(true);
+    if (StringUtils.isNotEmpty(filter)) {
+      FilterType filterType = FilterType.valueOf(filter.toUpperCase());
+      switch (filterType) {
+        case PINNED: {
+          newsFilter.setPinnedNews(true);
+          break;
+        }
+
+        case MYPOSTED: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          break;
+        }
+      }
     }
     //Set text to search news with
     if (text != null && StringUtils.isNotEmpty(text)) {

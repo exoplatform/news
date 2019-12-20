@@ -24,6 +24,7 @@
             <ul class="dropdown-menu">
               <li><a @click="newsFilter = 'all'">{{ $t('news.app.filter.all') }}</a></li>
               <li><a @click="newsFilter = 'pinned'">{{ $t('news.app.filter.pinned') }}</a></li>
+              <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
             </ul>
           </div>
         </div>
@@ -110,8 +111,8 @@ export default {
           this.fetchNews();
         }, this.searchDelay);
       } else {
-        if (this.newsFilter === 'pinned') {
-          this.getPinnedNews();
+        if (this.newsFilter) {
+          this.getFilteredNews(this.newsFilter);
         } else {
           this.getNewsList();
         }
@@ -121,13 +122,12 @@ export default {
       window.history.pushState('', 'News' , this.setQueryParam('filter', this.newsFilter));
 
       this.newsSpaces = [];
-      this.newsStatusLabel = this.newsFilter === 'pinned' ? this.$t('news.app.filter.pinned') : this.$t('news.app.filter.all');
-
+      this.newsStatusLabel = this.$t(`news.app.filter.${this.newsFilter}`);
       if (this.searchText && this.searchText.trim().length) {
         this.fetchNews();
       } else {
-        if (this.newsFilter === 'pinned') {
-          this.getPinnedNews();
+        if (this.newsFilter) {
+          this.getFilteredNews();
         } else {
           this.getNewsList();
         }
@@ -152,8 +152,8 @@ export default {
           this.errors.push(e)
         );
     },
-    getPinnedNews() {
-      newsServices.getFilteredNews('pinned', this.spacesFilter)
+    getFilteredNews() {
+      newsServices.getFilteredNews(this.newsFilter, this.spacesFilter)
         .then((data) => {
           this.initNewsList(data);
         }).catch(e =>

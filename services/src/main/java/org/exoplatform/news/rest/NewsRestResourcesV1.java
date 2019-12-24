@@ -131,14 +131,17 @@ public class NewsRestResourcesV1 implements ResourceContainer {
                           @ApiParam(value = "News spaces", required = true) @QueryParam("spaces") String spaces,
                           @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState,
                           @ApiParam(value = "News filter", required = true) @QueryParam("filter") String filter,
-                          @ApiParam(value = "search text", required = true) @QueryParam("text") String text) {
+                          @ApiParam(value = "search text", required = true) @QueryParam("text") String text,
+                          @ApiParam(value = "News pagination offset", defaultValue = "0") @QueryParam("offset") int offset,
+                          @ApiParam(value = "News pagination limit", defaultValue = "10") @QueryParam("limit") int limit,
+                          @ApiParam(value = "News total size", defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
     try {
       String authenticatedUser = request.getRemoteUser();
       if (StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
 
-      List<News> news = new ArrayList<>();
+      NewsEntity newsEntity = new NewsEntity();
       //Get news drafts by space
       if ("draft".equals(publicationState)) {
         if (StringUtils.isNotEmpty(spaces)) {
@@ -148,9 +151,11 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           }
           List<News> drafts = newsService.getNewsDrafts(spaces, author);
           if (drafts != null) {
-            news = drafts;
+            List<News> news = drafts;
+            newsEntity.setNews(news);
           }
         }
+        return Response.ok(newsEntity).build();
       } else if ("published".equals(publicationState)) {
         List<String> spacesList = new ArrayList<>();
         //Set spaces to search news in
@@ -162,7 +167,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
             spacesList.add(space);
           }
         }
-        NewsFilter newsFilter = buildFilter(spacesList, filter, text, author);
+        NewsFilter newsFilter = buildFilter(spacesList, filter, text, author, limit, offset);
+        List<News> news;
         //Set text to search news with
         if (StringUtils.isNotEmpty(text)) {
           String lang = request.getLocale().getLanguage();
@@ -175,19 +181,27 @@ public class NewsRestResourcesV1 implements ResourceContainer {
             newsItem.setIllustration(null);
           }
         }
-        return Response.ok(news).build();
+
+        newsEntity.setNews(news);
+        newsEntity.setOffset(offset);
+        newsEntity.setLimit(limit);
+        if(returnSize) {
+          newsEntity.setSize(newsService.getNewsCount(newsFilter));
+        }
+
+        return Response.ok(newsEntity).build();
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      return Response.ok(news).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news with params author=" + author + ", spaces=" + spaces + ", publicationState=" + publicationState, e);
       return Response.serverError().build();
     }
   }
 
-  private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author) {
+  private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
     NewsFilter newsFilter = new NewsFilter();
+
     newsFilter.setSpaces(spaces);
     if (StringUtils.isNotEmpty(filter)) {
       FilterType filterType = FilterType.valueOf(filter.toUpperCase());
@@ -205,13 +219,18 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         }
       }
     }
-    //Set text to search news with
+
+    // Set text to search news with
     if (text != null && StringUtils.isNotEmpty(text)) {
       newsFilter.setSearchText(text);
       newsFilter.setOrder("jcr:score");
     } else {
       newsFilter.setOrder("exo:dateModified");
     }
+
+    newsFilter.setLimit(limit);
+    newsFilter.setOffset(offset);
+
     return newsFilter;
   }
 

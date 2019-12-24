@@ -52,13 +52,9 @@
 import * as  newsServices from '../../services/newsServices';
 export default {
   props: {
-    newsFilter:{
-      type: String,
-      required: true
-    },
-    searchText: {
-      type: String,
-      required: true
+    value: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -74,8 +70,7 @@ export default {
       filterChanged: false,
       limit: 10,
       searchSpaces: '',
-      searchDelay: 300,
-      filteredSpaces: []
+      searchDelay: 300
     };
   },
   computed: {
@@ -84,7 +79,7 @@ export default {
     }
   },
   watch:{
-    searchSpaceText(){
+    searchSpaceText() {
       if(this.searchSpaceText.trim()) {
         clearTimeout(this.searchSpaces);
         this.searchSpaces = setTimeout(() => {
@@ -107,7 +102,7 @@ export default {
       }
     },
     selectedSpaces() {
-      const filteredSpacesSorted = this.filteredSpaces.map(Number).sort((a, b) => a - b);
+      const filteredSpacesSorted = this.value.map(Number).sort((a, b) => a - b);
       const selectedSpacesSorted = this.selectedSpaces.map(Number).sort((a, b) => a - b);
       if (filteredSpacesSorted.length !== selectedSpacesSorted.length) {
         this.filterChanged = true;
@@ -133,7 +128,7 @@ export default {
     },
     closeFilterNewsDrawer() {
       this.open = false;
-      this.selectedSpaces = this.filteredSpaces;
+      this.selectedSpaces = this.value;
       this.showFilterNews = false;
       this.searchSpaceText = '';
       document.body.style.overflow = 'auto';
@@ -166,11 +161,11 @@ export default {
       this.showLoadMore = false;
     },
     applySpaceFilter() {
-      this.filteredSpaces = this.selectedSpaces;
-      newsServices.getNews(this.selectedSpaces,this.newsFilter, this.searchText).then(news => {
-        this.$emit('newsFilteredBySpaces', news, this.selectedSpaces);
-        this.closeFilterNewsDrawer();
-      });
+      this.value = this.selectedSpaces;
+      this.$emit('input', this.value);
+
+      this.closeFilterNewsDrawer();
+
       this.filterApplied = this.selectedSpaces.length !== 0;
       this.filterChanged = false;
     }

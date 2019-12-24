@@ -15,6 +15,8 @@ public interface NewsService {
 
   List<News> getNews(NewsFilter filter) throws Exception;
 
+  int getNewsCount(NewsFilter filter) throws Exception;
+
   News updateNews(News news) throws Exception;
 
   void markAsRead(News news, String userId) throws Exception;

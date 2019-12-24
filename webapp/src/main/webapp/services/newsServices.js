@@ -23,21 +23,24 @@ export function getNewsDrafts(spaceId) {
   });
 }
 
-export function getFilteredNews(filter, spaces) {
-  return fetch(`${newsConstants.NEWS_API}?filter=${filter}&author=${newsConstants.userName}&spaces=${spaces}&publicationState=published`, {
-    credentials: 'include',
-    method: 'GET',
-  }).then((resp) => {
-    if (resp && resp.ok) {
-      return resp.json();
-    } else {
-      throw new Error('Error getting filtered news list');
-    }
-  });
-}
-
-export function getNews(spaces, filter, searchText) {
-  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&text=${searchText}&spaces=${spaces}&publicationState=published&filter=${filter}`, {
+export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
+  let url = `${newsConstants.NEWS_API}?author=${newsConstants.userName}&publicationState=published&filter=${filter}`;
+  if(searchText) {
+    url += `&text=${searchText}`;
+  }
+  if(spaces) {
+    url += `&spaces=${spaces}`;
+  }
+  if(!isNaN(offset)) {
+    url += `&offset=${offset}`;
+  }
+  if(!isNaN(limit)) {
+    url += `&limit=${limit}`;
+  }
+  if(returnSize) {
+    url += `&returnSize=${returnSize}`;
+  }
+  return fetch(url, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -197,15 +200,6 @@ export function getUserSpaces(offset, limit) {
   }).then((resp) => resp.json()).then(resp => {
     return resp;
   });
-}
-
-export function searchNews(searchText, filter, spaces) {
-  return fetch(`${newsConstants.NEWS_API}/?author=${newsConstants.userName}&text=${searchText}&filter=${filter}&spaces=${spaces}&publicationState=published`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'GET'
-  }).then(resp => resp.json());
 }
 
 export function searchSpaces(searchText) {

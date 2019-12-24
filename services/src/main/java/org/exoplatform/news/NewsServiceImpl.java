@@ -52,6 +52,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -225,6 +226,7 @@ public class NewsServiceImpl implements NewsService {
    * @return all news
    * @throws Exception
    */
+  @Override
   public List<News> getNews(NewsFilter filter) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -238,12 +240,43 @@ public class NewsServiceImpl implements NewsService {
       StringBuilder sqlQuery = queyBuilder.buildQuery(filter);
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
+      ((QueryImpl) query).setOffset(filter.getOffset());
+      ((QueryImpl) query).setLimit(filter.getLimit());
+
       NodeIterator it = query.execute().getNodes();
       while (it.hasNext()) {
         Node iterNode = it.nextNode();
         listNews.add(convertNodeToNews(iterNode));
       }
       return listNews;
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+  }
+
+  @Override
+  public int getNewsCount(NewsFilter filter) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+            (repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName()),
+            repositoryService.getCurrentRepository());
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+    try {
+      StringBuilder sqlQuery = queryBuilder.buildQuery(filter);
+      QueryManager qm = session.getWorkspace().getQueryManager();
+      Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
+
+      int count = 0;
+      NodeIterator it = query.execute().getNodes();
+      while (it.hasNext()) {
+        it.nextNode();
+        count++;
+      }
+      return count;
     } finally {
       if (session != null) {
         session.logout();
@@ -968,7 +1001,7 @@ public class NewsServiceImpl implements NewsService {
     SearchContext context = new SearchContext(null, null);
     context.lang(lang);
     List<News> newsList = new ArrayList<>();
-    List<SearchResult> searchResults = newsSearchConnector.search(filter, 0, 0, "relevancy", "desc");
+    List<SearchResult> searchResults = newsSearchConnector.search(filter, filter.getOffset(), filter.getLimit(), "relevancy", "desc");
     searchResults.forEach(res -> {
       try {
         News news = convertNodeToNews(((NewsSearchResult) res).getNode());

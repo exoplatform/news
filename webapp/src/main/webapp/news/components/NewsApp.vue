@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="newsAppFilterOptions">
-          <news-app-filter :search-text="searchText" :news-filter="newsFilter" @newsFilteredBySpaces="onFilterApplied"></news-app-filter>
+          <news-spaces-selector v-model="spacesFilter"></news-spaces-selector>
         </div>
       </div>
     </div>
@@ -80,6 +80,9 @@
       <span class="iconNotFound"></span>
       <h3>{{ notFoundMessage }}</h3>
     </div>
+    <div v-if="showLoadMoreButton" class="newsListPagination">
+      <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
+    </div>
   </div>
 </template>
 
@@ -90,48 +93,51 @@ export default {
   data() {
     return {
       newsList: [],
+      newsPerPage: 10,
+      showLoadMoreButton: false,
       errors: [],
       showDropDown: false,
       NEWS_TEXT_MAX_LENGTH: 300,
       searchText: '',
       searchNews: '',
       searchDelay: 300,
-      notFoundMessage: this.$t('news.app.noNews'),
-      newsFilter: 'all',
-      newsSpaces: [],
+      newsFilter: '',
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all')
     };
+  },
+  computed: {
+    notFoundMessage() {
+      if (this.searchText.trim().length) {
+        return this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
+      } else {
+        return this.$t('news.app.noNews');
+      }
+    }
   },
   watch: {
     searchText() {
       if (this.searchText && this.searchText.trim().length) {
         clearTimeout(this.searchNews);
         this.searchNews = setTimeout(() => {
-          this.fetchNews();
+          this.fetchNews(false);
         }, this.searchDelay);
       } else {
-        if (this.newsFilter) {
-          this.getFilteredNews(this.newsFilter);
-        } else {
-          this.getNewsList();
-        }
+        this.fetchNews(false);
       }
     },
     newsFilter() {
       window.history.pushState('', 'News' , this.setQueryParam('filter', this.newsFilter));
 
-      this.newsSpaces = [];
-      this.newsStatusLabel = this.$t(`news.app.filter.${this.newsFilter}`);
-      if (this.searchText && this.searchText.trim().length) {
-        this.fetchNews();
-      } else {
-        if (this.newsFilter) {
-          this.getFilteredNews();
-        } else {
-          this.getNewsList();
-        }
-      }
+      this.newsStatusLabel = this.newsFilter === 'pinned' ? this.$t('news.app.filter.pinned') : this.$t('news.app.filter.all');
+
+      this.fetchNews(false);
+    },
+    spacesFilter: {
+      handler: function () {
+        this.fetchNews(false);
+      },
+      deep: true
     }
   },
   created() {
@@ -140,26 +146,10 @@ export default {
       // set filter value, which will trigger news fetching
       this.newsFilter = filterQueryParam;
     } else {
-      this.getNewsList();
+      this.fetchNews();
     }
   },
   methods: {
-    getNewsList() {
-      newsServices.getNews(this.spacesFilter, '' , '')
-        .then((data) => {
-          this.initNewsList(data);
-        }).catch(e =>
-          this.errors.push(e)
-        );
-    },
-    getFilteredNews() {
-      newsServices.getFilteredNews(this.newsFilter, this.spacesFilter)
-        .then((data) => {
-          this.initNewsList(data);
-        }).catch(e =>
-          this.errors.push(e)
-        );
-    },
     getNewsText(newsSummary, newsBody) {
       let text = newsSummary;
       if (!text) {
@@ -174,7 +164,7 @@ export default {
 
       return text;
     },
-    initNewsList(data) {
+    updateNewsList(data, append = true) {
       const result = [];
       const language = eXo.env.portal.language;
       const local = `${language}-${language.toUpperCase()}`;
@@ -201,7 +191,11 @@ export default {
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
         });
       });
-      this.newsList = result;
+      if(append) {
+        this.newsList = this.newsList.concat(result);
+      } else {
+        this.newsList = result;
+      }
       window.require(['SHARED/social-ui-profile'], function (socialProfile) {
         const labels = {
           StatusTitle: 'Loading...',
@@ -214,20 +208,27 @@ export default {
         socialProfile.initUserProfilePopup('newsListItems', labels);
       });
     },
-    fetchNews() {
+    fetchNews(append = true) {
       const searchTerm = this.searchText.trim().toLowerCase();
-      newsServices.searchNews(searchTerm, this.newsFilter, this.spacesFilter).then(data => {
-        if (data.length) {
-          this.initNewsList(data);
-        } else {
+      const offset = append ? this.newsList.length : 0;
+      newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
+        if (data.news && data.news.length) {
+          if(data.news.length > this.newsPerPage) {
+            this.showLoadMoreButton = true;
+            data.news.pop();
+            this.updateNewsList(data.news, append);
+          } else {
+            this.showLoadMoreButton = false;
+            this.updateNewsList(data.news, append);
+          }
+        } else if(!append) {
+          this.showLoadMoreButton = false;
           this.newsList = [];
-          this.notFoundMessage = this.$t('news.app.searchNotFound').replace('{0}', this.searchText);
         }
       });
     },
-    onFilterApplied: function(newsList, selectedSpaces) {
-      this.spacesFilter = selectedSpaces;
-      this.initNewsList(newsList);
+    loadMore: function() {
+      this.fetchNews();
     },
     getQueryParam(paramName) {
       const uri = window.location.search.substring(1);

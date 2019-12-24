@@ -431,18 +431,6 @@ public class NewsRestResourcesV1Test {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
-  /*
-   * @Test public void shouldGetBadRequestWhenPinNewsAndUpdatedNewsIsNull()
-   * throws Exception { // Given NewsRestResourcesV1 newsRestResourcesV1 = new
-   * NewsRestResourcesV1(newsService, spaceService, identityManager,
-   * activityManager); HttpServletRequest request =
-   * mock(HttpServletRequest.class);
-   * when(request.getRemoteUser()).thenReturn("john"); // When Response response
-   * = newsRestResourcesV1.patchNews(request, "id123", null); // Then
-   * assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
-   * response.getStatus()); }
-   */
-
   @Test
   public void shouldGetNotFoundWhenNewsIsNull() throws Exception {
     // Given
@@ -841,7 +829,7 @@ public class NewsRestResourcesV1Test {
 
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -868,7 +856,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -892,14 +880,14 @@ public class NewsRestResourcesV1Test {
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", "", null);
+    Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", "", null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
   @Test
-  public void shouldGetNoTFoundWhenNoDraftsExists() throws Exception {
+  public void shouldGetNotFoundWhenNoDraftsExists() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
@@ -910,7 +898,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "", "", null);
+    Response response = newsRestResourcesV1.getNews(request, "john", "1", "", "", null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -1140,12 +1128,13 @@ public class NewsRestResourcesV1Test {
     when(newsService.getNews(any())).thenReturn(allNews);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","", null);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","", null, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> news = (List<News>) response.getEntity();
-    assertEquals(3, news.size());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
+    assertEquals(3, newsList.size());
   }
 
   @Test
@@ -1158,12 +1147,13 @@ public class NewsRestResourcesV1Test {
     when(newsService.getNews(newsFilter)).thenReturn(null);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", null, null);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", null, null, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> news = (List<News>) response.getEntity();
-    assertEquals(0, news.size());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    assertNotNull(newsEntity);
+    assertEquals(0, newsEntity.getNews().size());
   }
 
   @Test
@@ -1235,13 +1225,15 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
+    when(newsService.getNewsCount(any())).thenReturn(allNews.size());
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","pinned", null);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","pinned", null, 0, 10, true);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1249,6 +1241,9 @@ public class NewsRestResourcesV1Test {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
     }
+    assertEquals(0, newsEntity.getOffset().intValue());
+    assertEquals(10, newsEntity.getLimit().intValue());
+    assertEquals(3, newsEntity.getSize().intValue());
   }
 
   @Test
@@ -1283,11 +1278,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","", text);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","", text, 0, 5, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1296,6 +1292,9 @@ public class NewsRestResourcesV1Test {
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
+    assertEquals(0, newsEntity.getOffset().intValue());
+    assertEquals(5, newsEntity.getLimit().intValue());
+    assertNull(newsEntity.getSize());
   }
 
   @Test
@@ -1330,11 +1329,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published","", text);
+    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published","", text, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1380,11 +1380,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1419,7 +1420,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(false);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1457,11 +1458,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null);
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1503,11 +1505,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, null);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, null, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){
@@ -1550,11 +1553,12 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(anyString(),any())).thenReturn(true);
 
     //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, text);
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, text, 0, 10, false);
 
     //Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    List<News> newsList = (List<News>) response.getEntity();
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
     for (int i=0; i<newsList.size(); i++){

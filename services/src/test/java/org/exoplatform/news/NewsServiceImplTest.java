@@ -58,6 +58,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
@@ -1191,7 +1192,7 @@ public class NewsServiceImplTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
+    QueryImpl query = mock(QueryImpl.class);
     when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
@@ -1267,7 +1268,7 @@ public class NewsServiceImplTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
+    QueryImpl query = mock(QueryImpl.class);
     when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
@@ -2436,7 +2437,7 @@ public class NewsServiceImplTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
+    QueryImpl query = mock(QueryImpl.class);
     when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);

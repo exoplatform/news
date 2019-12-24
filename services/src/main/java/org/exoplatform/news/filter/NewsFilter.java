@@ -14,6 +14,10 @@ public class NewsFilter {
 
   private String author;
 
+  private int offset;
+
+  private int limit;
+
   public NewsFilter(){
   }
 
@@ -55,5 +59,21 @@ public class NewsFilter {
 
   public void setAuthor(String author) {
     this.author = author;
+  }
+
+  public int getOffset() {
+    return offset;
+  }
+
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  public int getLimit() {
+    return limit;
+  }
+
+  public void setLimit(int limit) {
+    this.limit = limit;
   }
 }

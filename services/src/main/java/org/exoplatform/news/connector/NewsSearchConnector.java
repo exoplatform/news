@@ -9,6 +9,7 @@ import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -68,6 +69,8 @@ public class NewsSearchConnector extends SearchServiceConnector {
       StringBuilder sqlQuery = queryBuilder.buildQuery(filter);
       QueryManager qm = session.getWorkspace().getQueryManager();
       Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
+      ((QueryImpl) query).setOffset(filter.getOffset());
+      ((QueryImpl) query).setLimit(filter.getLimit());
       QueryResult result = query.execute();
       NodeIterator nodeIterator = result.getNodes();
       RowIterator rowIterator = result.getRows();

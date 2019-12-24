@@ -11,6 +11,7 @@ import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.search.ResultNode;
 import org.junit.Test;
@@ -93,7 +94,7 @@ public class NewsSearchConnectorTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
+    Query query = mock(QueryImpl.class);
     when(qm.createQuery(anyString(),anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
@@ -133,7 +134,7 @@ public class NewsSearchConnectorTest {
     String sort = "relevancy";
     String order = "desc";
     int offset = 0;
-    int limit = 0;
+    int limit = 10;
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -145,7 +146,7 @@ public class NewsSearchConnectorTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
+    Query query = mock(QueryImpl.class);
     when(qm.createQuery(anyString(),anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
@@ -294,12 +295,11 @@ public class NewsSearchConnectorTest {
     propertiesParam.addProperty(displayNameParam);
     initParams.addParameter(propertiesParam);
     SearchContext context = mock(SearchContext.class);
-    ResultNode resultNode = mock(ResultNode.class);
     String searchText = "Test";
     String sort = "relevancy";
     String order = "desc";
     int offset = 0;
-    int limit = 0;
+    int limit = 10;
     List<String> sites = new ArrayList<>();
     sites.add("news");
 
@@ -310,7 +310,7 @@ public class NewsSearchConnectorTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Workspace workspace = mock(Workspace.class);
     QueryManager queryManager = mock(QueryManager.class);
-    Query query = mock(Query.class);
+    Query query = mock(QueryImpl.class);
     QueryResult queryResult = mock(QueryResult.class);
 
     NewsSearchConnector newsSearchConnector = new NewsSearchConnector(initParams, sessionProviderService, repositoryService);

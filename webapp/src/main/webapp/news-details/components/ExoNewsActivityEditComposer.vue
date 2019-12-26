@@ -1,7 +1,6 @@
 <template>
   <div class="newsEditComponent">
     <a id="newsEditButton" :data-original-title="$t('news.edit.edit')" :href="editLink"
-       target="_blank"
        class="btn"
        rel="tooltip"
        data-placement="bottom">

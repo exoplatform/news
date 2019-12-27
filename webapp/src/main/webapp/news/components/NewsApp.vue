@@ -129,7 +129,7 @@ export default {
     newsFilter() {
       window.history.pushState('', 'News' , this.setQueryParam('filter', this.newsFilter));
 
-      this.newsStatusLabel = this.newsFilter === 'pinned' ? this.$t('news.app.filter.pinned') : this.$t('news.app.filter.all');
+      this.newsStatusLabel = this.$t(`news.app.filter.${this.newsFilter}`);
 
       this.fetchNews(false);
     },

@@ -636,9 +636,9 @@ public class NewsServiceImpl implements NewsService {
     news.setBody(getStringProperty(node, "exo:body"));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
-    news.setUpdater(getStringProperty(node, "exo:lastModifier"));
-    news.setUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPublicationDate(getPublicationDate(node));
+    news.setUpdater(getLastUpdater(node));
+    news.setUpdateDate(getLastUpdatedDate(node));
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
     }
@@ -862,7 +862,7 @@ public class NewsServiceImpl implements NewsService {
    * Return the date of the first published version of the node
    * 
    * @param node The News node
-   * @return The first published version of the node
+   * @return The date of the first published version of the node
    * @throws RepositoryException
    */
   private Date getPublicationDate(Node node) throws RepositoryException {
@@ -871,6 +871,49 @@ public class NewsServiceImpl implements NewsService {
     if (!versions.isEmpty()) {
       versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
       return versions.get(0).getCreatedTime().getTime();
+    }
+
+    return null;
+  }
+
+  /**
+   * Return the date of the last published version of the node
+   *
+   * @param node The News node
+   * @return The date of the last published version of the node
+   * @throws RepositoryException
+   */
+  private Date getLastUpdatedDate(Node node) throws RepositoryException {
+    VersionNode lastUpdatedVersion = getLastUpdatedVersion(node);
+    if(lastUpdatedVersion != null) {
+      return lastUpdatedVersion.getCreatedTime().getTime();
+    } else {
+      return getDateProperty(node, "exo:dateModified");
+    }
+  }
+
+  /**
+   * Return the author of the last published version of the node
+   *
+   * @param node The News node
+   * @return The author of the last published version of the node
+   * @throws RepositoryException
+   */
+  private String getLastUpdater(Node node) throws RepositoryException {
+    VersionNode lastUpdatedVersion = getLastUpdatedVersion(node);
+    if(lastUpdatedVersion != null) {
+      return lastUpdatedVersion.getAuthor();
+    } else {
+      return getStringProperty(node, "exo:lastModifier");
+    }
+  }
+
+  private VersionNode getLastUpdatedVersion(Node node) throws RepositoryException {
+    VersionNode versionNode = new VersionNode(node, node.getSession());
+    List<VersionNode> versions = versionNode.getChildren();
+    if (!versions.isEmpty()) {
+      versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
+      return versions.get(versions.size() - 1);
     }
 
     return null;

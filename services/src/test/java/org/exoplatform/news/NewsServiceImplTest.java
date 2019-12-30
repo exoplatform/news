@@ -30,6 +30,9 @@ import javax.jcr.Workspace;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
@@ -83,6 +86,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -233,6 +237,103 @@ public class NewsServiceImplTest {
 
     // Then
     assertNull(news);
+  }
+
+  @Test
+  public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
+    // Given
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+    Node node = mock(Node.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(node.getSession()).thenReturn(session);
+    when(node.hasProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(true);
+    when(node.getProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(property);
+    Calendar calendarUpdated = Calendar.getInstance();
+    calendarUpdated.set(2019, 11, 20, 12, 00);
+    Property updatedProperty = mock(Property.class);
+    when(updatedProperty.getDate()).thenReturn(calendarUpdated);
+    when(node.hasProperty(eq("exo:dateModified"))).thenReturn(true);
+    when(node.getProperty(eq("exo:dateModified"))).thenReturn(updatedProperty);
+    when(node.isNodeType(eq("mix:versionable"))).thenReturn(true);
+    VersionHistory versionHistory = mock(VersionHistory.class);
+    when(node.getVersionHistory()).thenReturn(versionHistory);
+    Version version1 = mock(Version.class);
+    when(version1.getUUID()).thenReturn("1");
+    when(version1.getName()).thenReturn("1");
+    when(version1.getSession()).thenReturn(session);
+    Property version1AuthorProperty = mock(Property.class);
+    when(version1AuthorProperty.getString()).thenReturn("john");
+    when(version1.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
+    when(version1.getProperty(eq("exo:lastModifier"))).thenReturn(version1AuthorProperty);
+    Calendar calendar1 = Calendar.getInstance();
+    calendar1.set(2019, 11, 20, 10, 00);
+    Property version1CreatedProperty = mock(Property.class);
+    when(version1CreatedProperty.getDate()).thenReturn(calendar1);
+    when(version1.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
+    when(version1.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version1CreatedProperty);
+    when(version1.getContainingHistory()).thenReturn(mock(VersionHistory.class));
+    Version version2 = mock(Version.class);
+    when(version2.getUUID()).thenReturn("2");
+    when(version2.getName()).thenReturn("2");
+    when(version2.getSession()).thenReturn(session);
+    Property version2AuthorProperty = mock(Property.class);
+    when(version2AuthorProperty.getString()).thenReturn("mary");
+    when(version2.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
+    when(version2.getProperty(eq("exo:lastModifier"))).thenReturn(version2AuthorProperty);
+    Calendar calendar2 = Calendar.getInstance();
+    Property version2CreatedProperty = mock(Property.class);
+    when(version2CreatedProperty.getDate()).thenReturn(calendar2);
+    when(version2.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
+    when(version2.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version2CreatedProperty);
+    calendar2.set(2019, 11, 20, 11, 00);
+    when(version2.getCreated()).thenReturn(calendar2);
+    when(version2.getContainingHistory()).thenReturn(mock(VersionHistory.class));
+    VersionIterator versionIterator = mock(VersionIterator.class);
+    when(versionIterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false)
+            .thenReturn(true).thenReturn(true).thenReturn(false)
+            .thenReturn(true).thenReturn(true).thenReturn(false);
+    when(versionIterator.nextVersion()).thenReturn(version1).thenReturn(version2)
+            .thenReturn(version1).thenReturn(version2)
+            .thenReturn(version1).thenReturn(version2);
+    when(versionHistory.getAllVersions()).thenReturn(versionIterator);
+    when(versionHistory.getRootVersion()).thenReturn(mock(Version.class));
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getLong()).thenReturn((long) 10);
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
+
+    // When
+    News news = newsService.getNewsById("1");
+
+    // Then
+    assertNotNull(news);
+    assertEquals(calendar1.getTime(), news.getPublicationDate());
+    assertEquals(calendar2.getTime(), news.getUpdateDate());
+    assertEquals("mary", news.getUpdater());
   }
 
   @Test

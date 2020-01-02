@@ -205,6 +205,7 @@ public class NewsServiceImplTest {
     currentIdentity.setMemberships(memberships);
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
+    when(spaceService.isSuperManager("user")).thenReturn(false);
 
     // When
     News news = newsService.getNewsById("1");
@@ -499,6 +500,7 @@ public class NewsServiceImplTest {
     Mockito.doNothing()
            .when(newsServiceSpy)
            .sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS));
+    Mockito.doReturn(true).when(newsServiceSpy).canEditNews(any(),any());
 
     // When
     newsServiceSpy.shareNews(sharedNews, Arrays.asList(space1));
@@ -1333,6 +1335,14 @@ public class NewsServiceImplTest {
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    when(spaceService.isSuperManager("user")).thenReturn(false);
 
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName", "test test");
@@ -1340,13 +1350,6 @@ public class NewsServiceImplTest {
 
     when(poster.getProfile()).thenReturn(p1);
 
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
     // When
     List<News> newsList = newsService.getNews(newsFilter);
 

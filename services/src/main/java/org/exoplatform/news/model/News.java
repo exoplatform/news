@@ -54,6 +54,8 @@ public class News {
 
   private List<NewsAttachment> attachments;
 
+  private Boolean canEdit;
+
   public String getId() {
     return id;
   }
@@ -238,6 +240,14 @@ public class News {
     this.attachments = attachments;
   }
 
+  public Boolean getCanEdit() {
+    return canEdit;
+  }
+
+  public void setCanEdit(Boolean canEdit) {
+    this.canEdit = canEdit;
+  }
+  
   public boolean isArchived() {
     return archived;
   }
@@ -253,5 +263,4 @@ public class News {
   public void setCanArchive(boolean canArchive) {
     this.canArchive = canArchive;
   }
-
 }

@@ -86,10 +86,10 @@
                   <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
                 </p>
               </div>
-              <div id="newsActions" class="share pull-right">
+              <div class="newsRightActions">
                 <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
-                <exo-news-share-activity v-if="!news.archived" :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle">
-                </exo-news-share-activity>
+                <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
+                <exo-news-share-activity v-if="!news.archived" :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle"></exo-news-share-activity>
               </div>
               <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
               <!--begin -->
@@ -217,6 +217,7 @@ export default {
         newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${encodeURI(item.path)}`;
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
+        const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
@@ -230,6 +231,8 @@ export default {
           avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
           profileURL: `/portal/intranet/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
+          activityId: activityId,
+          canEdit: item.canEdit,
           archived: item.archived,
           canArchive: item.canArchive,
           pinned: item.pinned,

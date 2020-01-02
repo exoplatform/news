@@ -1,6 +1,7 @@
 <template>
   <div class="newsEditComponent">
     <a id="newsEditButton" :data-original-title="$t('news.edit.edit')" :href="editLink"
+       :target="openTarget"
        class="btn"
        rel="tooltip"
        data-placement="bottom">
@@ -22,10 +23,10 @@ export default {
       required: false,
       default: ''
     },
-    showPinInput: {
-      type: Boolean,
+    openTarget: {
+      type: String,
       required: false,
-      default: true
+      default: '_self'
     }
   },
   computed: {

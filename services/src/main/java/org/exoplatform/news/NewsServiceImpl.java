@@ -655,6 +655,7 @@ public class NewsServiceImpl implements NewsService {
       news.setArchived(originalNode.getProperty("exo:archived").getBoolean());
     }
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     if (originalNode.hasProperty("exo:activities")) {
       news.setActivities(originalNode.getProperty("exo:activities").getString());
     }

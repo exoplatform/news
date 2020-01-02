@@ -14,6 +14,15 @@
             type="text"
             class="searchNewsInput mr-3">
         </div>
+        <v-app
+          class="VuetifyApp">
+          <v-progress-circular
+            v-if="loadingNews && newsList.length !== 0"
+            :size="30"
+            :width="3"
+            indeterminate
+            class="loadingRing"
+            color="#578dc9" /> </v-app>
       </div>
       <div class="newsAppToolbarRight">
         <div class="newsTypes">
@@ -34,6 +43,15 @@
         </div>
       </div>
     </div>
+    <v-app
+      class="VuetifyApp">
+      <v-progress-circular
+        v-if="loadingNews && newsList.length === 0"
+        :size="40"
+        :width="4"
+        indeterminate
+        class="loadingRing"
+        color="#578dc9" /> </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
         <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsItemIllustration"></a>
@@ -97,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="articleNotFound">
+    <div v-if="newsList.length === 0 && !loadingNews" class="articleNotFound">
       <span class="iconNotFound"></span>
       <h3>{{ notFoundMessage }}</h3>
     </div>
@@ -126,6 +144,7 @@ export default {
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,
+      loadingNews: true
     };
   },
   computed: {
@@ -221,6 +240,7 @@ export default {
       } else {
         this.newsList = result;
       }
+      this.loadingNews = false;
       window.require(['SHARED/social-ui-profile'], function (socialProfile) {
         const labels = {
           StatusTitle: 'Loading...',
@@ -236,6 +256,7 @@ export default {
     fetchNews(append = true) {
       const searchTerm = this.searchText.trim().toLowerCase();
       const offset = append ? this.newsList.length : 0;
+      this.loadingNews = true;
       newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
         if (data.news && data.news.length) {
           if(data.news.length > this.newsPerPage) {
@@ -249,6 +270,8 @@ export default {
         } else if(!append) {
           this.showLoadMoreButton = false;
           this.newsList = [];
+          this.loadingNews = false;
+
         }
       });
     },

@@ -4,6 +4,12 @@ import './components/initComponents.js';
 import NewsApp from './components/NewsApp.vue';
 import {newsConstants} from '../js/newsConstants';
 
+Vue.use(Vuetify);
+
+const vuetify = new Vuetify({
+  iconfont: '',
+});
+
 // get overridden components if exists
 if (extensionRegistry) {
   const components = extensionRegistry.loadComponents('News');
@@ -23,5 +29,6 @@ exoi18n.loadLanguageAsync(lang, url).then(i18n => {
   new Vue({
     render: (h) => h(NewsApp),
     i18n,
+    vuetify
   }).$mount('#NewsApp');
 });

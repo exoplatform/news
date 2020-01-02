@@ -25,6 +25,7 @@
               <li><a @click="newsFilter = 'all'">{{ $t('news.app.filter.all') }}</a></li>
               <li><a @click="newsFilter = 'pinned'">{{ $t('news.app.filter.pinned') }}</a></li>
               <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
+              <li><a @click="newsFilter = 'archived'">{{ $t('news.app.filter.archived') }}</a></li>
             </ul>
           </div>
         </div>
@@ -67,10 +68,30 @@
                   <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
                 </p>
               </div>
-              <div class="share pull-right">
-                <exo-news-share-activity :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle">
+              <div id="newsActions" class="share pull-right">
+                <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
+                <exo-news-share-activity v-if="!news.archived" :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle">
                 </exo-news-share-activity>
               </div>
+              <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+              <!--begin -->
+              <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+                <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+                  <div class="popupHeader clearfix">
+                    <a class="uiIconClose pull-right" title="Close"></a>
+                    <span class="PopupTitle popupTitle"></span>
+                  </div>
+                  <div class="PopupContent popupContent">
+                    <ul class="singleMessage popupMessage resizable">
+                      <li>
+                        <span class="confirmationIcon contentMessage"></span>
+                      </li>
+                    </ul>
+                    <div class="uiAction uiActionBorder"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- end -->
             </div>
           </div>
         </div>
@@ -103,7 +124,8 @@ export default {
       searchDelay: 300,
       newsFilter: '',
       spacesFilter: [],
-      newsStatusLabel: this.$t('news.app.filter.all')
+      newsStatusLabel: this.$t('news.app.filter.all'),
+      showArchiveButton: true,
     };
   },
   computed: {
@@ -189,6 +211,9 @@ export default {
           avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
           profileURL: `/portal/intranet/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
+          archived: item.archived,
+          canArchive: item.canArchive,
+          pinned: item.pinned,
         });
       });
       if(append) {

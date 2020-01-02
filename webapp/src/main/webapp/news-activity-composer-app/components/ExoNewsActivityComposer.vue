@@ -8,10 +8,10 @@
           <span class="newsFormTitle">{{ newsFormTitle }}</span>
         </div>
         <div v-if="showPinInput" class="pinArticleContent " @click="news.pinned">
-          <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" class="pinArticle"
+          <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" :class="[news.archived ? 'unauthorizedPin' : '']" class="pinArticle"
              rel="tooltip"
              data-placement="bottom"
-             @click="news.pinned = !news.pinned">
+             @click="!news.archived ? news.pinned = !news.pinned : null">
             <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
           </a>
         </div>
@@ -26,7 +26,7 @@
         <div v-if="editMode" class="newsFormRightActions">
           <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
           </button>
-          <button id="newsUpdateAndPost" :disabled="updateDisabled" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
+          <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
           </button>
         </div>
       </div>
@@ -157,6 +157,7 @@ export default {
         attachments: [],
         spaceId: '',
         pinned: false,
+        archived: false,
       },
       originalNews: {
         id: '',
@@ -336,6 +337,7 @@ export default {
             this.news.summary = fetchedNode.summary;
             this.news.body = fetchedNode.body;
             this.news.pinned = fetchedNode.pinned;
+            this.news.archived = fetchedNode.archived;
             CKEDITOR.instances['newsContent'].setData(fetchedNode.body);
             if (fetchedNode.illustrationURL) {
               newsServices.importFileFromUrl(fetchedNode.illustrationURL)
@@ -567,28 +569,30 @@ export default {
       });
     },
     updateAndPostNews: function () {
-      const self = this;
-      this.confirmAndUpdateNews().then(() => {
-        if(self.activityId)
-        {
-          const activity = {
-            id: self.activityId,
-            title: '',
-            body: '',
-            type: 'news',
-            templateParams: {
-              newsId: self.news.id,
-            },
-            updateDate: new Date().getTime()
-          };
+      if (!this.news.archived) {
+        const self = this;
+        this.confirmAndUpdateNews().then(() => {
+          if(self.activityId)
+          {
+            const activity = {
+              id: self.activityId,
+              title: '',
+              body: '',
+              type: 'news',
+              templateParams: {
+                newsId: self.news.id,
+              },
+              updateDate: new Date().getTime()
+            };
 
-          return newsServices.updateAndPostNewsActivity(activity);
-        }
-      }).then(() => {
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
-      }).catch (function() {
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
-      });
+            return newsServices.updateAndPostNewsActivity(activity);
+          }
+        }).then(() => {
+          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        }).catch (function() {
+          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        });
+      }
     },
     confirmAndUpdateNews: function() {
       if(this.news.pinned !== this.originalNews.pinned) {

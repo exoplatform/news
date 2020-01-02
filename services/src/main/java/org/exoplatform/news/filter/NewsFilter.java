@@ -4,11 +4,13 @@ import java.util.List;
 
 public class NewsFilter {
 
-  private boolean pinnedNews;
+  private boolean      pinnedNews;
 
-  private String searchText;
+  private boolean      archivedNews;
 
-  private String order;
+  private String       searchText;
+
+  private String       order;
 
   private List<String> spaces;
 
@@ -27,6 +29,14 @@ public class NewsFilter {
 
   public void setPinnedNews(boolean pinnedNews) {
     this.pinnedNews = pinnedNews;
+  }
+
+  public boolean isArchivedNews() {
+    return archivedNews;
+  }
+
+  public void setArchivedNews(boolean archivedNews) {
+    this.archivedNews = archivedNews;
   }
 
   public String getSearchText() {

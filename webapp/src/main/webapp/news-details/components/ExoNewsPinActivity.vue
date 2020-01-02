@@ -8,11 +8,12 @@
         </div>
       </transition>
     </div>
-    <a id="newsPinButton" :data-original-title="pinLabel" class="btn"
+    <a id="newsPinButton" :data-original-title="pinLabel" :class="[newsArchived ? 'unauthorizedPin' : '']"
+       class="btn"
        rel="tooltip"
        data-placement="bottom"
        @click="confirmAction">
-      <i :class="[newsPinned ? '' : 'unpinned']" class="uiIconPin" > </i>
+      <i :class="[newsPinned ? '' : 'unpinned']" class="uiIconPin"> </i>
     </a>
   </div>
 </template>
@@ -34,7 +35,12 @@ export default {
       type: Boolean,
       required: true,
       default: false
-    }
+    },
+    newsArchived: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
   },
   data() {
     return {
@@ -53,15 +59,17 @@ export default {
   },
   methods: {
     confirmAction : function() {
-      let confirmText = this.$t('news.pin.confirm');
-      let captionText = this.$t('news.pin.action');
-      const confirmButton = this.$t('news.pin.btn.confirm');
-      const cancelButton = this.$t('news.pin.btn.cancel');
-      if(this.newsPinned === true) {
-        confirmText = this.$t('news.unpin.confirm').replace('{0}', this.newsTitle);
-        captionText = this.$t('news.unpin.action');
+      if(!this.newsArchived) {
+        let confirmText = this.$t('news.pin.confirm');
+        let captionText = this.$t('news.pin.action');
+        const confirmButton = this.$t('news.pin.btn.confirm');
+        const cancelButton = this.$t('news.pin.btn.cancel');
+        if(this.newsPinned === true) {
+          confirmText = this.$t('news.unpin.confirm').replace('{0}', this.newsTitle);
+          captionText = this.$t('news.unpin.action');
+        }
+        eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label : confirmButton}], captionText, confirmText, cancelButton);
       }
-      eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label : confirmButton}], captionText, confirmText, cancelButton);
     },
     updatePinnedField : function () {
       const pinMessageTime = 5000;

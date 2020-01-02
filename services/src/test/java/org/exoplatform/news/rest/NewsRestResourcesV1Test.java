@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -12,7 +14,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -43,19 +50,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class NewsRestResourcesV1Test {
 
   @Mock
-  NewsService newsService;
+  NewsService            newsService;
 
   @Mock
   NewsAttachmentsService newsAttachmentsService;
 
   @Mock
-  SpaceService spaceService;
+  SpaceService           spaceService;
 
   @Mock
-  IdentityManager identityManager;
+  IdentityManager        identityManager;
 
   @Mock
-  ActivityManager activityManager;
+  ActivityManager        activityManager;
 
   @Before
   public void setup() {
@@ -65,7 +72,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -89,7 +99,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsWhenNewsExistsAndUserIsNotMemberOfTheSpaceButSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -108,7 +121,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -127,7 +143,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenNewsNotExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -145,7 +164,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenUpdatingNewsAndNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News existingNews = new News();
@@ -180,7 +202,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenShareNewsAndNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -216,7 +241,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotAuthorizedWhenUpdatingNewsAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -235,7 +263,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenUpdatingNewsAndNewsNotExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -249,11 +280,14 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
+
   @Test
   public void shouldGetOKWhenPinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -294,10 +328,211 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldGetOKWhenArchiveNewsAndNewsExistsAndUserIsPublisher() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    News oldnews = new News();
+    oldnews.setTitle("unarchived");
+    oldnews.setSummary("unarchived summary");
+    oldnews.setBody("unarchived body");
+    oldnews.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    oldnews.setCreationDate(date1);
+    oldnews.setPinned(false);
+    oldnews.setArchived(false);
+    oldnews.setId("id123");
+    oldnews.setSpaceId("space");
+
+    News updatedNews = new News();
+    updatedNews.setArchived(true);
+
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
+    currentIdentity.setMemberships(memberships);
+    Space space = mock(Space.class);
+
+    Mockito.doNothing().when(newsService).pinNews("id123");
+    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("space");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
+
+    // Then
+    verify(newsService, times(1)).archiveNews("id123");
+    verify(newsService, times(0)).updateNews(oldnews);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetOKWhenArchiveNewsAndNewsExistsAndUserIsNewsAuthor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    News oldnews = new News();
+    oldnews.setTitle("unarchived");
+    oldnews.setSummary("unarchived summary");
+    oldnews.setBody("unarchived body");
+    oldnews.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    oldnews.setCreationDate(date1);
+    oldnews.setPinned(false);
+    oldnews.setArchived(false);
+    oldnews.setId("id123");
+    oldnews.setSpaceId("space");
+    oldnews.setAuthor("john");
+
+    News updatedNews = new News();
+    updatedNews.setArchived(true);
+
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "redactor"));
+    currentIdentity.setMemberships(memberships);
+    Space space = mock(Space.class);
+
+    Mockito.doNothing().when(newsService).pinNews("id123");
+    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("space");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
+
+    // Then
+    verify(newsService, times(1)).archiveNews("id123");
+    verify(newsService, times(0)).updateNews(oldnews);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetOKWhenUnarchiveNewsAndNewsExistsAndUserIsNewsAuthor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    News oldnews = new News();
+    oldnews.setTitle("unarchived");
+    oldnews.setSummary("unarchived summary");
+    oldnews.setBody("unarchived body");
+    oldnews.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    oldnews.setCreationDate(date1);
+    oldnews.setPinned(false);
+    oldnews.setArchived(true);
+    oldnews.setId("id123");
+    oldnews.setSpaceId("space");
+    oldnews.setAuthor("john");
+
+    News updatedNews = new News();
+    updatedNews.setArchived(false);
+
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "redactor"));
+    currentIdentity.setMemberships(memberships);
+    Space space = mock(Space.class);
+
+    Mockito.doNothing().when(newsService).pinNews("id123");
+    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("space");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
+
+    // Then
+    verify(newsService, times(1)).unarchiveNews("id123");
+    verify(newsService, times(0)).updateNews(oldnews);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetUnauthorizedWhenArchiveNewsAndNewsExistsAndUserIsNotPublisherAndNotNewsAuthor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+
+    News oldnews = new News();
+    oldnews.setTitle("unarchived");
+    oldnews.setSummary("unarchived summary");
+    oldnews.setBody("unarchived body");
+    oldnews.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    oldnews.setCreationDate(date1);
+    oldnews.setPinned(false);
+    oldnews.setArchived(false);
+    oldnews.setId("id123");
+    oldnews.setSpaceId("space");
+    oldnews.setAuthor("test");
+
+    News updatedNews = new News();
+    updatedNews.setArchived(true);
+
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
+    memberships.add(new MembershipEntry("/platform/web-contributors", "redactor"));
+    currentIdentity.setMemberships(memberships);
+    Space space = mock(Space.class);
+
+    Mockito.doNothing().when(newsService).pinNews("id123");
+    when(newsService.getNewsById("id123")).thenReturn(oldnews);
+    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(space.getGroupId()).thenReturn("space");
+    when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
+
+    // Then
+    verify(newsService, times(0)).archiveNews("id123");
+    verify(newsService, times(0)).updateNews(oldnews);
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void shouldGetOKWhenUpdatingAndPinNewsAndNewsExistsAndAndUserIsPublisher() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -349,8 +584,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenUpdatingAndUnpinNewsAndNewsExistsAndAndUserIsPublisher() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -393,8 +630,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetUnauthorizedWhenUpdatingAndPinNewsAndNewsExistsAndAndUserIsNotAuthorizedToPin() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -434,8 +673,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -454,8 +695,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetUnauthorizedWhenPinNewsAndUserIsNotAuthorized() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -495,8 +738,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenPatchNewsAndUserIsAuthorized() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -542,8 +787,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenUnpinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -581,10 +828,14 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
+
   @Test
   public void shouldGetBadRequestWhenUpdatingNewsAndUpdatedNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -601,7 +852,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetBadRequestWhenPatchNewsAndUpdatedNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -617,7 +871,10 @@ public class NewsRestResourcesV1Test {
     // Given
     News news = new News();
     news.setId("1");
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
@@ -634,7 +891,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenSavingDraftsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -648,7 +908,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.createNews(request, news);
 
@@ -659,7 +918,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOkWhenCreateNewsWithPublishedState() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -674,7 +936,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.createNews(request, news);
 
@@ -685,7 +946,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotAuthorizedWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -708,7 +972,10 @@ public class NewsRestResourcesV1Test {
     // Given
     News news = new News();
     news.setId("1");
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -726,7 +993,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsDraftWhenNewsDraftExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -740,7 +1010,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1");
 
@@ -751,7 +1020,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotAuthorizedWhenNewsDraftExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -772,7 +1044,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenNewsDraftNotExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -786,10 +1061,14 @@ public class NewsRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
+
   @Test
   public void shouldGetBadRequestWhenNewsDraftIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -807,7 +1086,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsDraftListWhenNewsDraftsExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -827,7 +1109,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null, 0, 10, false);
 
@@ -838,7 +1119,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotAuthorizedWhenNewsDraftsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -857,14 +1141,17 @@ public class NewsRestResourcesV1Test {
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", "1", "draft", "", null, 0, 10, false);
-
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
+
   @Test
   public void shouldGetNotAuthorizedWhenNewsDraftsExistsAndUserNotExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("");
     News news = new News();
@@ -889,7 +1176,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenNoDraftsExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(null);
@@ -909,7 +1199,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldDeleteNewsWhenNewsExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -924,7 +1217,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.deleteNews(request, "1");
 
@@ -936,7 +1228,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldNotDeleteNewsWhenUserIsNotDraftAuthor() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -951,7 +1246,6 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
-
     // When
     Response response = newsRestResourcesV1.deleteNews(request, "1");
 
@@ -963,7 +1257,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotAuthorizedWhenDeletingNewsDraftThatExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -985,7 +1282,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenDeletingNewsDraftThatNotExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1004,7 +1304,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetBadRequestWhenDeletingNewsDraftWithIdNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1023,8 +1326,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenShareNewsAndNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1044,8 +1349,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetBadRequestWhenShareNewsAndSpacesNamesOfSharedNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     News news = new News();
     news.setId("1");
@@ -1062,8 +1369,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetBadRequestWhenShareNewsAndNSpaceIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1088,8 +1397,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetUnauthorizedWhenShareNewsAndNewsExistsAndUserIsNotMemberOfTheSpaceAndUserIsNOtSuperManager() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1113,9 +1424,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetAllPublishedNewsWhenExist() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetAllPublishedNewsWhenExist() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news1 = new News();
@@ -1127,10 +1441,10 @@ public class NewsRestResourcesV1Test {
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","", null, 0, 10, false);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", "", null, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
@@ -1138,18 +1452,21 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetEmptyListWhenNoPublishedExists() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetEmptyListWhenNoPublishedExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     NewsFilter newsFilter = new NewsFilter();
     when(newsService.getNews(newsFilter)).thenReturn(null);
 
-    //When
+    // When
     Response response = newsRestResourcesV1.getNews(request, "john", null, "published", null, null, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     assertNotNull(newsEntity);
@@ -1159,8 +1476,10 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenViewNewsAndNewsExists() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1173,7 +1492,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.getSpaceById("space1")).thenReturn(space1);
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
-    Mockito.doNothing().when(newsService).markAsRead(news,"john");
+    Mockito.doNothing().when(newsService).markAsRead(news, "john");
 
     // When
     Response response = newsRestResourcesV1.viewNews(request, "1");
@@ -1185,15 +1504,17 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenViewNewsAndNewsIsNull() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 =
-                                            new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
     news.setId("1");
     news.setViewsCount((long) 6);
     when(newsService.getNewsById("1")).thenReturn(news);
-    Mockito.doNothing().when(newsService).markAsRead(news,"john");
+    Mockito.doNothing().when(newsService).markAsRead(news, "john");
 
     // When
     Response response = newsRestResourcesV1.viewNews(request, "2");
@@ -1203,9 +1524,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetAllPinnedNewsWhenExist() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetAllPinnedNewsWhenExist() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news1 = new News();
@@ -1227,16 +1551,16 @@ public class NewsRestResourcesV1Test {
     when(newsService.getNews(any())).thenReturn(allNews);
     when(newsService.getNewsCount(any())).thenReturn(allNews.size());
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "published","pinned", null, 0, 10, true);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", "pinned", null, 0, 10, true);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals(true, newsList.get(i).isPinned());
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
@@ -1247,9 +1571,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1275,18 +1602,18 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","", text, 0, 5, false);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "", text, 0, 5, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
@@ -1298,9 +1625,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpace() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpace() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1326,18 +1656,18 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published","", text, 0, 10, false);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published", "", text, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
@@ -1346,9 +1676,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetPinnedNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetPinnedNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1377,18 +1710,18 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text, 0, 10, false);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "pinned", text, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals(true, newsList.get(i).isPinned());
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
@@ -1398,9 +1731,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetUnauthorizedWhenSearchingWithTextInNonMemberSpaces() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetUnauthorizedWhenSearchingWithTextInNonMemberSpaces() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1417,19 +1753,22 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(false);
+    when(spaceService.isMember(anyString(), any())).thenReturn(false);
 
-    //When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published","pinned", text, 0, 10, false);
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "pinned", text, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
   @Test
-  public void shouldGetMyPostedNewsWhenExists() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetMyPostedNewsWhenExists() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1455,27 +1794,30 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
+    // When
     Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
     }
   }
 
   @Test
-  public void shouldGetMyPostedNewsWhenFilteringWithTheGivenSpaces() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetMyPostedNewsWhenFilteringWithTheGivenSpaces() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1502,18 +1844,18 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
+    // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, null, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
@@ -1521,9 +1863,12 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetMyPostedNewsWhenSearchingWithTheGivenSpaces() throws Exception{
-    //Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+  public void shouldGetMyPostedNewsWhenSearchingWithTheGivenSpaces() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1550,18 +1895,18 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(),any())).thenReturn(true);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
-    //When
+    // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, text, 0, 10, false);
 
-    //Then
+    // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
     assertEquals(3, newsList.size());
-    for (int i=0; i<newsList.size(); i++){
+    for (int i = 0; i < newsList.size(); i++) {
       assertEquals("published", newsList.get(i).getPublicationState());
       assertEquals("john", newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());

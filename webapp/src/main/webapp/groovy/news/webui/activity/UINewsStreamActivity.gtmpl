@@ -87,6 +87,10 @@
   def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
+  def isArchived = news.archived;
+  def canArchive = news.canArchive;
+  def archivedLabel = _ctx.appRes("news.archive.label");
+
   def placeholder = _ctx.appRes("UIActivity.comment.placeholder").replace("'", "\\'");
 
   // labels
@@ -304,13 +308,17 @@
                           <% if (canPinNews) {
                             if (isPinned) { %>
                         	  <li>
-                        	     <a href="javascript:void(0)" data-confirm="<span>${labelConfirmUnpin}</span>" data-caption="$captionUnpin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="unpinActivity${activity.id}"" data-newsId="${news.id}">${labelUnpin}</a>
+								  <a href="javascript:void(0)" data-confirm="<span>${labelConfirmUnpin}</span>" data-caption="$captionUnpin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="unpinActivity${activity.id}"" data-newsId="${news.id}">${labelUnpin}</a>
                               </li>
                             <% } else { %>
+                              <% if (isArchived) { %>
+                                  <span class="controllPin unauthorizedPin">${labelPin}</span>
+                              <% } else {%>
                               <li>
                                  <a href="javascript:void(0)" data-confirm="<span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">${labelPin}</a>
                               </li>
                           <%
+                              }
                             }
                           }
                             if (activityDeletable) {
@@ -376,11 +384,29 @@
 				</div>
 			</div><!--end heading-->
 			<div class="description">
-                <img src="$illustrationURL" class="newsImage" alt="News"/>
+			    <% if (isArchived) { %>
+                <img src="$illustrationURL" class="newsImage newsArchivedImage" alt="News"/>
+                <% } else { %>
+                 <img src="$illustrationURL" class="newsImage" alt="News"/>
+                <% } %>
                 <div class="newsDetails">
-                    <div class="newsTitle">
-                        <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
+                    <% if (isArchived) { %>
+                    <div>
+                        <span id="archived${news.id}"><i>($archivedLabel)</i></span>
                     </div>
+                    <div class="newsArchived">
+                        <div class="newsTitle">
+                        <% if (!canArchive) { %>
+                           <span id="titleId${news.id}">$newsTitle</span>
+                        <% } else { %>
+                           <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
+                        <% } %>
+                        </div>
+                    <% } else { %>
+                        <div class="newsTitle">
+                           <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
+                        </div>
+                    <% } %>
                     <div class="newsBody">
                          <%
                            if (newsSummary) {
@@ -394,9 +420,18 @@
                             }
                          %>
                         <% if(displayReadMore) { %>
-                            <span class="readMore"><a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a></span>
+                            <span class="readMore">
+                            <% if (isArchived && !canArchive) { %>
+                                <span id="seeMoreId${news.id}">${labelReadMore}</span>
+                            <% } else { %>
+                                 <a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a>
+                            <% } %>
+                            </span>
                         <% } %>
                     </div>
+                    <% if (isArchived) { %>
+                    </div>
+                    <% } %>
                 </div>
 		        <div class="newsRibbon"></div>
             </div>

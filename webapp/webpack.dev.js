@@ -7,7 +7,7 @@ const app = 'news';
 
 // add the server path to your server location path
 
-const exoServerPath = "/home/exo/Source/News/platform-6.0.x-SNAPSHOT";
+const exoServerPath = "/home/exo/integration_19_08_2019/plf6/plf6/plfent-6.0.x-news2-20191021.020929-41/platform-6.0.x-news2-SNAPSHOT";
 
 
 let config = merge(webpackCommonConfig, {

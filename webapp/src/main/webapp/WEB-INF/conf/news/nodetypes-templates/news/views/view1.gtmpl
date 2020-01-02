@@ -120,6 +120,8 @@
       updaterProfileURL: '${updaterProfileURL}',
       updatedDate: '${newsUpdatedDate}',
       id: '${news.id}',
+      archived: ${news.archived},
+      canArchive: ${news.canArchive},
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,

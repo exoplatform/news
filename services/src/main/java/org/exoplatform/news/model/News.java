@@ -4,49 +4,53 @@ import java.util.Date;
 import java.util.List;
 
 public class News {
-  private String  id;
+  private String               id;
 
-  private String  title;
+  private String               title;
 
-  private String  summary;
+  private String               summary;
 
-  private String  body;
+  private String               body;
 
-  private String  author;
+  private String               author;
 
-  private String  authorDisplayName;
+  private String               authorDisplayName;
 
-  private String  updater;
+  private String               updater;
 
-  private String  uploadId;
+  private String               uploadId;
 
-  private byte[]  illustration;
+  private byte[]               illustration;
 
-  private Date    illustrationUpdateDate;
+  private Date                 illustrationUpdateDate;
 
-  private String  illustrationURL;
+  private String               illustrationURL;
 
-  private Date    creationDate;
+  private Date                 creationDate;
 
-  private Date    publicationDate;
+  private Date                 publicationDate;
 
-  private Date    updateDate;
+  private Date                 updateDate;
 
-  private boolean pinned;
+  private boolean              pinned;
 
-  private String  spaceId;
+  private boolean              archived;
 
-  private String  spaceDisplayName;
+  private boolean              canArchive;
 
-  private String  spaceUrl;
+  private String               spaceId;
 
-  private String  path;
+  private String               spaceDisplayName;
 
-  private String publicationState;
+  private String               spaceUrl;
 
-  private Long    viewsCount;
+  private String               path;
 
-  private String  activities;
+  private String               publicationState;
+
+  private Long                 viewsCount;
+
+  private String               activities;
 
   private List<NewsAttachment> attachments;
 
@@ -170,9 +174,13 @@ public class News {
     this.spaceId = spaceId;
   }
 
-  public String getSpaceDisplayName() { return spaceDisplayName; }
+  public String getSpaceDisplayName() {
+    return spaceDisplayName;
+  }
 
-  public void setSpaceDisplayName(String spaceDisplayName) { this.spaceDisplayName = spaceDisplayName; }
+  public void setSpaceDisplayName(String spaceDisplayName) {
+    this.spaceDisplayName = spaceDisplayName;
+  }
 
   public String getSpaceUrl() {
     return spaceUrl;
@@ -182,9 +190,13 @@ public class News {
     this.spaceUrl = spaceUrl;
   }
 
-  public String getPath() { return path; }
+  public String getPath() {
+    return path;
+  }
 
-  public void setPath(String path) { this.path = path; }
+  public void setPath(String path) {
+    this.path = path;
+  }
 
   public String getPublicationState() {
     return publicationState;
@@ -194,9 +206,13 @@ public class News {
     this.publicationState = publicationState;
   }
 
-  public String getAuthorDisplayName() { return authorDisplayName; }
+  public String getAuthorDisplayName() {
+    return authorDisplayName;
+  }
 
-  public void setAuthorDisplayName(String authorDisplayName) { this.authorDisplayName = authorDisplayName; }
+  public void setAuthorDisplayName(String authorDisplayName) {
+    this.authorDisplayName = authorDisplayName;
+  }
 
   public Long getViewsCount() {
     return viewsCount;
@@ -221,4 +237,21 @@ public class News {
   public void setAttachments(List<NewsAttachment> attachments) {
     this.attachments = attachments;
   }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
+  public boolean isCanArchive() {
+    return canArchive;
+  }
+
+  public void setCanArchive(boolean canArchive) {
+    this.canArchive = canArchive;
+  }
+
 }

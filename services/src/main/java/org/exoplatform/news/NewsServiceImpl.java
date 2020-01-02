@@ -118,9 +118,9 @@ public class NewsServiceImpl implements NewsService {
 
   private NewsSearchConnector      newsSearchConnector;
 
-  private NewsAttachmentsService newsAttachmentsService;
+  private NewsAttachmentsService   newsAttachmentsService;
 
-  private static final Log LOG = ExoLogger.getLogger(NewsServiceImpl.class);
+  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(RepositoryService repositoryService,
                          SessionProviderService sessionProviderService,
@@ -246,7 +246,8 @@ public class NewsServiceImpl implements NewsService {
       NodeIterator it = query.execute().getNodes();
       while (it.hasNext()) {
         Node iterNode = it.nextNode();
-        listNews.add(convertNodeToNews(iterNode));
+        News news = convertNodeToNews(iterNode);
+        listNews.add(news);
       }
       return listNews;
     } finally {
@@ -257,13 +258,19 @@ public class NewsServiceImpl implements NewsService {
   }
 
   @Override
+  public boolean canArchiveNews(String newsAuthor) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    return currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+        || currentIdentity.getUserId().equals(newsAuthor);
+  }
+
   public int getNewsCount(NewsFilter filter) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
-            (repositoryService.getCurrentRepository()
-                    .getConfiguration()
-                    .getDefaultWorkspaceName()),
-            repositoryService.getCurrentRepository());
+                                                 (repositoryService.getCurrentRepository()
+                                                                   .getConfiguration()
+                                                                   .getDefaultWorkspaceName()),
+                                                 repositoryService.getCurrentRepository());
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     try {
       StringBuilder sqlQuery = queryBuilder.buildQuery(filter);
@@ -614,7 +621,7 @@ public class NewsServiceImpl implements NewsService {
 
   @Override
   public News convertNodeToNews(Node node) throws Exception {
-    if(node == null) {
+    if (node == null) {
       return null;
     }
 
@@ -622,7 +629,7 @@ public class NewsServiceImpl implements NewsService {
 
     Node originalNode;
     // Retrieve the real news id if it is a frozen node
-    if(node.hasProperty("jcr:frozenUuid")) {
+    if (node.hasProperty("jcr:frozenUuid")) {
       String uuid = node.getProperty("jcr:frozenUuid").getString();
       originalNode = node.getSession().getNodeByUUID(uuid);
       news.setId(originalNode.getUUID());
@@ -635,6 +642,7 @@ public class NewsServiceImpl implements NewsService {
     news.setSummary(getStringProperty(node, "exo:summary"));
     news.setBody(getStringProperty(node, "exo:body"));
     news.setAuthor(getStringProperty(node, "exo:author"));
+    news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
     news.setPublicationDate(getPublicationDate(node));
     news.setUpdater(getLastUpdater(node));
@@ -643,18 +651,21 @@ public class NewsServiceImpl implements NewsService {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
     }
     news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
+    if (originalNode.hasProperty("exo:archived")) {
+      news.setArchived(originalNode.getProperty("exo:archived").getBoolean());
+    }
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     if (originalNode.hasProperty("exo:activities")) {
       news.setActivities(originalNode.getProperty("exo:activities").getString());
     }
     news.setPath(getPath(node));
-    if(!node.hasProperty("exo:viewsCount")) {
+    if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
 
-    if(node.hasNode("illustration")) {
+    if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
       news.setIllustration(bytes);
@@ -665,18 +676,20 @@ public class NewsServiceImpl implements NewsService {
     news.setAttachments(newsAttachmentsService.getNewsAttachments(node));
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
-    if(space != null) {
+    if (space != null) {
       String spaceName = space.getDisplayName();
       news.setSpaceDisplayName(spaceName);
-      if(StringUtils.isNotEmpty(space.getGroupId())) {
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(space.getGroupId()
-                .split("/")[2]).append("/").append(space.getPrettyName());
+      if (StringUtils.isNotEmpty(space.getGroupId())) {
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:")
+                                                    .append(space.getGroupId().split("/")[2])
+                                                    .append("/")
+                                                    .append(space.getPrettyName());
         news.setSpaceUrl(spaceUrl.toString());
       }
     }
 
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
-    if(identity != null && identity.getProfile() != null) {
+    if (identity != null && identity.getProfile() != null) {
       news.setAuthorDisplayName(identity.getProfile().getFullName());
     }
 
@@ -834,6 +847,7 @@ public class NewsServiceImpl implements NewsService {
     }
     newsDraftNode.setProperty("exo:dateModified", updateCalendar);
     newsDraftNode.setProperty("exo:pinned", false);
+    newsDraftNode.setProperty("exo:archived", false);
     newsDraftNode.setProperty("exo:spaceId", news.getSpaceId());
 
     Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
@@ -1044,16 +1058,68 @@ public class NewsServiceImpl implements NewsService {
     SearchContext context = new SearchContext(null, null);
     context.lang(lang);
     List<News> newsList = new ArrayList<>();
-    List<SearchResult> searchResults = newsSearchConnector.search(filter, filter.getOffset(), filter.getLimit(), "relevancy", "desc");
+    List<SearchResult> searchResults = newsSearchConnector.search(filter,
+                                                                  filter.getOffset(),
+                                                                  filter.getLimit(),
+                                                                  "relevancy",
+                                                                  "desc");
     searchResults.forEach(res -> {
       try {
-        News news = convertNodeToNews(((NewsSearchResult) res).getNode());
+        Node newsNode = ((NewsSearchResult) res).getNode();
+        News news = convertNodeToNews(newsNode);
         newsList.add(news);
+
       } catch (Exception e) {
         LOG.error("Error while processing search result in News", e);
       }
     });
     return newsList;
+  }
+
+  /**
+   * Archive a news
+   *
+   * @param newsId The id of the news to be archived
+   * @throws Exception
+   */
+  public void archiveNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    boolean isPinned = newsNode.getProperty("exo:pinned").getBoolean();
+    if (isPinned) {
+      unpinNews(newsId);
+    }
+    newsNode.setProperty("exo:archived", true);
+    newsNode.save();
+  }
+
+  /**
+   * Unarchive a news
+   *
+   * @param newsId The id of the news to be unarchived
+   * @throws Exception
+   */
+  public void unarchiveNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    newsNode.setProperty("exo:archived", false);
+    newsNode.save();
   }
 
 }

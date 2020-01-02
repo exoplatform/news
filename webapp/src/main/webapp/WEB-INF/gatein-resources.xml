@@ -97,6 +97,9 @@
         <module>newsDetails</module>
       </depends>
       <depends>
+        <module>socialUtil</module>
+      </depends>
+      <depends>
         <module>jquery</module>
         <as>$</as>
       </depends>

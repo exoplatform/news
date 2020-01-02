@@ -173,6 +173,8 @@
       titleLink: '${activityLink}',
       viewsCount: ${news.viewsCount},
       id: '${news.id}',
+      archived: ${news.archived},
+      canArchive: ${news.canArchive},
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,
@@ -254,7 +256,7 @@
 
 		 <div id="newsDetails"></div>
 
-
+			<% if (!news.archived || (news.archived && news.canArchive)) { %>
 			<div class="actionBar clearfix ">
 				 <% def toggleDisplayCommentAction = uicomponent.event('ToggleDisplayCommentForm', null, false);
 								 def commentLink = "";
@@ -492,10 +494,13 @@
 				</div> <!--end commentItem-->
 			  </div><!--end commentlist-->
     </div><!--end commentBox-->
+    <% } %>
 		</div><!--end #ActivityContextBox${activity.id}-->
 	</div> <!--end ContextBox${activity.id}-->
   </div> <!-- #boxContainer-->
-  <% uiform.end() %>
+  <% if (!news.archived || (news.archived && news.canArchive)) {
+    uiform.end()
+  }%>
 </div><!--activityStream-->
 <% } else { %> <!-- activity deleted -->
 <% uiform.begin() %>

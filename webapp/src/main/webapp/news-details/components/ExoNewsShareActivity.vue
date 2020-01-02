@@ -6,11 +6,11 @@
       </div>
     </transition>
 
-    <a id="newsShareButton" :data-original-title="$t('news.share.share')" class="btn"
+    <a id="newsShareButton" :data-original-title="$t('news.share.share')" :class="[newsArchived ? 'unauthorizedPin' : '']" class="btn"
        rel="tooltip"
        data-placement="bottom"
-       @click="showShareNewsPopup = true">
-      <i class="uiIconShare"></i>
+       @click="!newsArchived ? showShareNewsPopup = true : null">
+      <i :class="[newsArchived ? 'disabledIcon' : '']" class="uiIconShare"></i>
     </a>
     <exo-news-modal :show="showShareNewsPopup" :title="$t('news.share.popupTitle')" @close="closeShareNewsPopup">
       <div class="newsShareForm">
@@ -49,7 +49,12 @@ export default {
     newsTitle: {
       type: String,
       required: true
-    }
+    },
+    newsArchived: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
   },
   data() {
     const self = this;

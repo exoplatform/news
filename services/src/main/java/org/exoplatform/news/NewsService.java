@@ -1,12 +1,13 @@
 package org.exoplatform.news;
 
+import java.util.List;
+
+import javax.jcr.Node;
+
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.social.core.space.model.Space;
-
-import javax.jcr.Node;
-import java.util.List;
 
 public interface NewsService {
   News createNews(News news) throws Exception;
@@ -22,7 +23,7 @@ public interface NewsService {
   void markAsRead(News news, String userId) throws Exception;
 
   void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception;
-  
+
   void pinNews(String newsId) throws Exception;
 
   void unpinNews(String newsId) throws Exception;
@@ -38,6 +39,12 @@ public interface NewsService {
   public boolean canEditNews(String posterId, String spaceId);
 
   public boolean canPinNews();
+  
+  boolean canArchiveNews(String newsAuthor);
 
   List<News> searchNews(NewsFilter filter, String lang) throws Exception;
+
+  void archiveNews(String newsId) throws Exception;
+
+  void unarchiveNews(String newsId) throws Exception;
 }

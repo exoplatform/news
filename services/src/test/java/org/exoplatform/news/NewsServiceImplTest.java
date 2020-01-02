@@ -158,7 +158,7 @@ public class NewsServiceImplTest {
 
   @Mock
   NewsAttachmentsService     newsAttachmentsService;
-  
+
   @Rule
   public ExpectedException   exceptionRule = ExpectedException.none();
 
@@ -166,20 +166,20 @@ public class NewsServiceImplTest {
   public void shouldGetNodeWhenNewsExists() throws Exception {
     // Given
     NewsService newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl,
+                                                  newsSearchConnector,
+                                                  newsAttachmentsService);
     Node node = mock(Node.class);
     Property property = mock(Property.class);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
@@ -198,6 +198,13 @@ public class NewsServiceImplTest {
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
 
     // When
     News news = newsService.getNewsById("1");
@@ -210,20 +217,20 @@ public class NewsServiceImplTest {
   public void shouldGetNullWhenNewsDoesNotExist() throws Exception {
     // Given
     NewsService newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl,
+                                                  newsSearchConnector,
+                                                  newsAttachmentsService);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -340,20 +347,20 @@ public class NewsServiceImplTest {
   public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
     // Given
     NewsService newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl,
+                                                  newsSearchConnector,
+                                                  newsAttachmentsService);
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
@@ -392,20 +399,20 @@ public class NewsServiceImplTest {
   public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
     // Given
     NewsService newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl,
+                                                  newsSearchConnector,
+                                                  newsAttachmentsService);
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
@@ -444,20 +451,20 @@ public class NewsServiceImplTest {
   public void shouldShareNewsWhenNewsExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
     Property property = mock(Property.class);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
@@ -518,20 +525,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -583,20 +590,20 @@ public class NewsServiceImplTest {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     News news = new News();
     news.setTitle("new pinned news title");
     news.setSummary("new pinned news summary");
@@ -667,20 +674,20 @@ public class NewsServiceImplTest {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -734,20 +741,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     News news = new News();
@@ -780,20 +787,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
@@ -815,20 +822,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -874,20 +881,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -933,20 +940,20 @@ public class NewsServiceImplTest {
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -999,20 +1006,20 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     Node newsFolderNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
     Node applicationDataNode = mock(Node.class);
@@ -1084,20 +1091,20 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -1145,20 +1152,20 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -1209,20 +1216,20 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -1267,23 +1274,23 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldGetAllNewsNodesWhenExists() throws Exception {
+  public void shouldGetAllNewsNodesWhenExistsForPublisherUser() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -1328,10 +1335,18 @@ public class NewsServiceImplTest {
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
 
     Profile p1 = new Profile(poster);
-    p1.setProperty("fullName", "Sara Boutej");
+    p1.setProperty("fullName", "test test");
     NewsFilter newsFilter = new NewsFilter();
 
     when(poster.getProfile()).thenReturn(p1);
+
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
     // When
     List<News> newsList = newsService.getNews(newsFilter);
 
@@ -1346,20 +1361,20 @@ public class NewsServiceImplTest {
   public void shouldGetNoNewsNodesWhenDoesNotExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2515,20 +2530,20 @@ public class NewsServiceImplTest {
   public void shouldGetAllPinnedNewsNodesWhenExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2592,20 +2607,20 @@ public class NewsServiceImplTest {
   public void shouldGetNewsListsWhenSearching() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-            sessionProviderService,
-            nodeHierarchyCreator,
-            dataDistributionManager,
-            spaceService,
-            activityManager,
-            identityManager,
-            uploadService,
-            imageProcessor,
-            linkManager,
-            publicationServiceImpl,
-            publicationManagerImpl,
-            wcmPublicationServiceImpl,
-            newsSearchConnector,
-            newsAttachmentsService);
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2627,6 +2642,216 @@ public class NewsServiceImplTest {
     // Then
     assertNotNull(newsList);
     assertEquals(1, newsList.size());
+  }
+
+  @Test
+  public void shouldArchiveNews() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+
+    News news = new News();
+    news.setTitle("archived title");
+    news.setSummary("archived summary");
+    news.setBody("archived body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+
+    Property property = mock(Property.class);
+    when(newsNode.getProperty("exo:pinned")).thenReturn(property);
+    when(property.getBoolean()).thenReturn(true);
+    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doNothing().when(newsServiceSpy).unpinNews("id123");
+
+    // When
+    newsServiceSpy.archiveNews("id123");
+
+    // Then
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:archived"), eq(true));
+
+  }
+
+  @Test
+  public void shouldNotArchiveNewsAsNewsNodeIsNull() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+
+    News news = new News();
+    news.setTitle("archived title");
+    news.setSummary("archived summary");
+    news.setBody("archived body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(null);
+
+    exceptionRule.expect(ItemNotFoundException.class);
+    exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
+
+    newsService.archiveNews("id123");
+
+  }
+
+  @Test
+  public void shouldNotUnarchiveNewsAsNewsNodeIsNull() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+
+    News news = new News();
+    news.setTitle("archived title");
+    news.setSummary("archived summary");
+    news.setBody("archived body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(null);
+
+    exceptionRule.expect(ItemNotFoundException.class);
+    exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
+
+    newsService.unarchiveNews("id123");
+
+  }
+
+  @Test
+  public void shouldUnarchiveNews() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+
+    News news = new News();
+    news.setTitle("archived title");
+    news.setSummary("archived summary");
+    news.setBody("archived body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+
+    // When
+    newsService.unarchiveNews("id123");
+
+    // Then
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:archived"), eq(false));
+
   }
 
 }

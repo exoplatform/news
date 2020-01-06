@@ -487,10 +487,6 @@ export default {
           news.id = this.news.id;
           newsServices.updateNews(news)
             .then((updatedNews) => {
-              this.news.title = updatedNews.title;
-              if(this.news.summary !== updatedNews.summary) {
-                this.news.summary = updatedNews.summary;
-              }
               if(this.news.body !== updatedNews.body) {
                 // Images URLs may have been updated in body to transform temporary URLs to permanent URLs.
                 // Updated URLs are extracted here and re-applied on save.

@@ -7,27 +7,20 @@
 @header-popup-bg: #484848;
 @color-appNews-information: #676767;
 @textLightColor: #999;
-
+@btnDisableColor: #c6c6c6;
 
 /*============== Activity News ====================*/
 
 .activityStream.uiNewsActivity {
 
+  &:not(.uiSharedNewsActivity) .description {
+    background-color: #f9fafc;
+  }
+
   .unauthorizedPin {
     cursor: not-allowed;
     color: #4d5466;
     padding-left: 10px;
-  }
-
-  .newsRibbon {
-    background-image: url("@{images-path}/ribbon-news.png");
-    background-repeat: no-repeat;
-    position: absolute;
-    width: 73px;
-    height: 73px;
-    left: auto;
-    right: 0px;
-    bottom: 0px;
   }
 
   .newsImage {
@@ -37,9 +30,26 @@
     margin-bottom: 20px;
   }
 
-  .newsArchivedImage {
-    opacity: 0.4;
-    filter: grayscale();
+  .description .newsBody {
+    color: #a0a1a1;
+    font-style: italic;
+    line-height: 1.8em;
+  }
+
+  .newsArchived {
+    .newsImage {
+      opacity: 0.4;
+      filter: grayscale();
+    }
+    .newsTitle, .newsTitle a {
+      color: #a0a1a1;
+    }
+    .uiIconArchived {
+      font-size: 14px;
+    }
+    .readMore a {
+      color: #a0a1a1;
+    }
   }
 
 }
@@ -59,6 +69,7 @@
   }
 
   .newsTitle {
+    padding-top: 5px;
     padding-bottom: 10px;
     font-weight: bold;
 
@@ -72,9 +83,10 @@
     line-height: initial;
 
     .readMore {
-      font-weight: bold;
-      padding-left: 3px;
-      font-size: initial;
+      font-style: normal;
+      font-size: 14px;
+      text-decoration: underline;
+      padding-top: 10px;
     }
 
     img.pull-right {
@@ -151,7 +163,7 @@
 }
 
 .disabledIcon {
-  color: #c6c6c6;
+  color: @btnDisableColor;
 }
 
 /*============== Full Activity News ====================*/
@@ -179,11 +191,11 @@
     float: right;
   }
 
-  #newsShareActivity {
+  #newsShareActivity, #archiveNews {
     float: right;
   }
 
-  #newsShareButton, #newsEditButton, #newsPinButton {
+  #newsShareButton, #newsEditButton, #newsPinButton, .newsArchiveButton {
     border: none;
     padding: 9px 10px;
 
@@ -209,7 +221,7 @@
     }
 
     .unpinned {
-      color: #c6c6c6;
+      color: @btnDisableColor;
     }
   }
 
@@ -319,51 +331,50 @@
 }
 
 .uiSharedNewsActivity {
-  .newsdescription {
+  .description {
     position: relative;
 
     .sharedNewsTitle {
-      padding: 0px 15px 20px 15px;
-      padding-top: 5px;
+      padding: 0px 15px 15px 15px;
     }
 
     .sharedNewsDetails {
-      margin: 0px 15px 10px 13px;
-      border: 2px solid #f8f8f8;
-      border-radius: 5px;
+      margin: 0px 15px 0px 13px;
       background-color: #f8f8f8;
-      padding: 10px;
-      display: flow-root;
+      padding: 15px 15px 5px 15px;
+      font-size: 0.9em;
+    }
 
-      .newsArchivedImage {
-        opacity: 0.4;
-        filter: grayscale();
+    .originalSpace {
+      clear: both;
+      border-top: 1px solid #e1e8ee;
+      padding-top: 10px;
+      text-align: right;
+      color: #a0a1a1;
+
+      .avatarMini {
+        margin: auto;
+        border-radius: 25%;
+        border: 1px solid #d6d6d6;
       }
     }
-
-    .newsRibbon {
-      bottom: -10px;
-    }
-  }
-}
-
-.sharedAuthor {
-  color: gray;
-  font-weight: bold;
-}
-
-/*============== Archive News=============== */
-#archiveNews {
-  padding-top: 2px;
-
-  .uiIconUnarchive:before {
-    content: "\e912";
   }
 
-  .uiIconArchive:before {
-    content: "\e912";
+  .sharedAuthor {
     color: gray;
+    font-weight: bold;
   }
+}
+
+/*============== Archive News =============== */
+
+.uiIconUnarchived:before {
+  content: "\e912";
+  color: @btnDisableColor;
+}
+
+.uiIconArchived:before {
+  content: "\e912";
 }
 
 /*============== News Composer =============== */
@@ -451,7 +462,7 @@
           }
 
           .unpinned {
-            color: #c6c6c6;
+            color: @btnDisableColor;
           }
         }
       }
@@ -1849,6 +1860,11 @@
               #newsShareButton {
                 padding: 2px;
                 border: none;
+              }
+              .newsArchiveButton {
+                padding: 4px;
+                border: none;
+                margin-right: 15px;
               }
             }
           }

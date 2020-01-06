@@ -8,11 +8,11 @@
         </div>
       </transition>
     </div>
-    <a id="newsArchiveButton" :data-original-title="archiveLabel" class="btn"
+    <a :data-original-title="archiveLabel" class="btn newsArchiveButton"
        rel="tooltip"
        data-placement="bottom"
        @click="confirmAction">
-      <i :class="[newsArchived ? 'uiIconUnarchive' : 'uiIconArchive']"> </i>
+      <i :class="[newsArchived ? 'uiIconArchived' : 'uiIconUnarchived']"> </i>
     </a>
   </div>
 </template>

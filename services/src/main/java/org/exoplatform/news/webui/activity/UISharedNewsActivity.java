@@ -2,9 +2,13 @@ package org.exoplatform.news.webui.activity;
 
 import java.util.Map;
 
+import com.drew.lang.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.webui.activity.BaseUIActivity;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -26,6 +30,15 @@ public class UISharedNewsActivity extends UINewsActivity {
 
   public String getSharedActivityId() {
     return this.getActivity().getId();
+  }
+
+  public Space getOriginalNewsSpace() {
+    String spaceId = this.getNews().getSpaceId();
+    if(StringUtils.isNotBlank(spaceId)) {
+      SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+      return spaceService.getSpaceById(spaceId);
+    }
+    return null;
   }
 
   public String getPosterFullName() {

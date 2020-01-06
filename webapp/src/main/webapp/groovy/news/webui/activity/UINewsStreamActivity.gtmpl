@@ -234,6 +234,8 @@
     newsBody = new HtmlCleaner().clean(newsBody).getText();
   }
 
+  displayReadMore = displayReadMore && (!isArchived || canArchive);
+
   def illustration = Utils.getActivityManager().getActivityFilesIds(activity).stream()
                                        .findAny().orElse(null);
   StringBuffer illustrationURL = new StringBuffer();
@@ -383,58 +385,30 @@
 
 				</div>
 			</div><!--end heading-->
-			<div class="description">
-			    <% if (isArchived) { %>
-                <img src="$illustrationURL" class="newsImage newsArchivedImage" alt="News"/>
-                <% } else { %>
-                 <img src="$illustrationURL" class="newsImage" alt="News"/>
+			<div class="description <%=isArchived ? "newsArchived" : ""%>">
+          <img src="$illustrationURL" class="newsImage" alt="News"/>
+          <div class="newsDetails">
+              <div class="newsTitle">
+                <% if (isArchived) { %>
+                  <i class="uiIconArchived" data-original-title="$archivedLabel" rel="tooltip" data-placement="bottom"></i>
                 <% } %>
-                <div class="newsDetails">
-                    <% if (isArchived) { %>
-                    <div>
-                        <span id="archived${news.id}"><i>($archivedLabel)</i></span>
-                    </div>
-                    <div class="newsArchived">
-                        <div class="newsTitle">
-                        <% if (!canArchive) { %>
-                           <span id="titleId${news.id}">$newsTitle</span>
-                        <% } else { %>
-                           <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
-                        <% } %>
-                        </div>
-                    <% } else { %>
-                        <div class="newsTitle">
-                           <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
-                        </div>
-                    <% } %>
-                    <div class="newsBody">
-                         <%
-                           if (newsSummary) {
-                         %>
-                            $newsSummary
-                         <%
-                           } else {
-                         %>
-                             $newsBody
-                         <%
-                            }
-                         %>
-                        <% if(displayReadMore) { %>
-                            <span class="readMore">
-                            <% if (isArchived && !canArchive) { %>
-                                <span id="seeMoreId${news.id}">${labelReadMore}</span>
-                            <% } else { %>
-                                 <a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a>
-                            <% } %>
-                            </span>
-                        <% } %>
-                    </div>
-                    <% if (isArchived) { %>
-                    </div>
-                    <% } %>
-                </div>
-		        <div class="newsRibbon"></div>
-            </div>
+                <% if (isArchived && !canArchive) { %>
+                   <span id="titleId${news.id}">$newsTitle</span>
+                <% } else { %>
+                   <a href="$activityLink" id="titleId${news.id}">$newsTitle</a>
+                <% } %>
+              </div>
+              <div class="newsBody">
+                  <%=newsSummary ? newsSummary : newsBody%>
+
+                  <% if(displayReadMore) { %>
+                      <div class="readMore">
+                         <a href="$activityLink" id="seeMoreId${news.id}">${labelReadMore}</a>
+                      </div>
+                  <% } %>
+              </div>
+          </div>
+      </div>
 			<div class="actionBar clearfix ">
 				 <% def toggleDisplayCommentAction = uicomponent.event('ToggleDisplayCommentForm', null, false);
 								 def commentLink = "";

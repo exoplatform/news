@@ -75,13 +75,15 @@ export default {
   methods: {
     loadNewsDrafts: function() {
       newsServices.getNewsDrafts(this.spaceId).then(
-        (data) => {
-          this.newsDrafts = data.sort((draft1, draft2) => draft2.updateDate.time - draft1.updateDate.time);
-          data.map((draft) => {
-            if(draft.illustration){
-              draft.illustrationURL = `/portal/rest/v1/news/${draft.id}/illustration`;
-            }
-          });
+        data => {
+          if(data && data.news) {
+            this.newsDrafts = data.news.sort((draft1, draft2) => draft2.updateDate.time - draft1.updateDate.time);
+            data.map((draft) => {
+              if(draft.illustration){
+                draft.illustrationURL = `/portal/rest/v1/news/${draft.id}/illustration`;
+              }
+            });
+          }
         }
       );
     },

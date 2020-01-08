@@ -1,6 +1,4 @@
 <%
-  import org.apache.commons.lang.StringEscapeUtils;
-
   import org.exoplatform.ecm.jcr.model.VersionNode;
 
   import org.exoplatform.portal.webui.util.Util;
@@ -31,7 +29,7 @@
     if(identity != null && identity.getProfile() != null) {
       profileFullName = identity.getProfile().getFullName();
     }
-    return StringEscapeUtils.escapeHtml(profileFullName);
+    return profileFullName;
   }
 
   private Date getPublicationDate(def node) throws RepositoryException {

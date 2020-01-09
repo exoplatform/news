@@ -38,7 +38,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 
@@ -69,7 +69,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 

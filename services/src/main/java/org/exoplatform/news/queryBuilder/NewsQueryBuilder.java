@@ -37,7 +37,7 @@ public class NewsQueryBuilder {
           }
         } else {
           if (!isPublisher) {
-            sqlQuery.append("( exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = '")
+            sqlQuery.append("( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = '")
                     .append(username)
                     .append("')) AND ");
           }

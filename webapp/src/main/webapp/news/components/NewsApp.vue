@@ -243,7 +243,7 @@ export default {
       } else {
         this.newsList = result;
       }
-      this.loadingNews = false;
+
       window.require(['SHARED/social-ui-profile'], function (socialProfile) {
         const labels = {
           StatusTitle: 'Loading...',
@@ -273,10 +273,9 @@ export default {
         } else if(!append) {
           this.showLoadMoreButton = false;
           this.newsList = [];
-          this.loadingNews = false;
-
         }
-      });
+        this.loadingNews = false;
+      }).catch(() => this.loadingNews = false);
     },
     loadMore: function() {
       this.fetchNews();

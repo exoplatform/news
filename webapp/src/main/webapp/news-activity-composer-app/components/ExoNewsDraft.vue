@@ -78,7 +78,7 @@ export default {
         data => {
           if(data && data.news) {
             this.newsDrafts = data.news.sort((draft1, draft2) => draft2.updateDate.time - draft1.updateDate.time);
-            data.map((draft) => {
+            data.news.map((draft) => {
               if(draft.illustration){
                 draft.illustrationURL = `/portal/rest/v1/news/${draft.id}/illustration`;
               }

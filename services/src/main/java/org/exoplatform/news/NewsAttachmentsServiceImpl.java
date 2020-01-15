@@ -220,6 +220,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
     Node newsAttachmentsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsAttachmentsRootNode, getNodeRelativePath(Calendar.getInstance()));
 
     Node attachmentNode = newsAttachmentsFolderNode.addNode(uploadedResource.getFileName(), "nt:file");
+    attachmentNode.addMixin("mix:versionable");
     attachmentNode.setProperty("exo:title", uploadedResource.getFileName());
     Node resourceNode = attachmentNode.addNode("jcr:content", "nt:resource");
     resourceNode.setProperty("jcr:mimeType", uploadedResource.getMimeType());

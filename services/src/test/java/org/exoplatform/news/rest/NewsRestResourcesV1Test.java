@@ -14,12 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -87,7 +82,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -112,7 +107,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -134,7 +129,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -155,11 +150,48 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
+
+  @Test
+  public void shouldGetNewsSpacesWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    Space space2 = new Space();
+    space1.setId("2");
+    space1.setPrettyName("space2");
+    when(newsService.getNewsById(anyString())).thenReturn(news);
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
+    when(spaceService.getSpaceById("2")).thenReturn(space2);
+    when(spaceService.isMember(space1, "john")).thenReturn(true);
+    when(spaceService.isMember(space2, "john")).thenReturn(true);
+    when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsById(request, "1", "spaces");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    News filteredNews = (News) response.getEntity();
+    assertNotNull(filteredNews);
+    assertEquals(2, filteredNews.getSharedInSpacesList().size());
+    assertEquals(true, filteredNews.getSharedInSpacesList().contains(space1));
+    assertEquals(true, filteredNews.getSharedInSpacesList().contains(space2));
+  }
+
 
   @Test
   public void shouldGetOKWhenUpdatingNewsAndNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
@@ -1011,7 +1043,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1035,7 +1067,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1056,7 +1088,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -1077,7 +1109,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNewsById(request, null);
+    Response response = newsRestResourcesV1.getNewsById(request, null, null);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());

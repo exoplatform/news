@@ -327,9 +327,6 @@ export default {
     initNewsComposerData: function(newsId) {
       const self = this;
       newsServices.getNewsById(newsId)
-        .then((data) => {
-          if (data.ok) {return data.json();}
-        })
         .then(fetchedNode => {
           if(fetchedNode){
             this.news.id = fetchedNode.id;

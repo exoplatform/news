@@ -43,6 +43,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
 import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
@@ -247,6 +248,7 @@ public class NewsServiceImplTest {
     assertNull(news);
   }
 
+  @PrepareForTest({ PortalContainer.class, CommonsUtils.class })
   @Test
   public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
     // Given
@@ -267,6 +269,7 @@ public class NewsServiceImplTest {
             newsAttachmentsService);
     Node node = mock(Node.class);
     Property property = mock(Property.class);
+    when(property.getString()).thenReturn("");
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -333,6 +336,20 @@ public class NewsServiceImplTest {
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(PortalContainer.class);
+    when(CommonsUtils.getCurrentPortalOwner()).thenReturn("intranet");
+    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    Property actProperty = mock(Property.class);
+    when(actProperty.getString()).thenReturn("1:2;1:3");
+    when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
 
     // When
     News news = newsService.getNewsById("1");

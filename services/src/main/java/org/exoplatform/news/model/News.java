@@ -1,7 +1,10 @@
 package org.exoplatform.news.model;
 
+import org.exoplatform.social.core.space.model.Space;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class News {
   private String               id;
@@ -54,7 +57,13 @@ public class News {
 
   private List<NewsAttachment> attachments;
 
+  private String spaceAvatarUrl;
+
   private Boolean canEdit;
+
+  private Set<Space> sharedInSpacesList;
+
+  private String url;
 
   public String getId() {
     return id;
@@ -240,6 +249,14 @@ public class News {
     this.attachments = attachments;
   }
 
+  public String getSpaceAvatarUrl() {
+    return spaceAvatarUrl;
+  }
+
+  public void setSpaceAvatarUrl(String spaceAvatarUrl) {
+    this.spaceAvatarUrl = spaceAvatarUrl;
+  }
+
   public Boolean getCanEdit() {
     return canEdit;
   }
@@ -262,5 +279,21 @@ public class News {
 
   public void setCanArchive(boolean canArchive) {
     this.canArchive = canArchive;
+  }
+
+  public Set<Space> getSharedInSpacesList() {
+    return sharedInSpacesList;
+  }
+
+  public void setSharedInSpacesList(Set<Space> sharedInSpacesList) {
+    this.sharedInSpacesList = sharedInSpacesList;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 }

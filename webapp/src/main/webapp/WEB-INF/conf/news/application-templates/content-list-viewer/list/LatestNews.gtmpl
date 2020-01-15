@@ -4,8 +4,17 @@
   import org.exoplatform.portal.webui.util.Util;
   import org.exoplatform.wcm.webui.clv.UICLVPortlet;
   import org.exoplatform.wcm.webui.Utils;
+  import org.exoplatform.social.core.space.model.Space;
+  import org.exoplatform.social.core.space.spi.SpaceService;
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.commons.utils.CommonsUtils;
+  import org.exoplatform.container.PortalContainer;
+  import org.exoplatform.news.NewsService;
 
   import org.htmlcleaner.HtmlCleaner;
+
+  SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+  NewsService newsService = CommonsUtils.getService(NewsService.class);
 
   if (uicomponent.getUIPageIterator().getAvailable() > 0) {
 
@@ -51,7 +60,20 @@
 
       def firstNewsNode = nodes.get(0);
 
-      def firstItemLink = uicomponent.getURL(firstNewsNode);
+      StringBuilder firstNewsUrl = new StringBuilder("");
+      if (firstNewsNode.hasProperty("exo:activities")) {
+        def firstNewsActivityId =  firstNewsNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
+        Space firstNewsPostedInSpace = spaceService.getSpaceById( firstNewsNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
+        def portalName = PortalContainer.getCurrentPortalContainerName();
+        def portalOwner = CommonsUtils.getCurrentPortalOwner();
+        def currentUsername = newsService.getCurrentIdentity().getUserId();
+        if (spaceService.isMember(firstNewsPostedInSpace, currentUsername)) {
+          firstNewsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(firstNewsActivityId);
+        } else {
+          firstNewsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(firstNewsNode));
+        }
+      }
+      def firstItemLink = firstNewsUrl.toString();
       def firstImgSrc;
       if(isShowImage) {
         if(firstNewsNode.hasNode("illustration")) {
@@ -109,7 +131,6 @@
     if(nbOfNewsToDisplay > 1) {
       for (int i=1 ; i <= nbOfNewsToDisplay-1 ; i++) {
         def viewNode = nodes.get(i);
-        def itemLink = uicomponent.getURL(viewNode);
         def imgSrc;
         if(isShowImage) {
             if(viewNode.hasNode("illustration")) {
@@ -125,6 +146,20 @@
           itemSummary = viewNode.getProperty("exo:body").getString();
           itemSummary = new HtmlCleaner().clean(itemSummary).getText();
         }
+        StringBuilder newsUrl = new StringBuilder("");
+        if (viewNode.hasProperty("exo:activities")) {
+          def newsActivityId =  viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
+          Space newsPostedInSpace = spaceService.getSpaceById(viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
+          def portalName = PortalContainer.getCurrentPortalContainerName();
+          def portalOwner = CommonsUtils.getCurrentPortalOwner();
+          def currentUsername = newsService.getCurrentIdentity().getUserId();
+          if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
+            newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
+          } else {
+            newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(viewNode));
+          }
+        }
+        def itemLink = newsUrl.toString();
       %>
         <div class="newsLine">
             <div class="newsImage" style="background-image:url($imgSrc)" onclick="window.location='$itemLink'">

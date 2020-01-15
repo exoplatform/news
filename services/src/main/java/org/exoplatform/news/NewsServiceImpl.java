@@ -26,6 +26,8 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
 import org.exoplatform.news.connector.NewsSearchConnector;
@@ -647,6 +649,7 @@ public class NewsServiceImpl implements NewsService {
     news.setPublicationDate(getPublicationDate(node));
     news.setUpdater(getLastUpdater(node));
     news.setUpdateDate(getLastUpdatedDate(node));
+    news.setPath(getPath(node));
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
     }
@@ -657,9 +660,30 @@ public class NewsServiceImpl implements NewsService {
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     if (originalNode.hasProperty("exo:activities")) {
-      news.setActivities(originalNode.getProperty("exo:activities").getString());
+      StringBuilder memberSpaceActivities = new StringBuilder();
+      String[] activities = originalNode.getProperty("exo:activities").getString().split(";");
+      String currentUsername = getCurrentIdentity().getUserId();
+      String newsActivityId = activities[0].split(":")[1];
+      Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
+      String portalName = PortalContainer.getCurrentPortalContainerName();
+      String portalOwner = CommonsUtils.getCurrentPortalOwner();
+      StringBuilder newsUrl = new StringBuilder("");
+      if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
+        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
+        news.setUrl(newsUrl.toString());
+      } else {
+        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+        news.setUrl(newsUrl.toString());
+      }
+      memberSpaceActivities.append(activities[0]).append(";");
+      for (int i = 1; i < activities.length; i++){
+        Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
+        if (space != null && (spaceService.isMember(space, currentUsername))) {
+          memberSpaceActivities.append(activities[i]).append(";");
+        }
+      }
+      news.setActivities(memberSpaceActivities.toString());
     }
-    news.setPath(getPath(node));
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
@@ -680,11 +704,13 @@ public class NewsServiceImpl implements NewsService {
     if (space != null) {
       String spaceName = space.getDisplayName();
       news.setSpaceDisplayName(spaceName);
-      if (StringUtils.isNotEmpty(space.getGroupId())) {
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:")
-                                                    .append(space.getGroupId().split("/")[2])
-                                                    .append("/")
-                                                    .append(space.getPrettyName());
+      if(StringUtils.isNotEmpty(space.getGroupId())) {
+        String spaceId = space.getGroupId().split("/")[2];
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(spaceId)
+                .append("/").append(space.getPrettyName());
+        StringBuilder spaceAvatarUrl = new StringBuilder().append("/rest/v1/social/spaces/")
+                .append(spaceId).append("/avatar");
+        news.setSpaceAvatarUrl(spaceAvatarUrl.toString());
         news.setSpaceUrl(spaceUrl.toString());
       }
     }
@@ -693,6 +719,8 @@ public class NewsServiceImpl implements NewsService {
     if (identity != null && identity.getProfile() != null) {
       news.setAuthorDisplayName(identity.getProfile().getFullName());
     }
+
+
 
     return news;
   }

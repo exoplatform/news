@@ -14,10 +14,9 @@
         <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
         <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
         <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
-        
+
         <div class="newsDetails">
           <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
-
           <div class="news-top-information">
             <div class="news-header-content">
               <div id="titleNews" class="newsTitle">

@@ -3,7 +3,9 @@ package org.exoplatform.news.rest;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -252,7 +254,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       @ApiResponse(code = 401, message = "User not authorized to get the news"),
       @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
   public Response getNewsById(@Context HttpServletRequest request,
-                              @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+                          @ApiParam(value = "News id", required = true) @PathParam("id") String id,
+                          @ApiParam(value = "fields", required = true) @QueryParam("fields") String fields) {
     try {
 
       if (StringUtils.isBlank(id)) {
@@ -275,7 +278,20 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       }
       news.setIllustration(null);
 
-      return Response.ok(news).build();
+      if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
+        News filteredNews = new News();
+        Set<Space> spacesList = new HashSet<>();
+        String newsActivities = news.getActivities();
+        for (String act : newsActivities.split(";")) {
+          String spaceId = act.split(":")[0];
+          Space space = spaceService.getSpaceById(spaceId);
+          spacesList.add(space);
+        }
+        filteredNews.setSharedInSpacesList(spacesList);
+        return Response.ok(filteredNews).build();
+      } else {
+        return Response.ok(news).build();
+      }
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
       return Response.serverError().build();

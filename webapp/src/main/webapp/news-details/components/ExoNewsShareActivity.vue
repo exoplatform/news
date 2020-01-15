@@ -54,7 +54,7 @@ export default {
       type: Boolean,
       required: true,
       default: false
-    },
+    }
   },
   data() {
     const self = this;
@@ -121,7 +121,10 @@ export default {
           this.messageType = 'success';
           this.showMessage = true;
         })
-        .then(() => this.closeShareNewsPopup())
+        .then(() => {
+          this.closeShareNewsPopup();
+          this.$emit('newsShared', this.newsId);
+        })
         .catch(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
           this.message = this.$t('news.share.message.error').replace('{0}', `<b>${escapedNewsTitle}</b>`);

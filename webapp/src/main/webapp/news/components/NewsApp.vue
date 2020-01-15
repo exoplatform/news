@@ -60,57 +60,59 @@
             <h3>
               <a :href="news.newsUrl">{{ news.newsTitle }} </a>
             </h3>
-            <div class="newsSpace">
-              <span class="newsSpaceLabel">Posted in </span>
-              <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">{{ news.spaceDisplayName }}</a>
-            </div>
+            <news-spaces-shared-in v-if="news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
+          </div>
+          <div class="newsInfo">
+            <p class="newsOwner">
+              <a :href="news.profileURL" target="_blank">
+                <img :src="news.avatar">
+                <span>{{ news.author }}</span>
+              </a>
+            </p>
+            <i class="uiIconArrowNext"></i>
+            <p class="newsSpace">
+              <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
+                <img :src="news.spaceAvatarUrl">
+                <span>{{ news.spaceDisplayName }}</span>
+              </a>
+            </p>
+            <p class="newsDate">
+              <i class="uiIconClock"></i>
+              <span>{{ news.creationDate }}</span>
+            </p>
+            <p class="newsViews">
+              <i class="uiIconWatch"></i>
+              <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
+            </p>
           </div>
           <div class="newsItemContentDetails">
             <a :href="news.newsUrl">
               <p class="newsSummary" v-html="news.newsText"></p>
             </a>
-            <div class="newsItemInfo">
-              <div class="newsLeftInfo">
-                <p class="newsOwner">
-                  <a :href="news.profileURL" target="_blank">
-                    <img :src="news.avatar">
-                    <span>{{ news.author }}</span>
-                  </a>
-                </p>
-                <p class="newsDate">
-                  <i class="iconPLFCalendar"></i>
-                  <span>{{ news.creationDate }}</span>
-                </p>
-                <p class="newsViews">
-                  <i class="uiIconWatch"></i>
-                  <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
-                </p>
-              </div>
-              <div class="newsRightActions">
-                <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
-                <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
-                <exo-news-share-activity v-if="!news.archived" :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle"></exo-news-share-activity>
-              </div>
-              <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
-              <!--begin -->
-              <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-                <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-                  <div class="popupHeader clearfix">
-                    <a class="uiIconClose pull-right" title="Close"></a>
-                    <span class="PopupTitle popupTitle"></span>
-                  </div>
-                  <div class="PopupContent popupContent">
-                    <ul class="singleMessage popupMessage resizable">
-                      <li>
-                        <span class="confirmationIcon contentMessage"></span>
-                      </li>
-                    </ul>
-                    <div class="uiAction uiActionBorder"></div>
-                  </div>
+            <div class="newsActions">
+              <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
+              <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
+              <exo-news-share-activity :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle" @newsShared="reloadNews(news.newsId)"></exo-news-share-activity>
+            </div>
+            <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+            <!--begin -->
+            <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+              <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+                <div class="popupHeader clearfix">
+                  <a class="uiIconClose pull-right" title="Close"></a>
+                  <span class="PopupTitle popupTitle"></span>
+                </div>
+                <div class="PopupContent popupContent">
+                  <ul class="singleMessage popupMessage resizable">
+                    <li>
+                      <span class="confirmationIcon contentMessage"></span>
+                    </li>
+                  </ul>
+                  <div class="uiAction uiActionBorder"></div>
                 </div>
               </div>
-              <!-- end -->
             </div>
+            <!-- end -->
           </div>
         </div>
       </div>
@@ -212,9 +214,7 @@ export default {
       const options = {year: 'numeric', month: 'short', day: 'numeric'};
 
       data.forEach((item) => {
-        let newsUrl = '';
         const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
-        newsUrl = `${newsUrl}${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/detail?content-id=${encodeURI(item.path)}`;
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
@@ -226,7 +226,7 @@ export default {
           creationDate: newsCreatedDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          newsUrl: newsUrl,
+          newsUrl: item.url,
           author: item.authorDisplayName,
           avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
           profileURL: `/portal/intranet/profile/${item.author}`,
@@ -236,6 +236,8 @@ export default {
           archived: item.archived,
           canArchive: item.canArchive,
           pinned: item.pinned,
+          activities: item.activities,
+          spaceAvatarUrl: item.spaceAvatarUrl
         });
       });
       if(append) {
@@ -289,6 +291,11 @@ export default {
       const url = new URL(window.location);
       url.searchParams.set(paramName, paramValue);
       return url.href;
+    },
+    reloadNews(newsId) {
+      newsServices.getNewsById(newsId).then(newsUpdated => {
+        this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
+      });
     }
   }
 };

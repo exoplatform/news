@@ -5,8 +5,20 @@ export function getNewsById(id) {
   return fetch(`${newsConstants.NEWS_API}/${id}`, {
     credentials: 'include',
     method: 'GET',
+  }).then((data) => {
+    if (data.ok) {return data.json();}
   });
 }
+
+export function getNewsSpaces(newsId) {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}?fields=spaces`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}
+
 
 export function getNewsDrafts(spaceId) {
   return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaces=${spaceId}&publicationState=draft`, {

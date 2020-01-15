@@ -26,6 +26,16 @@
   import java.util.TimeZone;
   import java.util.Date;
 
+  import org.exoplatform.social.core.space.model.Space;
+  import org.exoplatform.social.core.space.spi.SpaceService;
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.commons.utils.CommonsUtils;
+  import org.exoplatform.container.PortalContainer;
+  import org.exoplatform.news.NewsService;
+
+  SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+  NewsService newsService = CommonsUtils.getService(NewsService.class);
+
   public String getProfileFullName(String userName) {
     String profileFullName = "";
     Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
@@ -104,7 +114,20 @@
             def isShowReadmore = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_READMORE);
 
             def newsTitle = "";
-            def itemLink = uicomponent.getURL(viewNode);
+            StringBuilder newsUrl = new StringBuilder("");
+            if (viewNode.hasProperty("exo:activities")) {
+              def newsActivityId =  viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
+              Space newsPostedInSpace = spaceService.getSpaceById( viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
+              def portalName = PortalContainer.getCurrentPortalContainerName();
+              def portalOwner = CommonsUtils.getCurrentPortalOwner();
+              def currentUsername = newsService.getCurrentIdentity().getUserId();
+              if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
+                newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
+              } else {
+                newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(viewNode));
+              }
+            }
+            def itemLink = newsUrl.toString();
 
             def newsPostedDate = "";
             if(viewNode.hasProperty("publication:liveDate")) {

@@ -179,15 +179,36 @@ export default {
     spacesFilter: {
       handler: function () {
         this.fetchNews(false);
+        if (this.spacesFilter.length > 0) {
+          window.history.pushState('', 'News', this.setQueryParam('spaces', this.spacesFilter.toString().replace(/,/g, '_')));
+        }else {
+          window.history.pushState('', 'News', this.removeQueryParam('spaces'));
+        }
+
       },
       deep: true
     }
   },
   created() {
     const filterQueryParam = this.getQueryParam('filter');
-    if(filterQueryParam) {
-      // set filter value, which will trigger news fetching
-      this.newsFilter = filterQueryParam;
+    const searchQueryParam = this.getQueryParam('search');
+    const spacesQueryParam = this.getQueryParam('spaces');
+    if(filterQueryParam || searchQueryParam || spacesQueryParam) {
+      if (filterQueryParam) {
+        // set filter value, which will trigger news fetching
+        this.newsFilter = filterQueryParam;
+      }
+      if (searchQueryParam) {
+        // set search value
+        this.searchText = searchQueryParam;
+      }
+      if (spacesQueryParam) {
+        // set space selected
+        const spaces = spacesQueryParam.toString().split('_');
+        for (let i = 0; i < spaces.length; i++) {
+          this.spacesFilter.push(new Number(spaces[i]).valueOf());
+        }
+      }
     } else {
       this.fetchNews();
     }
@@ -277,6 +298,11 @@ export default {
           this.newsList = [];
         }
         this.loadingNews = false;
+        if(searchTerm){
+          window.history.pushState('', 'News', this.setQueryParam('search', this.searchText));
+        }else {
+          window.history.pushState('', 'News', this.removeQueryParam('search'));
+        }
       }).catch(() => this.loadingNews = false);
     },
     loadMore: function() {
@@ -296,7 +322,12 @@ export default {
       newsServices.getNewsById(newsId).then(newsUpdated => {
         this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
       });
-    }
+    },
+    removeQueryParam(paramName) {
+      const url = new URL(window.location);
+      url.searchParams.delete(paramName);
+      return url.href;
+    },
   }
 };
 </script>

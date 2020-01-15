@@ -118,6 +118,10 @@ export default {
     }
   },
   created() {
+    if (this.value.length > 0) {
+      this.filterApplied = true;
+      this.selectedSpaces = this.value;
+    }
     this.loadUserSpaces();
   },
   methods:{

@@ -149,6 +149,8 @@ export default {
       newAttachedFiles.forEach(newFile => {
         this.queueUpload(newFile);
       });
+
+      this.$refs.uploadInput.value = null;
     },
     getIconClassFromFileMimeType: function(fileMimeType) {
       if(fileMimeType) {

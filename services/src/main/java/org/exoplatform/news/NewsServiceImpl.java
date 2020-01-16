@@ -660,29 +660,32 @@ public class NewsServiceImpl implements NewsService {
     news.setSpaceId(node.getProperty("exo:spaceId").getString());
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     if (originalNode.hasProperty("exo:activities")) {
-      StringBuilder memberSpaceActivities = new StringBuilder();
-      String[] activities = originalNode.getProperty("exo:activities").getString().split(";");
-      String currentUsername = getCurrentIdentity().getUserId();
-      String newsActivityId = activities[0].split(":")[1];
-      Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-      String portalName = PortalContainer.getCurrentPortalContainerName();
-      String portalOwner = CommonsUtils.getCurrentPortalOwner();
-      StringBuilder newsUrl = new StringBuilder("");
-      if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
-        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
-        news.setUrl(newsUrl.toString());
-      } else {
-        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
-        news.setUrl(newsUrl.toString());
-      }
-      memberSpaceActivities.append(activities[0]).append(";");
-      for (int i = 1; i < activities.length; i++){
-        Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-        if (space != null && (spaceService.isMember(space, currentUsername))) {
-          memberSpaceActivities.append(activities[i]).append(";");
+      String strActivities = originalNode.getProperty("exo:activities").getString();
+      if(StringUtils.isNotEmpty(strActivities)) {
+        String[] activities = strActivities.split(";");
+        StringBuilder memberSpaceActivities = new StringBuilder();
+        String currentUsername = getCurrentIdentity().getUserId();
+        String newsActivityId = activities[0].split(":")[1];
+        Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
+        String portalName = PortalContainer.getCurrentPortalContainerName();
+        String portalOwner = CommonsUtils.getCurrentPortalOwner();
+        StringBuilder newsUrl = new StringBuilder("");
+        if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
+          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
+          news.setUrl(newsUrl.toString());
+        } else {
+          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+          news.setUrl(newsUrl.toString());
         }
+        memberSpaceActivities.append(activities[0]).append(";");
+        for (int i = 1; i < activities.length; i++) {
+          Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
+          if (space != null && (spaceService.isMember(space, currentUsername))) {
+            memberSpaceActivities.append(activities[i]).append(";");
+          }
+        }
+        news.setActivities(memberSpaceActivities.toString());
       }
-      news.setActivities(memberSpaceActivities.toString());
     }
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);

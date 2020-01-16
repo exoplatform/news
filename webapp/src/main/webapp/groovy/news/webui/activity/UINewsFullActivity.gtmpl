@@ -125,7 +125,9 @@
   def updaterFullName = uicomponent.getUserFullName(news.updater);
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
-  def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+  def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
+
+  def mediumDateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(pcontext.getLocale());
   def newsPostedDate = "";
   if(news.publicationDate != null) {
     def postedDate = LocalDateTime.ofInstant(news.publicationDate.toInstant(), TimeZone.getDefault().toZoneId());
@@ -136,24 +138,22 @@
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
-  def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
-  def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");
-  def spaceURL = uicomponent.getSpaceURL();
+  def labelBy = _ctx.appRes("news.app.by");
+  def labelIn = _ctx.appRes("news.app.in");
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
-  StringBuffer illustrationURL = new StringBuffer();
-  if(news.illustration == null){
-    illustrationURL.append("/news/images/newsImageDefault.png");
-  } else {
-    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
+  String illustrationURL = "";
+  if(news.illustrationURL != null) {
+    illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
   }
 
   def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
   def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
   def newsBody = news.body.replaceAll("`", "\\\\`");
   def newsAttachments = news.attachments;
+  def spaceName = news.spaceDisplayName;
 
   def showEditButton = uicomponent.canEditNews(activity);
   def showPinInput = uicomponent.canPinNews(activity);
@@ -190,11 +190,14 @@
       titleLink: '${activityLink}',
       viewsCount: ${news.viewsCount},
       id: '${news.id}',
-      archived: ${news.archived}
+      archived: ${news.archived},
+      canArchive: ${news.canArchive},
+      profileAvatarURL: '${ownerAvatar}',
+      spaceName: '${spaceName}',
+      spaceURL:'${news.spaceUrl}',
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,
-    spaceURL:'$spaceURL',
     spaceGroupId: '$spaceGroupId'
   } """
 
@@ -399,29 +402,29 @@
                          <%
                      }
                 }
-          commentMessage = it.title;
-          commentPostedTime = uicomponent.getRelativeTimeLabel(_ctx, it.postedTime);
-                commentEditedTime = uicomponent.getRelativeTimeLabel(_ctx, it.updated.getTime());
-          commentEditedTime = _ctx.appRes("UIActivity.label.EditedFrom").replace("{0}",commentEditedTime);
-          commentAbsolutePostedTime = uicomponent.getAbsolutePostedTime(it.postedTime);
-          commenterAvatarImgSrc = id.profile.avatarUrl;
-          if (!commenterAvatarImgSrc) commenterAvatarImgSrc = LinkProvider.PROFILE_DEFAULT_AVATAR_URL;
-          def commentId = it.parentCommentId == null ? it.id : it.parentCommentId;
-        %>
-        <div id="commentContainer${it.id}" data-comment-id="$commentId" data-parent-comment="$it.parentCommentId" class="$commentParentClass">
-          <% if(commentCounter == commentList.size()) { %>
-          <div id="CommentBlock${activity.id}${commentCounter}" class="commentItem commentItemLast">
-          <% } else { %>
-            <div id="CommentBlock${it.id}" class="commentItem">
-          <% }  %>
-          <div class="commmentLeft">
-            <a href="$commenterProfileUri" title="$commenterFullName" class="avatarXSmall">
-              <img alt="$commenterFullName" src="$commenterAvatarImgSrc" />
-            </a>
-          </div><!--end commentLeft-->
-          <div class="commentRight">
+			  commentMessage = it.title;
+			  commentPostedTime = uicomponent.getRelativeTimeLabel(_ctx, it.postedTime);
+              commentEditedTime = uicomponent.getRelativeTimeLabel(_ctx, it.updated.getTime());
+			  commentEditedTime = _ctx.appRes("UIActivity.label.EditedFrom").replace("{0}",commentEditedTime);
+			  commentAbsolutePostedTime = uicomponent.getAbsolutePostedTime(it.postedTime);
+			  commenterAvatarImgSrc = id.profile.avatarUrl;
+			  if (!commenterAvatarImgSrc) commenterAvatarImgSrc = LinkProvider.PROFILE_DEFAULT_AVATAR_URL;
+			  def commentId = it.parentCommentId == null ? it.id : it.parentCommentId;
+			%>
+			<div id="commentContainer${it.id}" data-comment-id="$commentId" data-parent-comment="$it.parentCommentId" class="$commentParentClass">
+			  <% if(commentCounter == commentList.size()) { %>
+			  <div id="CommentBlock${activity.id}${commentCounter}" class="commentItem commentItemLast">
+			  <% } else { %>
+			    <div id="CommentBlock${it.id}" class="commentItem">
+			  <% }  %>
+				<div class="commmentLeft">
+					<a href="$commenterProfileUri" title="$commenterFullName" class="avatarXSmall">
+					  <img alt="$commenterFullName" src="$commenterAvatarImgSrc" />
+					</a>
+				</div><!--end commentLeft-->
+				<div class="commentRight">
             <div class="author">
-              <a href="$commenterProfileUri">$commenterFullName</a>
+              <a href="$commenterProfileUri" target="_blank">$commenterFullName</a>
             </div>
             <div class="contentComment" id="${activity.id}-${commentCounter}">
               $commentMessage

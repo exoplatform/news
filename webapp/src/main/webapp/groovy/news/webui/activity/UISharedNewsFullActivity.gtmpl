@@ -22,6 +22,8 @@
 
   import java.util.Date;
 
+  import groovy.json.JsonOutput;
+
   def pcontext = Util.getPortalRequestContext();
 
   def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
@@ -129,7 +131,11 @@ if (activity && news) {
   def posterFullName = uicomponent.getPosterFullName();
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
-  def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+  def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
+  def spaceName = news.spaceDisplayName;
+  def newsAttachments = news.attachments;
+
+  def mediumDateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(pcontext.getLocale());
   def newsPostedDate = "";
   if(news.publicationDate != null) {
     def postedDate = LocalDateTime.ofInstant(news.publicationDate.toInstant(), TimeZone.getDefault().toZoneId());
@@ -143,19 +149,20 @@ if (activity && news) {
   def labelPostedBy = _ctx.appRes("news.activity.postedBy");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
   def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
+  def labelBy = _ctx.appRes("news.app.by");
+  def labelIn = _ctx.appRes("news.app.in");
+  def lastUpdated = _ctx.appRes("news.activity.lastUpdated");
   def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");
   def labelSharedBy = _ctx.appRes("news.share.shareBy");
+
   def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
-  def sharedActivityLink = uicomponent.getActivityPermalink(sharedActivityId);
 
-  StringBuffer illustrationURL = new StringBuffer();
-  if(news.illustration == null){
-    illustrationURL.append("/news/images/newsImageDefault.png");
-  } else {
-    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
+  String illustrationURL = null;
+  if(news.illustration == null) {
+    illustrationURL = new StringBuilder("/news/images/newsImageDefault.png").toString();
   }
 
   def newsTitle = StringEscapeUtils.escapeHtml(news.title);
@@ -176,7 +183,8 @@ if (activity && news) {
     allCommentSize: '${allCommentSize}',
     commentFormFocused: '${uicomponent.isCommentFormFocused()}',
     labels: $labels,
-    nodeNewsId: '${news.id}'
+    nodeNewsId: '${news.id}',
+    attachments: ${JsonOutput.toJson(newsAttachments)},
   } """
 
   jsManager.require("SHARED/jquery", "jq")
@@ -235,48 +243,57 @@ if (activity && news) {
               activityTitle = "<span> <i>"+ "\"" + activity.title + "\""+ "</i> </span>";
             }
           %>
-          <div><span class="sharedAuthor"> $labelSharedBy $posterFullName </span> </div>
+          <div><span class="sharedAuthor"> $labelSharedBy $posterFullName </span>
+            <a onclick="history.back()" class="backBtn"><i class="uiIconBack"></i></a>
+          </div>
           <div class="sharedNewsTitle" style="padding-top: 8px;">$activityTitle</div>
           <hr>
           <div class="sharedNewsDetails">
-            <img src="$illustrationURL" class="newsImage illustrationPicture" alt="News"/>
+            <% if (illustrationURL != null)  { %>
+              <img src="$illustrationURL" class="newsImage illustrationPicture" alt="News"/>
+            <% } %>
             <div class="newsDetails">
               <div class="news-top-information">
                 <div class="news-header-content">
                   <div id="titleNews" class="newsTitle">
-                    <a href="$sharedActivityLink" class="activityLinkColor newsTitleLink">$newsTitle</a>
+                    <a class="activityLinkColor newsTitleLink">$newsTitle</a>
                   </div>
                   <div id="informationNews" class="newsInformation">
-                    <div class="newsAuthor">
-                      <div>
-                        <span class="newsInformationLabel">${labelPostedBy} :</span>
-                        <a href="$authorProfileURL" class="newsInformationValue newsAuthorName"> ${authorFullName}</a>
+                    <div class="activityAvatar avatarCircle">
+                      <a href="$authorProfileURL" target="_blank">
+                        <img src="$ownerAvatar" class="avatar avatarXSmall">
+                      </a>
+                    </div>
+                    <div>
+                      <div class="newsAuthor">
+                        <a href="$authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> ${authorFullName} </a>
                       </div>
                       <div>
-                        <span class="newsInformationLabel"> ${labelPublicationDate} :</span>
+                        <span class="newsInformationLabel"> ${labelIn} </span>
+                        <a href="$news.spaceUrl" class="newsInformationLabel newsSpace" target="_blank">${spaceName} </a>
                         <span class="newsInformationValue newsPostedDate">$newsPostedDate</span>
                       </div>
+                      <% if (showUpdateInfo) { %>
+                        <div class="newsUpdater">
+                          <div>
+                            <span class="newsInformationLabel">${lastUpdated} </span>
+                            <span class="newsInformationValue newsUpdatedDate">$newsUpdatedDate</span>
+                            <% if (authorFullName != updaterFullName )  { %>
+                              <span class="newsInformationLabel">${labelBy} </span>
+                              <a href="$updaterProfileURL" class="newsInformationValue newsUpdaterName">${updaterFullName}</a>
+                            <% } %>
+                          </div>
+                        </div>
+                      <% } %>
                     </div>
-                    <% if (showUpdateInfo) { %>
-                      <div class="newsUpdater">
-                        <div>
-                          <span class="newsInformationLabel">${labelUpdatedBy} :</span>
-                          <a href="$updaterProfileURL" class="newsInformationValue newsUpdaterName">${updaterFullName}</a>
-                        </div>
-                        <div>
-                          <span class="newsInformationLabel">${labelUpdatedDate} :</span>
-                          <span class="newsInformationValue newsUpdatedDate">$newsUpdatedDate</span>
-                        </div>
-                      </div>
-                    <% } %>
-                  </div>
+                   </div>
                 </div>
               </div>
 
               <% if (newsSummary != null) { %>
                 <div id="newsSummary" class="summary">
                   <span>${newsSummary}</span>
-                 </div>
+                </div>
               <% } %>
 
               <div id="newsBody" class="newsBody" class="fullDetailsBody clearfix">
@@ -284,7 +301,6 @@ if (activity && news) {
               </div>
             </div>
           </div>
-
         </div>
       </div>
       <div class="actionBar clearfix ">

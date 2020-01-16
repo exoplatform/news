@@ -1,39 +1,58 @@
 <template>
   <div id="newsDetails">
-    <div class="newsDetails-description">
+    <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
+    <div v-if="news.archived && !news.canArchive">
+      <div class="userNotAuthorized">
+        <div class="notAuthorizedIconDiv">
+          <img src="/news/images/notauthorized.png" class="iconNotAuthorized">
+        </div>
+        <h3>{{ $t('news.archive.text') }}</h3>
+      </div>
+    </div>
+    <div v-else class="newsDetails-description">
       <div class="newsDetails-header">
-        <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title" :news-archived="news.archived"></exo-news-share-activity>
-        <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
-        <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
-        <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
-
+        <div v-if="news.illustrationURL" class="illustration" >
+          <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
+        </div>
         <div class="newsDetails">
-          <img :src="news.illustrationURL" class="newsImage illustrationPicture" alt="News"/>
+          <div class="newsDetailsIcons">
+            <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title" :news-archived="news.archived"></exo-news-share-activity>
+            <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
+            <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
+            <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
+          </div>
           <div class="news-top-information">
-            <div class="news-header-content">
-              <div id="titleNews" class="newsTitle">
-                <a :href="news.titleLink" class="activityLinkColor newsTitleLink">{{ news.title }}</a>
-              </div>
-              <div id="informationNews" class="newsInformation">
-                <div class="newsAuthor">
-                  <div>
-                    <span class="newsInformationLabel">{{ $t('news.activity.postedBy') }} :</span>
-                    <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName"> {{ news.authorFullName }}</a>
-                  </div>
-                  <div>
-                    <span class="newsInformationLabel"> {{ $t('news.activity.publicationDate') }} :</span>
-                    <span class="newsInformationValue newsPostedDate"> {{ news.postedDate }}</span>
-                  </div>
+            <div id="titleNews" class="newsTitle">
+              <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
+            </div>
+          </div>
+          <div class="news-header-content">
+            <div class="activityAvatar avatarCircle">
+              <a :href="news.authorProfileURL" target="_blank">
+                <img :src="news.profileAvatarURL" class="avatar">
+              </a>
+            </div>
+            <div id="informationNews" class="newsInformation">
+              <div class="newsAuthor">
+                <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> {{ news.authorFullName }} </a>
+                <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
+                <div class="newsSpace">
+                  <a :href="news.spaceURL" class="newsInformationLabel" target="_blank">{{ news.spaceName }}</a>
                 </div>
-                <div v-if="showUpdateInfo" class="newsUpdater">
-                  <div>
-                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdatedBy') }} :</span>
+                <span class="newsInformationValue newsPostedDate">- {{ news.postedDate }}</span>
+              </div>
+              <div v-if="showUpdateInfo" class="newsUpdater">
+                <div>
+                  <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
+                </div>
+                <div>
+                  <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
+
+                  <div v-if="news.authorFullName != news.updaterFullName ">
+                    <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
                     <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
                   </div>
-                  <div>
-                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdatedDate') }} :</span>
-                    <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
-                  </div>
+
                 </div>
               </div>
             </div>
@@ -72,12 +91,10 @@
     </div>
   </div>
 </template>
-
 <script>
 import * as  newsServices from '../../services/newsServices';
 
 export default {
-
   props: {
     news: {
       type: Object,
@@ -114,6 +131,7 @@ export default {
     return {
       showUpdateInfo: this.news.postedDate !== this.news.updatedDate || this.news.authorFullName !== this.news.updaterFullName,
       BYTES_IN_MB: 1048576,
+      spaceDisplayName: this.news.spaceDisplayName,
     };
   },
   computed: {
@@ -195,6 +213,13 @@ export default {
         document.querySelector('.uiDocumentPreview').classList += ' collapsed';
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
+      }
+    },
+    goBack() {
+      if( history.length > 1) {
+        history.back();
+      } else {
+        window.open('/', '_self');
       }
     }
   }

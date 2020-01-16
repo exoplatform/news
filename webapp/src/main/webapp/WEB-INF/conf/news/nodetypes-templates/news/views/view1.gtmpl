@@ -75,8 +75,11 @@
   </div>
 
 <%
-
   } else {
+    String illustrationURL = "";
+    if(news.illustrationURL != null){
+      illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
+    }
 
     def activityId = "";
     if (news.activities) {
@@ -89,17 +92,13 @@
       }
     }
 
-    StringBuffer illustrationURL = new StringBuffer();
-    if(news.illustration != null) {
-      illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
-    } else {
-      illustrationURL.append("/news/images/newsImageDefault.png");
-    }
-
     def authorFullName = getProfileFullName(news.author);
     def updaterFullName = news.author.equals(news.updater) ? authorFullName : getProfileFullName(news.updater);
     def authorProfileURL = LinkProvider.getUserProfileUri(news.author);
     def updaterProfileURL = news.author.equals(news.updater) ? authorProfileURL : LinkProvider.getUserProfileUri(news.updater);
+    def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
+    def spaceName = news.spaceDisplayName;
+
     def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
     def newsPostedDate = "";
     def newsPublicationDate = getPublicationDate(newsNode);
@@ -117,7 +116,6 @@
 
     def showEditButton = newsService.canEditNews(news.author, news.spaceId);
     def showPinInput = newsService.canPinNews();
-    def spaceName = news.spaceDisplayName;
 
     def params = """ {
       activityId: '${activityId}',
@@ -138,6 +136,9 @@
         id: '${news.id}',
         archived: ${news.archived},
         canArchive: ${news.canArchive},
+        profileAvatarURL: '${ownerAvatar}',
+        spaceName: '${spaceName}',
+        spaceURL:'${news.spaceUrl}',
       },
       showEditButton: $showEditButton,
       showPinInput: $showPinInput,
@@ -149,7 +150,6 @@
     jsManager.require("SHARED/jquery", "jq")
                .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
                .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
-
 %>
 
   <div>

@@ -61,107 +61,127 @@
 
   def news = newsService.convertNodeToNews(newsNode);
 
-  def activityId = "";
-  if (news.activities) {
-    def originalSpaceIdActivityId = news.activities.split(";")[0];
-    if (originalSpaceIdActivityId != null) {
-      def originalActivityId = originalSpaceIdActivityId.split(":")[1];
-      if (originalActivityId != null) {
-        activityId = originalActivityId;
-      }
-    }
-  }
-
-  StringBuffer illustrationURL = new StringBuffer();
-  if(news.illustration != null) {
-    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
-  } else {
-    illustrationURL.append("/news/images/newsImageDefault.png");
-  }
-
-  def authorFullName = getProfileFullName(news.author);
-  def updaterFullName = news.author.equals(news.updater) ? authorFullName : getProfileFullName(news.updater);
-  def authorProfileURL = LinkProvider.getUserProfileUri(news.author);
-  def updaterProfileURL = news.author.equals(news.updater) ? authorProfileURL : LinkProvider.getUserProfileUri(news.updater);
-  def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
-  def newsPostedDate = "";
-  def newsPublicationDate = getPublicationDate(newsNode);
-  if(newsPublicationDate != null) {
-    def postedDate = LocalDateTime.ofInstant(newsPublicationDate.toInstant(), TimeZone.getDefault().toZoneId());
-    newsPostedDate = postedDate.format(mediumDateFormat);
-  }
-  def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
-  def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-
-  def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
-  def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
-  def newsBody = news.body.replaceAll("`", "\\\\`");
-  def newsAttachments = news.attachments;
-
-  def showEditButton = newsService.canEditNews(news.author, news.spaceId);
-  def showPinInput = newsService.canPinNews();
-  def spaceName = news.spaceDisplayName;
-
-  def params = """ {
-    activityId: '${activityId}',
-    newsId: '${news.id}',
-    news: {
-      title: '${newsTitle}',
-      summary: `${newsSummary}`,
-      pinned: ${news.pinned},
-      body: `${newsBody}`,
-      illustrationURL: '${illustrationURL}',
-      attachments: ${JsonOutput.toJson(newsAttachments)},
-      authorFullName: '${authorFullName}',
-      authorProfileURL: '${authorProfileURL}',
-      postedDate: '${newsPostedDate}',
-      updaterFullName: '${updaterFullName}',
-      updaterProfileURL: '${updaterProfileURL}',
-      updatedDate: '${newsUpdatedDate}',
-      id: '${news.id}',
-      archived: ${news.archived},
-      canArchive: ${news.canArchive},
-    },
-    showEditButton: $showEditButton,
-    showPinInput: $showPinInput,
-  } """
-
-  def notAuthorizedUserLabel = _ctx.appRes("news.activity.notAuthorizedUser").replace("{0}",spaceName);
-
-  def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
-  jsManager.require("SHARED/jquery", "jq")
-             .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
-             .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
+  if(news.archived && !news.canArchive) {
 
 %>
 
-<div>
-  <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
-  <!--begin -->
-  <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-    <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-      <div class="popupHeader clearfix">
-        <a class="uiIconClose pull-right" title="Close"></a>
-        <span class="PopupTitle popupTitle"></span>
+  <div>
+    <div class="userNotAuthorized">
+      <div class="notAuthorizedIconDiv">
+        <img src="/news/images/notauthorized.png" class="iconNotAuthorized">
       </div>
-      <div class="PopupContent popupContent">
-        <ul class="singleMessage popupMessage resizable">
-          <li>
-            <span class="confirmationIcon contentMessage"></span>
-          </li>
-        </ul>
-        <div class="uiAction uiActionBorder"></div>
-      </div>
+      <h3><%=_ctx.appRes("news.archive.text")%></h3>
     </div>
   </div>
-  <!-- end -->
-  <div id="newsDetails"></div>
 
-  <div class="notAuthorizedUser">
-    <div class="notAuthorizedMessage">
-      <div class="alert alert-info" id="">
-          <p> <%= notAuthorizedUserLabel %></p>
+<%
+
+  } else {
+
+    def activityId = "";
+    if (news.activities) {
+      def originalSpaceIdActivityId = news.activities.split(";")[0];
+      if (originalSpaceIdActivityId != null) {
+        def originalActivityId = originalSpaceIdActivityId.split(":")[1];
+        if (originalActivityId != null) {
+          activityId = originalActivityId;
+        }
+      }
+    }
+
+    StringBuffer illustrationURL = new StringBuffer();
+    if(news.illustration != null) {
+      illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
+    } else {
+      illustrationURL.append("/news/images/newsImageDefault.png");
+    }
+
+    def authorFullName = getProfileFullName(news.author);
+    def updaterFullName = news.author.equals(news.updater) ? authorFullName : getProfileFullName(news.updater);
+    def authorProfileURL = LinkProvider.getUserProfileUri(news.author);
+    def updaterProfileURL = news.author.equals(news.updater) ? authorProfileURL : LinkProvider.getUserProfileUri(news.updater);
+    def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+    def newsPostedDate = "";
+    def newsPublicationDate = getPublicationDate(newsNode);
+    if(newsPublicationDate != null) {
+      def postedDate = LocalDateTime.ofInstant(newsPublicationDate.toInstant(), TimeZone.getDefault().toZoneId());
+      newsPostedDate = postedDate.format(mediumDateFormat);
+    }
+    def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
+    def newsUpdatedDate = updatedDate.format(mediumDateFormat);
+
+    def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
+    def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
+    def newsBody = news.body.replaceAll("`", "\\\\`");
+    def newsAttachments = news.attachments;
+
+    def showEditButton = newsService.canEditNews(news.author, news.spaceId);
+    def showPinInput = newsService.canPinNews();
+    def spaceName = news.spaceDisplayName;
+
+    def params = """ {
+      activityId: '${activityId}',
+      newsId: '${news.id}',
+      news: {
+        title: '${newsTitle}',
+        summary: `${newsSummary}`,
+        pinned: ${news.pinned},
+        body: `${newsBody}`,
+        illustrationURL: '${illustrationURL}',
+        attachments: ${JsonOutput.toJson(newsAttachments)},
+        authorFullName: '${authorFullName}',
+        authorProfileURL: '${authorProfileURL}',
+        postedDate: '${newsPostedDate}',
+        updaterFullName: '${updaterFullName}',
+        updaterProfileURL: '${updaterProfileURL}',
+        updatedDate: '${newsUpdatedDate}',
+        id: '${news.id}',
+        archived: ${news.archived},
+        canArchive: ${news.canArchive},
+      },
+      showEditButton: $showEditButton,
+      showPinInput: $showPinInput,
+    } """
+
+    def notAuthorizedUserLabel = _ctx.appRes("news.activity.notAuthorizedUser").replace("{0}",spaceName);
+
+    def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
+    jsManager.require("SHARED/jquery", "jq")
+               .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
+               .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
+
+%>
+
+  <div>
+    <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+    <!--begin -->
+    <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+      <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+        <div class="popupHeader clearfix">
+          <a class="uiIconClose pull-right" title="Close"></a>
+          <span class="PopupTitle popupTitle"></span>
+        </div>
+        <div class="PopupContent popupContent">
+          <ul class="singleMessage popupMessage resizable">
+            <li>
+              <span class="confirmationIcon contentMessage"></span>
+            </li>
+          </ul>
+          <div class="uiAction uiActionBorder"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end -->
+    
+    <div id="newsDetails"></div>
+
+    <div class="notAuthorizedUser">
+      <div class="notAuthorizedMessage">
+        <div class="alert alert-info" id="">
+            <p> <%= notAuthorizedUserLabel %></p>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+<% } %>

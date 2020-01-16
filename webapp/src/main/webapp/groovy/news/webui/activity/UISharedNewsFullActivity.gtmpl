@@ -31,6 +31,24 @@
   def news = uicomponent.getNews();
 
 if (activity && news) {
+
+   if(news.archived && !news.canArchive) {
+
+%>
+
+  <div>
+    <div class="userNotAuthorized">
+      <div class="notAuthorizedIconDiv">
+        <img src="/news/images/notauthorized.png" class="iconNotAuthorized">
+      </div>
+      <h3><%=_ctx.appRes("news.archive.text")%></h3>
+    </div>
+  </div>
+
+<%
+
+  } else {
+
   def sharedActivityId = uicomponent.getSharedActivityId();
 
   def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
@@ -510,7 +528,8 @@ if (activity && news) {
   </div> <!-- #boxContainer-->
   <% uiform.end() %>
 </div><!--activityStream-->
-<% } else { %> <!-- activity deleted -->
+<% } // News archived %>
+<% } else { // Activity deleted %>
 <% uiform.begin() %>
 <div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
 <% uiform.end() %>

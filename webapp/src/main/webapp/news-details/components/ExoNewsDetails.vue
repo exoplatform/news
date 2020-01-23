@@ -19,11 +19,14 @@
             <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title" :news-archived="news.archived"></exo-news-share-activity>
             <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
             <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
-            <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
           </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
+            </div>
+            <div v-if="news.archived" class="newsArchived">
+              <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
+              <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
           <div class="news-header-content">

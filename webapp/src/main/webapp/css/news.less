@@ -77,16 +77,23 @@
       }
     }
 
-    .newsArchived {
-      background-color: #dcdcdc45;
-    }
-
     .newsTitle {
       padding-bottom: 10px;
       font-weight: bold;
 
       a {
         color: @baseColorDark;
+      }
+    }
+    .newsArchived {
+      display: flex;
+      justify-content: center;
+      .newsArchiveLabel {
+        font-weight: 100;
+        color: grey;
+        font-style: italic;
+        margin-top: -10px;
+        font-size: 14px;
       }
     }
 
@@ -234,7 +241,7 @@ i.uiIconBack:hover {
     margin-right: 5px;
   }
 
-  #newsShareButton, #newsEditButton, #newsPinButton, .newsArchiveButton {
+  #newsShareButton, #newsEditButton, #newsPinButton {
     border: none;
     padding: 9px 10px;
     margin-top: 10px;
@@ -377,13 +384,13 @@ i.uiIconBack:hover {
     }
   }
 
-  #newsArchiveButton {
-    float: right;
+  .newsArchiveButton {
     border: none;
-    padding: 9px 10px;
-
-    .uiIconUnarchive {
-      font-size: 22px;
+    padding: 8px 4px;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    i:before {
+      font-size: 24px;
     }
   }
 }

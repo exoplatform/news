@@ -50,4 +50,24 @@ public class UISharedNewsActivity extends UINewsActivity {
       return null;
     }
   }
+
+  public String getPosterUserName() {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    Identity poster = identityManager.getIdentity(this.getActivity().getUserId(), true);
+    if (poster != null) {
+      return poster.getRemoteId();
+    } else {
+      return null;
+    }
+  }
+
+  public String getPosterUrl() {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    Identity poster = identityManager.getIdentity(this.getActivity().getUserId(), true);
+    if (poster != null) {
+      return poster.getProfile().getUrl();
+    } else {
+      return null;
+    }
+  }
 }

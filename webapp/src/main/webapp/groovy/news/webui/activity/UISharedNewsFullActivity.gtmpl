@@ -30,6 +30,10 @@
 
   def activity = uicomponent.getActivity();
 
+  def sharedTitle = activity.title;
+
+  def streamOwner = activity.getStreamOwner();
+
   def news = uicomponent.getNews();
 
 if (activity && news) {
@@ -129,6 +133,9 @@ if (activity && news) {
   def authorFullName = uicomponent.getUserFullName(news.author);
   def updaterFullName = uicomponent.getUserFullName(news.updater);
   def posterFullName = uicomponent.getPosterFullName();
+  def sharerUserName = uicomponent.getPosterUserName();
+  def sharerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(sharerUserName).append("/avatar").toString();
+  def sharingUrl = uicomponent.getPosterUrl();
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
   def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
@@ -157,7 +164,11 @@ if (activity && news) {
 
   def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
-
+  Space space = Utils.getSpaceService().getSpaceByPrettyName(streamOwner);
+  def spaceSharedName = space.getDisplayName();
+  def urlSpaceShared = LinkProvider.getSpaceUri(space.url);
+  def ownerSpaceAvatar = space.avatarUrl;
+  if (!ownerSpaceAvatar) ownerSpaceAvatar = LinkProvider.SPACE_DEFAULT_AVATAR_URL;
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
   String illustrationURL = null;
@@ -243,11 +254,9 @@ if (activity && news) {
               activityTitle = "<span> <i>"+ "\"" + activity.title + "\""+ "</i> </span>";
             }
           %>
-          <div><span class="sharedAuthor"> $labelSharedBy $posterFullName </span>
+          <div>
             <a onclick="history.back()" class="backBtn"><i class="uiIconBack"></i></a>
           </div>
-          <div class="sharedNewsTitle" style="padding-top: 8px;">$activityTitle</div>
-          <hr>
           <div class="sharedNewsDetails">
             <% if (illustrationURL != null)  { %>
               <img src="$illustrationURL" class="newsImage illustrationPicture" alt="News"/>
@@ -303,6 +312,31 @@ if (activity && news) {
           </div>
         </div>
       </div>
+    <div class="sharedInfo">
+      <div class="newsSpaceAndOwner">
+        <div class="newsOwner">
+          <div class="avatarCircle avatarUser">
+            <a href="$sharingUrl" target="_blank">
+              <img src="$sharerAvatar" class="avatar">
+            </a>
+          </div>
+            <div class="userInfo">
+              <a href="$sharingUrl" target="_blank"> ${posterFullName} </a><span class="uiIconArrowRightMini uiIconLightGray"></span>
+            </div>
+              <div class="avatarSpace">
+                <a href="$urlSpaceShared" target="_blank">
+                  <img src="$ownerSpaceAvatar" class="avatar">
+                </a>
+              </div>
+                <div class="spaceInfo">
+                  <a href="$urlSpaceShared" target="_blank"> ${spaceSharedName} </a>
+                </div>
+             </div>
+          </div>
+        <div class="titleInfo">
+          <p>$sharedTitle</p>
+        </div>
+    </div>
       <div class="actionBar clearfix ">
       	<%
       	  def toggleDisplayCommentAction = uicomponent.event('ToggleDisplayCommentForm', null, false);

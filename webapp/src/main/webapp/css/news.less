@@ -1266,20 +1266,191 @@ i.uiIconBack:hover {
   }
 }
 
-/*============== News Share Popup =============== */
+/*============== News Share Drawer =============== */
 
 #newsShareActivity {
-  .uiPopup {
-    position: fixed;
-    top: 400px;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    height: 500px;
-    text-align: left;
+  .drawer {
+    &.open {
+      text-align: start;
+    }
 
-    .popupContent {
-      height: 85%;
+    .footer {
+      position: absolute;
+      min-width: 100%;
+      background-color: #FFFFFF;
+      border-top: 1px solid rgba(13, 13, 13, 0.05);
+      padding: 15px;
+      margin: 0;
+      bottom: 0;
+      box-sizing: border-box;
+    }
+
+    .content {
+      .shareInfo {
+        margin-top: 7%;
+
+        .shareSpaces {
+          .newsShareWith {
+            .control-group {
+              margin: 10px 0;
+
+              .selectize-input {
+                max-height: fit-content;
+                height: fit-content;
+                padding: 10px 10px;
+
+                .item {
+                  padding-right: 35px !important;
+                  background: #ccddef;
+                  color: #568dc9;
+                  border: 1px solid #568dc9;
+                  border-radius: 15px;
+                  margin: 4px 10px 4px 4px;
+                  font-size: 13px;
+
+                  a {
+                    color: white;
+                    background-color: #568dc9;
+                    border-radius: 50%;
+                    font-size: 10px;
+                    width: 16px;
+                    height: 16px;
+                    top: 3px;
+                    right: 4px;
+                  }
+                }
+
+                input {
+                  height: 33px;
+                }
+              }
+            }
+          }
+        }
+
+        .newsShareDescription {
+          width: 100%;
+          border-radius: 5px;
+        }
+      }
+    }
+  }
+
+  .newsPreview {
+    display: flex;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #dedede;
+
+    .newsItemIllustration {
+      flex: 1 0 80px;
+      height: 80px;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .illustration {
+      display: inline-flex;
+
+      img {
+        height: 80px;
+      }
+    }
+
+    .newsItemContent {
+      overflow: auto;
+      width: 100%;
+
+      .newsItemContentHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .previewNewsTitle {
+          overflow: hidden;
+        }
+
+        a {
+          color: #333;
+        }
+
+        h3 {
+          margin: 0;
+          font-size: 14px;
+          font-weight: bold;
+          padding-left: 15px;
+          letter-spacing: 0.1px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          height: 36px;
+          line-height: 18px;
+        }
+      }
+
+      .newsInfo {
+        padding: 9px 15px;
+        display: flex;
+        align-items: center;
+
+        .newsOwner, .newsSpace {
+          max-width: 48%;
+          padding-right: 0;
+          display: flex;
+          margin-bottom: 0;
+          font-style: italic;
+          font-size: 13px;
+
+          img {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 1px 1px 4px #d6d6d6;
+          }
+
+          a {
+            width: 100%;
+            color: #676767;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+          }
+
+          span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .newsSpace {
+          padding-left: 5px;
+
+          img {
+            width: 25px;
+            height: 25px;
+            border-radius: 25%;
+            margin-right: 10px;
+            box-shadow: 1px 1px 4px #d6d6d6;
+          }
+
+        }
+        .newsOwner{
+          padding-right: 5px;
+        }
+
+        .uiIconArrowNext:before {
+          content: "\e903";
+          font-size: 1.4em;
+          top: 0;
+          color: #676767;
+        }
+      }
     }
   }
 

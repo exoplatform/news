@@ -11,12 +11,12 @@
     </div>
     <div v-else class="newsDetails-description">
       <div class="newsDetails-header">
-        <div v-if="news.illustrationURL" class="illustration" >
+        <div v-if="news.illustrationURL" class="illustration">
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
           <div class="newsDetailsIcons">
-            <exo-news-share-activity v-if="showShareButton" :activity-id="activityId" :news-id="newsId" :news-title="news.title" :news-archived="news.archived"></exo-news-share-activity>
+            <exo-news-share-activity v-if="showShareButton" :news="news"></exo-news-share-activity>
             <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
             <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
           </div>
@@ -40,7 +40,7 @@
                 <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> {{ news.authorFullName }} </a>
                 <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
                 <div class="newsSpace">
-                  <a :href="news.spaceURL" class="newsInformationLabel" target="_blank">{{ news.spaceName }}</a>
+                  <a :href="news.spaceUrl" class="newsInformationLabel" target="_blank">{{ news.spaceName }}</a>
                 </div>
                 <span class="newsInformationValue newsPostedDate">- {{ news.postedDate }}</span>
               </div>

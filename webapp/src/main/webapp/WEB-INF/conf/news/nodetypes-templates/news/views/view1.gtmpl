@@ -77,7 +77,7 @@
 <%
   } else {
     String illustrationURL = "";
-    if(news.illustrationURL != null){
+    if(news.illustrationURL != null) {
       illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
     }
 
@@ -133,12 +133,15 @@
         updaterFullName: '${updaterFullName}',
         updaterProfileURL: '${updaterProfileURL}',
         updatedDate: '${newsUpdatedDate}',
-        id: '${news.id}',
+        newsId: '${news.id}',
         archived: ${news.archived},
         canArchive: ${news.canArchive},
         profileAvatarURL: '${ownerAvatar}',
-        spaceName: '${spaceName}',
-        spaceURL:'${news.spaceUrl}',
+        spaceDisplayName: '${spaceName}',
+        spaceUrl:'${news.spaceUrl}',
+        spaceAvatarUrl: '${news.spaceAvatarUrl}',
+        url: '${news.url}',
+        activityId: '${activityId}'
       },
       showEditButton: $showEditButton,
       showPinInput: $showPinInput,

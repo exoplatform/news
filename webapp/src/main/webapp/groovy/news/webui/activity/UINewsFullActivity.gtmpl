@@ -138,8 +138,6 @@
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
-  def labelBy = _ctx.appRes("news.app.by");
-  def labelIn = _ctx.appRes("news.app.in");
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
@@ -153,7 +151,6 @@
   def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
   def newsBody = news.body.replaceAll("`", "\\\\`");
   def newsAttachments = news.attachments;
-  def spaceName = news.spaceDisplayName;
 
   def showEditButton = uicomponent.canEditNews(activity);
   def showPinInput = uicomponent.canPinNews(activity);
@@ -189,12 +186,15 @@
       updatedDate: '${newsUpdatedDate}',
       titleLink: '${activityLink}',
       viewsCount: ${news.viewsCount},
-      id: '${news.id}',
+      newsId: '${news.id}',
       archived: ${news.archived},
       canArchive: ${news.canArchive},
       profileAvatarURL: '${ownerAvatar}',
-      spaceName: '${spaceName}',
-      spaceURL:'${news.spaceUrl}',
+      spaceDisplayName: '${news.spaceDisplayName}',
+      spaceUrl:'${news.spaceUrl}',
+      spaceAvatarUrl: '${news.spaceAvatarUrl}',
+      url: '${news.url}',
+      activityId: '${activity.id}'
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,

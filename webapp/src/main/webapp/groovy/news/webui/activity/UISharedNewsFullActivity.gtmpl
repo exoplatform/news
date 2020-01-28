@@ -172,8 +172,8 @@ if (activity && news) {
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
   String illustrationURL = null;
-  if(news.illustration == null) {
-    illustrationURL = new StringBuilder("/news/images/newsImageDefault.png").toString();
+  if(news.illustrationURL != null) {
+    illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
   }
 
   def newsTitle = StringEscapeUtils.escapeHtml(news.title);

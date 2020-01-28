@@ -54,19 +54,19 @@
         color="#578dc9" /> </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
-        <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsItemIllustration"></a>
+        <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsItemIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
-              <a :href="news.newsUrl">{{ news.newsTitle }} </a>
+              <a :href="news.url">{{ news.title }} </a>
             </h3>
             <news-spaces-shared-in v-if="news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
           </div>
           <div class="newsInfo">
             <p class="newsOwner">
-              <a :href="news.profileURL" target="_blank">
-                <img :src="news.avatar">
-                <span>{{ news.author }}</span>
+              <a :href="news.authorProfileURL" target="_blank">
+                <img :src="news.profileAvatarURL">
+                <span>{{ news.authorFullName }}</span>
               </a>
             </p>
             <i class="uiIconArrowNext"></i>
@@ -86,13 +86,13 @@
             </p>
           </div>
           <div class="newsItemContentDetails">
-            <a :href="news.newsUrl">
+            <a :href="news.url">
               <p class="newsSummary" v-html="news.newsText"></p>
             </a>
             <div class="newsActions">
               <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
               <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
-              <exo-news-share-activity :activity-id="news.activityId" :news-id="news.newsId" :news-title="news.newsTitle" @newsShared="reloadNews(news.newsId)"></exo-news-share-activity>
+              <exo-news-share-activity :news="news" @newsShared="reloadNews(news.newsId)"></exo-news-share-activity>
             </div>
             <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
             <!--begin -->
@@ -242,15 +242,15 @@ export default {
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
-          newsIllustration: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
-          newsTitle: item.title,
+          illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
+          title: item.title,
           creationDate: newsCreatedDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          newsUrl: item.url,
-          author: item.authorDisplayName,
-          avatar: `/portal/rest/v1/social/users/${item.author}/avatar`,
-          profileURL: `/portal/intranet/profile/${item.author}`,
+          url: item.url,
+          authorFullName: item.authorDisplayName,
+          profileAvatarURL: `/portal/rest/v1/social/users/${item.author}/avatar`,
+          authorProfileURL: `/portal/intranet/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,

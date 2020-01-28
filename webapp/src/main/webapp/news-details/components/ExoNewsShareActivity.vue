@@ -9,27 +9,69 @@
     <a id="newsShareButton" :data-original-title="$t('news.share.share')" :class="[newsArchived ? 'unauthorizedPin' : '']" class="btn"
        rel="tooltip"
        data-placement="bottom"
-       @click="!newsArchived ? showShareNewsPopup = true : null">
+       @click="!newsArchived ? showShareNewsDrawer = true : null">
       <i :class="[newsArchived ? 'disabledIcon' : '']" class="uiIconShare"></i>
     </a>
-    <exo-news-modal :show="showShareNewsPopup" :title="$t('news.share.popupTitle')" @close="closeShareNewsPopup">
-      <div class="newsShareForm">
-        <label class="newsTitle"> {{ newsTitleUnescaped }}</label>
-        <div class="shareSpaces">
-          <label class="newsShareWith">{{ $t('news.share.shareWith') }}
-            <div class="control-group">
-              <div class="controls">
-                <exo-suggester v-model="spaces" :options="suggesterOptions" :source-providers="[findSpaces]" :placeholder="$t('news.share.spaces.placeholder')" />
-              </div>
+
+    <div :class="showShareNewsDrawer ? 'open' : '' " class="drawer">
+      <div class="header">
+        <span>{{ $t('news.share.popupTitle') }}</span>
+        <a class="closebtn" href="javascript:void(0)" @click="closeShareNewsDrawer()">×</a>
+      </div>
+      <div class="content">
+        <div class="newsPreview">
+          <a :href="news.url" :style="{ 'background-image': 'url(' + newsIllustrationURL + ')' }" class="newsItemIllustration" target="_blank"></a>
+          <div class="newsItemContent">
+            <div class="newsItemContentHeader">
+              <h3>
+                <div class="previewNewsTitle">
+                  <div>
+                    <a :href="news.url" target="_blank">{{ news.title }}
+                    </a>
+                  </div>
+                </div>
+              </h3>
             </div>
-        </label></div>
-        <textarea v-model="description" :placeholder="$t('news.share.sharedActivityPlaceholder')" class="newsShareDescription"></textarea>
-        <div class="shareButtons">
-          <button :disabled="shareDisabled" class="btn btn-primary" @click="shareNews">{{ $t('news.share.share') }}</button>
-          <button class="btn" @click="closeShareNewsPopup">{{ $t('news.share.cancel') }}</button>
+            <div class="newsInfo">
+              <p class="newsOwner">
+                <a :href="news.authorProfileURL" target="_blank">
+                  <img :src="news.profileAvatarURL">
+                  <span>{{ news.authorFullName }}</span>
+                </a>
+              </p>
+              <i class="uiIconArrowNext"></i>
+              <p class="newsSpace">
+                <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
+                  <img :src="news.spaceAvatarUrl">
+                  <span>{{ news.spaceDisplayName }}</span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="shareInfo">
+          <div class="shareSpaces">
+            <label class="newsShareWith">{{ $t('news.share.shareInSpaces') }}
+              <div class="control-group">
+                <div class="controls">
+                  <exo-suggester v-model="spaces" :options="suggesterOptions" :source-providers="[findSpaces]"
+                                 :placeholder="$t('news.share.spaces.placeholder')"/>
+                </div>
+              </div>
+            </label>
+          </div>
+          <textarea v-model="description" :placeholder="$t('news.share.sharedActivityPlaceholder')"
+                    class="newsShareDescription"></textarea>
         </div>
       </div>
-    </exo-news-modal>
+      <div class="footer">
+        <div class="shareButtons">
+          <button :disabled="shareDisabled" class="btn btn-primary" @click="shareNews">{{ $t('news.share.share') }}</button>
+          <button class="btn" @click="closeShareNewsDrawer">{{ $t('news.share.cancel') }}</button>
+        </div>
+      </div>
+    </div>
+    <div v-show="showShareNewsDrawer" class="drawer-backdrop" @click="closeShareNewsDrawer()"></div>
   </div>
 </template>
 
@@ -38,28 +80,16 @@ import * as newsServices from '../../services/newsServices';
 
 export default {
   props: {
-    activityId: {
-      type: String,
-      required: true
-    },
-    newsId: {
-      type: String,
-      required: true
-    },
-    newsTitle: {
-      type: String,
-      required: true
-    },
-    newsArchived: {
-      type: Boolean,
+    news: {
+      type: Object,
       required: true,
-      default: false
+      default: function() { return new Object(); }
     }
   },
   data() {
     const self = this;
     return {
-      showShareNewsPopup: false,
+      showShareNewsDrawer: false,
       spaces: [],
       spacesItems: [],
       description: '',
@@ -67,6 +97,7 @@ export default {
       showMessage: false,
       messageType: 'success',
       messageDisplayTime: 5000,
+      newsIllustrationURL: '',
       suggesterOptions: {
         valueField: 'value',
         labelField: 'text',
@@ -89,7 +120,7 @@ export default {
   },
   computed:{
     newsTitleUnescaped: function() {
-      return this.newsTitle ? this.newsTitle.replace(/&#39;/g, '\'') : this.newsTitle;
+      return this.news.title ? this.news.title.replace(/&#39;/g, '\'') : this.news.title;
     },
     shareDisabled: function() {
       return !this.spaces || this.spaces.filter(part => part !== '').length === 0;
@@ -107,10 +138,11 @@ export default {
   },
   mounted(){
     $('[rel="tooltip"]').tooltip();
+    this.newsIllustrationURL = !this.news.illustrationURL || this.news.illustrationURL === 'null' ? '/news/images/newsImageDefault.png' : this.news.illustrationURL;
   },
   methods: {
     shareNews: function() {
-      newsServices.shareNews(this.newsId, this.activityId, this.description, this.spaces)
+      newsServices.shareNews(this.news.newsId, this.news.activityId, this.description, this.spaces)
         .then(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
           let successMessage = this.$t('news.share.message.success').replace('{0}', `<b>${escapedNewsTitle}</b>`);
@@ -122,7 +154,7 @@ export default {
           this.showMessage = true;
         })
         .then(() => {
-          this.closeShareNewsPopup();
+          this.closeShareNewsDrawer();
           this.$emit('newsShared', this.newsId);
         })
         .catch(() => {
@@ -143,8 +175,8 @@ export default {
         });
       }
     },
-    closeShareNewsPopup: function(){
-      this.showShareNewsPopup = false;
+    closeShareNewsDrawer: function(){
+      this.showShareNewsDrawer = false;
       this.spaces = [];
       this.description = '';
     },

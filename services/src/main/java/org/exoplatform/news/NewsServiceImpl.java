@@ -261,9 +261,9 @@ public class NewsServiceImpl implements NewsService {
 
   @Override
   public boolean canArchiveNews(String newsAuthor) {
-    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-    return currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-        || currentIdentity.getUserId().equals(newsAuthor);
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    return currentIdentity != null && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+        || currentIdentity.getUserId().equals(newsAuthor));
   }
 
   public int getNewsCount(NewsFilter filter) throws Exception {

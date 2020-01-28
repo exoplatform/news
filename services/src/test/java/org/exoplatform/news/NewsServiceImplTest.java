@@ -1,8 +1,6 @@
 package org.exoplatform.news;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -520,6 +518,7 @@ public class NewsServiceImplTest {
     Mockito.doReturn(true).when(newsServiceSpy).canEditNews(any(),any());
 
     // When
+    setCurrentIdentity();
     newsServiceSpy.shareNews(sharedNews, Arrays.asList(space1));
 
     // Then
@@ -1352,13 +1351,7 @@ public class NewsServiceImplTest {
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setCurrentIdentity();
     when(spaceService.isSuperManager("user")).thenReturn(false);
 
     Profile p1 = new Profile(poster);
@@ -1918,13 +1911,7 @@ public class NewsServiceImplTest {
                                                       newsSearchConnector,
                                                       newsAttachmentsService);
 
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setCurrentIdentity();
 
     // When
     boolean canPinNews = newsService.canPinNews();
@@ -2872,6 +2859,16 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).save();
     verify(newsNode, times(1)).setProperty(eq("exo:archived"), eq(false));
 
+  }
+
+  private void setCurrentIdentity() {
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
   }
 
 }

@@ -708,11 +708,11 @@ public class NewsServiceImpl implements NewsService {
       String spaceName = space.getDisplayName();
       news.setSpaceDisplayName(spaceName);
       if(StringUtils.isNotEmpty(space.getGroupId())) {
-        String spaceId = space.getGroupId().split("/")[2];
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(spaceId)
+        String spaceGroupId = space.getGroupId().split("/")[2];
+        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(spaceGroupId)
                 .append("/").append(space.getPrettyName());
         StringBuilder spaceAvatarUrl = new StringBuilder().append("/rest/v1/social/spaces/")
-                .append(spaceId).append("/avatar");
+                .append(space.getPrettyName()).append("/avatar");
         news.setSpaceAvatarUrl(spaceAvatarUrl.toString());
         news.setSpaceUrl(spaceUrl.toString());
       }

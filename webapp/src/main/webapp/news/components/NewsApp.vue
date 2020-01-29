@@ -1,12 +1,12 @@
 <template>
   <div class="newsApp">
     <div class="newsAppToolBar">
-      <div class="newsAppToolbarLeft">
+      <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'" class="newsAppToolbarLeft">
         <h3 class="newsAppToolBarTitle">
           {{ $t('news.app.title') }}
         </h3>
         <div class="inputNewsSearchWrapper">
-          <i class="uiIconSearchSpaces"></i>
+          <i class="uiIconSearchSpaces" @click="searchInputDisplayed = !searchInputDisplayed"></i>
           <input
             id="searchInput"
             v-model="searchText"
@@ -63,27 +63,27 @@
             <news-spaces-shared-in v-if="news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
           </div>
           <div class="newsInfo">
-            <p class="newsOwner">
+            <div class="newsOwner">
               <a :href="news.authorProfileURL" target="_blank">
                 <img :src="news.profileAvatarURL">
                 <span>{{ news.authorFullName }}</span>
               </a>
-            </p>
-            <i class="uiIconArrowNext"></i>
-            <p class="newsSpace">
-              <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
-                <img :src="news.spaceAvatarUrl">
-                <span>{{ news.spaceDisplayName }}</span>
-              </a>
-            </p>
-            <p class="newsDate">
+              <i class="uiIconArrowNext"></i>
+              <span class="newsSpace">
+                <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
+                  <img :src="news.spaceAvatarUrl">
+                  <span>{{ news.spaceDisplayName }}</span>
+                </a>
+              </span>
+            </div>
+            <div class="newsDate">
               <i class="uiIconClock"></i>
               <span>{{ news.creationDate }}</span>
-            </p>
-            <p class="newsViews">
+            </div>
+            <div class="newsViews">
               <i class="uiIconWatch"></i>
-              <span class="viewsText">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
-            </p>
+              <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
+            </div>
           </div>
           <div class="newsItemContentDetails">
             <a :href="news.url">
@@ -142,6 +142,7 @@ export default {
       searchText: '',
       searchNews: '',
       searchDelay: 300,
+      searchInputDisplayed: false,
       newsFilter: '',
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),

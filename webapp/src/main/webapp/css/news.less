@@ -1782,6 +1782,7 @@ i.uiIconBack:hover {
         display: flex;
         align-items: center;
         margin-left: 40px;
+        margin-right: 10px;
         flex: 1 1 auto;
 
         input, input:focus {
@@ -1823,6 +1824,9 @@ i.uiIconBack:hover {
 
       .newsAppFilterOptions {
         margin-left: 15px;
+        display: flex;
+        align-self: center;
+        justify-content: center;
 
         .uiIconFilter {
           padding-right: 5px;
@@ -1833,86 +1837,98 @@ i.uiIconBack:hover {
           }
         }
 
-        .filterSpacesDrawer {
-          .drawer {
-            .content {
-              .searchSpacesInput {
-                display: flex;
-                align-items: center;
+        .filterSpacesDrawer.drawer {
+          .content {
+            .searchSpacesInput {
+              display: flex;
+              align-items: center;
 
-                input, input:focus {
-                  width: 100%;
-                  padding-left: 32px;
-                  margin-top: 8px;
-                  box-shadow: none;
-                  border: none;
-                  border-bottom: 1px solid #ccc;
-                  border-radius: initial;
-                }
+              input, input:focus {
+                width: 100%;
+                padding-left: 32px;
+                margin-top: 8px;
+                box-shadow: none;
+                border: none;
+                border-bottom: 1px solid #ccc;
+                border-radius: initial;
+              }
+            }
+
+            .spacesList {
+              .uiCheckbox {
+                margin: 10px;
               }
 
-              .spacesList {
-                .uiCheckbox {
-                  margin: 10px;
+              .spaceCheckbox {
+                color: #4D5466;
+
+                &:before {
+                  background: #ffffff;
+                  border: 1px solid #A7B4C2;
                 }
 
-                .spaceCheckbox {
-                  color: #4D5466;
-
-                  &:before {
-                    background: #ffffff;
-                    border: 1px solid #A7B4C2;
-                  }
-
-                  &:after {
-                    border-bottom: 2px solid @primaryColor;
-                    border-left: 2px solid @primaryColor;
-                    width: 6px;
-                    height: 3px;
-                  }
-
-                  > img {
-                    margin-left: 22px;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                  }
+                &:after {
+                  border-bottom: 2px solid @primaryColor;
+                  border-left: 2px solid @primaryColor;
+                  width: 6px;
+                  height: 3px;
                 }
 
-                .noSpacesFound {
-                  text-align: center;
-                }
-
-                .moreSpace {
-                  text-align: center;
-
-                  .loadMoreSpaces {
-                    cursor: pointer;
-                    display: flex;
-                    place-content: center;
-                    align-items: flex-end;
-
-                    > a {
-                      font-weight: bold;
-                    }
-                  }
+                > img {
+                  margin-left: 22px;
+                  border-radius: 50%;
+                  width: 30px;
+                  height: 30px;
                 }
               }
 
               .noSpacesFound {
-                margin: 15px;
                 text-align: center;
-                color: #848181;
-                font-size: 18px;
-                font-weight: bold;
+              }
+
+              .moreSpace {
+                text-align: center;
+
+                .loadMoreSpaces {
+                  cursor: pointer;
+                  display: flex;
+                  place-content: center;
+                  align-items: flex-end;
+
+                  > a {
+                    font-weight: bold;
+                  }
+                }
+              }
+              .noSpacesFound{
+                  margin: 15px;
+                  text-align: center;
+                  color: #848181;
+                  font-size: 18px;
+                  font-weight: bold;
+              }
+            }
+            .footer{
+              .btn{
+                &.reset{
+                  float: left;
+                }
               }
             }
 
-            .footer {
-              .btn {
-                &.reset {
-                  float: left;
-                }
+            .noSpacesFound {
+              margin: 15px;
+              text-align: center;
+              color: #848181;
+              font-size: 18px;
+              font-weight: bold;
+            }
+          }
+
+          .footer {
+            .btn {
+              &.reset {
+                float: left;
               }
             }
           }
@@ -2016,14 +2032,13 @@ i.uiIconBack:hover {
     box-shadow: 0 1px 2px #71717129;
 
     .newsItem {
-      display: inline-flex;
-      flex-wrap: wrap;
+      display: flex;
       width: 100%;
       align-items: flex-start;
-      padding: 20px 0;
+      padding: 15px 0 5px 0;
 
       .newsItemIllustration {
-        flex: 1 0 120px;
+        flex: 0 0 120px;
         height: 120px;
         background-position: center;
         background-size: cover;
@@ -2033,26 +2048,18 @@ i.uiIconBack:hover {
       }
 
       .newsItemContent {
-        flex: 1 0 80%;
+        width: 100%;
+        padding-left: 15px;
 
         .newsItemContentHeader {
           display: flex;
-          align-items: center;
           justify-content: space-between;
 
           h3 {
             margin: 0;
             font-size: 14px;
             font-weight: bold;
-            padding-left: 14px;
             letter-spacing: .1px;
-
-          }
-
-          .newsSpaceLabel {
-            color: #949494;
-            font-style: italic;
-            margin-right: 10px;
           }
 
           .newsSpaceName {
@@ -2065,7 +2072,6 @@ i.uiIconBack:hover {
             .newsSpaceLabel {
               color: #949494;
               font-style: italic;
-              margin-right: 10px;
             }
 
             .sharedInSpaces {
@@ -2073,12 +2079,13 @@ i.uiIconBack:hover {
 
               .space {
                 cursor: pointer;
+                margin-left: 10px;
 
                 img {
                   width: 25px;
+                  max-width: 25px;
                   height: 25px;
                   border-radius: 25%;
-                  margin-right: 10px;
                   box-shadow: 1px 1px 4px #d6d6d6;
                 }
               }
@@ -2086,6 +2093,7 @@ i.uiIconBack:hover {
               .plusSpaces {
                 width: 25px;
                 line-height: 25px;
+                margin-left: 10px;
                 border-radius: 25%;
                 color: white;
                 box-shadow: 1px 1px 4px #d6d6d6;
@@ -2118,7 +2126,6 @@ i.uiIconBack:hover {
         }
 
         .newsItemContentDetails {
-          padding-left: 15px;
 
           .newsSummary {
             font-size: 14px;
@@ -2152,9 +2159,9 @@ i.uiIconBack:hover {
     .newsInfo {
       display: flex;
       align-items: center;
-      padding: 0 15px 15px;
+      padding: 0 0 5px;
 
-      p {
+      > div {
         display: flex;
         padding-right: 20px;
         margin-bottom: 0;
@@ -2178,7 +2185,7 @@ i.uiIconBack:hover {
       }
 
       .newsViews {
-        .viewsText {
+        .viewsCount {
           color: @color-appNews-information;
           font-size: 12px;
           padding-left: 7px;
@@ -2190,13 +2197,15 @@ i.uiIconBack:hover {
       }
 
       .newsOwner {
-        padding-right: 5px;
+        align-items: center;
 
-        a {
+        &> a {
           color: @color-appNews-information;
-          display: flex;
-          align-items: center;
+          display: block;
           font-size: 12px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
 
           &:hover {
             span {
@@ -2208,9 +2217,13 @@ i.uiIconBack:hover {
             width: 25px;
             height: 25px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 5px;
             box-shadow: 1px 1px 4px #d6d6d6;
           }
+        }
+
+        .uiIconArrowNext {
+          padding-left: 2px;
         }
       }
 
@@ -2224,11 +2237,13 @@ i.uiIconBack:hover {
       .newsSpace {
         padding-left: 5px;
 
-        a {
+        a.newsSpaceName {
           color: @color-appNews-information;
-          display: flex;
-          align-items: center;
+          display: block;
           font-size: 12px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
 
           &:hover {
             span {
@@ -2240,7 +2255,7 @@ i.uiIconBack:hover {
             width: 25px;
             height: 25px;
             border-radius: 25%;
-            margin-right: 10px;
+            margin-right: 5px;
             box-shadow: 1px 1px 4px #d6d6d6;
           }
         }
@@ -2675,44 +2690,133 @@ i.uiIconBack:hover {
       }
     }
   }
+}
 
+@media screen and (max-width: 630px) {
   .newsApp {
+    padding: 0px;
+
+    .newsAppToolBar {
+      padding: 0px 10px;
+
+      .newsAppToolbarLeft {
+        .newsAppToolBarTitle {
+          display: none;
+        }
+
+        .inputNewsSearchWrapper {
+          margin-left: 10px;
+        }
+      }
+
+      .newsAppToolbarLeft.newsAppHideSearchInput {
+        .newsAppToolBarTitle {
+          display: block;
+        }
+
+        .inputNewsSearchWrapper .searchNewsInput {
+            width: 0px;
+            border: 0px;
+          }
+      }
+
+      .newsTypesSelectBox {
+        .btn {
+          border: none;
+          padding-left: 0px;
+          padding-right: 0px;
+        }
+
+        .dropdown-menu {
+          left: auto;
+          right: 0;
+        }
+      }
+      .newsAppFilterOptions {
+        .newsSpacesFilterButton {
+          padding: 0px;
+          border: none;
+
+          span {
+            display: none;
+          }
+        }
+      }
+
+    }
+
     .newsListItems {
+      margin-top: 0px;
+      padding: 0 10px;
+
       .newsItem {
-        border-bottom: 1px dashed #dcdcdc;
+        border-bottom: 1px solid #dcdcdc;
+        padding: 5px 0;
 
         &:last-child {
           border-bottom: none;
         }
 
+        .newsItemIllustration {
+          flex-basis: 70px;
+          height: 70px;
+        }
+
         .newsItemContent {
           .newsItemContentHeader {
-            display: block;
+            margin-bottom: 5px;
 
             h3 {
               padding-left: 0;
+            }
 
-              a {
-                color: #3c3c3c;
-                transition: all .4s ease-in-out 0s;
+            .sharedIn .sharedInSpaces {
+              a.space, a.plusSpaces {
+                margin-left: 3px;
               }
             }
 
-            p {
-              border-bottom: none;
+            .newsSpaceLabel {
+              display: none;
+            }
+          }
+
+          .newsInfo {
+            flex-direction: column;
+            align-items: initial;
+
+            &>div {
+              padding-right: 0px;
+            }
+
+            .newsOwner {
+              .spaceAvatar {
+                display: flex;
+                margin-left: 5px;
+                align-items: center;
+
+                a {
+                  margin-left: 5px;
+                }
+              }
+            }
+
+            .newsDate {
+              margin-top: 8px;
+              margin-left: 4px;
+            }
+
+            .newsViews {
+              display: none;
+            }
+
+            .share {
+              display: none;
             }
           }
 
           .newsItemContentDetails {
-            padding-left: 0;
-
-            .newsItemInfo {
-              display: block;
-
-              .newsRightInfo {
-                padding-top: 20px;
-              }
-            }
+            display: none;
           }
         }
       }
@@ -2758,6 +2862,20 @@ i.uiIconBack:hover {
       margin-top: 20px;
     }
   }
+
+  .newsApp {
+    .drawer {
+      .header {
+        display: block;
+      }
+      .content {
+        top: 50px;
+      }
+      .footer {
+        display: block;
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 1025px) {
@@ -2774,6 +2892,10 @@ i.uiIconBack:hover {
     height: auto;
     max-width: 100%;
   }
+
+    .newsApp .newsAppToolBar .newsAppToolbarLeft {
+      flex-grow: 10;
+    }
 }
 
 @media screen and (min-width: 481px) {

@@ -1,11 +1,11 @@
 <template>
-  <div class="filterSpacesDrawer" @keydown.esc="closeFilterNewsDrawer()">
-    <div class="btn" @click="openFilterNewsDrawer()">
+  <div @keydown.esc="closeFilterNewsDrawer()">
+    <div class="btn newsSpacesFilterButton" @click="openFilterNewsDrawer()">
       <i :class="{filterApplied}" class="uiIconFilter"></i>
       <span v-if="selectedSpaces.length === 0 || !filterApplied">{{ $t('news.app.filter.label') }}</span>
       <span v-if="filterApplied && selectedSpaces.length !== 0">{{ $t('news.app.filter.filterApplied') }}</span>
     </div>
-    <div :class="{open}" class="drawer">
+    <div :class="{open}" class="drawer filterSpacesDrawer">
       <div class="header">
         <span>{{ $t('news.app.filter.bySpaces') }}</span>
         <a class="closebtn" href="javascript:void(0)" @click="closeFilterNewsDrawer()">×</a>

@@ -40,7 +40,7 @@
                 <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> {{ news.authorFullName }} </a>
                 <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
                 <div class="newsSpace">
-                  <a :href="news.spaceUrl" class="newsInformationLabel" target="_blank">{{ news.spaceName }}</a>
+                  <a :href="news.spaceUrl" class="newsInformationLabel" target="_blank">{{ news.spaceDisplayName }}</a>
                 </div>
                 <span class="newsInformationValue newsPostedDate">- {{ news.postedDate }}</span>
               </div>

@@ -171,13 +171,14 @@ if (activity && news) {
   if (!ownerSpaceAvatar) ownerSpaceAvatar = LinkProvider.SPACE_DEFAULT_AVATAR_URL;
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
-  String illustrationURL = null;
+
+  String illustrationURL = "";
   if(news.illustrationURL != null) {
     illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
   }
 
-  def newsTitle = StringEscapeUtils.escapeHtml(news.title);
-  def newsSummary = StringEscapeUtils.escapeHtml(news.summary);
+  def newsTitle = news.title;
+  def newsSummary = news.summary;
   def newsBody = news.body;
 
   //params for init UIActivity javascript object
@@ -195,12 +196,39 @@ if (activity && news) {
     commentFormFocused: '${uicomponent.isCommentFormFocused()}',
     labels: $labels,
     nodeNewsId: '${news.id}',
+     news: {
+       title: '${newsTitle}',
+       summary: `${newsSummary}`,
+       body: `${newsBody}`,
+       pinned: ${news.pinned},
+       illustrationURL: '${illustrationURL}',
+       attachments: ${JsonOutput.toJson(newsAttachments)},
+       authorFullName: '${authorFullName}',
+       authorProfileURL: '${authorProfileURL}',
+       postedDate: '${newsPostedDate}',
+       updaterFullName: '${updaterFullName}',
+       updaterProfileURL: '${updaterProfileURL}',
+       updatedDate: '${newsUpdatedDate}',
+       titleLink: '${activityLink}',
+       viewsCount: ${news.viewsCount},
+       id: '${news.id}',
+       archived: ${news.archived},
+       canArchive: ${news.canArchive},
+       profileAvatarURL: '${ownerAvatar}',
+       spaceDisplayName: '${spaceName}',
+       spaceURL:'${news.spaceUrl}',
+     },
+    showShareButton: false,
+    showEditButton: false,
+    showPinInput: false,
     attachments: ${JsonOutput.toJson(newsAttachments)},
   } """
 
   jsManager.require("SHARED/jquery", "jq")
            .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
-           .require("SHARED/social-ui-activity", "activity").addScripts("activity.onLoad($params);");
+           .require("SHARED/social-ui-activity", "activity").addScripts("activity.onLoad($params);")
+           .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
+
 
   //make sures commentFormFocused is set to false to prevent any refresh to focus, only focus after post a comment
   uicomponent.setCommentFormFocused(false);
@@ -241,77 +269,12 @@ if (activity && news) {
   }
 %>
 
-<div class="activityStream uiNewsActivity uiSharedNewsActivity" id="activityContainer${activity.id}">
+<div class="activityStream uiNewsActivity" id="activityContainer${activity.id}">
   <% uiform.begin() %>
   <div class="boxContainer" id="boxContainer">
   <div id="ContextBox${activity.id}" class="uiBox contentBox">
     <div id="ActivityContextBox${activity.id}">
-      <div class="newsDetails-description">
-        <div class="newsDetails-header">
-          <%
-            String activityTitle="";
-            if (activity.title && !activity.title.isEmpty()) {
-              activityTitle = "<span> <i>"+ "\"" + activity.title + "\""+ "</i> </span>";
-            }
-          %>
-          <div>
-            <a onclick="history.back()" class="backBtn"><i class="uiIconBack"></i></a>
-          </div>
-          <div class="sharedNewsDetails">
-            <% if (illustrationURL != null)  { %>
-              <img src="$illustrationURL" class="newsImage illustrationPicture" alt="News"/>
-            <% } %>
-            <div class="newsDetails">
-              <div class="news-top-information">
-                <div class="news-header-content">
-                  <div id="titleNews" class="newsTitle">
-                    <a class="activityLinkColor newsTitleLink">$newsTitle</a>
-                  </div>
-                  <div id="informationNews" class="newsInformation">
-                    <div class="activityAvatar avatarCircle">
-                      <a href="$authorProfileURL" target="_blank">
-                        <img src="$ownerAvatar" class="avatar avatarXSmall">
-                      </a>
-                    </div>
-                    <div>
-                      <div class="newsAuthor">
-                        <a href="$authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> ${authorFullName} </a>
-                      </div>
-                      <div>
-                        <span class="newsInformationLabel"> ${labelIn} </span>
-                        <a href="$news.spaceUrl" class="newsInformationLabel newsSpace" target="_blank">${spaceName} </a>
-                        <span class="newsInformationValue newsPostedDate">$newsPostedDate</span>
-                      </div>
-                      <% if (showUpdateInfo) { %>
-                        <div class="newsUpdater">
-                          <div>
-                            <span class="newsInformationLabel">${lastUpdated} </span>
-                            <span class="newsInformationValue newsUpdatedDate">$newsUpdatedDate</span>
-                            <% if (authorFullName != updaterFullName )  { %>
-                              <span class="newsInformationLabel">${labelBy} </span>
-                              <a href="$updaterProfileURL" class="newsInformationValue newsUpdaterName">${updaterFullName}</a>
-                            <% } %>
-                          </div>
-                        </div>
-                      <% } %>
-                    </div>
-                   </div>
-                </div>
-              </div>
-
-              <% if (newsSummary != null) { %>
-                <div id="newsSummary" class="summary">
-                  <span>${newsSummary}</span>
-                </div>
-              <% } %>
-
-              <div id="newsBody" class="newsBody" class="fullDetailsBody clearfix">
-                ${newsBody}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="newsDetails"></div>
     <div class="sharedInfo">
       <div class="newsSpaceAndOwner">
         <div class="newsOwner">

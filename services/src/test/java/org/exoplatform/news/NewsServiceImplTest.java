@@ -5,10 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -392,6 +389,7 @@ public class NewsServiceImplTest {
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(newsNode.getName()).thenReturn("Updated title");
 
     News news = new News();
     news.setTitle("Updated title");
@@ -444,6 +442,7 @@ public class NewsServiceImplTest {
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(newsNode.getName()).thenReturn("Updated title");
 
     News news = new News();
     news.setTitle("Updated title");
@@ -2851,6 +2850,7 @@ public class NewsServiceImplTest {
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(newsNode.getName()).thenReturn("archived title");
 
     // When
     newsService.unarchiveNews("id123");
@@ -2859,6 +2859,60 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).save();
     verify(newsNode, times(1)).setProperty(eq("exo:archived"), eq(false));
 
+  }
+
+  @Test
+  public void shouldUpdateNewsNodePathWhenNewsNameIsUpdated() throws Exception {
+    // Given
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+
+    Node newsNode = mock(Node.class);
+    Node parentNode = mock(Node.class);
+    Node illustrationNode = mock(Node.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(newsNode.getName()).thenReturn("Untitled");
+    when(newsNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22/Untitled");
+    when(newsNode.getParent()).thenReturn(parentNode);
+    when(parentNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22");
+    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
+    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    News news = new News();
+    news.setTitle("update title");
+    news.setSummary("Updated summary");
+    news.setBody("Updated body");
+    news.setUploadId(null);
+    news.setViewsCount((long) 10);
+    // when
+    newsService.updateNews(news);
+    // then
+    verify(workSpace, times(1)).move(any(), any());
+    verify(newsNode, times(1)).save();
   }
 
   private void setCurrentIdentity() {

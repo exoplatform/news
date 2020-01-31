@@ -313,6 +313,7 @@ public class NewsServiceImpl implements NewsService {
       Node newsNode = session.getNodeByUUID(news.getId());
       if (newsNode != null) {
         newsNode.setProperty("exo:title", news.getTitle());
+        newsNode.setProperty("exo:name", news.getTitle());
         newsNode.setProperty("exo:summary", news.getSummary());
         String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
         news.setBody(processedBody);
@@ -330,6 +331,14 @@ public class NewsServiceImpl implements NewsService {
         news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
 
         newsNode.save();
+
+        // update name of node
+        if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
+          String srcPath = newsNode.getPath();
+          String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY : newsNode.getParent().getPath()) + "/"
+                  + Utils.cleanName(news.getTitle()).trim();
+          session.getWorkspace().move(srcPath, destPath);
+        }
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());

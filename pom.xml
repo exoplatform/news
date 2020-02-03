@@ -42,7 +42,6 @@
   <properties>
     <org.exoplatform.social.version>6.0.x-SNAPSHOT</org.exoplatform.social.version>
     <org.exoplatform.ecms.version>6.0.x-SNAPSHOT</org.exoplatform.ecms.version>
-    <htmlcleaner.version>2.7</htmlcleaner.version>
     <pitest.version>1.4.10</pitest.version>
   </properties>
 
@@ -61,11 +60,6 @@
         <version>${org.exoplatform.ecms.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.sourceforge.htmlcleaner</groupId>
-        <artifactId>htmlcleaner</artifactId>
-        <version>${htmlcleaner.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

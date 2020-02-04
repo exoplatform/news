@@ -386,7 +386,7 @@
 				</div>
 			</div><!--end heading-->
 			<div class="description <%=isArchived ? "newsArchived" : ""%>">
-          <img src="$illustrationURL" class="newsImage" alt="News"/>
+          <img src="$illustrationURL" class="newsSmallIllustration" alt="News"/>
           <div class="newsDetails">
               <div class="newsTitle">
                 <% if (isArchived) { %>

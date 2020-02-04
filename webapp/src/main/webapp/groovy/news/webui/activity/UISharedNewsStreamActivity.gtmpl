@@ -379,7 +379,7 @@ def streamOwner = activity.getStreamOwner();
                 <div class="description <%=isArchived ? "newsArchived" : ""%>">
                     <div class="sharedNewsTitle">${activity.title}</div>
                     <div class="sharedNewsDetails">
-                        <img src="$illustrationURL" class="newsImage" alt="News"/>
+                        <img src="$illustrationURL" class="newsSmallIllustration" alt="News"/>
                         <div class="newsDetails">
                             <div class="newsTitle">
                                 <% if (isArchived) { %>

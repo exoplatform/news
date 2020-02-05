@@ -54,13 +54,13 @@
         color="#578dc9" /> </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
-        <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.newsIllustration + ')' }" class="newsSmallIllustration"></a>
+        <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
               <a :href="news.url">{{ news.title }} </a>
             </h3>
-            <news-spaces-shared-in v-if="news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
+            <news-spaces-shared-in v-if="news.activities && news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
           </div>
           <div class="newsInfo">
             <div class="newsOwner">

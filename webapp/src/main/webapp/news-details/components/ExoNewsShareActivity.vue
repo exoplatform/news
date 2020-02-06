@@ -20,7 +20,9 @@
       </div>
       <div class="content">
         <div class="newsPreview">
-          <a :href="news.url" :style="{ 'background-image': 'url(' + newsIllustrationURL + ')' }" class="newsItemIllustration" target="_blank"></a>
+          <a :href="news.url" target="_blank">
+            <img :src="newsIllustrationURL" class="newsItemIllustration"/>
+          </a>
           <div class="newsItemContent">
             <div class="newsItemContentHeader">
               <h3>
@@ -155,7 +157,7 @@ export default {
         })
         .then(() => {
           this.closeShareNewsDrawer();
-          this.$emit('newsShared', this.newsId);
+          this.$emit('newsShared', this.news.newsId);
         })
         .catch(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);

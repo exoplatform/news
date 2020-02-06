@@ -20,8 +20,6 @@
   import java.time.LocalDateTime;
   import java.util.TimeZone;
 
-  import java.util.Date;
-
   import groovy.json.JsonOutput;
 
   def pcontext = Util.getPortalRequestContext();
@@ -139,8 +137,6 @@ if (activity && news) {
   def authorProfileURL = uicomponent.getUserProfileURL(news.author);
   def updaterProfileURL = uicomponent.getUserProfileURL(news.updater);
   def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
-  def spaceName = news.spaceDisplayName;
-  def newsAttachments = news.attachments;
 
   def mediumDateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(pcontext.getLocale());
   def newsPostedDate = "";
@@ -150,31 +146,22 @@ if (activity && news) {
   }
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-  def showUpdateInfo = !newsPostedDate.equals(updatedDate);
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
-  def labelPostedBy = _ctx.appRes("news.activity.postedBy");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
-  def labelUpdatedBy = _ctx.appRes("news.activity.lastUpdatedBy");
-  def labelBy = _ctx.appRes("news.app.by");
-  def labelIn = _ctx.appRes("news.app.in");
-  def lastUpdated = _ctx.appRes("news.activity.lastUpdated");
-  def labelUpdatedDate = _ctx.appRes("news.activity.lastUpdatedDate");
-  def labelSharedBy = _ctx.appRes("news.share.shareBy");
 
-  def spaceURL = uicomponent.getSpaceURL();
   def spaceGroupId = uicomponent.getSpaceGroupId();
   Space space = Utils.getSpaceService().getSpaceByPrettyName(streamOwner);
   def spaceSharedName = space.getDisplayName();
   def urlSpaceShared = LinkProvider.getSpaceUri(space.url);
   def ownerSpaceAvatar = space.avatarUrl;
   if (!ownerSpaceAvatar) ownerSpaceAvatar = LinkProvider.SPACE_DEFAULT_AVATAR_URL;
-  def activityLink = uicomponent.getActivityPermalink(activity.id);
 
+  def activityLink = uicomponent.getActivityPermalink(activity.id);
 
   String illustrationURL = "";
   if(news.illustrationURL != null) {
-    illustrationURL = new StringBuilder("/rest/v1/news/").append(news.id).append("/illustration").toString();
+    illustrationURL = new StringBuilder("/portal/rest/v1/news/").append(news.id).append("/illustration").toString();
   }
 
   def newsTitle = news.title;
@@ -185,7 +172,6 @@ if (activity && news) {
   def params = """ {
     activityId: '${activity.id}',
     newsId: '${news.id}',
-    spaceURL:'$spaceURL',
     spaceGroupId: '$spaceGroupId',
     placeholderComment: '${placeholder}',
     inputWriteAComment: '$inputWriteAComment',
@@ -202,7 +188,7 @@ if (activity && news) {
        body: `${newsBody}`,
        pinned: ${news.pinned},
        illustrationURL: '${illustrationURL}',
-       attachments: ${JsonOutput.toJson(newsAttachments)},
+       attachments: ${JsonOutput.toJson(news.attachments)},
        authorFullName: '${authorFullName}',
        authorProfileURL: '${authorProfileURL}',
        postedDate: '${newsPostedDate}',
@@ -211,24 +197,22 @@ if (activity && news) {
        updatedDate: '${newsUpdatedDate}',
        titleLink: '${activityLink}',
        viewsCount: ${news.viewsCount},
-       id: '${news.id}',
+       newsId: '${news.id}',
        archived: ${news.archived},
        canArchive: ${news.canArchive},
        profileAvatarURL: '${ownerAvatar}',
-       spaceDisplayName: '${spaceName}',
-       spaceURL:'${news.spaceUrl}',
+       spaceDisplayName: '${news.spaceDisplayName}',
+       spaceUrl:'${news.spaceUrl}',
      },
     showShareButton: false,
     showEditButton: false,
     showPinInput: false,
-    attachments: ${JsonOutput.toJson(newsAttachments)},
   } """
 
   jsManager.require("SHARED/jquery", "jq")
            .require("SHARED/bts_tooltip").addScripts("jq('*[rel=\"tooltip\"]').tooltip();")
            .require("SHARED/social-ui-activity", "activity").addScripts("activity.onLoad($params);")
            .require("SHARED/newsDetails", "newsDetails").addScripts("newsDetails.init($params);");
-
 
   //make sures commentFormFocused is set to false to prevent any refresh to focus, only focus after post a comment
   uicomponent.setCommentFormFocused(false);
@@ -394,6 +378,7 @@ if (activity && news) {
       		  } else {
       			commentContentClass = "";
       		  }
+
       		  def id = Utils.getIdentityManager().getIdentity(it.userId);
               commenterFullName = StringEscapeUtils.escapeHtml(id.profile.fullName);
               commenterProfileUri = LinkProvider.getUserProfileUri(id.getRemoteId());
@@ -448,7 +433,7 @@ if (activity && news) {
                 </div><!--end commentLeft-->
                 <div class="commentRight">
                   <div class="author">
-                  	<a href="$commenterProfileUri">$commenterFullName</a>
+              <a href="$commenterProfileUri" target="_blank">$commenterFullName</a>
                   </div>
                   <div class="contentComment" id="${activity.id}-${commentCounter}">
                   	$commentMessage

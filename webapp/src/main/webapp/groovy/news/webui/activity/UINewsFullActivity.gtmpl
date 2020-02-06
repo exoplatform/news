@@ -18,18 +18,18 @@
   import java.time.format.DateTimeFormatter;
   import java.time.format.FormatStyle;
   import java.time.LocalDateTime;
-  import java.util.Date;
   import java.util.TimeZone;
-  import java.util.Date;
 
   import groovy.json.JsonOutput;
 
   def pcontext = Util.getPortalRequestContext();
+
   def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
+
   def activity = uicomponent.getActivity();
   def news = uicomponent.getNews();
 
- if (activity && news) { //process if not null
+ if (activity && news) {
 
    if(news.archived && !news.canArchive) {
 
@@ -138,6 +138,7 @@
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
+
   def spaceGroupId = uicomponent.getSpaceGroupId();
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
@@ -150,18 +151,16 @@
   def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
   def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
   def newsBody = news.body.replaceAll("`", "\\\\`");
-  def newsAttachments = news.attachments;
 
   def showEditButton = uicomponent.canEditNews(activity);
   def showPinInput = uicomponent.canPinNews(activity);
-
-  def isPinned = news.pinned;
 
 
   //params for init UIActivity javascript object
   def params = """ {
     activityId: '${activity.id}',
     newsId: '${news.id}',
+    spaceGroupId: '$spaceGroupId',
     placeholderComment: '${placeholder}',
     inputWriteAComment: '$inputWriteAComment',
     commentMinCharactersAllowed: '${uicomponent.getCommentMinCharactersAllowed()}',
@@ -175,9 +174,9 @@
       title: '${newsTitle}',
       summary: `${newsSummary}`,
       body: `${newsBody}`,
-      pinned: $isPinned,
+      pinned: ${news.pinned},
       illustrationURL: '${illustrationURL}',
-      attachments: ${JsonOutput.toJson(newsAttachments)},
+      attachments: ${JsonOutput.toJson(news.attachments)},
       authorFullName: '${authorFullName}',
       authorProfileURL: '${authorProfileURL}',
       postedDate: '${newsPostedDate}',
@@ -194,11 +193,10 @@
       spaceUrl:'${news.spaceUrl}',
       spaceAvatarUrl: '${news.spaceAvatarUrl}',
       url: '${news.url}',
-      activityId: '${activity.id}'
     },
+    showShareButton: true,
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,
-    spaceGroupId: '$spaceGroupId'
   } """
 
   jsManager.require("SHARED/jquery", "jq")
@@ -243,27 +241,6 @@
    //hides diplayPeopleBG
    listPeopleBGClass = "displayNone";
   }
-
-  activityPostedTime = uicomponent.getRelativeTimeLabel(_ctx, activity.postedTime);
-  def postedTimeTooltip =	_ctx.appRes("UIActivity.label.PostedFrom").replace("{0}",activityPostedTime);
-  activityUpdatedTime = uicomponent.getRelativeTimeLabel(_ctx,activity.updated.getTime());
-  activityUpdatedTime =	_ctx.appRes("UIActivity.label.EditedFrom").replace("{0}",activityUpdatedTime);
-
-  def viewerId = Utils.getViewerIdentity().getId();
-
-  def labelPin = _ctx.appRes("news.pin.label");
-  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("news.pin.action"));
-  def labelCancelbutton = _ctx.appRes("news.edit.cancel");
-  def labelConfirmButn = _ctx.appRes("news.pin.btn.confirm");
-  def labelConfirmPin =  _ctx.appRes("news.pin.confirm");
-  def messageSuccessPin =  _ctx.appRes("news.pin.success");
-  def messageErrorPin =  _ctx.appRes("news.pin.error");
-
-  def labelUnpin = _ctx.appRes("news.unpin.label");
-  def captionUnpin = _ctx.appRes("news.unpin.action");
-  def labelConfirmUnpin =  _ctx.appRes("news.unpin.confirm").replace("{0}",newsTitle);
-  def messageSuccessUnpin =  _ctx.appRes("news.unpin.success");
-  def messageErrorUnpin =  _ctx.appRes("news.unpin.error");
 %>
 
   <div class="activityStream uiNewsActivity" id="activityContainer${activity.id}">
@@ -480,7 +457,6 @@
                           </div>
           <%}%>
           </div>
-
         </div>
         <% }) %>
         </div> <!--end commentlist-->

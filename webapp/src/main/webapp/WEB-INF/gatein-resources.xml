@@ -22,13 +22,6 @@
                   xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
 
   <portal-skin>
-    <skin-name>Default</skin-name>
-    <skin-module>customModuleNews</skin-module>
-    <css-path>/css/news.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
-
-  <portal-skin>
     <skin-name>Enterprise</skin-name>
     <skin-module>customModuleNews</skin-module>
     <css-path>/css/news.css</css-path>

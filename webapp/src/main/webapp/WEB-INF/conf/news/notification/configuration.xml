@@ -79,7 +79,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -115,7 +115,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -151,7 +151,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -187,7 +187,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -223,7 +223,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -259,7 +259,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>
@@ -295,7 +295,7 @@
               <string>news</string>
             </field>
             <field name="bundlePath">
-              <string>locale.portlet.news.News_en</string>
+              <string>locale.portlet.news.News</string>
             </field>
           </object>
         </object-param>

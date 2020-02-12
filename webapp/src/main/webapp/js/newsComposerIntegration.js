@@ -1,6 +1,6 @@
 (function () {
   var newsComposerIntegration = {
-    init: function(spaceId) {
+    init: function(spaceId, labels) {
       const newsEditorLinkContainer = document.querySelector('.uiComposer .share-buttons-down');
       if(newsEditorLinkContainer) {
         let newsEditorLink = newsEditorLinkContainer.querySelector('.newsEditorComposerLink');
@@ -13,7 +13,7 @@
           }
           newsEditorLink.setAttribute('href', url);
           newsEditorLink.setAttribute('target', '_blank');
-          newsEditorLink.appendChild(document.createTextNode('Write an article'));
+          newsEditorLink.appendChild(document.createTextNode(labels.writeLinkLabel));
           newsEditorLinkContainer.appendChild(newsEditorLink);
         }
       }

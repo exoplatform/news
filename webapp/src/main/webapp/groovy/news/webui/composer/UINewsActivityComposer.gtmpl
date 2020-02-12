@@ -5,8 +5,11 @@ def jsManager = requestContext.getJavascriptManager();
 if (uicomponent.isEnabled()) {
   def space = uicomponent.getCurrentSpace();
   def spaceId = space?.getId();
+  def labels = """ {
+    writeLinkLabel: '${_ctx.appRes("news.composer.write")}'
+  } """
   jsManager.require("SHARED/newsComposerIntegration","newsComposerIntegration")
-         .addScripts("newsComposerIntegration.init($spaceId) ;");
+         .addScripts("newsComposerIntegration.init($spaceId, $labels) ;");
 }
 
 %>

@@ -236,7 +236,7 @@ export default {
       const options = {year: 'numeric', month: 'short', day: 'numeric'};
 
       data.forEach((item) => {
-        const newsCreatedDate = new Date(item.creationDate.time).toLocaleDateString(local, options);
+        const newsPublicationDate = new Date(item.publicationDate.time).toLocaleDateString(local, options);
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
@@ -245,7 +245,7 @@ export default {
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          creationDate: newsCreatedDate,
+          creationDate: newsPublicationDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
           url: item.url,

@@ -83,6 +83,7 @@ CKEDITOR.dialog.add( 'videoDialog', function( editor ) {
 
             var p = new CKEDITOR.dom.element('div');
             p.setAttribute('class', 'video');
+            p.setAttribute('contenteditable', 'false');
 
             var iframe = new CKEDITOR.dom.element('iframe');
             iframe.setAttribute('src', url);

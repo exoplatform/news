@@ -10,187 +10,107 @@
   import org.exoplatform.commons.utils.CommonsUtils;
   import org.exoplatform.container.PortalContainer;
   import org.exoplatform.news.NewsService;
-
+  import org.exoplatform.portal.webui.util.Util;
+  import groovy.json.JsonOutput;
+  import org.htmlcleaner.HtmlCleaner;
+  import java.util.List;
+  import org.exoplatform.news.model.News;
   import org.htmlcleaner.HtmlCleaner;
 
   SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
   NewsService newsService = CommonsUtils.getService(NewsService.class);
-
+  List<News> listNews = new ArrayList<News>();
+  def currentPageData = uicomponent.getCurrentPageData();
+  def nodes = new ArrayList();
+  def seeAll = _ctx.appRes("news.pinned.seeAll");
+  def nbOfNewsToDisplay = currentPageData.size() > 4 ? 4 : currentPageData.size();
+  for (int i=0 ; i < nbOfNewsToDisplay; i++) {
+    if(Utils.isViewable(currentPageData.get(i))) {
+      nodes.add(currentPageData.get(i));
+    }
+    listNews.add(newsService.convertNodeToNews(nodes.get(i)));
+    def body = new HtmlCleaner().clean(listNews.get(i).getBody()).getText();
+      if( body != null ){
+        listNews.get(i).setBody(body.toString());
+      }
+  }
   if (uicomponent.getUIPageIterator().getAvailable() > 0) {
-
-    def siteName = Util.getPortalRequestContext().getPortalOwner();
-
     ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
     newsResourceBundle = resourceBundleService.getResourceBundle("locale.portlet.news.News", Util.getPortalRequestContext().getLocale());
+    def header = uicomponent.getHeader();
+    def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER) && header?.trim();
+    def siteName = Util.getPortalRequestContext().getPortalOwner();
+    def seeAllUrl = "/portal/" + siteName + "/news?filter=pinned";
+
+    def params = """ {
+      newsInfo: ${JsonOutput.toJson(listNews)},
+      seeAllLabel: '$seeAll',
+      header: '${header}',
+      url: '${seeAllUrl}',
+      isShowHeader: '${isShowHeader}'
+    } """
+
+    def pcontext = Util.getPortalRequestContext();
+    def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
+    jsManager.require("SHARED/latestNews", "latestNews").addScripts("latestNews.initLatestNews($params);");
+
 %>
-<div class="latestNews">
-    <%
-      def header = uicomponent.getHeader();
-      def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER) && header?.trim();
-      def isShowReadmore = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_READMORE);
-      def isShowImage = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_ILLUSTRATION);
-      def isShowSummary = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_SUMMARY);
-    %>
-
-    <div class="newsHeader">
-        <div class="globalTitle">
-          <%
-            if(isShowHeader) {
-          %>
-              <h3 class="newsTitleTop">$header</h3>
-          <%
-            }
-          %>
+<div class="VuetifyApp">
+  <div id="latestNewsDetails">
+  <div class="skeletonContainer">
+    <div class="containerLeft">
+      <div class="v-skeleton-loader__bone imageNewsLeft">
+        <div class="v-skeleton-loader v-skeleton-loaderUp  v-skeleton-loader--is-loading theme--light newsSkeletonRight imageLeft">
         </div>
-        <div class="seeAllPinnedNews">
-          <a href="/portal/<%=siteName%>/news?filter=pinned"><%=newsResourceBundle.getString("news.pinned.seeAll")%></a>
-        </div>
-    </div>
-    <div class="latestNewsContent">
-     <%
-      def currentPageData = uicomponent.getCurrentPageData();
-      def nodes = new ArrayList();
-
-      def nbOfNewsToDisplay = currentPageData.size() > 4 ? 4 : currentPageData.size();
-      for (int i=0 ; i < nbOfNewsToDisplay; i++) {
-        if(Utils.isViewable(currentPageData.get(i))) {
-          nodes.add(currentPageData.get(i));
-        }
-      }
-
-      def firstNewsNode = nodes.get(0);
-
-      StringBuilder firstNewsUrl = new StringBuilder("");
-      if (firstNewsNode.hasProperty("exo:activities")) {
-        def firstNewsActivityId =  firstNewsNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
-        Space firstNewsPostedInSpace = spaceService.getSpaceById( firstNewsNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
-        def portalName = PortalContainer.getCurrentPortalContainerName();
-        def portalOwner = CommonsUtils.getCurrentPortalOwner();
-        def currentUsername = newsService.getCurrentIdentity().getUserId();
-        if (spaceService.isMember(firstNewsPostedInSpace, currentUsername)) {
-          firstNewsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(firstNewsActivityId);
-        } else {
-          firstNewsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(firstNewsNode));
-        }
-      }
-      def firstItemLink = firstNewsUrl.toString();
-      def firstImgSrc;
-      if(isShowImage) {
-        if(firstNewsNode.hasNode("illustration")) {
-          def firstImageNode= firstNewsNode.getNode("illustration");
-          firstImgSrc = "/portal/rest/v1/news/" + firstNewsNode.getUUID() + "/illustration";
-        } else {
-          firstImgSrc = "/news/images/newsImageDefault.png";
-        }
-      }
-      def firstItemTitle = uicomponent.getTitle(firstNewsNode);
-      def firstItemSummary = uicomponent.getSummary(firstNewsNode);
-      if(!firstItemSummary?.trim() && firstNewsNode.hasProperty("exo:body")) {
-        firstItemSummary = firstNewsNode.getProperty("exo:body").getString();
-        firstItemSummary = new HtmlCleaner().clean(firstItemSummary).getText();
-      }
-
-      %>
-    <div class="latestNewsLeft" onclick="window.location='$firstItemLink'">
-
-      <div class="backgroundLeft" style="background-image:url($firstImgSrc)">
-          <div class="overlay"></div>
-      </div>
-
-      <div class="ombre">
-      </div>
-      <div class="contentText">
-          <div class="contentTitle">
-              <a href="$firstItemLink">$firstItemTitle</a>
-          </div>
-          <div class="contentBody">
-              <div class="contentBodyText" >
-                <%
-                  if (isShowSummary) {
-                %>
-                  <div class="summary contentDisplay">
-                     <a href="$firstItemLink"><p>$firstItemSummary</p></a>
-                  </div>
-                <%
-                  }
-                %>
-              </div>
-
-              <% if (isShowReadmore) { %>
-                <span class="more" >
-                    <a href="$firstItemLink" class="readMoreNews slideReadMore">
-                    <span><%= _ctx.appRes("UICLVPresentation.label.readmore") %></span>
-                    </a>
-                </span>
-              <% } %>
-          </div>
-      </div>
-    </div>
-    <div class="latestNewsRight">
-    <%
-    if(nbOfNewsToDisplay > 1) {
-      for (int i=1 ; i <= nbOfNewsToDisplay-1 ; i++) {
-        def viewNode = nodes.get(i);
-        def imgSrc;
-        if(isShowImage) {
-            if(viewNode.hasNode("illustration")) {
-                def imageNode = viewNode.getNode("illustration");
-                imgSrc = "/portal/rest/v1/news/" + viewNode.getUUID() + "/illustration";
-            } else {
-                imgSrc = "/news/images/newsImageDefault.png";
-            }
-        }
-        def itemTitle = uicomponent.getTitle(viewNode);
-        def itemSummary = uicomponent.getSummary(viewNode);
-        if(!itemSummary?.trim() && viewNode.hasProperty("exo:body")) {
-          itemSummary = viewNode.getProperty("exo:body").getString();
-          itemSummary = new HtmlCleaner().clean(itemSummary).getText();
-        }
-        StringBuilder newsUrl = new StringBuilder("");
-        if (viewNode.hasProperty("exo:activities")) {
-          def newsActivityId =  viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
-          Space newsPostedInSpace = spaceService.getSpaceById(viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
-          def portalName = PortalContainer.getCurrentPortalContainerName();
-          def portalOwner = CommonsUtils.getCurrentPortalOwner();
-          def currentUsername = newsService.getCurrentIdentity().getUserId();
-          if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
-            newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
-          } else {
-            newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(viewNode));
-          }
-        }
-        def itemLink = newsUrl.toString();
-      %>
-        <div class="newsLine">
-            <div class="newsImage" style="background-image:url($imgSrc)" onclick="window.location='$itemLink'">
-                <div class="overlay"></div>
+          <div>
+            <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone text-LingeTop">
             </div>
-            <div class="rightText">
-                <div class="rightTitle">
-                    <a href="$itemLink">$itemTitle</a>
-                </div>
-                <div class="rightBody">
-                     <%
-                       if (isShowSummary) {
-                     %>
-                       <div class="summary contentDisplay">
-                          <a href="$itemLink"><p>$itemSummary</p></a>
-                       </div>
-                     <%
-                       }
-                     %>
-                </div>
-                <% if (isShowReadmore) { %>
-                  <div class="rightMore">
-                      <a href="$itemLink" class="readMoreNews"><span><%= _ctx.appRes("UICLVPresentation.label.readmore") %></span></a>
-                  </div>
-                <% } %>
-            </div>
-        </div>
-    <%
-         }
-       }
-    }
-    %>
+           <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone text-center"> </div>
+             <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone titleNewsLeft"> </div>
+             </div>
+           </div>
+      </div>
+   <div class="imageNewsRight">
+    <div class="v-skeleton-loader__bone blockNewsInner">
+     <div class="newsItem">
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
+       </div>
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
+       </div>
+    <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
     </div>
+      <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
+      </div>
+    </div>
+   </div>
+  <div class="v-skeleton-loader__bone blockNewsInner">
+    <div class="newsItem">
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
+       </div>
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
+       </div>
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
+       </div>
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
+       </div>
+     </div>
+  </div>
+ <div class="v-skeleton-loader__bone blockNewsInner">
+   <div class="newsItem">
+     <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
+     </div>
+     <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
+     </div>
+       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
+       </div>
+      <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
 </div>
+<%
+}
+%>

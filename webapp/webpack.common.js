@@ -12,6 +12,7 @@ let config = {
     fileDropComponent :'./src/main/webapp/components/fileDrop/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',
+    latestNews:'./src/main/webapp/latest-news/main.js',
     news :'./src/main/webapp/news/main.js'
   },
   module: {

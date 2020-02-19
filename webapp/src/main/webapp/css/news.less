@@ -1734,7 +1734,7 @@ i.uiIconBack:hover {
 }
 .newsSmallIllustration {
   height: 150px;
-  max-width: 150px;
+  width: 150px;
   box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.22);
   border-radius: 5px;
 }
@@ -2044,7 +2044,7 @@ i.uiIconBack:hover {
       padding: 15px 0 5px 0;
 
       .newsSmallIllustration {
-        flex: 1 0 120px;
+        flex: 1 0 150px;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -2072,9 +2072,12 @@ i.uiIconBack:hover {
           }
 
           .sharedIn {
+            display: flex;
+
             .newsSpaceLabel {
               color: #949494;
               font-style: italic;
+              white-space: nowrap;
             }
 
             .sharedInSpaces {
@@ -2095,6 +2098,7 @@ i.uiIconBack:hover {
 
               .plusSpaces {
                 width: 25px;
+                height: 25px;
                 line-height: 25px;
                 margin-left: 10px;
                 border-radius: 25%;
@@ -2206,6 +2210,7 @@ i.uiIconBack:hover {
           color: @color-appNews-information;
           display: block;
           font-size: 12px;
+          padding-bottom: 5px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -2951,6 +2956,57 @@ i.uiIconBack:hover {
     margin-top: 10px;
   }
 
+  .newsApp .newsListItems .newsItem .newsItemContent {
+    min-width: 0;
+    .newsItemContentHeader {
+      h3 {
+        font-size: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 30px;
+        line-height: 15px;
+      }
+      .sharedIn {
+        display: none;
+      }
+    }
+
+    .newsInfo {
+      flex-direction: row !important;
+      justify-content: space-between;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      .newsOwner {
+        min-width: 0;
+        &>a {
+          display: none;
+        }
+
+        .uiIconArrowNext {
+          display: none;
+        }
+
+        .newsSpace {
+          padding-left: 0px;
+          min-width: 0;
+          span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+        }
+      }
+
+      .newsDate {
+        font-size: 12px;
+        margin-top: 4px !important;
+      }
+    }
+  }
+
   .newsDetails {
     .newsAttachmentsTitle {
       padding-bottom: 20px;
@@ -3099,6 +3155,15 @@ i.uiIconBack:hover {
 @media screen and (max-width: 768px) {
   .newsDetails-description a.activityLinkColor.newsTitleLink {
     display: inline-block;
+  }
+
+  .newsApp .newsListItems .newsItem .newsSmallIllustration {
+    flex: 1 0 70px;
+  }
+
+  .newsSmallIllustration {
+    width: 70px;
+    height: 70px;
   }
 
   .newsDetails-description .newsDetails .newsSmallIllustration {

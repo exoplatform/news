@@ -54,7 +54,7 @@
         color="#578dc9" /> </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
-        <a :href="news.newsUrl" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
+        <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>

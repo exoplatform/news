@@ -20,6 +20,8 @@
   import java.time.LocalDateTime;
   import java.util.TimeZone;
 
+  import java.util.Date;
+
   import groovy.json.JsonOutput;
 
   def pcontext = Util.getPortalRequestContext();
@@ -146,6 +148,10 @@ if (activity && news) {
   }
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
+  def showUpdateInfo = !newsPostedDate.equals(updatedDate);
+  if( news.updateDate.getTime() == news.publicationDate.getTime() ){
+    newsUpdatedDate = null;
+  }
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
@@ -378,7 +384,6 @@ if (activity && news) {
       		  } else {
       			commentContentClass = "";
       		  }
-
       		  def id = Utils.getIdentityManager().getIdentity(it.userId);
               commenterFullName = StringEscapeUtils.escapeHtml(id.profile.fullName);
               commenterProfileUri = LinkProvider.getUserProfileUri(id.getRemoteId());

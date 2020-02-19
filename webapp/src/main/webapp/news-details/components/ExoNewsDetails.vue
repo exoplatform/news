@@ -132,7 +132,7 @@ export default {
   },
   data() {
     return {
-      showUpdateInfo: this.news.postedDate !== this.news.updatedDate || this.news.authorFullName !== this.news.updaterFullName,
+      showUpdateInfo: this.news.updatedDate  !== 'null' ,
       BYTES_IN_MB: 1048576,
       spaceDisplayName: this.news.spaceDisplayName,
     };

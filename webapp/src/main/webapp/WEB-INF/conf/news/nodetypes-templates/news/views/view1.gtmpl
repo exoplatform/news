@@ -40,14 +40,14 @@
     }
     VersionNode versionNode = new VersionNode(originalNode, originalNode.getSession());
     List<VersionNode> versions = versionNode.getChildren();
-    if(versions.size() > 1) {
+    if(versions.size() > 0) {
       versions.sort(new Comparator<VersionNode>() {
         @Override
         public int compare(VersionNode o1, VersionNode o2) {
           return Integer.parseInt(o1.getName()) - Integer.parseInt(o2.getName());
         }
       });
-      return versions.get(1).getCreatedTime().getTime();
+      return versions.get(0).getCreatedTime().getTime();
     }
 
     return null;
@@ -99,7 +99,8 @@
     def ownerAvatar = new StringBuilder("/portal/rest/v1/social/users/").append(news.author).append("/avatar").toString();
     def spaceName = news.spaceDisplayName;
 
-    def mediumDateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(pcontext.getLocale());
+    def mediumDateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(pcontext.getLocale());
+
     def newsPostedDate = "";
     def newsPublicationDate = getPublicationDate(newsNode);
     if(newsPublicationDate != null) {
@@ -108,7 +109,9 @@
     }
     def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
     def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-
+    if( news.updateDate.getTime() == newsPublicationDate.getTime() ){
+      newsUpdatedDate = null;
+    }
     def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");
     def newsSummary = news.summary.replaceAll("`", "\\\\`").replaceAll("</script", "</scr\\\\ipt");
     def newsBody = news.body.replaceAll("`", "\\\\`");

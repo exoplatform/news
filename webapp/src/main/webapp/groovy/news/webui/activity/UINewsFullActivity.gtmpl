@@ -135,7 +135,9 @@
   }
   def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
   def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-
+  if( news.updateDate.getTime() == news.publicationDate.getTime() ){
+    newsUpdatedDate = null;
+  }
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");
 

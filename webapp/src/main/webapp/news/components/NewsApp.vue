@@ -259,7 +259,7 @@ export default {
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,
-          spaceAvatarUrl: item.spaceAvatarUrl
+          spaceAvatarUrl: item.spaceAvatarUrl,
         });
       });
       if(append) {

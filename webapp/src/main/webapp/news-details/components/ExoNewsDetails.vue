@@ -75,17 +75,7 @@
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachments">
             <div v-for="attachedFile in news.attachments" :key="attachedFile.id" class="newsAttachment" @click="openPreview(attachedFile)">
-              <div class="fileType">
-                <i :class="getIconClassFromFileMimeType(attachedFile.mimetype)" class="uiIconFileTypeDefault"></i>
-              </div>
-              <div class="fileDetails">
-                <div class="fileDetails1">
-                  <div class="fileNameLabel" data-toggle="tooltip" rel="tooltip" data-placement="top">{{ attachedFile.name }}</div>
-                </div>
-                <div class="fileDetails2">
-                  <div class="fileSize">{{ getFormattedFileSize(attachedFile.size) }} {{ $t('news.file.size.mega') }}</div>
-                </div>
-              </div>
+              <exo-news-attachment :file="attachedFile"></exo-news-attachment>
             </div>
           </div>
         </div>
@@ -169,19 +159,6 @@ export default {
     },
     updateViewsCount: function () {
       newsServices.incrementViewsNumberOfNews(this.newsId);
-    },
-    getIconClassFromFileMimeType: function(fileMimeType) {
-      if(fileMimeType) {
-        const fileMimeTypeClass = fileMimeType.replace(/\./g, '').replace('/', '').replace('\\', '');
-        return `uiIconFileType${fileMimeTypeClass}`;
-      } else {
-        return '';
-      }
-    },
-    getFormattedFileSize(fileSize) {
-      const formattedSizePrecision = 2;
-      const sizeMB = fileSize / this.BYTES_IN_MB;
-      return sizeMB.toFixed(formattedSizePrecision);
     },
     openPreview(attachedFile) {
       const self = this;

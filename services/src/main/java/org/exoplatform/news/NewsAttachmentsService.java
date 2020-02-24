@@ -21,5 +21,7 @@ public interface NewsAttachmentsService {
 
   String addAttachmentFromUploadedResource(Node newsNode, String uploadId) throws Exception;
 
+  void addAttachmentFromExistingResource(Node newsNode, String attachmentId) throws Exception;
+
   void removeAttachment(Node newsNode, String attachmentId);
 }

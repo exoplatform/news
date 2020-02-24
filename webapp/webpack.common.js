@@ -10,6 +10,7 @@ let config = {
     suggesterComponent :'./src/main/webapp/components/suggester/main.js',
     modalComponent :'./src/main/webapp/components/modal/main.js',
     fileDropComponent :'./src/main/webapp/components/fileDrop/main.js',
+    newsAttachmentComponent :'./src/main/webapp/components/newsAttachment/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',
     latestNews:'./src/main/webapp/latest-news/main.js',

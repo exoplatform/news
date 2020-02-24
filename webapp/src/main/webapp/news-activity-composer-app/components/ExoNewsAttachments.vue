@@ -1,66 +1,95 @@
 <template>
   <div>
-    <div class="multiploadFilesSelector">
-      <div id="DropFileBox" ref="dropFileBox" class="dropFileBox">
-        <span class="dropMsg">{{ $t('news.composer.attachments.drop') }}</span>
-        <span class="or">{{ $t('news.composer.attachments.or') }}</span>
-        <span>
-          <a :title="$t('news.composer.attachments.upload')" class="uploadButton" href="#" rel="tooltip" data-placement="bottom" @click="uploadFile">
-            <span class="text">{{ $t('news.composer.attachments.upload') }}</span>
-            <span class="mobileText">{{ $t('news.composer.attachments.upload') }}</span>
-          </a>
-        </span>
-      </div>
-      <div class="fileHidden" style="display:none">
-        <input ref="uploadInput" class="file" name="file" type="file" multiple="multiple" style="display:none" @change="handleFileUpload($refs.uploadInput.files)">
-      </div>
-      <transition name="fade">
-        <div v-show="fileSizeLimitError" class="sizeExceeded alert alert-error">
-          <i class="uiIconError"></i>
-          {{ $t('news.composer.attachments.maxFileSize.error').replace('{0}', maxFileSize) }}
-        </div>
-      </transition>
-      <transition name="fade">
-        <div v-show="filesCountLimitError" class="countExceeded alert alert-error">
-          <i class="uiIconError"></i>
-          {{ $t('news.composer.attachments.maxFileCount.error').replace('{0}', maxFilesCount) }}
-        </div>
-      </transition>
+    <div class="VuetifyApp">
+      <v-app>
+        <v-btn
+          class="attachmentsButton"
+          fixed
+          bottom
+          right
+          fab
+          x-large
+          @click="showAttachments = !showAttachments"
+        >
+          <i class="uiIconAttachment"></i>
+          <v-progress-circular
+            :class="uploading ? 'uploading' : ''"
+            indeterminate>
+            {{ value.length }}
+          </v-progress-circular>
+        </v-btn>
+      </v-app>
     </div>
-
-    <div class="limitMessage">
-      <div class="sizeLimit">{{ $t('news.composer.attachments.maxFileSize').replace('{0}', maxFileSize) }}</div>
-      <div class="countLimit">{{ $t('news.composer.attachments.maxFileCount').replace('{0}', maxFilesCount) }}</div>
-    </div>
-
-    <div class="uploadedFiles">
-      <div class="uploadedFilesTitle">{{ $t('news.composer.attachments.title') }} ({{ value.length }})</div>
-      <div class="uploadedFilesItems">
-        <div v-for="attachedFile in value" :key="attachedFile.name" class="uploadedFilesItem">
-          <div class="fileType">
-            <i :class="getIconClassFromFileMimeType(attachedFile.mimetype)" class="uiIconFileTypeDefault"></i>
-          </div>
-          <div class="fileDetails">
-            <div :class="[(attachedFile.id) ? 'fileDetails1Uploaded': '', (attachedFile.uploadProgress === 100) ? 'fileDetails1UploadCompleted': '']" class="fileDetails1">
-              <div class="fileNameLabel" data-toggle="tooltip" rel="tooltip" data-placement="top">{{ attachedFile.name }}</div>
-              <div class="fileSize">{{ getFormattedFileSize(attachedFile.size) }} {{ $t('news.file.size.mega') }}</div>
+    <div :class="showAttachments ? 'open' : ''" class="newsAttachments drawer" @keydown.esc="closeAttachments()">
+      <div :class="showDocumentSelector? 'documentSelector' : ''" class="attachmentsHeader header">
+        <a v-if="showDocumentSelector" class="backButton" @click="toggleServerFileSelector()">
+          <i class="uiIconBack"> </i>
+        </a>
+        <span class="attachmentsTitle">{{ drawerTitle }}</span>
+        <a class="attachmentsCloseIcon" @click="closeAttachments()">×</a>
+      </div>
+      <div :class="showDocumentSelector? 'serverFiles' : 'newsAttachments'" class="content">
+        <div v-if="!showDocumentSelector" class="newsAttachmentsContent">
+          <div class="multiploadFilesSelector">
+            <div id="DropFileBox" ref="dropFileBox" class="dropFileBox">
+              <span class="dropMsg">{{ $t('news.composer.attachments.drop') }}</span>
+              <span>
+                <a :title="$t('news.composer.attachments.upload')" class="uploadButton" href="#" rel="tooltip" data-placement="bottom" @click="uploadFile">
+                  <span class="text">{{ $t('news.composer.attachments.upload') }}</span>
+                  <span class="mobileText">{{ $t('news.composer.attachments.upload') }}</span>
+                </a>
+              </span>
+              <span class="or">{{ $t('news.composer.attachments.or') }}</span>
+              <span>
+                <a title="Select on server" class="uploadButton" href="#" rel="tooltip" data-placement="bottom" @click="toggleServerFileSelector()">
+                  <span class="text">{{ $t('news.composer.attachments.existingUploads') }}</span>
+                </a>
+              </span>
             </div>
-            <div class="fileDetails2">
-              <div v-show="!attachedFile.id" :class="[attachedFile.uploadProgress === 100 ? 'upload-completed': '']" class="progress">
-                <div :style="'width:' + attachedFile.uploadProgress + '%'" class="bar"></div>
+            <div class="fileHidden" style="display:none">
+              <input ref="uploadInput" class="file" name="file" type="file" multiple="multiple" style="display:none" @change="handleFileUpload($refs.uploadInput.files)">
+            </div>
+            <transition name="fade">
+              <div v-show="fileSizeLimitError" class="sizeExceeded alert alert-error">
+                <i class="uiIconError"></i>
+                {{ $t('news.composer.attachments.maxFileSize.error').replace('{0}', maxFileSize) }}
+              </div>
+            </transition>
+            <transition name="fade">
+              <div v-show="filesCountLimitError" class="countExceeded alert alert-error">
+                <i class="uiIconError"></i>
+                {{ $t('news.composer.attachments.maxFileCount.error').replace('{0}', maxFilesCount) }}
+              </div>
+            </transition>
+          </div>
+
+          <div class="limitMessage">
+            <div class="sizeLimit">{{ $t('news.composer.attachments.maxFileSize').replace('{0}', maxFileSize) }}</div>
+            <div class="countLimit">{{ $t('news.composer.attachments.maxFileCount').replace('{0}', maxFilesCount) }}</div>
+          </div>
+
+          <div class="uploadedFiles">
+            <div class="uploadedFilesTitle">{{ $t('news.composer.attachments.title') }} ({{ value.length }})</div>
+            <div class="uploadedFilesItems">
+              <div v-for="attachedFile in value" :key="attachedFile.name" class="uploadedFilesItem">
+                <exo-news-attachment :file="attachedFile"></exo-news-attachment>
+                <div class="removeFile">
+                  <a :title="$t('news.composer.attachments.delete')" href="#" class="actionIcon" rel="tooltip"
+                     data-placement="top" @click="removeAttachedFile(attachedFile)">
+                    <i class="uiIcon uiIconLightGray"></i>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-          <div class="removeFile">
-            <a :title="$t('news.composer.attachments.delete')" href="#" class="actionIcon" rel="tooltip" data-placement="top" @click="removeAttachedFile(attachedFile)">
-              <i class="uiIcon uiIconLightGray" ></i>
-            </a>
-          </div>
         </div>
+        <exo-server-files-selector v-if="showDocumentSelector" :attached-files="value" :space-id="spaceId" @attachExistingServerAttachment="toggleServerFileSelector" @cancel="toggleServerFileSelector()"></exo-server-files-selector>
+      </div>
+      <div v-if="!showDocumentSelector" class="attachmentsFooter footer">
+        <a class="btn" @click="closeAttachments()">{{ $t('news.composer.attachments.close') }}</a>
       </div>
     </div>
-
-    <exo-document-selector v-if="showDocumentSelector" @close="showDocumentSelector = false" @cancel="showDocumentSelector = false"></exo-document-selector>
+    <div v-show="showAttachments" class="drawer-backdrop" @click="closeAttachments()"></div>
   </div>
 </template>
 
@@ -72,10 +101,15 @@ export default {
     value: {
       type: Array,
       default: () => []
+    },
+    spaceId: {
+      type: String,
+      default: ''
     }
   },
   data() {
     return {
+      showAttachments: false,
       message: '',
       uploadingFilesQueue: [],
       uploadingCount : 0,
@@ -87,7 +121,8 @@ export default {
       maxFileSize: 25,
       maxFilesCount: 10,
       BYTES_IN_MB: 1048576,
-      MESSAGES_DISPLAY_TIME: 5000
+      MESSAGES_DISPLAY_TIME: 5000,
+      drawerTitle: `${this.$t('news.composer.attachments.header')}`
     };
   },
   watch: {
@@ -124,6 +159,12 @@ export default {
     }.bind(this));
   },
   methods: {
+    closeAttachments: function() {
+      this.showAttachments = false;
+    },
+    setUploadingCount: function(uploadingCount) {
+      this.uploading = uploadingCount > 0;
+    },
     uploadFile: function() {
       this.$refs.uploadInput.click();
     },
@@ -149,16 +190,6 @@ export default {
       newAttachedFiles.forEach(newFile => {
         this.queueUpload(newFile);
       });
-
-      this.$refs.uploadInput.value = null;
-    },
-    getIconClassFromFileMimeType: function(fileMimeType) {
-      if(fileMimeType) {
-        const fileMimeTypeClass = fileMimeType.replace(/\./g, '').replace('/', '').replace('\\', '');
-        return `uiIconFileType${fileMimeTypeClass}`;
-      } else {
-        return '';
-      }
     },
     getFormattedFileSize(fileSize) {
       const formattedSizePrecision = 2;
@@ -227,7 +258,7 @@ export default {
             }
 
             if(!responseObject.upload[file.uploadId] || !responseObject.upload[file.uploadId].percent ||
-              responseObject.upload[file.uploadId].percent !== this.maxProgress.toString()) {
+                responseObject.upload[file.uploadId].percent !== this.maxProgress.toString()) {
               this.removeAttachedFile(file.uploadId);
             } else {
               file.uploadProgress = this.maxProgress;
@@ -251,6 +282,14 @@ export default {
         this.value = this.value.filter(attachedFile => attachedFile.id !== file.id);
       }
       this.$emit('input', this.value);
+    },
+    toggleServerFileSelector(selectedFiles){
+      if (selectedFiles) {
+        this.value = selectedFiles;
+        this.$emit('input', this.value);
+      }
+      this.showDocumentSelector = !this.showDocumentSelector;
+      this.drawerTitle = this.showDocumentSelector? `${this.$t('news.composer.attachments.existingUploads')}` : `${this.$t('news.composer.attachments.header')}`;
     }
   }
 };

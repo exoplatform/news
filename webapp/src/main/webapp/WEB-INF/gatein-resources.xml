@@ -67,6 +67,9 @@
       <depends>
         <module>socialUtil</module>
       </depends>
+      <depends>
+        <module>newsAttachmentComponent</module>
+      </depends>
     </module>
   </portlet>
 
@@ -184,6 +187,9 @@
     <depends>
       <module>documentPreview</module>
     </depends>
+    <depends>
+      <module>newsAttachmentComponent</module>
+    </depends>
   </module>
 
   <module>
@@ -231,6 +237,17 @@
     <depends>
       <module>jquery</module>
       <as>$</as>
+    </depends>
+  </module>
+
+  <module>
+    <name>newsAttachmentComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsAttachmentComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
     </depends>
   </module>
 

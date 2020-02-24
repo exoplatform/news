@@ -16,7 +16,6 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,8 +32,8 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsAttachmentsServiceImplTest {
@@ -359,4 +358,72 @@ public class NewsAttachmentsServiceImplTest {
     // Then
     assertEquals("attachId1", attachmentId);
   }
+
+  @Test
+  public void shouldAddAttachmentFromExistingResourceToNewsHavingAttachments() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
+    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+            repositoryService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            uploadService,
+            documentService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    Value[] oldValues = new Value[]{new StringValue("1"),new StringValue("2"),new StringValue("3")};
+    Value[] newValues = new Value[]{new StringValue("1"),new StringValue("2"),new StringValue("3"),new StringValue("4")};
+    Property attachmentsIdsProperty = mock(Property.class);
+    when(attachmentsIdsProperty.getValues()).thenReturn(oldValues);
+    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentsIdsProperty);
+    when(node.getSession()).thenReturn(session);
+    String uploadId = "4";
+
+    // When
+    newsAttachmentsService.addAttachmentFromExistingResource(node, uploadId);
+
+    // Then
+    verify(node, times(1)).setProperty(eq("exo:attachmentsIds"), eq(newValues));
+  }
+
+  @Test
+  public void shouldAddAttachmentFromExistingResourceToNewsNotHavingAttachments() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
+    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+            repositoryService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            uploadService,
+            documentService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(false);
+    Value[] newValues = new Value[]{new StringValue("1")};
+    when(node.getSession()).thenReturn(session);
+    String uploadId = "1";
+
+    // When
+    newsAttachmentsService.addAttachmentFromExistingResource(node, uploadId);
+
+    // Then
+    verify(node, times(1)).setProperty(eq("exo:attachmentsIds"), eq(newValues));
+  }
+
+
 }

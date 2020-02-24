@@ -223,6 +223,26 @@ export function searchSpaces(searchText) {
   }).then(resp => resp.json());
 }
 
+export function fetchFoldersAndFiles(currentDrive, workspace, parentPath) {
+  return fetch(`/portal/rest/managedocument/getFoldersAndFiles/?driveName=${currentDrive}&workspaceName=${workspace}&currentFolder=${parentPath}`,
+    {})
+    .then(response => response.text())
+    .then(xmlStr => (new window.DOMParser()).parseFromString(xmlStr, 'text/xml'))
+    .then(xml => {
+      return xml;
+    });
+}
+
+export function getDrivers() {
+  return fetch('/portal/rest/wcmDriver/getDrivers',
+    {})
+    .then(response => response.text())
+    .then(xmlStr => (new window.DOMParser()).parseFromString(xmlStr, 'text/xml'))
+    .then(xml => {
+      return xml;
+    });
+}
+
 export function escapeHTML(unsafeText) {
   const div = document.createElement('div');
   div.innerText = unsafeText;

@@ -1,7 +1,9 @@
 import ExoNewsActivityComposer  from './ExoNewsActivityComposer.vue';
 import ExoNewsDraft from './ExoNewsDraft.vue';
-import ExoFilesSelector  from './ExoFilesSelector.vue';
+import ExoServerFilesSelector  from './ExoServerFilesSelector.vue';
+import ExoNewsAttachments  from './ExoNewsAttachments.vue';
 
 Vue.component('exo-news-activity-composer', ExoNewsActivityComposer);
 Vue.component('exo-news-draft', ExoNewsDraft);
-Vue.component('exo-files-selector', ExoFilesSelector);
+Vue.component('exo-server-files-selector', ExoServerFilesSelector);
+Vue.component('exo-news-attachments', ExoNewsAttachments);

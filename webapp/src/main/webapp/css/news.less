@@ -9,6 +9,9 @@
 @textLightColor: #999999;
 @btnDisableColor: #c6c6c6;
 
+//Heading color
+@headingColor: #4d5466;
+
 
 /*============== Activity News ====================*/
 
@@ -30,7 +33,7 @@
 
   .unauthorizedPin {
     cursor: not-allowed;
-    color: #4d5466;
+    color: @headingColor;
     padding-left: 10px;
   }
 
@@ -136,7 +139,7 @@
     .newsAttachmentsTitle {
       width: 80%;
       margin: 0 auto;
-      color: #4d5466;
+      color: @headingColor;
       font-size: 18px;
       padding: 40px 0px;
       border-top: 1px #ced2d5 solid;
@@ -844,6 +847,19 @@ i.uiIconBack:hover {
 
   .attachmentsHeader {
     height: auto;
+    display: flex;
+    justify-content: space-between;
+
+    .backButton {
+      width: 40px;
+
+      .uiIconBack {
+        color: grey;
+        background: none;
+        margin: 0;
+        padding: 15px;
+      }
+    }
 
     .attachmentsTitle {
       font-size: 18px;
@@ -860,13 +876,13 @@ i.uiIconBack:hover {
   }
 
   .uploadedFilesTitle {
-    color: #4d5466;
+    color: @headingColor;
     font-size: 18px;
     font-weight: bold;
     padding: 15px;
   }
 
-  .uploadedFilesItem, .newsAttachment {
+  .uploadedFilesItem, .newsAttachment, .fileSelection {
     display: flex;
     font-size: 18px;
     margin: 15px;
@@ -943,47 +959,57 @@ i.uiIconBack:hover {
       }
     }
 
-    .fileDetails {
-      width: 100%;
+    .file {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      width: 100%;
 
-      .fileDetails1 {
-        display: flex;
-        margin-top: 10px;
-      }
-
-      .fileNameLabel {
+      .fileDetails {
         width: 100%;
-        text-overflow: ellipsis;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         overflow: hidden;
         white-space: nowrap;
-      }
+        text-overflow: ellipsis;
+        margin-left: 5%;
 
-      .fileSize {
-        width: auto;
-        white-space: nowrap;
-      }
-
-      .progress {
-        height: 10px;
-        margin: 0px;
-
-        .bar {
-          height: 10px;
-          line-height: 10px;
-          background-image: none;
+        .fileDetails1 {
+          display: flex;
+          margin-top: 10px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         }
-      }
 
-      .upload-completed {
-        visibility: hidden;
-        opacity: 0;
-        transition: visibility 0s 3s, opacity 2s 1s linear;
+        .fileNameLabel {
+          width: 100%;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .fileSize {
+          width: auto;
+          white-space: nowrap;
+        }
+
+        .progress {
+          height: 10px;
+          margin: 0px;
+
+          .bar {
+            height: 10px;
+            line-height: 10px;
+            background-image: none;
+          }
+        }
+
+        .upload-completed {
+          visibility: hidden;
+          opacity: 0;
+          transition: visibility 0s 3s, opacity 2s 1s linear;
+        }
       }
     }
 
@@ -1026,7 +1052,16 @@ i.uiIconBack:hover {
     .sizeLimit, .countLimit {
       margin-right: 2px;
       line-height: 16px;
+      font-weight: initial;
       box-sizing: border-box;
+      transition: font-weight 2s ease-in-out;
+    }
+
+    .countLimit {
+      &.noFilesLeft {
+        color: red;
+      }
+
     }
 
     .sizeLimit:before {
@@ -1092,6 +1127,277 @@ i.uiIconBack:hover {
   .attachmentsFooter {
     .btn {
       float: right;
+    }
+  }
+
+  .uiPopup.documentSelector {
+    top: 12%;
+    left: 21%;
+  }
+
+  .content.serverFiles{
+    bottom: 0;
+
+    .serverFiles {
+      height: 77%;
+
+      .contentHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 3%;
+        border-bottom: 1px solid #efefef;
+
+        .currentDirectory {
+          display: flex;
+          align-items: center;
+          margin-right: 10px;
+          flex: 1;
+          min-width: 0;
+
+          .documents {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+
+            .uiIconFolder {
+              margin-right: 5px;
+              color: @headingColor;
+            }
+
+            p {
+              margin-bottom: 0;
+              color: @headingColor
+            }
+          }
+
+          .currentDrive {
+            cursor: pointer;
+            display: flex;
+            min-width: 0;
+            flex: 0 1 auto;
+            align-items: center;
+
+            .currentDriveTitle {
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+
+              &.active {
+                font-weight: bold;
+              }
+            }
+          }
+
+          .uiIconArrowRight {
+            color: @headingColor;
+            margin: 0 2px;
+          }
+
+          .foldersHistory {
+            display: flex;
+            flex: 1;
+
+            .longFolderHistory {
+              display: flex;
+              align-items: center;
+
+              .dropdown-toggle {
+                border: none;
+              }
+            }
+
+            .folderHistory {
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              display: flex;
+              align-items: center;
+
+              .currentSpaceDirectory {
+                cursor: pointer;
+
+                &.active {
+                  font-weight: bold;
+                }
+              }
+
+              a {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+              }
+            }
+          }
+        }
+
+        .searchBox {
+          display: inline-flex;
+          align-items: center;
+
+          &.visible {
+            width: 100%;
+
+            .searchInput {
+              border-radius: 5px 0 0 5px;
+              border-right: 0;
+            }
+
+            .uiIconCloseServerAttachments {
+              font-size: 14px;
+              padding: 10px 15px 13px 15px;
+              margin-bottom: 12px;
+              border: 1px solid #b3b3b3;
+              border-left: 0;
+              border-radius: 0 5px 5px 0;
+              cursor: pointer;
+
+              &::before{
+                color: #578dc9;
+                content: "\f12a";
+                font-family: 'IONIC-FONT';
+                font-size: 12px;
+              }
+            }
+          }
+
+          .searchInput {
+            width: 100%;
+            border: 1px solid #b3b3b3;
+            margin: 0 0 10px;
+            display: none;
+          }
+
+          .uiIconSearch {
+            border: 1px solid #b3b3b3;
+            padding: 10px;
+            border-radius: 15%;
+            margin-bottom: 10px;
+            color: @headingColor;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .contentBody::-webkit-scrollbar-thumb  {
+        background: #578dc9;
+        border-radius: 3px;
+      }
+
+      .contentBody::-webkit-scrollbar-thumb  {
+        background: #578dc9;
+        border-radius: 3px;
+      }
+
+      .contentBody::-webkit-scrollbar-track  {
+        background: #ced2d5;
+      }
+
+      .contentBody::-webkit-scrollbar-track  {
+        background: #ced2d5;
+      }
+
+      .contentBody::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .contentBody {
+        height: 86%;
+        overflow-y: auto;
+
+        .selectionBox {
+          display: flex;
+          flex-wrap: wrap;
+
+          .emptyFolder {
+            margin: 20% auto;
+            text-align: center;
+
+            .uiIconEmptyFolder::before {
+              content: "\ea7b";
+              font-size: 34pt;
+              font-weight: normal;
+              color: @baseColorDark;
+            }
+          }
+
+          .loader {
+            margin: auto;
+          }
+
+          .folderSelection {
+            width: 20%;
+            margin: 9px;
+            cursor: pointer;
+
+            a {
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              font-size: 12px;
+
+              i {
+                font-size: 41px;
+              }
+
+              .selectionLabel {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                color: #333;
+              }
+            }
+          }
+
+          .fileSelection {
+            width: 20%;
+            margin: 7px;
+            padding: 10px 2px 5px;
+            cursor: pointer;
+            height: fit-content;
+
+            .file {
+              flex-direction: column;
+              align-items: center;
+
+              .fileDetails {
+                margin: 0;
+
+                .fileSize {
+                  display: none;
+                }
+
+                .fileNameLabel {
+                  font-size: 12px;
+                }
+              }
+            }
+
+            &.selected {
+              border-radius: 5px;
+              background-color: #E1E8EE;
+            }
+          }
+        }
+      }
+
+      .attachActions {
+        bottom: 10px;
+        position: absolute;
+        right: 0;
+        left: 0;
+
+        .buttonActions {
+          display: flex;
+          flex-direction: row-reverse;
+          border-top: 1px solid #efefef;
+          padding: 10px 10px 0 0;
+
+          button {
+            margin: 0 5px;
+          }
+        }
+      }
     }
   }
 }
@@ -1866,7 +2172,7 @@ i.uiIconBack:hover {
               }
 
               .spaceCheckbox {
-                color: #4D5466;
+                color: @headingColor;
 
                 &:before {
                   background: #ffffff;
@@ -2954,6 +3260,7 @@ i.uiIconBack:hover {
   .uiComposer .share-buttons-down .newsEditorComposerLink {
     margin-right: 0;
     margin-top: 10px;
+    cursor: pointer;
   }
 
   .newsApp .newsListItems .newsItem .newsItemContent {
@@ -3211,6 +3518,16 @@ i.uiIconBack:hover {
       .footer {
         display: block;
       }
+    }
+  }
+
+  .newsAttachments.drawer {
+    .content {
+      top: 50px;
+      height: auto;
+    }
+    .footer {
+      height: auto;
     }
   }
 }

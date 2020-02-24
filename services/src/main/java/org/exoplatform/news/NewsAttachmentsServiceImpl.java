@@ -153,7 +153,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * New attachments have only an uploadId, no id, so all attachments of the updatedNews with an uploadId are considered as new attachments.
    *
    * @param updatedNews The updated News
-   * @param newsNode The existing News node
+   * @param newsNode    The existing News node
    * @throws RepositoryException
    */
   @Override
@@ -162,7 +162,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
 
     // attachments to remove
     List<String> existingAttachmentsIds = new ArrayList<>();
-    if(newsNode.hasProperty("exo:attachmentsIds")) {
+    if (newsNode.hasProperty("exo:attachmentsIds")) {
       Value[] attachmentsIdsProperty = newsNode.getProperty("exo:attachmentsIds").getValues();
       existingAttachmentsIds = Arrays.stream(attachmentsIdsProperty).map(value -> {
         try {
@@ -184,14 +184,22 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
 
     // new attachments
     List<NewsAttachment> updatedAttachmentsWithIds = new ArrayList<>();
-    for(NewsAttachment updatedAttachment : updatedAttachments) {
-      if(StringUtils.isEmpty(updatedAttachment.getId()) && StringUtils.isNotEmpty(updatedAttachment.getUploadId())) {
+    for (NewsAttachment updatedAttachment : updatedAttachments) {
+      if (StringUtils.isEmpty(updatedAttachment.getId()) && StringUtils.isNotEmpty(updatedAttachment.getUploadId())) {
         try {
           String newAttachmentId = addAttachmentFromUploadedResource(newsNode, updatedAttachment.getUploadId());
           updatedAttachment.setId(newAttachmentId);
           updatedAttachment.setUploadId(null);
         } catch (Exception e) {
           LOG.error("Error while adding attachment to news " + updatedNews.getId(), e);
+        }
+      }
+      //Attachments from existing resource
+      else if (StringUtils.isEmpty(updatedAttachment.getUploadId()) && !existingAttachmentsIds.contains(updatedAttachment.getId())) {
+        try {
+          addAttachmentFromExistingResource(newsNode, updatedAttachment.getId());
+        } catch (Exception e) {
+          LOG.error("Error while adding attachment to news " + updatedAttachment.getId(), e);
         }
       }
       updatedAttachmentsWithIds.add(updatedAttachment);
@@ -247,6 +255,25 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
     newsNode.save();
 
     return attachmentNode.getUUID();
+  }
+
+  /**
+   * Add an existing resource with the given id to the given news node
+   *
+   * @param newsNode   The news node
+   * @param resourceId The id of the existing resource
+   * @throws Exception
+   */
+  @Override
+  public void addAttachmentFromExistingResource(Node newsNode, String resourceId) throws Exception {
+    Value[] attachmentsIdsProperty;
+    if (newsNode.hasProperty("exo:attachmentsIds")) {
+      attachmentsIdsProperty = newsNode.getProperty("exo:attachmentsIds").getValues();
+    } else {
+      attachmentsIdsProperty = new Value[0];
+    }
+    newsNode.setProperty("exo:attachmentsIds", ArrayUtils.add(attachmentsIdsProperty, new StringValue(resourceId)));
+    newsNode.save();
   }
 
   /**

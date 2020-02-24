@@ -63,41 +63,7 @@
         </div>
       </div>
     </form>
-
-    <div class="VuetifyApp">
-      <v-app>
-        <v-btn
-          class="attachmentsButton"
-          fixed
-          bottom
-          right
-          fab
-          x-large
-          @click="showAttachments = !showAttachments"
-        >
-          <i class="uiIconAttachment"></i>
-          <v-progress-circular
-            :class="uploading ? 'uploading' : ''"
-            indeterminate>
-            {{ news.attachments.length }}
-          </v-progress-circular>
-        </v-btn>
-      </v-app>
-    </div>
-    <div :class="showAttachments ? 'open' : ''" class="newsAttachments drawer" @keydown.esc="closeAttachments()">
-      <div class="attachmentsHeader header">
-        <span class="attachmentsTitle">{{ $t('news.composer.attachments.header') }}</span>
-        <a class="attachmentsCloseIcon" @click="closeAttachments()">×</a>
-      </div>
-      <div class="content">
-        <exo-files-selector v-model="news.attachments" @uploadingCountChanged="setUploadingCount"></exo-files-selector>
-      </div>
-      <div class="attachmentsFooter footer">
-        <a class="btn" @click="closeAttachments()">Close</a>
-      </div>
-    </div>
-    <div v-show="showAttachments" class="drawer-backdrop" @click="closeAttachments()"></div>
-
+    <exo-news-attachments :space-id="news.spaceId" v-model="news.attachments"></exo-news-attachments>
     <!-- The following bloc is needed in order to display the pin confirmation popup -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -335,6 +301,7 @@ export default {
             this.news.body = fetchedNode.body;
             this.news.pinned = fetchedNode.pinned;
             this.news.archived = fetchedNode.archived;
+            this.news.spaceId = fetchedNode.spaceId;
             CKEDITOR.instances['newsContent'].setData(fetchedNode.body);
             if (fetchedNode.illustrationURL) {
               newsServices.importFileFromUrl(fetchedNode.illustrationURL)
@@ -624,12 +591,6 @@ export default {
       }
 
       return newsServices.updateNews(updatedNews);
-    },
-    closeAttachments: function() {
-      this.showAttachments = false;
-    },
-    setUploadingCount: function(uploadingCount) {
-      this.uploading = uploadingCount > 0;
     }
   }
 };

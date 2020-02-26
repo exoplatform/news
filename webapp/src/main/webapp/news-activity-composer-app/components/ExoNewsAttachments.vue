@@ -105,6 +105,16 @@ export default {
     spaceId: {
       type: String,
       default: ''
+    },
+    maxFilesCount: {
+      type: String,
+      required: false,
+      default: null
+    },
+    maxFileSize: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data() {
@@ -118,8 +128,6 @@ export default {
       showDocumentSelector: false,
       fileSizeLimitError: false,
       filesCountLimitError: false,
-      maxFileSize: 25,
-      maxFilesCount: 10,
       BYTES_IN_MB: 1048576,
       MESSAGES_DISPLAY_TIME: 5000,
       drawerTitle: `${this.$t('news.composer.attachments.header')}`
@@ -138,6 +146,8 @@ export default {
     }
   },
   mounted() {
+    console.log(this.maxFilesCount);
+    console.log(this.maxFileSize);
     ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach( function( evt ) {
       /*
         For each event add an event listener that prevents the default action

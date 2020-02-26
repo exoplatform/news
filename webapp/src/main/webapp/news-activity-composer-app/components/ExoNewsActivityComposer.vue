@@ -63,7 +63,7 @@
         </div>
       </div>
     </form>
-    <exo-news-attachments :space-id="news.spaceId" v-model="news.attachments"></exo-news-attachments>
+    <exo-news-attachments :space-id="news.spaceId" v-model="news.attachments" :max-files-count="maxToUpload" :max-file-size="maxFileSize"></exo-news-attachments>
     <!-- The following bloc is needed in order to display the pin confirmation popup -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -109,7 +109,17 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
+    maxToUpload: {
+      type: String,
+      required: false,
+      default: null
+    },
+    maxFileSize: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   data() {
     return {

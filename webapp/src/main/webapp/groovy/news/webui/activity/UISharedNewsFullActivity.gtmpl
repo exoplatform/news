@@ -264,7 +264,9 @@ if (activity && news) {
   <div class="boxContainer" id="boxContainer">
   <div id="ContextBox${activity.id}" class="uiBox contentBox">
     <div id="ActivityContextBox${activity.id}">
+    <div class="news-details-shared">
       <div id="newsDetails"></div>
+      </div>
     <div class="sharedInfo">
       <div class="newsSpaceAndOwner">
         <div class="newsOwner">
@@ -274,7 +276,10 @@ if (activity && news) {
             </a>
           </div>
             <div class="userInfo">
-              <a href="$sharingUrl" target="_blank"> ${posterFullName} </a><span class="uiIconArrowRightMini uiIconLightGray"></span>
+              <a href="$sharingUrl" target="_blank"> ${posterFullName} </a>
+            </div>
+            <div class="createIn">
+                <span class="uiIconArrowRightMini uiIconLightGray"></span>
             </div>
               <div class="avatarSpace">
                 <a href="$urlSpaceShared" target="_blank">

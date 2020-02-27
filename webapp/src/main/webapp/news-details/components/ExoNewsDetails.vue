@@ -10,18 +10,20 @@
       </div>
     </div>
     <div v-else class="newsDetails-description">
-      <div class="newsDetails-header">
+      <div :class="[news.illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="news.illustrationURL" class="illustration">
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIcons">
+          <div class="newsDetailsIconsShared">
             <exo-news-share-activity v-if="showShareButton" :news="news"></exo-news-share-activity>
+          </div>
+          <div class="newsDetailsIcons">
             <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
             <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
           </div>
           <div class="news-top-information">
-            <div id="titleNews" class="newsTitle">
+            <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
             </div>
             <div v-if="news.archived" class="newsArchived">
@@ -29,33 +31,37 @@
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
-          <div class="news-header-content">
-            <div class="activityAvatar avatarCircle">
-              <a :href="news.authorProfileURL" target="_blank">
-                <img :src="news.profileAvatarURL" class="avatar">
-              </a>
-            </div>
-            <div id="informationNews" class="newsInformation">
-              <div class="newsAuthor">
-                <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName" target="_blank"> {{ news.authorFullName }} </a>
-                <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
-                <div class="newsSpace">
-                  <a :href="news.spaceUrl" class="newsInformationLabel" target="_blank">{{ news.spaceDisplayName }}</a>
+          <div class="newsInformationBackground">
+            <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content">
+              <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
+                <div class="activityAvatar avatarCircle">
+                  <a :href="news.authorProfileURL" target="_blank">
+                    <img :src="news.profileAvatarURL" class="avatar">
+                  </a>
                 </div>
-                <span class="newsInformationValue newsPostedDate">- {{ news.postedDate }}</span>
               </div>
-              <div v-if="showUpdateInfo" class="newsUpdater">
-                <div>
-                  <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
-                </div>
-                <div>
-                  <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
-
-                  <div v-if="news.authorFullName != news.updaterFullName ">
-                    <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
-                    <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
+              <div id="informationNews" class="newsInformation">
+                <div class="newsAuthor">
+                  <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName news-details-information" target="_blank"> {{ news.authorFullName }} </a>
+                  <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
+                  <div class="newsSpace">
+                    <a :href="news.spaceUrl" class="newsInformationLabel news-details-information" target="_blank">{{ news.spaceDisplayName }}</a>
                   </div>
+                  <span class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>
+                </div>
+                <div v-if="showUpdateInfo" class="newsUpdater">
+                  <div>
+                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
+                  </div>
+                  <div>
+                    <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
 
+                    <div v-if="news.authorFullName != news.updaterFullName ">
+                      <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
+                      <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
+                    </div>
+
+                  </div>
                 </div>
               </div>
             </div>
@@ -65,7 +71,7 @@
             <span v-html="linkifiedSummary"></span>
           </div>
 
-          <div id="newsBody" class="fullDetailsBody clearfix">
+          <div id="newsBody" :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']" class="fullDetailsBody clearfix">
             <span v-html="news.body"></span>
           </div>
 

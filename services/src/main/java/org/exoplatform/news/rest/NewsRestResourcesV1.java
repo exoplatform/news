@@ -504,11 +504,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       }
 
       if (!news.isPinned()) {
-        String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
-
         Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (space == null
-            || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+        if (space == null) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
       }

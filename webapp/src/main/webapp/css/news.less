@@ -3705,32 +3705,36 @@ i.uiIconBack:hover {
   }
 }
 
-.latestNewsLeft {
-  .contentText {
-    width: 100%;
+  .latestNewsLeft {
+    .contentText {
+      width: 100%;
+    }
+
+    .contentTitle, .contentBody {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
   }
 
-  .contentTitle, .contentBody {
-    padding-left: 20px;
-    padding-right: 20px;
+  .latestNewsRight {
+    margin-top: 20px;
   }
 }
 
-.latestNewsRight {
-  margin-top: 20px;
-}
-}
+  .newsApp {
+    .drawer {
+      .header {
+        display: block;
+      }
 
-.newsApp {
-.drawer {
-  .header {
-    display: block;
-  }
-  .content {
-    top: 50px;
-  }
-  .footer {
-    display: block;
+      .content {
+        top: 50px;
+      }
+
+      .footer {
+        display: block;
+      }
+    }
   }
 
   #newsShareActivity .drawer, .newsAttachments.drawer {
@@ -3738,13 +3742,13 @@ i.uiIconBack:hover {
       top: 50px;
       height: auto;
     }
+
     .footer {
       height: auto;
     }
   }
 }
-}
-}
+
 
 @media screen and (max-width: 1025px) {
 #newsActivityComposer #newsForm .dropZone img {

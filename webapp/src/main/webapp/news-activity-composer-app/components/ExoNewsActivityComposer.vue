@@ -28,6 +28,8 @@
           </button>
           <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
           </button>
+          <button class="btn" @click="goBack"> {{ $t("news.composer.btn.cancel") }}
+          </button>
         </div>
       </div>
       <div id="newsTop"></div>
@@ -601,6 +603,13 @@ export default {
       }
 
       return newsServices.updateNews(updatedNews);
+    },
+    goBack() {
+      if( history.length > 1) {
+        history.back();
+      } else {
+        window.open('/', '_self');
+      }
     }
   }
 };

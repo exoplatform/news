@@ -83,7 +83,7 @@
             </div>
           </div>
         </div>
-        <exo-server-files-selector v-if="showDocumentSelector" :attached-files="value" :space-id="spaceId" @attachExistingServerAttachment="toggleServerFileSelector" @cancel="toggleServerFileSelector()"></exo-server-files-selector>
+        <exo-server-files-selector v-if="showDocumentSelector" :attached-files="value" :space-id="spaceId" :max-files-count="maxFilesCount" @attachExistingServerAttachment="toggleServerFileSelector" @cancel="toggleServerFileSelector()"></exo-server-files-selector>
       </div>
       <div v-if="!showDocumentSelector" class="attachmentsFooter footer">
         <a class="btn" @click="closeAttachments()">{{ $t('news.composer.attachments.close') }}</a>
@@ -105,6 +105,16 @@ export default {
     spaceId: {
       type: String,
       default: ''
+    },
+    maxFilesCount: {
+      type: String,
+      required: false,
+      default: null
+    },
+    maxFileSize: {
+      type: String,
+      required: false,
+      default: null
     }
   },
   data() {
@@ -118,8 +128,6 @@ export default {
       showDocumentSelector: false,
       fileSizeLimitError: false,
       filesCountLimitError: false,
-      maxFileSize: 25,
-      maxFilesCount: 10,
       BYTES_IN_MB: 1048576,
       MESSAGES_DISPLAY_TIME: 5000,
       drawerTitle: `${this.$t('news.composer.attachments.header')}`

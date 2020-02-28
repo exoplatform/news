@@ -102,7 +102,12 @@ export default {
     attachedFiles: {
       type: Array,
       default: () => []
-    }
+    },
+    maxFilesCount: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   data() {
     return {
@@ -118,7 +123,6 @@ export default {
       files: [],
       space: {},
       selectedFiles: [],
-      maxFilesCount: 10,
       foldersHistory: [],
       showSearchInput: false,
       searchFilesFolders: '',

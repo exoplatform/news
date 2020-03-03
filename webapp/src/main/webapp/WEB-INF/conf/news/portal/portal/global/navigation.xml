@@ -30,22 +30,21 @@
         <node>
             <name>news</name>
             <label>#{news.navigation.node.label}</label>
-            <page-reference>portal::intranet::news</page-reference>
+            <visibility>SYSTEM</visibility>
+            <page-reference>portal::global::news</page-reference>
 
             <node>
-                <uri>news/editor</uri>
                 <name>editor</name>
-                <label>#{portal.intranet.newsEditor}</label>
+                <label>#{portal.global.newsEditor}</label>
                 <visibility>SYSTEM</visibility>
-                <page-reference>portal::intranet::newsComposer</page-reference>
+                <page-reference>portal::global::newsComposer</page-reference>
             </node>
 
             <node>
-                <uri>news/detail</uri>
                 <name>detail</name>
-                <label>#{portal.intranet.newsDetail}</label>
+                <label>#{portal.global.newsDetail}</label>
                 <visibility>SYSTEM</visibility>
-                <page-reference>portal::intranet::newsDetail</page-reference>
+                <page-reference>portal::global::newsDetail</page-reference>
             </node>
         </node>
     </page-nodes>

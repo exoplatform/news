@@ -84,11 +84,6 @@
               <read-only>false</read-only>
             </preference>
             <preference>
-              <name>nodeIdentifier</name>
-              <value>/sites/intranet/web contents/site artifacts/Welcome</value>
-              <read-only>false</read-only>
-            </preference>
-            <preference>
               <name>ShowPrintAction</name>
               <value>false</value>
               <read-only>false</read-only>

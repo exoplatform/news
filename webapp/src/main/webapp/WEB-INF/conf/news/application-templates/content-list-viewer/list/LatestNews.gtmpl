@@ -13,7 +13,7 @@
   import org.exoplatform.portal.webui.util.Util;
   import groovy.json.JsonOutput;
   import org.htmlcleaner.HtmlCleaner;
-  import java.util.List;
+  import java.util.*;
   import org.exoplatform.news.model.News;
   import org.htmlcleaner.HtmlCleaner;
 
@@ -42,8 +42,19 @@
     def siteName = Util.getPortalRequestContext().getPortalOwner();
     def seeAllUrl = "/portal/" + siteName + "/news?filter=pinned";
 
+    List newsInfos = new ArrayList();
+    for(News news : listNews) {
+      Map<String, String> newsInfo = new HashMap();
+      newsInfo.put("id", news.id);
+      newsInfo.put("title", news.title);
+      newsInfo.put("body", news.body);
+      newsInfo.put("illustrationURL", news.illustrationURL);
+      newsInfo.put("url", news.url);
+      newsInfos.add(newsInfo);
+    }
+
     def params = """ {
-      newsInfo: ${JsonOutput.toJson(listNews)},
+      newsInfo: ${JsonOutput.toJson(newsInfos)},
       seeAllLabel: '$seeAll',
       header: '${header}',
       url: '${seeAllUrl}',

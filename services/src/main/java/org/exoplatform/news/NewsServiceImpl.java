@@ -715,6 +715,9 @@ public class NewsServiceImpl implements NewsService {
     Space space = spaceService.getSpaceById(news.getSpaceId());
     if (space != null) {
       String spaceName = space.getDisplayName();
+      String currentUser = getCurrentUserId();
+      boolean hiddenSpace = space.getVisibility().equals(Space.HIDDEN) && !spaceService.isMember(space, currentUser) && !spaceService.isSuperManager(currentUser);
+      news.setHiddenSpace(hiddenSpace);
       news.setSpaceDisplayName(spaceName);
       if(StringUtils.isNotEmpty(space.getGroupId())) {
         String spaceGroupId = space.getGroupId().split("/")[2];

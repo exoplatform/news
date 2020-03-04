@@ -202,6 +202,9 @@ public class NewsServiceImplTest {
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
     when(spaceService.isSuperManager("user")).thenReturn(false);
+    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
+    when(space.getVisibility()).thenReturn("private");
+    when(spaceService.isSuperManager(anyString())).thenReturn(false);
 
     // When
     News news = newsService.getNewsById("1");
@@ -345,6 +348,9 @@ public class NewsServiceImplTest {
     Property actProperty = mock(Property.class);
     when(actProperty.getString()).thenReturn("1:2;1:3");
     when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
+    when(space.getVisibility()).thenReturn("private");
+    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
+    when(spaceService.isSuperManager(anyString())).thenReturn(false);
 
     // When
     News news = newsService.getNewsById("1");
@@ -1352,7 +1358,7 @@ public class NewsServiceImplTest {
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
     setCurrentIdentity();
     when(spaceService.isSuperManager("user")).thenReturn(false);
-
+    when(space.getVisibility()).thenReturn("private");
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName", "test test");
     NewsFilter newsFilter = new NewsFilter();
@@ -2111,7 +2117,9 @@ public class NewsServiceImplTest {
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
     when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
-
+    when(space.getVisibility()).thenReturn("private");
+    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
+    when(spaceService.isSuperManager(anyString())).thenReturn(false);
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName", "root root");
 
@@ -2196,6 +2204,7 @@ public class NewsServiceImplTest {
     space1.setId("1");
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
+    space1.setVisibility("private");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("jean");
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
@@ -2253,6 +2262,7 @@ public class NewsServiceImplTest {
     space1.setId("1");
     space1.setDisplayName("space1");
     space1.setGroupId("space1");
+    space1.setVisibility("private");
 
     Node newsNode = mock(Node.class);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
@@ -2356,6 +2366,7 @@ public class NewsServiceImplTest {
     space1.setId("1");
     space1.setDisplayName("space1");
     space1.setGroupId("space1");
+    space1.setVisibility("private");
 
     Node newsNode = mock(Node.class);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
@@ -2462,6 +2473,7 @@ public class NewsServiceImplTest {
     space1.setDisplayName("space1");
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
+    space1.setVisibility("private");
 
     Node newsNode = mock(Node.class);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
@@ -2588,6 +2600,9 @@ public class NewsServiceImplTest {
     when(node3.hasNode("illustration")).thenReturn(false);
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
+    when(spaceService.isSuperManager(anyString())).thenReturn(false);
+    when(space.getVisibility()).thenReturn("private");
     when(space.getDisplayName()).thenReturn("Test news space");
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);

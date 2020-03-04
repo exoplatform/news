@@ -119,6 +119,7 @@
 
     def showEditButton = newsService.canEditNews(news.author, news.spaceId);
     def showPinInput = newsService.canPinNews();
+    def hiddenSpace = news.hiddenSpace;
 
     def params = """ {
       activityId: '${activityId}',
@@ -144,13 +145,20 @@
         spaceUrl:'${news.spaceUrl}',
         spaceAvatarUrl: '${news.spaceAvatarUrl}',
         url: '${news.url}',
-        activityId: '${activityId}'
+        activityId: '${activityId}',
+        hiddenSpace: ${news.hiddenSpace},
       },
       showEditButton: $showEditButton,
       showPinInput: $showPinInput,
     } """
+    def notAuthorizedUserLabel = "";
+    if( hiddenSpace ){
+      notAuthorizedUserLabel = _ctx.appRes("news.activity.notAuthorizedUserForSpaceHidden");
+    }else {
+      notAuthorizedUserLabel = _ctx.appRes("news.activity.notAuthorizedUser").replace("{0}",spaceName);
+    }
 
-    def notAuthorizedUserLabel = _ctx.appRes("news.activity.notAuthorizedUser").replace("{0}",spaceName);
+
 
     def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
     jsManager.require("SHARED/jquery", "jq")

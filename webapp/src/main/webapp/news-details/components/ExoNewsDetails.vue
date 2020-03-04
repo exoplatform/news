@@ -43,8 +43,8 @@
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
                   <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName news-details-information" target="_blank"> {{ news.authorFullName }} </a>
-                  <span class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
-                  <div class="newsSpace">
+                  <span v-if="!news.hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
+                  <div v-if="!news.hiddenSpace" class="newsSpace">
                     <a :href="news.spaceUrl" class="newsInformationLabel news-details-information" target="_blank">{{ news.spaceDisplayName }}</a>
                   </div>
                   <span class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>

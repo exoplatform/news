@@ -56,7 +56,7 @@
               xs12
               sm6>
               <v-img
-                :src="newsInfo[0].illustration"
+                :src="newsInfo[0].illustrationURL"
                 aspect-ratio="2.3"
                 @click="openNews(newsInfo[0].url)">
                 <v-row align="end" class="lightbox white--text pa-2 fill-height">
@@ -93,7 +93,7 @@
                         tile
                         size="95"
                         class="mr-2 my-0">
-                        <v-img :src="item.illustration" @click="openNews(item.url)"/>
+                        <v-img :src="item.illustrationURL" @click="openNews(item.url)"/>
                       </v-list-item-avatar>
 
                       <v-list-item-content class="pt-0 pl-3">
@@ -116,7 +116,7 @@
             <v-carousel-item
               v-for="(slide, index) of newsInfo"
               :key="index"
-              :src="slide.illustration"
+              :src="slide.illustrationURL"
               aspect-ratio="2.3"
               @click="openNews(slide.url)">
               <v-sheet
@@ -174,10 +174,8 @@ export default {
   },
   created() {
     for (let i=0; i<this.newsInfo.length; i++){
-      if(this.newsInfo[i].illustration === null) {
-        this.newsInfo[i].illustration = '/news/images/newsImageDefault.png';
-      }else {
-        this.newsInfo[i].illustration = `/portal/rest/v1/news/${this.newsInfo[i].id}/illustration`;
+      if(this.newsInfo[i].illustrationURL === null) {
+        this.newsInfo[i].illustrationURL = '/news/images/newsImageDefault.png';
       }
     }
   },

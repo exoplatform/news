@@ -68,8 +68,8 @@
                 <img :src="news.profileAvatarURL">
                 <span>{{ news.authorFullName }}</span>
               </a>
-              <i class="uiIconArrowNext"></i>
-              <span class="newsSpace">
+              <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
+              <span v-if="!news.hiddenSpace" class="newsSpace">
                 <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
                   <img :src="news.spaceAvatarUrl">
                   <span>{{ news.spaceDisplayName }}</span>
@@ -260,6 +260,7 @@ export default {
           pinned: item.pinned,
           activities: item.activities,
           spaceAvatarUrl: item.spaceAvatarUrl,
+          hiddenSpace: item.hiddenSpace,
         });
       });
       if(append) {

@@ -44,7 +44,7 @@ def streamOwner = activity.getStreamOwner();
   def labelShowPreviousComments = _ctx.appRes("UIActivity.label.Show_Previous_Comments");
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
-
+  def labelSpaceHidden = _ctx.appRes("news.activity.shared.hiddenSpace");
   def labelOriginalSpace = _ctx.appRes("news.activity.shared.originalSpace");
 
   def labelOnePersonLikeThis=_ctx.appRes("UIActivity.label.One_Person_Like_This");
@@ -92,6 +92,7 @@ def streamOwner = activity.getStreamOwner();
 
   def isArchived = news.archived;
   def canArchive = news.canArchive;
+  def hiddenSpace = news.hiddenSpace;
   def archivedLabel = _ctx.appRes("news.archive.label");
 
   def placeholder = _ctx.appRes("UIActivity.comment.placeholder").replace("'", "\\'");
@@ -402,8 +403,10 @@ def streamOwner = activity.getStreamOwner();
                             </div>
                         </div>
                         <div class="originalSpace">
-                        <% if(originalSpace) { %>
+                        <% if(originalSpace && !hiddenSpace) { %>
                             ${labelOriginalSpace} <img class="avatarMini" alt="$originalSpaceName" src="$originalSpaceImageSource"/> $originalSpaceName
+                        <% } else { %>
+                          ${labelOriginalSpace} $labelSpaceHidden
                         <% } %>
                         </div>
                     </div>

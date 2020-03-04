@@ -195,6 +195,7 @@
       spaceUrl:'${news.spaceUrl}',
       spaceAvatarUrl: '${news.spaceAvatarUrl}',
       url: '${news.url}',
+      hiddenSpace: ${news.hiddenSpace},
     },
     showShareButton: true,
     showEditButton: $showEditButton,

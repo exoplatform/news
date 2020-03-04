@@ -65,6 +65,8 @@ public class News {
 
   private String url;
 
+  private boolean hiddenSpace;
+
   public String getId() {
     return id;
   }
@@ -295,5 +297,13 @@ public class News {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public boolean isHiddenSpace() {
+    return hiddenSpace;
+  }
+
+  public void setHiddenSpace(boolean hiddenSpace) {
+    this.hiddenSpace = hiddenSpace;
   }
 }

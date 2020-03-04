@@ -209,6 +209,7 @@ if (activity && news) {
        profileAvatarURL: '${ownerAvatar}',
        spaceDisplayName: '${news.spaceDisplayName}',
        spaceUrl:'${news.spaceUrl}',
+       hiddenSpace: ${news.hiddenSpace},
      },
     showShareButton: false,
     showEditButton: false,

@@ -29,7 +29,7 @@
         <a class="attachmentsCloseIcon" @click="closeAttachments()">×</a>
       </div>
       <div :class="showDocumentSelector? 'serverFiles' : 'newsAttachments'" class="content">
-        <div v-if="!showDocumentSelector" class="newsAttachmentsContent">
+        <div v-show="!showDocumentSelector" class="newsAttachmentsContent">
           <div class="multiploadFilesSelector">
             <div id="DropFileBox" ref="dropFileBox" class="dropFileBox">
               <span class="dropMsg">{{ $t('news.composer.attachments.drop') }}</span>

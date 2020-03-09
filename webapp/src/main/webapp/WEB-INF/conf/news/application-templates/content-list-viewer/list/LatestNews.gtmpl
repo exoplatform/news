@@ -23,16 +23,22 @@
   def currentPageData = uicomponent.getCurrentPageData();
   def nodes = new ArrayList();
   def seeAll = _ctx.appRes("news.pinned.seeAll");
-  def nbOfNewsToDisplay = currentPageData.size() > 4 ? 4 : currentPageData.size();
-  for (int i=0 ; i < nbOfNewsToDisplay; i++) {
-    if(Utils.isViewable(currentPageData.get(i))) {
-      nodes.add(currentPageData.get(i));
-    }
-    listNews.add(newsService.convertNodeToNews(nodes.get(i)));
-    def body = new HtmlCleaner().clean(listNews.get(i).getBody()).getText();
+  for (int i=0 ; i < currentPageData.size(); i++) {
+    def node = currentPageData.get(i);
+    if(Utils.isViewable(node)) {
+      nodes.add(node);
+
+      def news = newsService.convertNodeToNews(node);
+      def body = new HtmlCleaner().clean(news.getBody()).getText();
       if( body != null ){
-        listNews.get(i).setBody(body.toString());
+        news.setBody(body.toString());
       }
+      listNews.add(news);
+
+      if(listNews.size() >= 4) {
+        break;
+      }
+    }
   }
   if (uicomponent.getUIPageIterator().getAvailable() > 0) {
     ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);

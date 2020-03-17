@@ -251,7 +251,7 @@ export default {
           url: item.url,
           authorFullName: item.authorDisplayName,
           profileAvatarURL: `/portal/rest/v1/social/users/${item.author}/avatar`,
-          authorProfileURL: `/portal/intranet/profile/${item.author}`,
+          authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,

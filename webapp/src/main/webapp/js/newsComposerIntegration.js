@@ -7,7 +7,7 @@
         if(!newsEditorLink) {
           newsEditorLink = document.createElement('a');
           newsEditorLink.setAttribute('class', 'newsEditorComposerLink');
-          let url = '/portal/intranet/news/editor';
+          let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
           if(spaceId) {
             url += '?spaceId=' + spaceId;
           }

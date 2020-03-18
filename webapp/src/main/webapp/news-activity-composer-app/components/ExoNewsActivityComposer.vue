@@ -1,6 +1,5 @@
 <template>
   <div id="newsActivityComposer" class="newsComposer">
-
     <div class="newsComposerActions">
       <div class="newsFormButtons">
         <div class="newsFormLeftActions">
@@ -20,8 +19,11 @@
           <div class="newsDrafts">
             <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
           </div>
-          <button id="newsPost" :disabled="postDisabled" class="btn btn-primary" @click="postNews"> {{ $t("news.composer.post") }}
-          </button>
+          <div class="VuetifyApp">
+            <v-app>
+              <v-btn id="newsPost" :loading="postingNews" :disabled="postDisabled || postingNews" elevation="0" class="btn btn-primary" @click="postNews">{{ $t("news.composer.post") }}</v-btn>
+            </v-app>
+          </div>
         </div>
         <div v-if="editMode" class="newsFormRightActions">
           <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
@@ -411,7 +413,6 @@ export default {
       }
 
       newsServices.saveNews(news).then((createdNews) => {
-        this.postingNews = false;
         let createdNewsActivity = null;
         if(createdNews.activities) {
           const createdNewsActivities = createdNews.activities.split(';')[0].split(':');

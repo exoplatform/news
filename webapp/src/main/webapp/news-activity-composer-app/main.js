@@ -12,7 +12,10 @@ const vuetify = new Vuetify({
 const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
 
 // should expose the locale resources as REST API
-const url = `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
+const urls = [
+  `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`,
+  `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.attachmentsSelector.attachments-${lang}.json`
+];
 
 // get overrided components if exists
 if (extensionRegistry) {
@@ -27,7 +30,7 @@ if (extensionRegistry) {
 let newsActivityComposerApp;
 export function init(showPin, maxToUpload, maxFileSize) {
   // getting locale resources
-  exoi18n.loadLanguageAsync(lang, url).then(i18n => {
+  exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale resources are ready
     newsActivityComposerApp = new Vue({
       el: '#NewsComposerApp',

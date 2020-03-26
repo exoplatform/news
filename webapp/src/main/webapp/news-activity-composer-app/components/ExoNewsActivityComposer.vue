@@ -67,7 +67,28 @@
         </div>
       </div>
     </form>
-    <exo-news-attachments :space-id="news.spaceId" v-model="news.attachments" :max-files-count="maxToUpload" :max-file-size="maxFileSize"></exo-news-attachments>
+
+    <div class="VuetifyApp">
+      <v-app>
+        <v-btn
+          class="attachmentsButton"
+          fixed
+          bottom
+          right
+          fab
+          x-large
+          @click="openApp()"
+        >
+          <i class="uiIconAttachment"></i>
+          <v-progress-circular
+            :class="uploading ? 'uploading' : ''"
+            indeterminate>
+            {{ news.attachments.length }}
+          </v-progress-circular>
+        </v-btn>
+      </v-app>
+    </div>
+    <exo-attachments :space-id="news.spaceId" v-model="news.attachments" :max-files-count="maxToUpload" :max-file-size="maxFileSize" :show-attachments-drawer="showAttachmentsDrawer" @HideAttachmentsDrawer="onHideAttachmentsDrawer"></exo-attachments>
     <!-- The following bloc is needed in order to display the pin confirmation popup -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -173,7 +194,7 @@ export default {
       illustrationChanged: false,
       attachmentsChanged: false,
       imagesURLs: new Map(),
-      showAttachments: false,
+      showAttachmentsDrawer: false,
       uploading: false
     };
   },
@@ -229,7 +250,6 @@ export default {
       this.initDone = true;
     }
     this.displayFormTitle();
-
   },
   mounted() {
     $('[rel="tooltip"]').tooltip();
@@ -611,7 +631,13 @@ export default {
       } else {
         window.open('/', '_self');
       }
-    }
+    },
+    openApp() {
+      this.showAttachmentsDrawer = true;
+    },
+    onHideAttachmentsDrawer: function(showAttachments){
+      this.showAttachmentsDrawer = showAttachments;
+    },
   }
 };
 </script>

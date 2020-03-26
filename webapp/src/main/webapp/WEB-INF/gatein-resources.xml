@@ -68,7 +68,8 @@
         <module>socialUtil</module>
       </depends>
       <depends>
-        <module>newsAttachmentComponent</module>
+        <module>ExoAttachmentsApp</module>
+        <as>attachmentsApp</as>
       </depends>
     </module>
   </portlet>

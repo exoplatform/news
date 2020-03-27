@@ -22,8 +22,10 @@
   List<News> listNews = new ArrayList<News>();
   def currentPageData = uicomponent.getCurrentPageData();
   def nodes = new ArrayList();
-  String sliderSpaceId = System.getProperty("exo.news.slider.space.id");  
+  String sliderSpacePrettyName = System.getProperty("exo.news.slider.space.prettyName", "communication");  
   def seeAll = _ctx.appRes("news.pinned.seeAll");
+  Space sliderSpace = spaceService.getSpaceByPrettyName(sliderSpacePrettyName);
+  String sliderSpaceId = sliderSpace != null ? sliderSpace.getId() : null;
   for (int i=0 ; i < currentPageData.size(); i++) {
     def node = currentPageData.get(i);
     if(Utils.isViewable(node) && (sliderSpaceId == null || !node.hasProperty("exo:spaceId") || !node.getProperty("exo:spaceId").getString().equals(sliderSpaceId))) {

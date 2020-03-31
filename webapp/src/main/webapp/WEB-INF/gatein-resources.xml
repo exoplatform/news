@@ -110,6 +110,16 @@
   </portlet>
 
   <module>
+    <name>newsComposerPlugin</name>
+    <script>
+      <path>/js/newsComposerPlugin.js</path>
+    </script>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
+
+  <module>
     <name>newsComposerIntegration</name>
     <script>
       <path>/js/newsComposerIntegration.js</path>

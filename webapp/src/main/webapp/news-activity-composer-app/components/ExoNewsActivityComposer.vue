@@ -252,9 +252,17 @@ export default {
     this.displayFormTitle();
   },
   mounted() {
-    $('[rel="tooltip"]').tooltip();
+    document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
-    this.extendForm();
+    this.initCKEditor().then(editor => {
+      const message = localStorage.getItem('exo-activity-composer-message');
+      if(message) {
+        editor.setData(message);
+        localStorage.removeItem('exo-activity-composer-message');
+      }
+    });
+
+    $('[rel="tooltip"]').tooltip();
   },
   beforeDestroy() {
     const textarea = document.querySelector('#activityComposerTextarea');
@@ -283,36 +291,44 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
-      $('textarea#newsContent').ckeditor({
-        customConfig: '/commons-extension/ckeditorCustom/config.js',
-        extraPlugins: extraPlugins,
-        removePlugins: 'image,confirmBeforeReload,maximize,resize',
-        allowedContent: true,
-        toolbarLocation: 'top',
-        removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-        toolbar: [
-          { name: 'format', items: ['Format'] },
-          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'fontsize', items: ['FontSize'] },
-          { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
-        ],
-        format_tags: 'p;h1;h2;h3',
-        autoGrow_minHeight: this.newsFormContentHeight,
-        height: this.newsFormContentHeight,
-        bodyClass: 'newsContent',
-        dialog_noConfirmCancel: true,
-        sharedSpaces: {
-          top: 'newsTop'
-        },
-        on: {
-          change: function (evt) {
-            self.news.body = evt.editor.getData();
+
+      const promiseCkeditor = new Promise(function(resolve) {
+        $('textarea#newsContent').ckeditor({
+          customConfig: '/commons-extension/ckeditorCustom/config.js',
+          extraPlugins: extraPlugins,
+          removePlugins: 'image,confirmBeforeReload,maximize,resize',
+          allowedContent: true,
+          toolbarLocation: 'top',
+          removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
+          toolbar: [
+            { name: 'format', items: ['Format'] },
+            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+            { name: 'fontsize', items: ['FontSize'] },
+            { name: 'colors', items: [ 'TextColor' ] },
+            { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+            { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+          ],
+          format_tags: 'p;h1;h2;h3',
+          autoGrow_minHeight: self.newsFormContentHeight,
+          height: self.newsFormContentHeight,
+          bodyClass: 'newsContent',
+          dialog_noConfirmCancel: true,
+          sharedSpaces: {
+            top: 'newsTop'
+          },
+          on: {
+            instanceReady: function(evt) {
+              resolve(evt.editor);
+            },
+            change: function (evt) {
+              self.news.body = evt.editor.getData();
+            }
           }
-        }
+        });
       });
+
+      return promiseCkeditor;
     },
     displayFormTitle: function() {
       if(!this.editMode) {
@@ -446,10 +462,6 @@ export default {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
         }
       });
-    },
-    extendForm: function(){
-      document.body.style.overflow = 'hidden';
-      this.initCKEditor();
     },
     saveNewsDraft: function () {
       const news = {

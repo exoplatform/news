@@ -8,7 +8,9 @@ if (uicomponent.isEnabled()) {
   def labels = """ {
     writeLinkLabel: '${_ctx.appRes("news.composer.write")}'
   } """
-  jsManager.require("SHARED/newsComposerIntegration","newsComposerIntegration")
+
+  jsManager.require("SHARED/newsComposerPlugin","newsComposerPlugin")
+         .require("SHARED/newsComposerIntegration","newsComposerIntegration")
          .addScripts("newsComposerIntegration.init($spaceId, $labels) ;");
 }
 

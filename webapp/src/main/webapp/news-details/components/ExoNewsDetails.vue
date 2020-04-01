@@ -81,7 +81,7 @@
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachments">
             <div v-for="attachedFile in news.attachments" :key="attachedFile.id" class="newsAttachment" @click="openPreview(attachedFile)">
-              <exo-news-attachment :file="attachedFile"></exo-news-attachment>
+              <exo-attachment-item :file="attachedFile"></exo-attachment-item>
             </div>
           </div>
         </div>

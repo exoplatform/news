@@ -88,7 +88,7 @@
         </v-btn>
       </v-app>
     </div>
-    <exo-attachments :space-id="news.spaceId" v-model="news.attachments" :max-files-count="maxToUpload" :max-file-size="maxFileSize" :show-attachments-drawer="showAttachmentsDrawer" @HideAttachmentsDrawer="onHideAttachmentsDrawer" @uploadingCountChanged="setUploadingCount"></exo-attachments>
+    <exo-attachments ref="attachmentsComponent" :space-id="news.spaceId" v-model="news.attachments" @HideAttachmentsDrawer="onHideAttachmentsDrawer" @uploadingCountChanged="setUploadingCount"></exo-attachments>
     <!-- The following bloc is needed in order to display the pin confirmation popup -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -134,17 +134,7 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    },
-    maxToUpload: {
-      type: String,
-      required: false,
-      default: null
-    },
-    maxFileSize: {
-      type: String,
-      required: false,
-      default: null
-    },
+    }
   },
   data() {
     return {
@@ -194,7 +184,6 @@ export default {
       illustrationChanged: false,
       attachmentsChanged: false,
       imagesURLs: new Map(),
-      showAttachmentsDrawer: false,
       uploading: false
     };
   },
@@ -645,7 +634,7 @@ export default {
       }
     },
     openApp() {
-      this.showAttachmentsDrawer = true;
+      this.$refs.attachmentsComponent.toggleAttachmentsDrawer();
     },
     onHideAttachmentsDrawer: function(showAttachments){
       this.showAttachmentsDrawer = showAttachments;

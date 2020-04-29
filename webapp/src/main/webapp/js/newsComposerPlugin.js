@@ -25,9 +25,9 @@
     }
   };
 
-  const hintActivityComposerPlugin = {
-    key: 'hint',
-    rank: 10,
+  const switchToArticleActivityComposerPlugin = {
+    key: 'switchToArticle',
+    rank: 40,
     resourceBundle: 'locale.portlet.news.News',
     labelKey: 'news.composer.switch.article',
 
@@ -48,5 +48,5 @@
   }
 
   extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-action', newsActivityComposerPlugin);
-  extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-hint-action', hintActivityComposerPlugin);
+  extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-hint-action', switchToArticleActivityComposerPlugin);
 })(extensionRegistry);

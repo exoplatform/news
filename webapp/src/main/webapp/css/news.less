@@ -2609,8 +2609,7 @@ i.uiIconBack:hover {
   }
 
   .v-skeleton-loader__bone::after {
-    animation: loader 2s infinite;
-    animation-timing-function: linear;
+    animation: none!important;
     content: "";
     height: 100%;
     left: 0;
@@ -3540,4 +3539,36 @@ p.caption-title:after {
   height: 60px;
   margin: 10px 0 0 10px;
   background-size: 40px;
+}
+
+.noNews {
+  display: flex;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
+  width: -webkit-fill-available;
+  .noNewsContent {
+    text-align: center;
+    margin: auto;
+    .uiNoNewsIcon {
+      color: #6d7d9821;
+      font-size: 60px;
+      font-style: normal;
+      font-weight: normal;
+      &:before {
+        font-family: 'PLF-FONT-ICONS';
+        content: "\e62a" !important;
+      }
+    }
+    .noNewsTitle {
+      color: #4d5466;
+      font-weight: normal;
+      font-size: 22px;
+    }
+    p {
+      font-weight: normal;
+      font-size: 15px;
+      color: #a8b3c5;
+    }
+  }
 }

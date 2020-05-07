@@ -43,7 +43,6 @@
       }
     }
   }
-  if (uicomponent.getUIPageIterator().getAvailable() > 0) {
     ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
     newsResourceBundle = resourceBundleService.getResourceBundle("locale.portlet.news.News", Util.getPortalRequestContext().getLocale());
     def header = uicomponent.getHeader();
@@ -131,6 +130,3 @@
   </div>
  </div>
 </div>
-<%
-}
-%>

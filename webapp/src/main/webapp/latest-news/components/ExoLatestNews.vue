@@ -56,6 +56,7 @@
               xs12
               sm6>
               <v-img
+                v-if="typeof newsInfo[0] !== 'undefined'"    
                 :src="newsInfo[0].illustrationURL"
                 aspect-ratio="2.3"
                 @click="openNews(newsInfo[0].url)">
@@ -106,9 +107,16 @@
 
               </v-layout>
             </v-flex>
+            <div v-if="newsInfo.length === 0" class="noNews">
+              <div class="noNewsContent">
+                <i class="uiNoNewsIcon"></i>
+                <div class="noNewsTitle">{{ $t('news.latest.noNews') }}</div>
+              </div>
+            </div>
           </v-layout>
 
-          <v-carousel
+          <v-carousel 
+            v-if="newsInfo.length !== 0"
             :height="250"
             class="d-sm-none carousel-news"
             touch
@@ -136,6 +144,12 @@
               </v-sheet>
             </v-carousel-item>
           </v-carousel>
+          <div v-else class="d-sm-none noNews">
+            <div class="noNewsContent">
+              <i class="uiNoNewsIcon"></i>
+              <div class="noNewsTitle">{{ $t('news.latest.noNews') }}</div>
+            </div>
+          </div>
         </v-flex>
       </v-layout>
     </v-container>

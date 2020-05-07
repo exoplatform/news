@@ -16,7 +16,7 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
 <script>
 	require( ["SHARED/jquery", "SHARED/bootstrap", "SHARED/bts_carousel" ], function(jQuery){
 		jQuery(document).ready(function () {
-			jQuery('.carousel').carousel({
+			jQuery('.eventAlAUne').carousel({
 				interval: 5000
 			});
 		});
@@ -27,7 +27,7 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
    def newsAlaUne = uicomponent.getCurrentPageData();
 %>
 
-<div id="eventAlAUne" class="carousel slide" data-ride="carousel">
+<div id="eventAlAUne" data-ride="carousel">
 
     <!-- Begin Wrapper for slides -->
     <div class="carousel-inner">
@@ -124,24 +124,26 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
 		Space sliderSpace = spaceService.getSpaceByPrettyName(sliderSpacePrettyName);
 		String sliderSpaceId = sliderSpace != null ? sliderSpace.getId() : null;
 		def currentUsername = newsService.getCurrentIdentity().getUserId();
+		def portalOwner = CommonsUtils.getCurrentPortalOwner();
 		if (newsAlaUne.size() != 0 ) { %>
 		<a class="left carousel-control" href="javascript:void(0)" data-slide="prev" data-target="#eventAlAUne">‹</a>
 		<a class="right carousel-control" href="javascript:void(0)" data-slide="next" data-target="#eventAlAUne">›</a>
-		<% } else if (spaceService.isMember(sliderSpace, currentUsername)) { %>
-		<div class="noNewsSlideContent">
-			<div class="bookImage"></div>
-			<div class="noNewsMsg"><%= _ctx.appRes("news.slider.yourArticleTitleGoesHere") %></div>
-			<div class="addArticleBtn">
-				<button class="btn"
-						onclick="javascript:window.location.href='/portal/dw/news/editor?spaceId=$sliderSpaceId'">
-					<%= _ctx.appRes("news.slider.write") %>
-				</button>
-			</div>
-		</div>
 		<% } else {%>
 		<div class="noNewsSlideContent">
-			<div class="bookImage"></div>
-			<div class="noNewsMsg"><%= _ctx.appRes("news.slider.yourArticleTitleGoesHere") %></div>
+			<div class="noNewsImage">
+				<div class="bookImage"></div>
+			</div>
+			<div class="NewsSliderText">
+				<div class="noNewsMsg"><%= _ctx.appRes("news.slider.yourArticleTitleGoesHere") %></div>
+				<% if (sliderSpaceId != null && spaceService.isMember(sliderSpace, currentUsername)) {%>
+				<div class="addArticleBtn">
+					<button class="btn"
+							onclick="window.open('/portal/$portalOwner/news/editor?spaceId=$sliderSpaceId', '_blank')">
+						<%= _ctx.appRes("news.slider.write") %>
+					</button>
+				</div>
+				<% } %>
+			</div>
 		</div>
 		<% } %>
 	</div>

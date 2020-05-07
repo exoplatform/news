@@ -3296,7 +3296,6 @@ max-height: 400px;
 
 #eventAlAUne {
   position: relative;
-  margin-bottom: 20px;
   line-height: 1;
   box-shadow: none;
   margin-top: -1px;
@@ -3345,13 +3344,6 @@ max-height: 400px;
 .caption-description  {
     color: #a3a3a3;
     font-size: 16px;
-}
-
-.carousel {
-    position: relative;
-    margin-bottom: 20px;
-    line-height: 1;
-    box-shadow: 0px 0px 7px 0px #e0e0e0;
 }
 
 @media (max-width: 460px) {
@@ -3572,35 +3564,60 @@ p.caption-title:after {
     }
   }
 }
-
-.bookImage {
-  content: url("@{images-path}/book.png");
-  height: 12rem;
+.noNewsImage {
+  height: inherit;
+  width: 25%;
   float: right;
-  padding-top: 12px;
-  padding-right: 50px;
-  opacity: 20%;
+  .bookImage {
+    content: url("@{images-path}/book.png");
+    height: 12rem;
+    float: right;
+    padding-top: 12px;
+    padding-right: 50px;
+    opacity: 20%;
+  }
 }
+
 .noNewsSlideContent {
   height: 220px;
   background-color: @primaryColor;
-
-  .noNewsMsg {
-    margin: auto;
-    width: max-content;
-    color: white;
-    font-size: 2rem;
-    padding-top: 60px;
-  }
-  .addArticleBtn {
-    width: 100%;
-    text-align: center;
-    padding-top: 18px;
-    padding-left: 18rem;
-
-    .btn {
-      width: 20%;
+  .NewsSliderText {
+    height: inherit;
+    width: 50%;
+    float: right;
+    .noNewsMsg {
+      margin: auto;
+      width: max-content;
+      color: white;
+      font-size: 2rem;
+      padding-top: 60px;
     }
+    .addArticleBtn {
+      width: 100%;
+      text-align: center;
+      padding-top: 18px;
+      .btn {
+        width: 32%;
+      }
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .noNewsSlideContent {
+    height: 130px;
+    .NewsSliderText {
+      width: 100%;
+      .noNewsMsg {
+        font-size: 1rem;
+      }
+      .addArticleBtn {
+        display: none;
+      }
+    }
+  }
+  .noNewsImage {
+    display: none;
   }
 }
 

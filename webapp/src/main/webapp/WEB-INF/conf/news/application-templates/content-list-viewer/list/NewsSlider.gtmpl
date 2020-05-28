@@ -106,10 +106,10 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
 				if(!Utils.isViewable(viewNode)) continue;
         %>
 				<% if (j==0){ %>
-					<li data-target="#eventAlAUne" data-slide-to="${j-1}" class="active"></li>
+					<li data-target="#eventAlAUne" data-slide-to="${j}" class="active"></li>
 				<% }
 				else{ %>
-					<li data-target="#eventAlAUne" data-slide-to="${j-1 }" class=""></li>
+					<li data-target="#eventAlAUne" data-slide-to="${j}" class=""></li>
 				<%} %>
 		<%
 				if(j==6) break;

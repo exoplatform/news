@@ -250,7 +250,13 @@ export default {
         localStorage.removeItem('exo-activity-composer-message');
       }
     });
-
+    this.$nextTick(() => {
+      const attachmentsComposer = JSON.parse(localStorage.getItem('exo-activity-composer-attachments'));
+      if (attachmentsComposer) {
+        this.news.attachments = attachmentsComposer;
+        localStorage.removeItem('exo-activity-composer-attachments');
+      }
+    });
     $('[rel="tooltip"]').tooltip();
   },
   beforeDestroy() {

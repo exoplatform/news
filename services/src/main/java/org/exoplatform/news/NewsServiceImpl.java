@@ -673,13 +673,14 @@ public class NewsServiceImpl implements NewsService {
       if(StringUtils.isNotEmpty(strActivities)) {
         String[] activities = strActivities.split(";");
         StringBuilder memberSpaceActivities = new StringBuilder();
-        String currentUsername = getCurrentIdentity().getUserId();
+        org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+        String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
         String portalName = PortalContainer.getCurrentPortalContainerName();
         String portalOwner = CommonsUtils.getCurrentPortalOwner();
         StringBuilder newsUrl = new StringBuilder("");
-        if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
+        if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
         } else {
@@ -689,7 +690,7 @@ public class NewsServiceImpl implements NewsService {
         memberSpaceActivities.append(activities[0]).append(";");
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-          if (space != null && (spaceService.isMember(space, currentUsername))) {
+          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername)) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }
@@ -1000,6 +1001,9 @@ public class NewsServiceImpl implements NewsService {
    */
   public boolean canEditNews(String posterId, String spaceId) {
     org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    if (currentIdentity == null) {
+      return false;
+    }
     String authenticatedUser = currentIdentity.getUserId();
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || spaceService.isSuperManager(authenticatedUser)

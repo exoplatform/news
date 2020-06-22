@@ -23,5 +23,9 @@ public interface NewsAttachmentsService {
 
   void addAttachmentFromExistingResource(Node newsNode, String attachmentId) throws Exception;
 
+  void makeAttachmentsPublic(Node newsNode) throws Exception;
+
+  void unmakeAttachmentsPublic(Node newsNode) throws Exception;
+
   void removeAttachment(Node newsNode, String attachmentId);
 }

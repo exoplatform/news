@@ -20,6 +20,7 @@ public class NewsQueryBuilder {
    * 
    * @param filter news filter to customize the query
    * @return built query
+   * @throws Exception for error when creating query
    */
   public StringBuilder buildQuery(NewsFilter filter) throws Exception {
 

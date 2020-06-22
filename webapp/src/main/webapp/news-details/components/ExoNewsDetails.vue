@@ -175,8 +175,8 @@ export default {
             repository: 'repository',
             workspace: 'collaboration',
             title: attachedFile.name,
-            downloadUrl: `/rest/v1/news/attachments/${attachedFile.id}/file`,
-            openUrl: `/rest/v1/news/attachments/${attachedFile.id}/open`
+            downloadUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/file`,
+            openUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/open`
           },
           showComments: false
         });

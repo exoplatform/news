@@ -201,6 +201,9 @@
     <depends>
       <module>newsAttachmentComponent</module>
     </depends>
+    <depends>
+      <module>ExoAttachmentsApp</module>
+    </depends>
   </module>
 
   <module>

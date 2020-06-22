@@ -3,7 +3,9 @@ package org.exoplatform.news;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.access.PermissionType;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
+import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -18,6 +20,7 @@ import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.AdditionalMatchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -425,5 +428,98 @@ public class NewsAttachmentsServiceImplTest {
     verify(node, times(1)).setProperty(eq("exo:attachmentsIds"), eq(newValues));
   }
 
+  @Test
+  public void shouldMakeAttachmentsPublic() throws Exception {
+    // Given
+    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+            repositoryService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            uploadService,
+            documentService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    when(node.getUUID()).thenReturn("id123");
+    when(node.getName()).thenReturn("name123");
+    when(node.getSession()).thenReturn(session);
+    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    Property attachmentIdsProperty = mock(Property.class);
+    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
+    when(attachmentNode1.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
+    when(attachmentNode2.canAddMixin(eq("exo:privilegeable"))).thenReturn(false);
+    ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
+    when(attachmentNode3.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
+    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
+    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
 
+
+    // When
+    newsAttachmentsService.makeAttachmentsPublic(node);
+
+    // Then
+    verify(attachmentNode1, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode1, times(1)).addMixin(eq("exo:privilegeable"));
+    verify(attachmentNode2, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode2, times(0)).addMixin(eq("exo:privilegeable"));
+    verify(attachmentNode3, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode3, times(1)).addMixin(eq("exo:privilegeable"));
+  }
+
+  @Test
+  public void shouldUnmakeAttachmentsPublic() throws Exception {
+    // Given
+    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+            repositoryService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            uploadService,
+            documentService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    when(node.getUUID()).thenReturn("id123");
+    when(node.getName()).thenReturn("name123");
+    when(node.getSession()).thenReturn(session);
+    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    Property attachmentIdsProperty = mock(Property.class);
+    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
+    when(attachmentNode1.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
+    when(attachmentNode2.isNodeType(eq("exo:privilegeable"))).thenReturn(false);
+    ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
+    when(attachmentNode3.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
+    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
+    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
+
+
+    // When
+    newsAttachmentsService.unmakeAttachmentsPublic(node);
+
+    // Then
+    verify(attachmentNode1, times(1)).removePermission(eq("*:/platform/users"));
+    verify(attachmentNode2, times(0)).removePermission(eq("*:/platform/users"));
+    verify(attachmentNode3, times(1)).removePermission(eq("*:/platform/users"));
+  }
 }

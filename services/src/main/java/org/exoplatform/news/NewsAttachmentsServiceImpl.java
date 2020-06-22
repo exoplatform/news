@@ -66,23 +66,16 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * Get the list of attachments of the given news node
    * @param newsNode The news node
    * @return The list of attachments
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public List<NewsAttachment> getNewsAttachments(Node newsNode) throws Exception {
     List<NewsAttachment> attachments = new ArrayList<>();
-    if(newsNode.hasProperty("exo:attachmentsIds")) {
-      Property attachmentsIdsProperty = newsNode.getProperty("exo:attachmentsIds");
-      if (attachmentsIdsProperty != null) {
-        for (Value value : attachmentsIdsProperty.getValues()) {
-          try {
-            String attachmentId = value.getString();
-            Node attachmentNode = newsNode.getSession().getNodeByUUID(attachmentId);
-            attachments.add(convertNodeToNewsAttachment(attachmentNode));
-          } catch (RepositoryException e) {
-            LOG.error("Error while fetching attachment of News " + newsNode.getUUID(), e);
-          }
-        }
+    for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
+      try {
+        attachments.add(convertNodeToNewsAttachment(attachmentNode));
+      } catch (RepositoryException e) {
+        LOG.error("Error while fetching attachment of News " + newsNode.getUUID(), e);
       }
     }
 
@@ -93,7 +86,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * Get the attachment with the given id
    * @param attachmentId The attachment id
    * @return The attachment
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public NewsAttachment getNewsAttachment(String attachmentId) throws Exception {
@@ -112,7 +105,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * Get data stream of the attachment with the given id
    * @param attachmentId The attachment id
    * @return The attachment data stream
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public InputStream getNewsAttachmentStream(String attachmentId) throws Exception {
@@ -132,7 +125,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * Get the URL to open the attachment with the given id
    * @param attachmentId The attachment id
    * @return The URl to open the attachment
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public String getNewsAttachmentOpenUrl(String attachmentId) throws Exception {
@@ -154,7 +147,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    *
    * @param updatedNews The updated News
    * @param newsNode    The existing News node
-   * @throws RepositoryException
+   * @throws RepositoryException when error
    */
   @Override
   public List<NewsAttachment> updateNewsAttachments(News updatedNews, Node newsNode) throws Exception {
@@ -212,7 +205,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    * @param newsNode The news node
    * @param uploadId The id of the uploaded resource
    * @return The id of the added attachment
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public String addAttachmentFromUploadedResource(Node newsNode, String uploadId) throws Exception {
@@ -262,7 +255,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
    *
    * @param newsNode   The news node
    * @param resourceId The id of the existing resource
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public void addAttachmentFromExistingResource(Node newsNode, String resourceId) throws Exception {
@@ -274,6 +267,35 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
     }
     newsNode.setProperty("exo:attachmentsIds", ArrayUtils.add(attachmentsIdsProperty, new StringValue(resourceId)));
     newsNode.save();
+  }
+
+  @Override
+  public void makeAttachmentsPublic(Node newsNode) throws Exception {
+    for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
+      try {
+        if (attachmentNode.canAddMixin("exo:privilegeable")) {
+          attachmentNode.addMixin("exo:privilegeable");
+        }
+        ((ExtendedNode)attachmentNode).setPermission("*:/platform/users", new String[] { PermissionType.READ });
+        attachmentNode.save();
+      } catch (Exception e) {
+        LOG.error("Cannot make News attachment " + attachmentNode.getUUID() + " of News " + newsNode.getUUID() + " public", e);
+      }
+    }
+  }
+
+  @Override
+  public void unmakeAttachmentsPublic(Node newsNode) throws Exception {
+    for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
+      try {
+        if (attachmentNode.isNodeType("exo:privilegeable")) {
+          ((ExtendedNode)attachmentNode).removePermission("*:/platform/users");
+          attachmentNode.save();
+        }
+      } catch (Exception e) {
+        LOG.error("Cannot remove public access of News attachment " + attachmentNode.getUUID() + " of News " + newsNode.getUUID(), e);
+      }
+    }
   }
 
   /**
@@ -341,6 +363,26 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
       spaceNewsRootNode = spaceDocumentsFolderNode.getNode(NEWS_ATTACHMENTS_NODES_FOLDER);
     }
     return spaceNewsRootNode;
+  }
+
+  private List<Node> getAttachmentsNodesOfNews(Node newsNode) throws Exception {
+    List<Node> attachmentsNode = new ArrayList<>();
+    if(newsNode != null && newsNode.hasProperty("exo:attachmentsIds")) {
+      Property attachmentsIdsProperty = newsNode.getProperty("exo:attachmentsIds");
+      if (attachmentsIdsProperty != null) {
+        for (Value value : attachmentsIdsProperty.getValues()) {
+          String attachmentId = value.getString();
+          try {
+            Node attachmentNode = newsNode.getSession().getNodeByUUID(attachmentId);
+            attachmentsNode.add(attachmentNode);
+          } catch (Exception e) {
+            LOG.error("Cannot get News attachment " + attachmentId + " of News " + newsNode.getUUID(), e);
+          }
+        }
+      }
+    }
+
+    return attachmentsNode;
   }
 
   private String getNodeRelativePath(Calendar now) {

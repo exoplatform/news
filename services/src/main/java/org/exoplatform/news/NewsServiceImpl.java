@@ -162,7 +162,7 @@ public class NewsServiceImpl implements NewsService {
    * exists with this id, the draft is updated and published.
    * 
    * @param news The news to create
-   * @throws Exception
+   * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
@@ -199,7 +199,7 @@ public class NewsServiceImpl implements NewsService {
    * 
    * @param id Id of the news
    * @return The news with the given id
-   * @throws Exception
+   * @throws Exception when error
    */
   public News getNewsById(String id) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
@@ -226,7 +226,7 @@ public class NewsServiceImpl implements NewsService {
    * Get all news
    * 
    * @return all news
-   * @throws Exception
+   * @throws Exception when error
    */
   @Override
   public List<News> getNews(NewsFilter filter) throws Exception {
@@ -299,7 +299,7 @@ public class NewsServiceImpl implements NewsService {
    * (if any).
    * 
    * @param news The new news
-   * @throws Exception
+   * @throws Exception when error
    */
   public News updateNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -358,7 +358,7 @@ public class NewsServiceImpl implements NewsService {
    * 
    * @param userId The current user id
    * @param news The news to be updated
-   * @throws Exception
+   * @throws Exception when error
    */
   public void markAsRead(News news, String userId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -409,7 +409,7 @@ public class NewsServiceImpl implements NewsService {
    * Pin a news
    *
    * @param newsId The id of the news to be pinned
-   * @throws Exception
+   * @throws Exception when error
    */
   public void pinNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -421,11 +421,9 @@ public class NewsServiceImpl implements NewsService {
     News news = getNewsById(newsId);
 
     Node newsNode = session.getNodeByUUID(newsId);
-    newsNode.setProperty("exo:pinned", true);
-    newsNode.save();
 
+    // Make News node readable by all users
     Node pinnedRootNode = getPinnedNewsFolder();
-
     Calendar newsCreationCalendar = Calendar.getInstance();
     newsCreationCalendar.setTime(news.getCreationDate());
     Node newsFolderNode = dataDistributionType.getOrCreateDataNode(pinnedRootNode, getNodeRelativePath(newsCreationCalendar));
@@ -433,7 +431,13 @@ public class NewsServiceImpl implements NewsService {
       newsNode.addMixin("exo:privilegeable");
     }
     ((ExtendedNode) newsNode).setPermission("*:/platform/users", new String[] { PermissionType.READ });
+
+    newsAttachmentsService.makeAttachmentsPublic(newsNode);
+
     linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
+
+    newsNode.setProperty("exo:pinned", true);
+    newsNode.save();
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -448,14 +452,20 @@ public class NewsServiceImpl implements NewsService {
       throw new Exception("Unable to find a news with an id equal to: " + newsId);
     }
 
+    // Update News node
     Node newsNode = session.getNodeByUUID(newsId);
     if (newsNode == null) {
       throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
     }
     newsNode.setProperty("exo:pinned", false);
-    ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+    if(newsNode.isNodeType("exo:privilegeable")) {
+      ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+    }
     newsNode.save();
 
+    newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
+
+    // Remove pin symlink
     Node pinnedRootNode = getPinnedNewsFolder();
     if (pinnedRootNode == null) {
       throw new Exception("Unable to find the root pinned folder: /Application Data/News/pinned");
@@ -478,7 +488,7 @@ public class NewsServiceImpl implements NewsService {
    * Get the root folder for pinned news
    *
    * @return the pinned folder node
-   * @throws Exception
+   * @throws Exception when error
    */
   private Node getPinnedNewsFolder() throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -511,6 +521,7 @@ public class NewsServiceImpl implements NewsService {
    * 
    * @param sharedNews Data of the shared news
    * @param spaces List of spaces to share the news with
+   * @throws Exception when error
    */
   public void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -568,7 +579,7 @@ public class NewsServiceImpl implements NewsService {
    * @param spaceId News space
    * @param author News drafts author
    * @return The news drafts
-   * @throws Exception
+   * @throws Exception when error
    */
   public List<News> getNewsDrafts(String spaceId, String author) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
@@ -608,7 +619,7 @@ public class NewsServiceImpl implements NewsService {
    * Delete news
    * 
    * @param newsId the news id to delete
-   * @throws Exception
+   * @throws Exception when error
    */
   public void deleteNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
@@ -745,6 +756,7 @@ public class NewsServiceImpl implements NewsService {
    * Post the news activity in the given space
    * 
    * @param news The news to post as an activity
+   * @throws Exception when error
    */
   void postNewsActivity(News news) throws Exception {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), false);
@@ -852,9 +864,9 @@ public class NewsServiceImpl implements NewsService {
   /**
    * Create the exo:news draft node in CMS
    * 
-   * @param news
+   * @param news the news
    * @return News draft id
-   * @throws Exception
+   * @throws Exception when error
    */
   public News createNewsDraft(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -922,7 +934,7 @@ public class NewsServiceImpl implements NewsService {
    * 
    * @param node The News node
    * @return The date of the first published version of the node
-   * @throws RepositoryException
+   * @throws RepositoryException when error
    */
   private Date getPublicationDate(Node node) throws RepositoryException {
     VersionNode versionNode = new VersionNode(node, node.getSession());
@@ -956,7 +968,7 @@ public class NewsServiceImpl implements NewsService {
    *
    * @param node The News node
    * @return The author of the last published version of the node
-   * @throws RepositoryException
+   * @throws RepositoryException when error
    */
   private String getLastUpdater(Node node) throws RepositoryException {
     VersionNode lastUpdatedVersion = getLastUpdatedVersion(node);
@@ -1100,6 +1112,7 @@ public class NewsServiceImpl implements NewsService {
    * 
    * @param filter news filter
    * @param lang language
+   * @throws Exception when error
    */
   public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
 
@@ -1128,7 +1141,7 @@ public class NewsServiceImpl implements NewsService {
    * Archive a news
    *
    * @param newsId The id of the news to be archived
-   * @throws Exception
+   * @throws Exception when error
    */
   public void archiveNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
@@ -1153,7 +1166,7 @@ public class NewsServiceImpl implements NewsService {
    * Unarchive a news
    *
    * @param newsId The id of the news to be unarchived
-   * @throws Exception
+   * @throws Exception when error
    */
   public void unarchiveNews(String newsId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);

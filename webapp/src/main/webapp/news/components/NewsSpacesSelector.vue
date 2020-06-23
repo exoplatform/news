@@ -143,7 +143,7 @@ export default {
     },
     loadUserSpaces() {
       this.showLoadMore = true;
-      newsServices.getUserSpaces(0, this.limit).then(data => {
+      newsServices.getUserSpaces(0, this.limit,'member').then(data => {
         if (data.size < this.limit) {
           this.showLoadMore = false;
         }
@@ -156,7 +156,7 @@ export default {
       });
     },
     loadMoreSpaces() {
-      newsServices.getUserSpaces(this.limit, 0).then((resp) => resp.spaces).then(spaces => {
+      newsServices.getUserSpaces(this.limit, 0 ,'member').then((resp) => resp.spaces).then(spaces => {
         spaces.forEach(space => {
           space.avatarUrl = space.avatarUrl ? space.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
           this.userSpaces.push(space);

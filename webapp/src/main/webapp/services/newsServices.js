@@ -205,8 +205,8 @@ export function getSpaceById(id) {
   });
 }
 
-export function getUserSpaces(offset, limit) {
-  return fetch(`${newsConstants.SOCIAL_SPACE_API}?offset=${offset}&limit=${limit}&returnSize=true`, {
+export function getUserSpaces(offset, limit , filterType) {
+  return fetch(`${newsConstants.SOCIAL_SPACE_API}?offset=${offset}&limit=${limit}&returnSize=true&filterType=${filterType}`, {
     credentials: 'include',
     method: 'GET',
   }).then((resp) => resp.json()).then(resp => {

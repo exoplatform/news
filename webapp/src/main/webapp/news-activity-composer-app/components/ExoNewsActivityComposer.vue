@@ -477,6 +477,7 @@ export default {
           newsServices.deleteDraft(this.news.id)
             .then(() => this.$emit('draftDeleted'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+          this.news.id = null;
         }
         this.savingDraft = false;
       } else if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {

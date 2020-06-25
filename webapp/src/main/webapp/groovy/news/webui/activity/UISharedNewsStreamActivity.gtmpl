@@ -170,7 +170,7 @@ def streamOwner = activity.getStreamOwner();
                                 <li>
                                     <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity"
                                        data-caption="$captionConfirmation" data-close="$labelClosebutton"
-                                       data-ok="$labelConfirmbutton" data-delete="<%=uicomponent.event(" DeleteActivity",uicomponent.getId(), "");%>" class="controllDelete"
+                                       data-ok="$labelConfirmbutton" data-delete="<%=uicomponent.event("DeleteActivity",uicomponent.getId(), "");%>" class="controllDelete"
                                     id="DeleteActivityButton${activity.id}">${labelDelete}</a>
 
                                 </li>

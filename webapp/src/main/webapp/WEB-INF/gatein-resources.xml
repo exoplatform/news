@@ -109,15 +109,12 @@
     </module>
   </portlet>
 
-  <module>
-    <name>newsComposerPlugin</name>
-    <script>
-      <path>/js/newsComposerPlugin.js</path>
-    </script>
-    <depends>
-      <module>extensionRegistry</module>
-    </depends>
-  </module>
+  <javascript>
+    <param>
+      <js-module>newsComposerPlugin</js-module>
+      <js-path>/js/newsComposerPlugin.js</js-path>
+    </param>
+  </javascript>
 
   <module>
     <name>newsComposerIntegration</name>

@@ -171,7 +171,6 @@
       <div id="ActivityContextBox${activity.id}">
 
        <div id="newsDetails"></div>
-        <% _ctx.includeTemplates("UIActivityActionBar-actions-mobile") %>
         <% if (!news.archived || (news.archived && news.canArchive)) { %>
         <div class="actionsDetailsWrapper">
           <% _ctx.includeTemplates("UIActivityListLiked") %>

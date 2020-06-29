@@ -63,6 +63,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
   private final static String    PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
+  private final static String    PLATFORM_PROFESSIONAL_GROUP = "/platform/professional";
+
   private NewsService            newsService;
 
   private NewsAttachmentsService newsAttachmentsService;
@@ -413,7 +415,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
       if (updatedNews.isPinned() != news.isPinned()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
+                currentIdentity.isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*");
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -590,7 +593,8 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
 
       if (updatedNews.isPinned() != news.isPinned()) {
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
+                currentIdentity.isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*");
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();

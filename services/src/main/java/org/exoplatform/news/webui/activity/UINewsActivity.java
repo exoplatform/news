@@ -49,6 +49,8 @@ public class UINewsActivity extends BaseUIActivity {
 
   private final static String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
+  private final static String PLATFORM_PROFESSIONAL_GROUP = "/platform/professional";
+
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private News                news;
@@ -89,7 +91,8 @@ public class UINewsActivity extends BaseUIActivity {
   }
 
   public boolean canPinNews(ExoSocialActivity activity) {
-    return ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return  ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*") ||
+            ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   public static class LikeActivityActionListener extends BaseUIActivity.LikeActivityActionListener {

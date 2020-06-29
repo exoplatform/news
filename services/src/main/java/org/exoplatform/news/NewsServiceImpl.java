@@ -92,6 +92,8 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
+  private final static String      PLATFORM_PROFESSIONAL_GROUP = "/platform/professional";
+
   private RepositoryService        repositoryService;
 
   private SessionProviderService   sessionProviderService;
@@ -1029,7 +1031,8 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
-    return getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return  getCurrentIdentity().isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*") ||
+            getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {

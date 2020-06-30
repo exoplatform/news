@@ -92,7 +92,7 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String      PLATFORM_PROFESSIONAL_GROUP = "/platform/professional";
+  private final static String      PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
 
   private RepositoryService        repositoryService;
 
@@ -1031,7 +1031,7 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
-    return  getCurrentIdentity().isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*") ||
+    return  getCurrentIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
             getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 

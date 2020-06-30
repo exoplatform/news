@@ -63,7 +63,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
   private final static String    PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String    PLATFORM_PROFESSIONAL_GROUP = "/platform/professional";
+  private final static String    PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
 
   private NewsService            newsService;
 
@@ -416,7 +416,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       if (updatedNews.isPinned() != news.isPinned()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
         boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
-                currentIdentity.isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*");
+                currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*");
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -594,7 +594,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
       if (updatedNews.isPinned() != news.isPinned()) {
         boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
-                currentIdentity.isMemberOf(PLATFORM_PROFESSIONAL_GROUP, "*");
+                currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*");
 
         if (!canPinOrUnpinNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();

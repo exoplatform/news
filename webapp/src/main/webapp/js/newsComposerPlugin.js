@@ -7,9 +7,10 @@ const newsActivityComposerPlugin = {
   iconClass: 'newsComposerIcon',
   enabled: function() {
     let isRedactor = false;
-    isRedactor = getSpaceMemberships(`/spaces/${eXo.env.portal.spaceGroup}`);
+    if (eXo.env.portal.spaceId) {
+      isRedactor = getSpaceMemberships(`/spaces/${eXo.env.portal.spaceGroup}`);
+    }
     return eXo.env.portal.spaceId != null && eXo.env.portal.spaceId.length !== 0 && isRedactor;
-
   },
   onExecute: function() {
     let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;

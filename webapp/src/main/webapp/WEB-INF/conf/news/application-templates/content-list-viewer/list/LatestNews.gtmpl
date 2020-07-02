@@ -56,7 +56,7 @@
       Map<String, String> newsInfo = new HashMap();
       newsInfo.put("id", news.id);
       newsInfo.put("title", news.title);
-      if (!StringUtils.isEmpty(news.summary)){
+      if (StringUtils.isNotEmpty(news.summary)){
       newsInfo.put("body", news.summary);
       }else {
       newsInfo.put("body", news.body);

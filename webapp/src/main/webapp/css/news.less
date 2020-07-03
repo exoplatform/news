@@ -3168,7 +3168,12 @@ i.uiIconBack:hover {
     }
   }
 }
-
+@media screen and (max-width: 481px){
+  .newsDetails-description .newsDetails .fullDetailsBody .video{
+    width: 100%;
+    height: 100px;
+  }
+}
 @media screen and (max-width: 1025px) {
 #newsActivityComposer #newsForm .dropZone img {
 height: 80px;
@@ -3190,25 +3195,27 @@ max-width: 100%;
 }
 
 @media screen and (min-width: 481px) {
-.newsDetails {
-.newsAttachmentsTitle {
-  width: 80%;
+  .newsDetails {
+    .newsAttachmentsTitle {
+      width: 80%;
+    }
+
+    .newsAttachments {
+      width: 80%;
+    }
+  }
 }
 
-.newsAttachments {
-  width: 80%;
-}
-}
-}
 @media screen and (max-width: 1439px) {
-.newsDetails-description .illustrationPicture, .uiSharedNewsActivity .illustrationPicture {
-max-height: 40vh;
+  .newsDetails-description .illustrationPicture, .uiSharedNewsActivity .illustrationPicture {
+    max-height: 40vh;
+  }
 }
-}
+
 @media screen and (min-width: 1440px) {
-.newsDetails-description .illustrationPicture, .uiSharedNewsActivity .illustrationPicture {
-max-height: 400px;
-}
+  .newsDetails-description .illustrationPicture, .uiSharedNewsActivity .illustrationPicture {
+    max-height: 400px;
+  }
 }
 
 @media screen and (max-width: 630px) {

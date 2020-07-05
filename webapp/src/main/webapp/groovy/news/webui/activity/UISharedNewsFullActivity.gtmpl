@@ -160,7 +160,7 @@ if (activity && news) {
        archived: ${news.archived},
        canArchive: ${news.canArchive},
        profileAvatarURL: '${ownerAvatar}',
-       spaceDisplayName: '${news.spaceDisplayName}',
+       spaceDisplayName: "${news.spaceDisplayName}",
        spaceUrl:'${news.spaceUrl}',
        hiddenSpace: ${news.hiddenSpace},
      },

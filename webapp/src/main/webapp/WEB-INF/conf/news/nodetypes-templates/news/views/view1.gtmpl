@@ -141,7 +141,7 @@
         archived: ${news.archived},
         canArchive: ${news.canArchive},
         profileAvatarURL: '${ownerAvatar}',
-        spaceDisplayName: '${spaceName}',
+        spaceDisplayName: "${spaceName}",
         spaceUrl:'${news.spaceUrl}',
         spaceAvatarUrl: '${news.spaceAvatarUrl}',
         url: '${news.url}',

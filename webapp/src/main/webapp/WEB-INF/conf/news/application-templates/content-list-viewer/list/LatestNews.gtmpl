@@ -16,6 +16,7 @@
   import java.util.*;
   import org.exoplatform.news.model.News;
   import org.htmlcleaner.HtmlCleaner;
+  import org.apache.commons.lang.StringUtils;
 
   SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
   NewsService newsService = CommonsUtils.getService(NewsService.class);
@@ -55,7 +56,11 @@
       Map<String, String> newsInfo = new HashMap();
       newsInfo.put("id", news.id);
       newsInfo.put("title", news.title);
-      newsInfo.put("body", news.body);
+      if (StringUtils.isNotEmpty(news.summary)){
+        newsInfo.put("body", news.summary);
+      }else {
+        newsInfo.put("body", news.body);
+      }
       newsInfo.put("illustrationURL", news.illustrationURL);
       newsInfo.put("url", news.url);
       newsInfos.add(newsInfo);

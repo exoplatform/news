@@ -722,4 +722,45 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       return Response.serverError().build();
     }
   }
+
+  @GET
+  @Path("canCreateNews/{spaceId}")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RolesAllowed("users")
+  @ApiOperation(value = "check if the current user can create a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News deleted"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "User not authorized to check"),
+      @ApiResponse(code = 404, message = "Space not found"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response canCreateNews(@Context HttpServletRequest request,
+                                @ApiParam(value = "space id", required = true) @PathParam("spaceId") String spaceId) {
+    try {
+      boolean canCreateNews = false;
+      if (StringUtils.isBlank(spaceId)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      Space space = spaceService.getSpaceById(spaceId);
+      if (space == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      String authenticatedUser = request.getRemoteUser();
+
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      if (!spaceService.isMember(space, authenticatedUser)) {
+        canCreateNews = false;
+      } else {
+        canCreateNews = newsService.canCreateNews(authenticatedUser, space);
+      }
+
+      return Response.ok(String.valueOf(canCreateNews)).build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the authenticated user can create a news", e);
+      return Response.serverError().build();
+    }
+  }
 }

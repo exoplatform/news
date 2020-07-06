@@ -142,7 +142,7 @@ if (activity && news) {
     labels: $labels,
     nodeNewsId: '${news.id}',
      news: {
-       title: '${newsTitle}',
+       title: "${newsTitle}",
        summary: `${newsSummary}`,
        body: `${newsBody}`,
        pinned: ${news.pinned},

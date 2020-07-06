@@ -70,6 +70,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -1184,6 +1185,28 @@ public class NewsServiceImpl implements NewsService {
     }
     newsNode.setProperty("exo:archived", false);
     newsNode.save();
+  }
+
+  /**
+   * Check if the space contains any redactors to give them the ability to create news
+   * otherwise everyone will be able to create
+   *
+   * @param authenticatedUser The id of the authenticated user
+   * @param space the space to check in
+   * @throws Exception when error
+   */
+  public boolean canCreateNews(String authenticatedUser, Space space) throws Exception{
+    Boolean spaceHasRedactors = false;
+    Boolean isCurrentUserRedactor = false;
+    String spaceGroupId = space.getGroupId();
+    
+    List<String> spaceRedactors = SpaceUtils.findMembershipUsersByGroupAndTypes(spaceGroupId, "redactor");
+    if (!spaceRedactors.isEmpty()) {
+      spaceHasRedactors = true;
+      //check if connected user is redactor
+      isCurrentUserRedactor = spaceRedactors.contains(authenticatedUser);
+    }
+    return (!spaceHasRedactors || isCurrentUserRedactor);
   }
 
 }

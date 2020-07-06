@@ -186,8 +186,9 @@
       </div>
     </div>
     <!-- end -->
-    
+    <div class="notMemberUser">
     <div id="newsDetails"></div>
+    </div>
 
     <div class="notAuthorizedUser">
       <div class="notAuthorizedMessage">

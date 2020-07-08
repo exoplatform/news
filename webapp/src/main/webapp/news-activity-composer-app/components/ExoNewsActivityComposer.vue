@@ -1,5 +1,5 @@
 <template>
-  <div id="newsActivityComposer" class="newsComposer">
+  <div v-if="canCreatNews" id="newsActivityComposer" class="newsComposer">
     <div class="newsComposerActions">
       <div class="newsFormButtons">
         <div class="newsFormLeftActions">
@@ -109,6 +109,21 @@
     </div>
     <!-- end -->
   </div>
+  <div v-else class="newsComposer">
+    <div id="form_msg_error" class="alert alert-error">
+      <span data-dismiss="alert" >
+        <i class="uiIconColorError pull-left"></i>
+      </span>
+      <div class="msg_error">
+        <div>
+          <span class="msg_permission_denied" >{{ $t("news.permission.denied") }}</span>
+        </div>
+        <div>
+          <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -184,7 +199,9 @@ export default {
       illustrationChanged: false,
       attachmentsChanged: false,
       imagesURLs: new Map(),
-      uploading: false
+      uploading: false,
+      canCreatNews: true,
+      currentSpace: {}
     };
   },
   computed: {
@@ -238,7 +255,14 @@ export default {
     } else {
       this.initDone = true;
     }
-    this.displayFormTitle();
+    newsServices.getSpaceById(this.spaceId).then(space => {
+      this.currentSpace = space;
+      this.displayFormTitle();
+      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
+        this.canCreatNews = canCreateNews;
+      });
+    });
+
   },
   mounted() {
     document.body.style.overflow = 'hidden';

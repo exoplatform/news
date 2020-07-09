@@ -248,3 +248,14 @@ export function escapeHTML(unsafeText) {
   div.innerText = unsafeText;
   return div.innerHTML;
 }
+
+export function canUserCreateNews(spaceId) {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canCreateNews/${eXo.env.portal.spaceId || spaceId}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}

@@ -180,7 +180,7 @@ if (activity && news) {
 
 <div class="activityStream uiActivityStreamWrapper uiNewsActivity" id="activityContainer${activity.id}">
   <% uiform.begin() %>
-  <div class="boxContainer" id="boxContainer">
+  <div class="boxContainer contentSharedNews" id="boxContainer">
   <div id="ContextBox${activity.id}" class="uiBox contentBox">
     <div id="ActivityContextBox${activity.id}">
     <div class="news-details-shared">

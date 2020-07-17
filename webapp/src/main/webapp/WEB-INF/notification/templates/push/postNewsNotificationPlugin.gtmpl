@@ -2,25 +2,25 @@
 def notificationDescription = "";
 switch(CONTEXT) {
  case "POST NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description",CONTENT_AUTHOR,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "SHARE NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.share",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "SHARE MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "LIKE MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "LIKE MY SHARED NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "COMMENT MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  case "COMMENT MY SHARED NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
+   notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",CURRENT_USER,CONTENT_TITLE,CONTENT_SPACE);
    break;
  default:
    break;

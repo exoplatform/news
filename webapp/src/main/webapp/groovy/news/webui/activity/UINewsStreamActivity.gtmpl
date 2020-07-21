@@ -183,18 +183,24 @@
                             </i>
                         </div>
 
-                        <ul class="dropdown-menu pull-right" role="menu">
+                        <ul class="dropdown-menu actLink-items pull-right" role="menu">
                           <% if (canPinNews) {
                             if (isPinned) { %>
-                        	  <li>
-								  <a href="javascript:void(0)" data-confirm="<span>${labelConfirmUnpin}</span>" data-caption="$captionUnpin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="unpinActivity${activity.id}"" data-newsId="${news.id}">${labelUnpin}</a>
+                        	  <li class="actLink-item">
+								  <a href="javascript:void(0)" data-confirm="<span>${labelConfirmUnpin}</span>" data-caption="$captionUnpin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="unpinActivity${activity.id}"" data-newsId="${news.id}">
+                                    <i class="uiIcon uiIconPinNews actLink-icon"></i>
+                                    <span class="actLink-label">${labelUnpin}</span>
+                                  </a>
                               </li>
                             <% } else { %>
                               <% if (isArchived) { %>
                                   <span class="controllPin unauthorizedPin">${labelPin}</span>
                               <% } else {%>
-                              <li>
-                                 <a href="javascript:void(0)" data-confirm="<span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">${labelPin}</a>
+                              <li class="actLink-item">
+                                 <a href="javascript:void(0)" data-confirm="<span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">
+                            <i class="uiIcon uiIconPinNews actLink-icon"></i>
+                            <span class="actLink-label">${labelPin}</span>
+                                 </a>
                               </li>
                           <%
                               }
@@ -202,8 +208,11 @@
                           }
                             if (activityDeletable) {
                           %>
-                            <li>
-                              <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity" data-caption="$captionConfirmation" data-close="$labelClosebutton" data-ok="$labelConfirmbutton"  data-delete="<%=uicomponent.event("DeleteActivity", uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">${labelDelete}</a>
+                            <li class="actLink-item">
+                              <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity" data-caption="$captionConfirmation" data-close="$labelClosebutton" data-ok="$labelConfirmbutton"  data-delete="<%=uicomponent.event("DeleteActivity", uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">
+                                  <i class="uiIcon uiIconTrashActivity actLink-icon"></i>
+                                  <span class="actLink-label">${labelDelete}</span>
+                              </a>
                             </li>
                           <% } %>
                         </ul>

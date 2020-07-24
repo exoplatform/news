@@ -36,7 +36,7 @@
               <v-btn
                 depressed
                 small
-                class="caption text-uppercase grey--text d-none d-sm-flex" @click="openAllNewsPinned(url)" > {{ seeAll }}</v-btn>
+                class="caption text-uppercase grey--text d-sm-flex" @click="openAllNewsPinned(url)" > {{ seeAll }}</v-btn>
             </v-flex>
           </v-layout>
         </v-flex>

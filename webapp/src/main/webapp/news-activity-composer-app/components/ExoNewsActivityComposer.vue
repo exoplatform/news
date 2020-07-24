@@ -1,125 +1,135 @@
 <template>
-  <div v-if="canCreatNews" id="newsActivityComposer" class="newsComposer">
-    <div class="newsComposerActions">
-      <div class="newsFormButtons">
-        <div class="newsFormLeftActions">
-          <img src="/news/images/newsImageDefault.png" />
-          <span class="newsFormTitle">{{ newsFormTitle }}</span>
-        </div>
-        <div v-if="showPinInput" class="pinArticleContent " @click="news.pinned">
-          <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" :class="[news.archived ? 'unauthorizedPin' : '']" class="pinArticle"
-             rel="tooltip"
-             data-placement="bottom"
-             @click="!news.archived ? news.pinned = !news.pinned : null">
-            <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
-          </a>
-        </div>
-        <div v-if="!editMode" class="newsFormRightActions">
-          <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-          <div class="newsDrafts">
-            <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
-          </div>
-          <div class="VuetifyApp">
-            <v-app>
-              <v-btn id="newsPost" :loading="postingNews" :disabled="postDisabled || postingNews" elevation="0" class="btn btn-primary" @click="postNews">{{ $t("news.composer.post") }}</v-btn>
-            </v-app>
-          </div>
-        </div>
-        <div v-if="editMode" class="newsFormRightActions">
-          <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
-          </button>
-          <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
-          </button>
-          <button class="btn" @click="goBack"> {{ $t("news.composer.btn.cancel") }}
-          </button>
-        </div>
+  <div>
+    <div v-if="!canCreatNews && loading">
+      <div class="VuetifyApp loadingComposer">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
       </div>
-      <div id="newsTop"></div>
     </div>
-
-    <form id="newsForm" class="newsForm">
-      <div class="newsFormInput">
-        <div class="newsFormAttachment">
-          <div class="control-group attachments">
-            <div class="controls">
-              <exo-file-drop v-model="news.illustration" @change="autoSave"/>
+    <div v-else-if="canCreatNews" id="newsActivityComposer" class="newsComposer">
+      <div class="newsComposerActions">
+        <div class="newsFormButtons">
+          <div class="newsFormLeftActions">
+            <img src="/news/images/newsImageDefault.png" />
+            <span class="newsFormTitle">{{ newsFormTitle }}</span>
+          </div>
+          <div v-if="showPinInput" class="pinArticleContent " @click="news.pinned">
+            <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" :class="[news.archived ? 'unauthorizedPin' : '']" class="pinArticle"
+               rel="tooltip"
+               data-placement="bottom"
+               @click="!news.archived ? news.pinned = !news.pinned : null">
+              <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
+            </a>
+          </div>
+          <div v-if="!editMode" class="newsFormRightActions">
+            <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+            <div class="newsDrafts">
+              <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
+            </div>
+            <div class="VuetifyApp">
+              <v-app>
+                <v-btn id="newsPost" :loading="postingNews" :disabled="postDisabled || postingNews" elevation="0" class="btn btn-primary" @click="postNews">{{ $t("news.composer.post") }}</v-btn>
+              </v-app>
             </div>
           </div>
+          <div v-if="editMode" class="newsFormRightActions">
+            <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
+            </button>
+            <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
+            </button>
+            <button class="btn" @click="goBack"> {{ $t("news.composer.btn.cancel") }}
+            </button>
+          </div>
         </div>
-        <div class="formInputGroup newsTitle">
-          <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
-        </div>
-        <div class="formInputGroup">
-          <textarea id="newsSummary"
-                    v-model="news.summary"
-                    :maxlength="summaryMaxLength"
-                    :placeholder="newsFormSummaryPlaceholder"
-                    class="newsFormInput">
-          </textarea>
-        </div>
-        <div class="formInputGroup">
-          <textarea id="newsContent"
-                    v-model="news.content"
-                    :placeholder="newsFormContentPlaceholder"
-                    class="newsFormInput"
-                    name="newsContent">
-          </textarea>
-        </div>
+        <div id="newsTop"></div>
       </div>
-    </form>
 
-    <div class="VuetifyApp">
-      <v-app>
-        <v-btn
-          class="attachmentsButton"
-          fixed
-          bottom
-          right
-          fab
-          x-large
-          @click="openApp()"
-        >
-          <i class="uiIconAttachment"></i>
-          <v-progress-circular
-            :class="uploading ? 'uploading' : ''"
-            indeterminate>
-            {{ news.attachments.length }}
-          </v-progress-circular>
-        </v-btn>
-      </v-app>
-    </div>
-    <exo-attachments ref="attachmentsComponent" :space-id="news.spaceId" v-model="news.attachments" @HideAttachmentsDrawer="onHideAttachmentsDrawer" @uploadingCountChanged="setUploadingCount"></exo-attachments>
-    <!-- The following bloc is needed in order to display the pin confirmation popup -->
-    <!--begin -->
-    <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-      <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-        <div class="popupHeader clearfix">
-          <a class="uiIconClose pull-right" title="Close"></a>
-          <span class="PopupTitle popupTitle"></span>
+      <form id="newsForm" class="newsForm">
+        <div class="newsFormInput">
+          <div class="newsFormAttachment">
+            <div class="control-group attachments">
+              <div class="controls">
+                <exo-file-drop v-model="news.illustration" @change="autoSave"/>
+              </div>
+            </div>
+          </div>
+          <div class="formInputGroup newsTitle">
+            <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
+          </div>
+          <div class="formInputGroup">
+            <textarea id="newsSummary"
+                      v-model="news.summary"
+                      :maxlength="summaryMaxLength"
+                      :placeholder="newsFormSummaryPlaceholder"
+                      class="newsFormInput">
+            </textarea>
+          </div>
+          <div class="formInputGroup">
+            <textarea id="newsContent"
+                      v-model="news.content"
+                      :placeholder="newsFormContentPlaceholder"
+                      class="newsFormInput"
+                      name="newsContent">
+            </textarea>
+          </div>
         </div>
-        <div class="PopupContent popupContent">
-          <ul class="singleMessage popupMessage resizable">
-            <li>
-              <span class="confirmationIcon contentMessage"></span>
-            </li>
-          </ul>
-          <div class="uiAction uiActionBorder"></div>
+      </form>
+
+      <div class="VuetifyApp">
+        <v-app>
+          <v-btn
+            class="attachmentsButton"
+            fixed
+            bottom
+            right
+            fab
+            x-large
+            @click="openApp()"
+          >
+            <i class="uiIconAttachment"></i>
+            <v-progress-circular
+              :class="uploading ? 'uploading' : ''"
+              indeterminate>
+              {{ news.attachments.length }}
+            </v-progress-circular>
+          </v-btn>
+        </v-app>
+      </div>
+      <exo-attachments ref="attachmentsComponent" :space-id="news.spaceId" v-model="news.attachments" @HideAttachmentsDrawer="onHideAttachmentsDrawer" @uploadingCountChanged="setUploadingCount"></exo-attachments>
+      <!-- The following bloc is needed in order to display the pin confirmation popup -->
+      <!--begin -->
+      <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
+        <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
+          <div class="popupHeader clearfix">
+            <a class="uiIconClose pull-right" title="Close"></a>
+            <span class="PopupTitle popupTitle"></span>
+          </div>
+          <div class="PopupContent popupContent">
+            <ul class="singleMessage popupMessage resizable">
+              <li>
+                <span class="confirmationIcon contentMessage"></span>
+              </li>
+            </ul>
+            <div class="uiAction uiActionBorder"></div>
+          </div>
         </div>
       </div>
-    </div>
     <!-- end -->
-  </div>
-  <div v-else class="newsComposer">
-    <div id="form_msg_error" class="alert alert-error">
-      <span data-dismiss="alert" >
-        <i class="uiIconColorError pull-left"></i>
-      </span>
-      <div class="msg_error">
-        <div>
-          <span class="msg_permission_denied" >{{ $t("news.permission.denied") }}</span>
-        </div>
-        <div>
-          <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
+    </div>
+    <div v-else class="newsComposer">
+      <div id="form_msg_error" class="alert alert-error">
+        <span data-dismiss="alert" >
+          <i class="uiIconColorError pull-left"></i>
+        </span>
+        <div class="msg_error">
+          <div>
+            <span class="msg_permission_denied" >{{ $t("news.permission.denied") }}</span>
+          </div>
+          <div>
+            <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -200,7 +210,8 @@ export default {
       attachmentsChanged: false,
       imagesURLs: new Map(),
       uploading: false,
-      canCreatNews: true,
+      canCreatNews: false,
+      loading: true,
       currentSpace: {}
     };
   },
@@ -250,19 +261,22 @@ export default {
     }
   },
   created() {
+    const timeOutLoading = 1000;
     if(this.newsId) {
       this.initNewsComposerData(this.newsId);
     } else {
       this.initDone = true;
     }
-    newsServices.getSpaceById(this.spaceId).then(space => {
-      this.currentSpace = space;
-      this.displayFormTitle();
-      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
-        this.canCreatNews = canCreateNews;
+    window.setTimeout(() => {
+      newsServices.getSpaceById(this.spaceId).then(space => {
+        this.currentSpace = space;
+        this.displayFormTitle();
+        newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
+          this.canCreatNews = canCreateNews;
+          this.loading = false;
+        });
       });
-    });
-
+    }, timeOutLoading);
   },
   mounted() {
     document.body.style.overflow = 'hidden';

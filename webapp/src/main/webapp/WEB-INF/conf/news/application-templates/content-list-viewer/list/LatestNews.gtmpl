@@ -46,7 +46,7 @@
   }
     ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
     newsResourceBundle = resourceBundleService.getResourceBundle("locale.portlet.news.News", Util.getPortalRequestContext().getLocale());
-    def header = uicomponent.getHeader();
+    def header = _ctx.appRes("news.latest.header");
     def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER) && header?.trim();
     def siteName = Util.getPortalRequestContext().getPortalOwner();
     def seeAllUrl = "/portal/" + siteName + "/news?filter=pinned";

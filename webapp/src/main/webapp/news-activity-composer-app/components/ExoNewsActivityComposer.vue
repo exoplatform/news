@@ -261,33 +261,37 @@ export default {
     }
   },
   created() {
-    const timeOutLoading = 1000;
     if(this.newsId) {
       this.initNewsComposerData(this.newsId);
     } else {
       this.initDone = true;
     }
-    window.setTimeout(() => {
-      newsServices.getSpaceById(this.spaceId).then(space => {
-        this.currentSpace = space;
-        this.displayFormTitle();
-        newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
-          this.canCreatNews = canCreateNews;
-          this.loading = false;
-        });
+    newsServices.getSpaceById(this.spaceId).then(space => {
+      this.currentSpace = space;
+      this.displayFormTitle();
+      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
+        this.canCreatNews = canCreateNews;
       });
-    }, timeOutLoading);
+    });
+
   },
   mounted() {
+    const timeOutLoading = 1000;
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
-    this.initCKEditor().then(editor => {
-      const message = localStorage.getItem('exo-activity-composer-message');
-      if(message) {
-        editor.setData(message);
-        localStorage.removeItem('exo-activity-composer-message');
+    window.setTimeout(() => {
+      if (this.canCreatNews) {
+        this.initCKEditor().then(editor => {
+          const message = localStorage.getItem('exo-activity-composer-message');
+          if(message) {
+            editor.setData(message);
+            localStorage.removeItem('exo-activity-composer-message');
+          }
+        });
       }
-    });
+      this.loading = false;
+    }, timeOutLoading);
+    
     this.$nextTick(() => {
       const attachmentsComposer = JSON.parse(localStorage.getItem('exo-activity-composer-attachments'));
       if (attachmentsComposer) {

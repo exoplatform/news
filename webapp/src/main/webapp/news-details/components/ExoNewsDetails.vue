@@ -19,7 +19,7 @@
             <exo-news-share-activity v-if="showShareButton" :news="news"></exo-news-share-activity>
           </div>
           <div class="newsDetailsIcons">
-            <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :activity-id="activityId"></exo-news-activity-edit-composer>
+            <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :space-id="spaceId" :activity-id="activityId"></exo-news-activity-edit-composer>
             <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
           </div>
           <div class="news-top-information">
@@ -128,6 +128,7 @@ export default {
   },
   data() {
     return {
+      spaceId: null,
       showUpdateInfo: this.news.updatedDate  !== 'null' ,
       BYTES_IN_MB: 1048576,
       spaceDisplayName: this.news.spaceDisplayName,
@@ -137,6 +138,11 @@ export default {
     linkifiedSummary : function() {
       return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
     }
+  },
+  created() {
+    newsServices.getNewsById(this.newsId).then(news => {
+      this.spaceId = news.spaceId;
+    });
   },
   mounted() {
     this.updateViewsCount();

@@ -18,6 +18,10 @@ export default {
       type: String,
       required: true
     },
+    spaceId: {
+      type: Number,
+      required: true
+    },
     activityId: {
       type: String,
       required: false,
@@ -31,7 +35,7 @@ export default {
   },
   computed: {
     editLink: function() {
-      return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?newsId=${this.newsId}&activityId=${this.activityId}`;
+      return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
     }
   }
 };

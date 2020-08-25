@@ -91,7 +91,7 @@
             </a>
             <div class="newsActions">
               <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
-              <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
+              <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :space-id="news.spaceId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
               <exo-news-share-activity :news="news" @newsShared="reloadNews(news.newsId)"></exo-news-share-activity>
             </div>
             <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
@@ -261,6 +261,7 @@ export default {
           activities: item.activities,
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
+          spaceId: item.spaceId,
         });
       });
       if(append) {

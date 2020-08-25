@@ -261,11 +261,6 @@ export default {
     }
   },
   created() {
-    if(this.newsId) {
-      this.initNewsComposerData(this.newsId);
-    } else {
-      this.initDone = true;
-    }
     newsServices.getSpaceById(this.spaceId).then(space => {
       this.currentSpace = space;
       this.displayFormTitle();
@@ -286,6 +281,12 @@ export default {
           if(message) {
             editor.setData(message);
             localStorage.removeItem('exo-activity-composer-message');
+          }
+        }).then(() => {
+          if(this.newsId) {
+            this.initNewsComposerData(this.newsId);
+          } else {
+            this.initDone = true;
           }
         });
       }

@@ -47,6 +47,4 @@ public interface NewsService {
   void archiveNews(String newsId) throws Exception;
 
   void unarchiveNews(String newsId) throws Exception;
-
-  boolean canCreateNews(String authenticatedUser, Space space) throws Exception;
 }

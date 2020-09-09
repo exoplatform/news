@@ -190,23 +190,23 @@ if (activity && news) {
       <div class="newsSpaceAndOwner">
         <div class="newsOwner">
           <div class="avatarCircle avatarUser">
-            <a href="$sharingUrl" target="_blank">
+            <a href="$sharingUrl">
               <img src="$sharerAvatar" class="avatar">
             </a>
           </div>
             <div class="userInfo">
-              <a href="$sharingUrl" target="_blank"> ${posterFullName} </a>
+              <a href="$sharingUrl"> ${posterFullName} </a>
             </div>
             <div class="createIn">
                 <span class="uiIconArrowRightMini uiIconLightGray"></span>
             </div>
               <div class="avatarSpace">
-                <a href="$urlSpaceShared" target="_blank">
+                <a href="$urlSpaceShared">
                   <img src="$ownerSpaceAvatar" class="avatar">
                 </a>
               </div>
                 <div class="spaceInfo">
-                  <a href="$urlSpaceShared" target="_blank"> ${spaceSharedName} </a>
+                  <a href="$urlSpaceShared"> ${spaceSharedName} </a>
                 </div>
              </div>
           </div>

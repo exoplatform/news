@@ -20,7 +20,7 @@
       </div>
       <div class="content">
         <div class="newsPreview">
-          <a :href="news.url" target="_blank">
+          <a :href="news.url">
             <img :src="newsIllustrationURL" class="newsItemIllustration"/>
           </a>
           <div class="newsItemContent">
@@ -28,7 +28,7 @@
               <h3>
                 <div class="previewNewsTitle">
                   <div>
-                    <a :href="news.url" target="_blank">{{ news.title }}
+                    <a :href="news.url">{{ news.title }}
                     </a>
                   </div>
                 </div>
@@ -36,14 +36,14 @@
             </div>
             <div class="newsInfo">
               <p class="newsOwner">
-                <a :href="news.authorProfileURL" target="_blank">
+                <a :href="news.authorProfileURL">
                   <img :src="news.profileAvatarURL">
                   <span>{{ news.authorFullName }}</span>
                 </a>
               </p>
               <i class="uiIconArrowNext"></i>
               <p class="newsSpace">
-                <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
+                <a :href="news.spaceUrl" class="newsSpaceName">
                   <img :src="news.spaceAvatarUrl">
                   <span>{{ news.spaceDisplayName }}</span>
                 </a>

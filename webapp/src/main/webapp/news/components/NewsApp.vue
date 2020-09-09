@@ -64,13 +64,13 @@
           </div>
           <div class="newsInfo">
             <div class="newsOwner">
-              <a :href="news.authorProfileURL" target="_blank">
+              <a :href="news.authorProfileURL">
                 <img :src="news.profileAvatarURL">
                 <span>{{ news.authorFullName }}</span>
               </a>
               <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
               <span v-if="!news.hiddenSpace" class="newsSpace">
-                <a :href="news.spaceUrl" class="newsSpaceName" target="_blank">
+                <a :href="news.spaceUrl" class="newsSpaceName">
                   <img :src="news.spaceAvatarUrl">
                   <span>{{ news.spaceDisplayName }}</span>
                 </a>

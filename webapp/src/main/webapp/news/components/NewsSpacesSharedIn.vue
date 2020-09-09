@@ -22,7 +22,7 @@
               <img :src="act.spaceAvatar" :alt="act.spaceAvatar" class="avatarMini">
               {{ act.spaceDisplayName }}
             </span>
-            <a :href="act.activityUrl" type="button" class="btn" target="_blank">{{ $t('news.app.viewArticle') }}</a>
+            <a :href="act.activityUrl" type="button" class="btn">{{ $t('news.app.viewArticle') }}</a>
             <br>
           </div>
         </div>

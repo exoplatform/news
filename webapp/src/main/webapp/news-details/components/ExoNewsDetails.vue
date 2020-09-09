@@ -35,17 +35,17 @@
             <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content">
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
                 <div class="activityAvatar avatarCircle">
-                  <a :href="news.authorProfileURL" target="_blank">
+                  <a :href="news.authorProfileURL">
                     <img :src="news.profileAvatarURL" class="avatar">
                   </a>
                 </div>
               </div>
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
-                  <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName news-details-information" target="_blank"> {{ news.authorFullName }} </a>
+                  <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ news.authorFullName }} </a>
                   <span v-if="!news.hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
                   <div v-if="!news.hiddenSpace" class="newsSpace">
-                    <a :href="news.spaceUrl" class="newsInformationLabel news-details-information" target="_blank">{{ news.spaceDisplayName }}</a>
+                    <a :href="news.spaceUrl" class="newsInformationLabel news-details-information">{{ news.spaceDisplayName }}</a>
                   </div>
                   <span class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>
                 </div>
@@ -157,10 +157,13 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
-    const linkContentElements = document.querySelector('#newsDetails #newsBody a');
-    if (linkContentElements) {
-      linkContentElements.setAttribute('target', '_blank');
-    }
+    const linkContentElements = document.querySelectorAll('#newsDetails a');
+    linkContentElements.forEach(function(linkContentElement) {
+      if (linkContentElement && !linkContentElement.href.includes(`${eXo.env.portal.context}/${eXo.env.portal.portalName}`)) {
+        linkContentElement.setAttribute('target', '_blank');
+      }
+    });
+    
     if(this.showPinInput) {
       document.querySelector('#pinNewsActivity').style.display = '';
     }

@@ -56,8 +56,9 @@
               xs12
               sm6>
               <v-img
-                v-if="typeof newsInfo[0] !== 'undefined'"    
+                v-if="typeof newsInfo[0] !== 'undefined'"
                 :src="newsInfo[0].illustrationURL"
+                class="firstNewsImg"
                 aspect-ratio="2.3"
                 @click="openNews(newsInfo[0].url)">
                 <v-row align="end" class="lightbox white--text pa-2 fill-height">

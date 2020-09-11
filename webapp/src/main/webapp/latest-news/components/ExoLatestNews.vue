@@ -8,31 +8,18 @@
         row
         mx-0
         class="white">
-        <v-flex
-          d-flex
-          xs12
-          px-3>
-          <v-layout
-            row
-            mx-0
-            align-center>
-            <v-flex
-              d-flex
-              xs12
-              sm6>
+        <v-flex class="px-3 border-box-sizing">
+          <v-layout class="d-flex mx-0 align-center border-box-sizing">
+            <v-flex class="d-flex text-truncate">
               <v-card v-if="isShowHeader"
                       flat
                       color="transparent">
-                <v-card-text class="body-1 text-uppercase grey--text px-0">
+                <v-card-text class="body-1 text-truncate text-uppercase grey--text px-0">
                   {{ header }}
                 </v-card-text>
               </v-card>
             </v-flex>
-            <v-flex
-              d-flex
-              xs12
-              sm6
-              justify-end>
+            <v-flex class="d-flex justify-end">
               <v-btn
                 depressed
                 small

@@ -836,7 +836,6 @@ public class NewsServiceImpl implements NewsService {
         spaceNewsRootNode.addMixin("exo:privilegeable");
       }
       Map<String, String[]> permissions = new HashMap<>();
-      permissions.put("*:/platform/administrators", PermissionType.ALL);
       permissions.put("*:" + space.getGroupId(), PermissionType.ALL);
       ((ExtendedNode) spaceNewsRootNode).setPermissions(permissions);
 

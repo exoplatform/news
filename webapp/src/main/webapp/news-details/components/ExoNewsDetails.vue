@@ -159,7 +159,7 @@ export default {
     });
     const linkContentElements = document.querySelectorAll('#newsDetails a');
     linkContentElements.forEach(function(linkContentElement) {
-      if (linkContentElement && !linkContentElement.href.includes(`${eXo.env.portal.context}/${eXo.env.portal.portalName}`)) {
+      if (linkContentElement && !linkContentElement.href.includes(`${document.location.host}${eXo.env.portal.context}`)) {
         linkContentElement.setAttribute('target', '_blank');
       }
     });

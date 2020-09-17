@@ -18,7 +18,6 @@
   def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
   def activity = uicomponent.getActivity();
   def news = uicomponent.getNews();
-  def activityDeletable = uicomponent.isActivityDeletable();
   def activityCommentAndLikable = uicomponent.isActivityCommentAndLikable();
   def canPinNews = uicomponent.canPinNews();
   def streamOwner = activity.getStreamOwner();
@@ -29,15 +28,9 @@
   def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
 
   def labelCancel = _ctx.appRes("UIActivity.label.Cancel");
-  def labelDelete = _ctx.appRes("UIActivity.label.Delete");
   def inputWriteAComment = _ctx.appRes("UIActivity.input.Add_your_comment").replace("'", "\\'");
 
   def labelReadMore = _ctx.appRes("news.activity.readMore");
-
-  def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
-  def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));
-  def labelConfirmbutton=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirm_Delete_Activity-Button"));
-  def labelClosebutton=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Cancel_Delete_Activity-Button"));
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
@@ -175,7 +168,7 @@
 
         <!-- three dots activity menu -->
           <%
-			  		if(activityDeletable || canPinNews){
+			  		if(canPinNews){
 			    %>
                     <div id="dropDownEditActivity${activity.id}" class="btn-group uiDropdownWithIcon actLink ">
                         <div class="dropdown-toggle" data-toggle="dropdown">
@@ -206,15 +199,7 @@
                               }
                             }
                           }
-                            if (activityDeletable) {
                           %>
-                            <li class="actLink-item">
-                              <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity" data-caption="$captionConfirmation" data-close="$labelClosebutton" data-ok="$labelConfirmbutton"  data-delete="<%=uicomponent.event("DeleteActivity", uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">
-                                  <i class="uiIcon uiIconTrashActivity actLink-icon"></i>
-                                  <span class="actLink-label">${labelDelete}</span>
-                              </a>
-                            </li>
-                          <% } %>
                         </ul>
                     </div>
 			    <%

@@ -24,7 +24,7 @@
   <parent>
     <artifactId>news</artifactId>
     <groupId>org.exoplatform.addons.news</groupId>
-    <version>1.1.2</version>
+    <version>1.1.2-patched</version>
   </parent>
   <artifactId>news-packaging</artifactId>
   <packaging>pom</packaging>

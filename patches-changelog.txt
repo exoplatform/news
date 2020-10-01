@@ -1,5 +1,13 @@
               2020-10-01 eXo Support <support@exoplatform.org> 
 
-   # 1.1.2 Patches changelog: 
+   # 1.1.2 / 5.3.5 Patches changelog:  
+
+* 2020-09-21: Patch-5.3.5:1, Author: Jihed Chabbeh<jchabbeh@exoplatform.com>
+
+  -  https://github.com/exoplatform/ecms/commit/ea5a344593264a858ad55063e71cdc9c481cc295
+  
+* 2020-09-21: Patch-5.3.5:1, Author: Dorra Messaabi<dmessaabi@exoplatform.com>
+
+  -  https://github.com/exoplatform/news/pull/42
 
 

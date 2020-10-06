@@ -36,6 +36,7 @@
   <modules>
     <module>services</module>
     <module>webapp</module>
+    <module>upgrade-plugin</module>
     <module>packaging</module>
   </modules>
 

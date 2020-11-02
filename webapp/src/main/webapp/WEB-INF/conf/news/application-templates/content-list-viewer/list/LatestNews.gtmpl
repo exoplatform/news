@@ -75,63 +75,13 @@
     } """
 
     def pcontext = Util.getPortalRequestContext();
-    def jsManager = pcontext.getJavascriptManager().require("SHARED/uiForm");
+    def jsManager = pcontext.getJavascriptManager();
     jsManager.require("SHARED/latestNews", "latestNews").addScripts("latestNews.initLatestNews($params);");
-
 %>
 <div class="VuetifyApp">
-  <div id="latestNewsDetails">
-  <div class="skeletonContainer">
-    <div class="containerLeft">
-      <div class="v-skeleton-loader__bone imageNewsLeft">
-        <div class="v-skeleton-loader v-skeleton-loaderUp  v-skeleton-loader--is-loading theme--light newsSkeletonRight imageLeft">
-        </div>
-          <div>
-            <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone text-LingeTop">
-            </div>
-           <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone text-center"> </div>
-             <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight v-skeleton-loader__bone titleNewsLeft"> </div>
-             </div>
-           </div>
-      </div>
-   <div class="imageNewsRight">
-    <div class="v-skeleton-loader__bone blockNewsInner">
-     <div class="newsItem">
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
-       </div>
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
-       </div>
-    <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
-    </div>
-      <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
-      </div>
-    </div>
-   </div>
-  <div class="v-skeleton-loader__bone blockNewsInner">
-    <div class="newsItem">
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
-       </div>
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
-       </div>
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
-       </div>
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
-       </div>
-     </div>
+  <div data-app="true"
+    class="v-application VuetifyApp v-application--is-ltr theme--light"
+    id="latestNewsDetails" flat="">
+    <v-cacheable-dom-app cache-id="latestNewsDetails"></v-cacheable-dom-app>
   </div>
- <div class="v-skeleton-loader__bone blockNewsInner">
-   <div class="newsItem">
-     <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight newsTitleRight">
-     </div>
-     <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonTextRight">
-     </div>
-       <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight textRight">
-       </div>
-      <div class="v-skeleton-loader  v-skeleton-loader--is-loading theme--light newsSkeletonRight skeletonText">
-      </div>
-     </div>
-    </div>
-   </div>
-  </div>
- </div>
 </div>

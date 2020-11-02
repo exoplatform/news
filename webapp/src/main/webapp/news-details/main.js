@@ -21,10 +21,16 @@ export function init(params) {
     `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`,
     `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.attachmentsSelector.attachments-${lang}.json`
   ];
+
+  const appId = 'newsDetails';
+  const cacheId = `${appId}_${params.activityId}`;
+
+  const appElement = document.createElement('div');
+  appElement.id = appId;
+
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale resources are ready
     newsDetails = new Vue({
-      el: '#newsDetails',
       data: function() {
         return {
           news: params.news,
@@ -35,9 +41,17 @@ export function init(params) {
           showShareButton : params.showShareButton,
         };
       },
-      template: '<exo-news-details :news="news" :news-id="newsId" :activity-id="activityId" :show-edit-button="showEditButton" :show-pin-input="showPinInput" :show-share-button="showShareButton"></exo-news-details>',
+      template: `<exo-news-details
+                  v-cacheable="{cacheId: '${cacheId}'}"
+                  id="${appId}"
+                  :news="news"
+                  :news-id="newsId"
+                  :activity-id="activityId"
+                  :show-edit-button="showEditButton"
+                  :show-pin-input="showPinInput"
+                  :show-share-button="showShareButton" />`,
       i18n
-    });
+    }).$mount(appElement);
   });
 }
 

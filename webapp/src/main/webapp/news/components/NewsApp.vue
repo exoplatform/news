@@ -147,7 +147,8 @@ export default {
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,
-      loadingNews: true
+      loadingNews: true,
+      initialized: false,
     };
   },
   computed: {
@@ -286,7 +287,7 @@ export default {
       const searchTerm = this.searchText.trim().toLowerCase();
       const offset = append ? this.newsList.length : 0;
       this.loadingNews = true;
-      newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
+      return newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
         if (data.news && data.news.length) {
           if(data.news.length > this.newsPerPage) {
             this.showLoadMoreButton = true;
@@ -306,7 +307,14 @@ export default {
         }else {
           window.history.pushState('', 'News', this.removeQueryParam('search'));
         }
-      }).catch(() => this.loadingNews = false);
+        return this.$nextTick();
+      }).catch(() => this.loadingNews = false)
+        .finally(() => {
+          if (!this.initialized) {
+            this.initialized = true;
+            this.$root.$emit('application-loaded');
+          }
+        });
     },
     loadMore: function() {
       this.fetchNews();

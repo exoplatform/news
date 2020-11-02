@@ -95,7 +95,7 @@
 
               </v-layout>
             </v-flex>
-            <div v-if="newsInfo.length === 0" class="noNews">
+            <div v-if="newsInfo.length === 0" class="noNews mx-auto">
               <div class="noNewsContent">
                 <i class="uiNoNewsIcon"></i>
                 <div class="noNewsTitle">{{ $t('news.latest.noNews') }}</div>
@@ -180,6 +180,9 @@ export default {
         this.newsInfo[i].illustrationURL = '/news/images/newsImageDefault.png';
       }
     }
+  },
+  mounted() {
+    this.$nextTick().then(() => this.$root.$emit('application-loaded'));
   },
   methods:{
     openNews(url){

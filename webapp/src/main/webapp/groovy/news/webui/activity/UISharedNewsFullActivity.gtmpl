@@ -184,8 +184,10 @@ if (activity && news) {
   <div id="ContextBox${activity.id}" class="uiBox contentBox">
     <div id="ActivityContextBox${activity.id}">
     <div class="news-details-shared">
-      <div id="newsDetails"></div>
+      <div id="newsDetails">
+        <v-cacheable-dom-app cache-id="newsDetails_${activity.id}"></v-cacheable-dom-app>
       </div>
+    </div>
     <div class="sharedInfo">
       <div class="newsSpaceAndOwner">
         <div class="newsOwner">

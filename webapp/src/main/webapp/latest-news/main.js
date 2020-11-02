@@ -18,6 +18,7 @@ const vuetify = new Vuetify({
   iconfont: '',
 });
 
+const appId = 'latestNewsDetails';
 
 let latestNewsDetails;
 export function initLatestNews(params) {
@@ -26,9 +27,11 @@ export function initLatestNews(params) {
   // should expose the locale resources as REST API
   const url = `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
+    const appElement = document.createElement('div');
+    appElement.id = appId;
+
     // init Vue app when locale resources are ready
     latestNewsDetails = new Vue({
-      el: '#latestNewsDetails',
       data: function() {
         return {
           newsInfo: params.newsInfo,
@@ -38,10 +41,10 @@ export function initLatestNews(params) {
           isShowHeader: params.isShowHeader
         };
       },
-      template: '<exo-news-latest :news-info="newsInfo" :header="header" :see-all="seeAllLabel" :url="url"  :is-show-header="isShowHeader"></exo-news-latest>',
+      template: `<exo-news-latest id="${appId}" v-cacheable :news-info="newsInfo" :header="header" :see-all="seeAllLabel" :url="url"  :is-show-header="isShowHeader"></exo-news-latest>`,
       i18n,
       vuetify,
-    });
+    }).$mount(appElement);
   });
 }
 

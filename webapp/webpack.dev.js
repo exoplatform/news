@@ -7,13 +7,14 @@ const app = 'news';
 
 // add the server path to your server location path
 
-const exoServerPath = "/home/exo/Source/News/platform-6.0.x-SNAPSHOT";
+const exoServerPath = "/exo-server";
 
 
 let config = merge(webpackCommonConfig, {
   output: {
     path: path.resolve(`${exoServerPath}/webapps/${app}/`),
-    filename: 'js/[name].bundle.js'
+    filename: 'js/[name].bundle.js',
+    libraryTarget: 'amd'
   },
   devtool: 'inline-source-map'
 });

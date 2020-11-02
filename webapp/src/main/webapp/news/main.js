@@ -4,6 +4,8 @@ import './components/initComponents.js';
 import NewsApp from './components/NewsApp.vue';
 import {newsConstants} from '../js/newsConstants';
 
+Vue.component('news-app', NewsApp);
+
 Vue.use(Vuetify);
 
 const vuetify = new Vuetify({
@@ -25,10 +27,17 @@ const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
 // should expose the locale resources as REST API
 const url = `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
 
-exoi18n.loadLanguageAsync(lang, url).then(i18n => {
-  new Vue({
-    render: (h) => h(NewsApp),
-    i18n,
-    vuetify
-  }).$mount('#NewsApp');
-});
+const appId = 'NewsApp';
+
+export function init() {
+  exoi18n.loadLanguageAsync(lang, url).then(i18n => {
+    const appElement = document.createElement('div');
+    appElement.id = appId;
+
+    new Vue({
+      template: `<news-app id="${appId}" v-cacheable />`,
+      i18n,
+      vuetify,
+    }).$mount(appElement);
+  });
+}

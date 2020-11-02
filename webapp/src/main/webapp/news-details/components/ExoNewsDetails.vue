@@ -140,9 +140,14 @@ export default {
     }
   },
   created() {
-    newsServices.getNewsById(this.newsId).then(news => {
-      this.spaceId = news.spaceId;
-    });
+    newsServices.getNewsById(this.newsId)
+      .then(news => {
+        this.spaceId = news.spaceId;
+        return this.$nextTick();
+      })
+      .finally(() => {
+        this.$root.$emit('application-loaded');
+      });
   },
   mounted() {
     this.updateViewsCount();
@@ -165,7 +170,10 @@ export default {
     });
     
     if(this.showPinInput) {
-      document.querySelector('#pinNewsActivity').style.display = '';
+      const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
+      if (pinButton) {
+        pinButton.style.display = '';
+      }
     }
   },
   methods: {

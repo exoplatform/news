@@ -170,7 +170,9 @@
     <div id="ContextBox${activity.id}" class="uiBox contentBox clearfix">
       <div id="ActivityContextBox${activity.id}">
 
-       <div id="newsDetails"></div>
+       <div id="newsDetails">
+         <v-cacheable-dom-app cache-id="newsDetails_${activity.id}"></v-cacheable-dom-app>
+       </div>
         <% if (!news.archived || (news.archived && news.canArchive)) { %>
         <div class="actionsDetailsWrapper">
           <% _ctx.includeTemplates("UIActivityListLiked") %>

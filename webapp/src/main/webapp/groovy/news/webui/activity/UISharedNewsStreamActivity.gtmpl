@@ -18,7 +18,6 @@ def pcontext = Util.getPortalRequestContext();
 def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
 def activity = uicomponent.getActivity();
 def news = uicomponent.getNews();
-def activityDeletable = uicomponent.isActivityDeletable();
 def activityEditable = uicomponent.isActivityEditable(activity);
 def activityCommentAndLikable = uicomponent.isActivityCommentAndLikable();
 def streamOwner = activity.getStreamOwner();
@@ -34,7 +33,6 @@ def streamOwner = activity.getStreamOwner();
   def labelLike = _ctx.appRes("UIActivity.label.Like");
   def labelUpdate = _ctx.appRes("UIActivity.label.Update");
   def labelEdit = _ctx.appRes("UIActivity.label.Edit");
-  def labelDelete = _ctx.appRes("UIActivity.label.Delete");
   def labelViewAllReplies = _ctx.appRes("UIActivity.label.ViewAllReplies");
   def labelUnlike = _ctx.appRes("UIActivity.label.Unlike");
   def labelSource = _ctx.appRes("UIActivity.label.Source");
@@ -54,10 +52,7 @@ def streamOwner = activity.getStreamOwner();
   def labelYouAndOnePersonLikeThis=_ctx.appRes("UIActivity.label.You_And_One_Person_Like_This");
   def labelYouAndOthersLikeThis=_ctx.appRes("UIActivity.label.You_And_Others_Like_This");
 
-  def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
-  def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));
-  def labelConfirmbutton=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirm_Delete_Activity-Button"));
-  def labelClosebutton=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Cancel_Delete_Activity-Button"));
+
   def labelToDeleteThisComment=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Comment"));
 
   def likeActivityAction = uicomponent.event("LikeActivity", "true");
@@ -270,7 +265,7 @@ def streamOwner = activity.getStreamOwner();
                     <span class="arrowLeft"></span>
                     <!--div class="pull-right"-->
                     <%
-                    if(activityEditable || activityDeletable ){
+                    if(activityEditable){
                     %>
                     <div id="dropDownEditActivity${activity.id}"
                          class="btn-group uiDropdownWithIcon actLink hidden-phone hidden-tablet">
@@ -286,14 +281,9 @@ def streamOwner = activity.getStreamOwner();
                             </li>
                             <%
                             }
-                            if (activityDeletable) {
+                           
                             %>
-                            <li>
-                                <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity"
-                                   data-caption="$captionConfirmation" data-close="$labelClosebutton"
-                                   data-ok="$labelConfirmbutton" data-delete="<%=uicomponent.event(" DeleteActivity",uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">${labelDelete}</a>
-                            </li>
-                            <%}%>
+                           
                         </ul>
                     </div>
                     <%
@@ -330,7 +320,7 @@ def streamOwner = activity.getStreamOwner();
                                 href="$activityLink" <% if(activity.postedTime != activity.updated.getTime() ){%> title="$postedTimeTooltip"> $activityUpdatedTime <%} else {%> >$activityPostedTime <%}%></a></span>
 
                         <%
-                        if(activityEditable || activityDeletable ) {
+                        if(activityEditable) {
                         %>
                         <div id="dropDownEditActivity${activity.id}"
                              class="btn-group uiDropdownWithIcon actionLink hidden-desktop visible-tablet visible-phone">
@@ -346,16 +336,9 @@ def streamOwner = activity.getStreamOwner();
                                 </li>
                                 <%
                                 }
-                                if (activityDeletable) {
+                               
                                 %>
-                                <li>
-                                    <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity"
-                                       data-caption="$captionConfirmation" data-close="$labelClosebutton"
-                                       data-ok="$labelConfirmbutton" data-delete="<%=uicomponent.event(" DeleteActivity",uicomponent.getId(), "");%>" class="controllDelete"
-                                    id="DeleteActivityButton${activity.id}">${labelDelete}</a>
-
-                                </li>
-                                <%}%>
+                               
                             </ul>
                         </div>
                         <%

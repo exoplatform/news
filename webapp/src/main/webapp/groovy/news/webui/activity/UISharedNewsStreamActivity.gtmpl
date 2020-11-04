@@ -15,7 +15,6 @@ import org.htmlcleaner.HtmlCleaner;
 import static org.exoplatform.social.webui.activity.BaseUIActivity.TEMPLATE_PARAM_COMMENT;
 
 def pcontext = Util.getPortalRequestContext();
-def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
 def activity = uicomponent.getActivity();
 def news = uicomponent.getNews();
 def activityEditable = uicomponent.isActivityEditable(activity);
@@ -226,8 +225,4 @@ def streamOwner = activity.getStreamOwner();
     </div> <!-- #boxContainer-->
     <% uiform.end() %>
 </div><!--activityStream-->
-<% } else { %> <!-- activity deleted -->
-<% uiform.begin() %>
-<div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
-<% uiform.end() %>
 <% } %>

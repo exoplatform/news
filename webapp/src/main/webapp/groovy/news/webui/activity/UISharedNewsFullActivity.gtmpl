@@ -26,8 +26,6 @@
 
   def pcontext = Util.getPortalRequestContext();
 
-  def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
-
   def activity = uicomponent.getActivity();
 
   def sharedTitle = activity.title;
@@ -227,8 +225,4 @@ if (activity && news) {
   <% uiform.end() %>
 </div><!--activityStream-->
 <% } // News archived %>
-<% } else { // Activity deleted %>
-<% uiform.begin() %>
-<div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
-<% uiform.end() %>
 <% } %>

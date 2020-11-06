@@ -40,8 +40,8 @@
   </modules>
 
   <properties>
-    <org.exoplatform.social.version>6.1.x-SNAPSHOT</org.exoplatform.social.version>
-    <addon.exo.ecms.version>6.1.x-SNAPSHOT</addon.exo.ecms.version>
+    <org.exoplatform.social.version>6.1.0-M11</org.exoplatform.social.version>
+    <addon.exo.ecms.version>6.1.0-M11</addon.exo.ecms.version>
     <pitest.version>1.4.10</pitest.version>
   </properties>
 

@@ -76,12 +76,18 @@
 
     def pcontext = Util.getPortalRequestContext();
     def jsManager = pcontext.getJavascriptManager();
-    jsManager.require("SHARED/latestNews", "latestNews").addScripts("latestNews.initLatestNews($params);");
+
+    // Added to include the SHARED/latestNews module in dependencies
+    // of the page to preload it with its dependencies
+    jsManager.require("SHARED/latestNews", "latestNews");
 %>
 <div class="VuetifyApp">
   <div data-app="true"
     class="v-application VuetifyApp v-application--is-ltr theme--light"
     id="latestNewsDetails" flat="">
     <v-cacheable-dom-app cache-id="latestNewsDetails"></v-cacheable-dom-app>
+    <script type="text/javascript">
+      require(["SHARED/latestNews"], latestNews => latestNews.initLatestNews($params));
+    </script>
   </div>
 </div>

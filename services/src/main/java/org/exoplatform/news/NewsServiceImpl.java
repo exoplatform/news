@@ -2,14 +2,7 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -27,6 +20,7 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
@@ -664,7 +658,7 @@ public class NewsServiceImpl implements NewsService {
 
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(getStringProperty(node, "exo:body"));
+    news.setBody(formatMention(getStringProperty(node, "exo:body")));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -1183,6 +1177,44 @@ public class NewsServiceImpl implements NewsService {
     }
     newsNode.setProperty("exo:archived", false);
     newsNode.save();
+  }
+
+  public Identity loadUser(String username) {
+    if (username == null || username.isEmpty()) {
+      return null;
+    }
+    org.exoplatform.social.core.identity.model.Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
+
+    if (identity == null) {
+      return null;
+    } else {
+      return identity;
+    }
+  }
+
+  public String formatMention(String text) {
+    if (text == null || text.isEmpty()) {
+      return text;
+    }
+    HTMLEntityEncoder encoder = HTMLEntityEncoder.getInstance();
+    StringBuilder sb = new StringBuilder();
+    StringTokenizer tokenizer = new StringTokenizer(text);
+    while (tokenizer.hasMoreElements()) {
+      String next = (String) tokenizer.nextElement();
+      if (next.length() == 0) {
+        continue;
+      } else if (next.charAt(0) == '@') {
+        String username = next.substring(1);
+        org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
+        if (identity != null) {
+          next = "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
+                  + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
+        }
+      }
+      sb.append(next);
+      sb.append(' ');
+    }
+    return sb.toString();
   }
 
 }

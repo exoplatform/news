@@ -86,10 +86,12 @@
     def postedDate = LocalDateTime.ofInstant(news.publicationDate.toInstant(), TimeZone.getDefault().toZoneId());
     newsPostedDate = postedDate.format(mediumDateFormat);
   }
-  def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
-  def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-  if( news.updateDate.getTime() == news.publicationDate.getTime() ){
+  def newsUpdatedDate = null;
+  if( news.updateDate == null || news.publicationDate == null || news.publicationDate.equals(news.updateDate) ){
     newsUpdatedDate = null;
+  } else {
+    def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
+    newsUpdatedDate = updatedDate.format(mediumDateFormat);
   }
   def labelReadMore = _ctx.appRes("news.activity.readMore");
   def labelPublicationDate = _ctx.appRes("news.activity.publicationDate");

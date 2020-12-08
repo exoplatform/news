@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!canCreatNews && loading">
+    <div v-show="loading">
       <div class="VuetifyApp loadingComposer">
         <v-progress-circular
           indeterminate
@@ -8,14 +8,14 @@
         ></v-progress-circular>
       </div>
     </div>
-    <div v-else-if="canCreatNews" id="newsActivityComposer" class="newsComposer">
+    <div v-show="canCreatNews && !loading" id="newsActivityComposer" class="newsComposer">
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
             <img src="/news/images/newsImageDefault.png" />
             <span class="newsFormTitle">{{ newsFormTitle }}</span>
           </div>
-          <div v-if="showPinInput" class="pinArticleContent " @click="news.pinned">
+          <div v-show="showPinInput" class="pinArticleContent " @click="news.pinned">
             <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" :class="[news.archived ? 'unauthorizedPin' : '']" class="pinArticle"
                rel="tooltip"
                data-placement="bottom"
@@ -23,7 +23,7 @@
               <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
             </a>
           </div>
-          <div v-if="!editMode" class="newsFormRightActions">
+          <div v-show="!editMode" class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
             <div class="newsDrafts">
               <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
@@ -34,7 +34,7 @@
               </v-app>
             </div>
           </div>
-          <div v-if="editMode" class="newsFormRightActions">
+          <div v-show="editMode" class="newsFormRightActions">
             <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
             </button>
             <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
@@ -118,7 +118,8 @@
       </div>
     <!-- end -->
     </div>
-    <div v-else class="newsComposer">
+    
+    <div v-show="!canCreatNews && !loading" class="newsComposer">
       <div id="form_msg_error" class="alert alert-error">
         <span data-dismiss="alert" >
           <i class="uiIconColorError pull-left"></i>
@@ -212,7 +213,8 @@ export default {
       uploading: false,
       canCreatNews: false,
       loading: true,
-      currentSpace: {}
+      currentSpace: {},
+      spaceURL: null
     };
   },
   computed: {
@@ -260,38 +262,37 @@ export default {
       }
     }
   },
-  created() {
-    newsServices.getSpaceById(this.spaceId).then(space => {
-      this.currentSpace = space;
-      this.displayFormTitle();
-      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
-        this.canCreatNews = canCreateNews;
-      });
-    });
-
-  },
   mounted() {
-    const timeOutLoading = 1000;
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
-    window.setTimeout(() => {
-      if (this.canCreatNews) {
-        this.initCKEditor().then(editor => {
-          const message = localStorage.getItem('exo-activity-composer-message');
-          if(message) {
-            editor.setData(message);
-            localStorage.removeItem('exo-activity-composer-message');
+    
+    newsServices.getSpaceById(this.spaceId).then(space => {
+      this.currentSpace = space;
+      this.spaceURL = this.currentSpace.prettyName;
+      this.displayFormTitle();
+
+      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
+        this.canCreatNews = canCreateNews;
+        this.$nextTick(() => {
+          if (this.canCreatNews) {
+            this.initCKEditor().then(editor => {
+              const message = localStorage.getItem('exo-activity-composer-message');
+              if(message) {
+                editor.setData(message);
+                localStorage.removeItem('exo-activity-composer-message');
+              }
+            }).then(() => {
+              if(this.newsId) {
+                this.initNewsComposerData(this.newsId);
+              } else {
+                this.initDone = true;
+              }
+            });
           }
-        }).then(() => {
-          if(this.newsId) {
-            this.initNewsComposerData(this.newsId);
-          } else {
-            this.initDone = true;
-          }
+          this.loading = false;
         });
-      }
-      this.loading = false;
-    }, timeOutLoading);
+      });
+    });
     
     this.$nextTick(() => {
       const attachmentsComposer = JSON.parse(localStorage.getItem('exo-activity-composer-attachments'));
@@ -336,6 +337,8 @@ export default {
           extraPlugins: extraPlugins,
           removePlugins: 'image,confirmBeforeReload,maximize,resize',
           allowedContent: true,
+          typeOfRelation: 'mention_activity_stream',
+          spaceURL: self.spaceURL,
           toolbarLocation: 'top',
           removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
           toolbar: [

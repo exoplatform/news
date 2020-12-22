@@ -1203,11 +1203,11 @@ public class NewsServiceImpl implements NewsService {
       String next = (String) tokenizer.nextElement();
       if (next.length() == 0) {
         continue;
-      } else if (next.charAt(0) == '@') {
-        String username = next.substring(1);
+      } else if (next.contains("@")) {
+        String username = next.split("@")[1];
         org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
         if (identity != null) {
-          next = "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
+          next = next.split("@")[0] + "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
                   + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
         }
       }

@@ -477,7 +477,7 @@ export default {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary,
-        body: this.news.body,
+        body: this.getBody() ? this.getBody() : this.news.body,
         author: eXo.env.portal.userName,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
@@ -665,7 +665,7 @@ export default {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
-        body: this.news.body,
+        body: this.getBody() ? this.getBody() : this.news.body,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         publicationState: 'published'
@@ -694,6 +694,10 @@ export default {
     },
     setUploadingCount: function(uploadingCount) {
       this.uploading = uploadingCount > 0;
+    },
+    getBody: function() {
+      const newData = CKEDITOR.instances['newsContent'].getData();
+      return newData ? newData : null;
     }
   }
 };

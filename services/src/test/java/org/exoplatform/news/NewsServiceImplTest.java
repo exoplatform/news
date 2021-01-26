@@ -2975,4 +2975,43 @@ public class NewsServiceImplTest {
     //Then
     assertEquals("test mention user in news <a href=\"http://exoplatfom.com/profile/john\">john john</a> ", article);
   }
+  
+  
+  @Test
+  public void testHTMLSanitization() throws Exception {
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+  
+    Node newsNode = mock(Node.class);
+    when(newsNode.hasProperty(anyString())).thenReturn(true);
+    when(newsNode.hasProperty(eq("jcr:frozenUuid"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:dateCreated"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:dateModified"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:activities"))).thenReturn(false);
+  
+    Property property = mock(Property.class);
+    when(property.getString()).thenReturn("propertyValue");
+  
+    Property propertyBody = mock(Property.class);
+    when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
+    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
+    
+    
+    assertFalse(newsService.convertNodeToNews(newsNode).getBody().contains("<img"));
+    
+  }
 }

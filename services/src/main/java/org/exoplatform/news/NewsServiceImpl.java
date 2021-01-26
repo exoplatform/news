@@ -21,6 +21,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
@@ -658,7 +659,7 @@ public class NewsServiceImpl implements NewsService {
 
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(formatMention(getStringProperty(node, "exo:body")));
+    news.setBody(formatMention(HTMLSanitizer.sanitize(getStringProperty(node, "exo:body"))));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));

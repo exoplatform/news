@@ -1206,8 +1206,8 @@ public class NewsServiceImpl implements NewsService {
         continue;
       } else if (next.contains("@")) {
         String username = "";
-        String[]splitTable = next.split("@");
-        if(splitTable.length>1) {
+        String[] splitTable = next.split("@");
+        if (splitTable.length > 1) {
           username = splitTable[1];
           org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
           if (identity != null) {

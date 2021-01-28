@@ -1205,11 +1205,15 @@ public class NewsServiceImpl implements NewsService {
       if (next.length() == 0) {
         continue;
       } else if (next.contains("@")) {
-        String username = next.split("@")[1];
-        org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
-        if (identity != null) {
-          next = next.split("@")[0] + "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
-                  + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
+        String username = "";
+        String[] splitTable = next.split("@");
+        if (splitTable.length > 1) {
+          username = splitTable[1];
+          org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
+          if (identity != null) {
+            next = splitTable[0] + "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
+                    + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
+          }
         }
       }
       sb.append(next);

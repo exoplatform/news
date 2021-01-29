@@ -477,7 +477,7 @@ export default {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary,
-        body: this.getBody() ? this.getBody() : this.news.body,
+        body: this.news.body,
         author: eXo.env.portal.userName,
         attachments: this.news.attachments,
         pinned: this.news.pinned,

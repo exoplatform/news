@@ -1992,10 +1992,17 @@ public class NewsRestResourcesV1Test {
     news3.setBody("@john test again");
     news3.setTitle(text);
     news3.setPublicationState("published");
+    News news4 = new News();
+    news4.setSpaceId("4");
+    news4.setAuthor("john");
+    news4.setBody("this won't mention @ john");
+    news4.setTitle(text);
+    news4.setPublicationState("published");
     List<News> allNews = new ArrayList<>();
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    allNews.add(news4);
     when(newsService.getNews(any())).thenReturn(allNews);
     when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
@@ -2007,11 +2014,17 @@ public class NewsRestResourcesV1Test {
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsList = newsEntity.getNews();
     assertNotNull(newsList);
-    assertEquals(3, newsList.size());
+    assertEquals(4, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
-      assertEquals("published", newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
-      assertTrue("test mention user in news <a href=\"/portal/dw/profile/john\">john john</a> ", newsList.get(i).getBody().contains("<a href=\"/portal/dw/profile/john\" rel=\"nofollow\">john john</a>"));
+      if(i < 3) {
+        assertEquals("published", newsList.get(i).getPublicationState());
+        assertEquals("john", newsList.get(i).getAuthor());
+        assertTrue("test mention user in news <a href=\"/portal/dw/profile/john\">john john</a> ", newsList.get(i).getBody().contains("<a href=\"/portal/dw/profile/john\" rel=\"nofollow\">john john</a>"));
+      } else {
+        assertEquals("published", newsList.get(i).getPublicationState());
+        assertEquals("john", newsList.get(i).getAuthor());
+        assertFalse("this shouldn't mention the user john", newsList.get(i).getBody().contains("/portal/dw/profile/john"));
+      }
     }
   }
 

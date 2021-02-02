@@ -17,13 +17,7 @@ import org.exoplatform.commons.api.notification.service.template.TemplateContext
 import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeSharedNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -32,12 +26,14 @@ import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = ShareMyNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = LikeNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = LikeSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = CommentNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl") })
 public class WebTemplateProvider extends TemplateProvider {
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
 
@@ -50,6 +46,7 @@ public class WebTemplateProvider extends TemplateProvider {
     this.templateBuilders.put(PluginKey.key(LikeSharedNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(CommentNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(CommentSharedNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
   }
 
   private class TemplateBuilder extends AbstractTemplateBuilder {

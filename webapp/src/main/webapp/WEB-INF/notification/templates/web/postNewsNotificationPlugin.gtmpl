@@ -13,6 +13,9 @@
           case "POST NEWS":
             notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
             break;
+          case "MENTION IN NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.mention.in.news",CONTENT_TITLE);
+            break;
           case "SHARE NEWS":
             notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
             break;

@@ -31,6 +31,7 @@ import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
@@ -1074,6 +1075,7 @@ public class NewsServiceImpl implements NewsService {
     }
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
+    String contentBody = news.getBody();
     String lastSpaceIdActivityId = activities.split(";")[activities.split(";").length - 1];
     String contentSpaceId = lastSpaceIdActivityId.split(":")[0];
     String contentActivityId = lastSpaceIdActivityId.split(":")[1];
@@ -1098,6 +1100,20 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
+      Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
+      if (mentionedIds != null && !mentionedIds.isEmpty()) {
+        NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
+                .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
+                .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)
+                .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
+                .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
+                .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
+                .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
+                .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+                .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+                .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
+        mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
+      }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareNewsNotificationPlugin.ID))).execute(ctx);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
@@ -1191,26 +1207,6 @@ public class NewsServiceImpl implements NewsService {
     newsNode.save();
   }
 
-  public Identity loadUser(String username) {
-    if (username == null || username.isEmpty()) {
-      return null;
-    }
-    org.exoplatform.social.core.identity.model.Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
-
-    if (identity == null) {
-      return null;
-    } else {
-      return identity;
-    }
-  }
-
-  /**
-   * Substitute @username expressions by full user profile link
-   * 
-   * @param portalOwner Portal Site name, used to build
-   * @param message Message to process
-   * @return 
-   */
   protected String substituteUsernames(String portalOwner, String message) {
     if (message == null || message.trim().isEmpty()) {
       return message;

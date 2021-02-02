@@ -2254,6 +2254,7 @@ public class NewsServiceImplTest {
 
     News news = new News();
     news.setTitle("title");
+    news.setBody("body");
     news.setAuthor("root");
     news.setId("id123");
     news.setSpaceId("1");

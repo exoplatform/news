@@ -18,13 +18,7 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeSharedNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -42,7 +36,8 @@ import org.exoplatform.webui.utils.TimeConvertUtils;
     @TemplateConfig(pluginId = LikeNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = LikeSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = CommentNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
 public class MailTemplateProvider extends TemplateProvider {
   protected static Log    log = ExoLogger.getLogger(MailTemplateProvider.class);
 
@@ -57,6 +52,7 @@ public class MailTemplateProvider extends TemplateProvider {
     this.templateBuilders.put(PluginKey.key(LikeSharedNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(CommentNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(CommentSharedNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
     this.identityManager = identityManager;
   }
 

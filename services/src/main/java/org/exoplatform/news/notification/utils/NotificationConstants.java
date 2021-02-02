@@ -26,8 +26,9 @@ public class NotificationConstants {
     LIKE_MY_NEWS ("LIKE MY NEWS"),
     LIKE_MY_SHARED_NEWS ("LIKE MY SHARED NEWS"),
     COMMENT_MY_NEWS ("COMMENT MY NEWS"),
-    COMMENT_MY_SHARED_NEWS ("COMMENT MY SHARED NEWS");
-    
+    COMMENT_MY_SHARED_NEWS ("COMMENT MY SHARED NEWS"),
+    MENTION_IN_NEWS ("MENTION IN NEWS");
+
     private String context;
 
     private NOTIFICATION_CONTEXT(String context) {

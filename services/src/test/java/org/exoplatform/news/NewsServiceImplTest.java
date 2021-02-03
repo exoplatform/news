@@ -2975,4 +2975,38 @@ public class NewsServiceImplTest {
     //Then
     assertEquals("test mention user in news <a href=\"http://exoplatfom.com/profile/john\">john john</a> ", article);
   }
+
+  @Test
+  public void testWrongFormatMention() throws Exception {
+    //Given
+    NewsServiceImpl newsServiceImpl = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+    Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = posterIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME),
+            eq("john"),
+            anyBoolean())).thenReturn(posterIdentity);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.when(CommonsUtils.getCurrentDomain()).thenReturn("http://exoplatfom.com");
+
+    //When
+    String article = newsServiceImpl.formatMention("test mention user in news @ john");
+    //Then
+    assertEquals("test mention user in news @ john ", article);
+  }
 }

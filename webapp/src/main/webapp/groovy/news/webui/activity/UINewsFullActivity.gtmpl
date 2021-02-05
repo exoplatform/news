@@ -14,7 +14,6 @@
   import org.exoplatform.social.core.manager.IdentityManager;
   import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
   import org.exoplatform.social.core.identity.model.Identity;
-  import org.exoplatform.news.NewsUtils;
 
   import java.time.format.DateTimeFormatter;
   import java.time.format.FormatStyle;
@@ -28,7 +27,7 @@
   def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
 
   def activity = uicomponent.getActivity();
-  def news = NewsUtils.formatNews(uicomponent.getNews());
+  def news = uicomponent.getNews();
 
  if (activity && news) {
 

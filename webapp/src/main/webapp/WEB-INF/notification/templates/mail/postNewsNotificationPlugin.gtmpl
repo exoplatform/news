@@ -13,6 +13,9 @@ switch(CONTEXT) {
  case "POST NEWS":
    title =  _ctx.appRes("news.notification.title",CONTENT_SPACE);
    break;
+ case "MENTION IN NEWS":
+   title = _ctx.appRes("news.notification.title.mention.in.news",CONTENT_TITLE);
+   break;
  case "SHARE NEWS":
    title =  _ctx.appRes("news.notification.title.share",CONTENT_SPACE);
    break;
@@ -70,6 +73,9 @@ def notificationDescription = "";
 switch(CONTEXT) {
  case "POST NEWS":
    notificationDescription =  _ctx.appRes("news.notification.description",creator,CONTENT_TITLE,spaceName);
+   break;
+ case "MENTION IN NEWS":
+   notificationDescription =  _ctx.appRes("news.notification.description.mention.in.news",CONTENT_TITLE);
    break;
  case "SHARE NEWS":
    notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);

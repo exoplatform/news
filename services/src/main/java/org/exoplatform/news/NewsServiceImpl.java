@@ -1101,8 +1101,9 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
-      Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
-      if (mentionedIds != null && !mentionedIds.isEmpty()) {
+      Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
+      if(matcher.find()) {
+        Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
         NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
                 .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
                 .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)

@@ -5,6 +5,7 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
@@ -56,7 +57,7 @@ public class UINewsActivity extends BaseUIActivity {
   private News                news;
 
   public News getNews() {
-    return news;
+    return NewsUtils.formatNews(news);
   }
 
   public void setNews(News news) {

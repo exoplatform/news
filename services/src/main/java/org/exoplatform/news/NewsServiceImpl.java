@@ -659,7 +659,7 @@ public class NewsServiceImpl implements NewsService {
 
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(formatMention(HTMLSanitizer.sanitize(getStringProperty(node, "exo:body"))));
+    news.setBody(getStringProperty(node, "exo:body"));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -1179,47 +1179,4 @@ public class NewsServiceImpl implements NewsService {
     newsNode.setProperty("exo:archived", false);
     newsNode.save();
   }
-
-  public Identity loadUser(String username) {
-    if (username == null || username.isEmpty()) {
-      return null;
-    }
-    org.exoplatform.social.core.identity.model.Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
-
-    if (identity == null) {
-      return null;
-    } else {
-      return identity;
-    }
-  }
-
-  public String formatMention(String text) {
-    if (text == null || text.isEmpty()) {
-      return text;
-    }
-    HTMLEntityEncoder encoder = HTMLEntityEncoder.getInstance();
-    StringBuilder sb = new StringBuilder();
-    StringTokenizer tokenizer = new StringTokenizer(text);
-    while (tokenizer.hasMoreElements()) {
-      String next = (String) tokenizer.nextElement();
-      if (next.length() == 0) {
-        continue;
-      } else if (next.contains("@")) {
-        String username = "";
-        String[] splitTable = next.split("@");
-        if (splitTable.length > 1) {
-          username = splitTable[1];
-          org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
-          if (identity != null) {
-            next = splitTable[0] + "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
-                    + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
-          }
-        }
-      }
-      sb.append(next);
-      sb.append(' ');
-    }
-    return sb.toString();
-  }
-
 }

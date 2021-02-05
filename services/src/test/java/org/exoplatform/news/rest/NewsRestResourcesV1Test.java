@@ -1,12 +1,8 @@
 package org.exoplatform.news.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -16,12 +12,17 @@ import static org.mockito.Mockito.when;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import javax.jcr.Node;
+import javax.jcr.Property;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.NewsServiceImpl;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
@@ -29,6 +30,8 @@ import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.social.core.identity.model.Profile;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
@@ -40,8 +43,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({CommonsUtils.class, ConversationState.class})
+@PowerMockIgnore({"javax.management.*"})
 public class NewsRestResourcesV1Test {
 
   @Mock
@@ -1945,5 +1954,112 @@ public class NewsRestResourcesV1Test {
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
   }
+  @Test
+  public void testFormatMention() throws Exception {
+    //Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    org.exoplatform.social.core.identity.model.Identity johnIdentity = new org.exoplatform.social.core.identity.model.Identity("john");
+    Profile johnProfile = new Profile();
+    johnProfile.setUrl("/portal/dw/profile/john");
+    johnProfile.setProperty("fullName", "john john");
+    johnIdentity.setProfile(johnProfile);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "john")).thenReturn(johnIdentity);
+    String filter = "myPosted";
+    String text = "text";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setBody("test @john");
+    news1.setTitle(text);
+    news1.setPublicationState("published");
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setBody("test @john again");
+    news2.setTitle(text);
+    news2.setPublicationState("published");
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setBody("@john test again");
+    news3.setTitle(text);
+    news3.setPublicationState("published");
+    News news4 = new News();
+    news4.setSpaceId("4");
+    news4.setAuthor("john");
+    news4.setBody("this won't mention @ john");
+    news4.setTitle(text);
+    news4.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    allNews.add(news4);
+    when(newsService.getNews(any())).thenReturn(allNews);
+    when(spaceService.isMember(anyString(), any())).thenReturn(true);
 
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null, 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
+    assertNotNull(newsList);
+    assertEquals(4, newsList.size());
+    for (int i = 0; i < newsList.size(); i++) {
+      if(i < 3) {
+        assertEquals("published", newsList.get(i).getPublicationState());
+        assertEquals("john", newsList.get(i).getAuthor());
+        assertTrue("test mention user in news <a href=\"/portal/dw/profile/john\">john john</a> ", newsList.get(i).getBody().contains("<a href=\"/portal/dw/profile/john\" rel=\"nofollow\">john john</a>"));
+      } else {
+        assertEquals("published", newsList.get(i).getPublicationState());
+        assertEquals("john", newsList.get(i).getAuthor());
+        assertFalse("this shouldn't mention the user john", newsList.get(i).getBody().contains("/portal/dw/profile/john"));
+      }
+    }
+  }
+
+  @Test
+  public void testHTMLSanitization() throws Exception {
+
+
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn("john");
+    when(request.getLocale()).thenReturn(new Locale("en"));
+    String filter = "myPosted";
+    String text = "text";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setBody("body <img='#' onerror=alert('test')/>");
+    news1.setTitle(text);
+    news1.setPublicationState("published");
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    when(newsService.getNews(any())).thenReturn(allNews);
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null, 0, 10, false);
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
+    for (int i = 0; i < newsList.size(); i++) {
+      assertEquals("john", newsList.get(i).getAuthor());
+      assertFalse("body should not contain <img tag", newsList.get(i).getBody().contains("<img"));
+    }
+  }
 }

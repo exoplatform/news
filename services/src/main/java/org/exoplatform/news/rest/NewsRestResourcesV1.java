@@ -2,10 +2,7 @@ package org.exoplatform.news.rest;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +23,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
@@ -118,7 +119,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         createdNews = newsService.createNewsDraft(news);
       }
 
-      return Response.ok(createdNews).build();
+      return Response.ok(NewsUtils.formatNews(createdNews)).build();
     } catch (Exception e) {
       LOG.error("Error when creating the news " + news.getTitle(), e);
       return Response.serverError().build();
@@ -190,7 +191,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           }
         }
 
-        newsEntity.setNews(news);
+        newsEntity.setNews(formatNewsList(news));
         newsEntity.setOffset(offset);
         newsEntity.setLimit(limit);
         if(returnSize) {
@@ -206,6 +207,19 @@ public class NewsRestResourcesV1 implements ResourceContainer {
           + publicationState, e);
       return Response.serverError().build();
     }
+  }
+
+  /**
+   * Formats a list of news using @formatNews
+   * @param news
+   * @return
+   */
+  private List<News> formatNewsList(List<News> news) {
+    List<News> formattedNews = new ArrayList<>();
+    for (News newsItem : news) {
+      formattedNews.add(NewsUtils.formatNews(newsItem));
+    }
+    return formattedNews;
   }
 
   private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
@@ -293,7 +307,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
         filteredNews.setSharedInSpacesList(spacesList);
         return Response.ok(filteredNews).build();
       } else {
-        return Response.ok(news).build();
+        return Response.ok(NewsUtils.formatNews(news)).build();
       }
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
@@ -432,7 +446,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
       news = newsService.updateNews(news);
 
-      return Response.ok(news).build();
+      return Response.ok(NewsUtils.formatNews(news)).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
       return Response.serverError().build();

@@ -65,7 +65,7 @@
           <div class="newsInfo">
             <div class="newsOwner">
               <a :href="news.authorProfileURL">
-                <img :src="news.profileAvatarURL">
+                <img :lazy-src="news.profileAvatarURL" :src="news.profileAvatarURL" eager/>
                 <span>{{ news.authorFullName }}</span>
               </a>
               <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
@@ -195,6 +195,7 @@ export default {
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
     const spacesQueryParam = this.getQueryParam('spaces');
+    this.clearCache();
     if(filterQueryParam || searchQueryParam || spacesQueryParam) {
       if (filterQueryParam) {
         // set filter value, which will trigger news fetching
@@ -339,6 +340,13 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
+    clearCache(){
+      caches.open('portal-pwa-resources-image').then(function(cache) {
+        cache.delete('/portal/rest/v1/social/users/root/avatar').then(function() {
+          console.debug('cache deleted');
+        });
+      });
+    }
   }
 };
 </script>

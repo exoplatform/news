@@ -65,13 +65,13 @@
           <div class="newsInfo">
             <div class="newsOwner">
               <a :href="news.authorProfileURL">
-                <img :lazy-src="news.authorAvatarUrl" :src="news.authorAvatarUrl" eager/>
+                <img :src="news.authorAvatarUrl">
                 <span>{{ news.authorFullName }}</span>
               </a>
-              <i class="uiIconArrowNext"></i>
-              <span class="newsSpace">
+              <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
+              <span v-if="!news.hiddenSpace" class="newsSpace">
                 <a :href="news.spaceUrl" class="newsSpaceName">
-                  <img :lazy-src="news.spaceAvatarUrl" :src="news.spaceAvatarUrl" eager/>
+                  <img :src="news.spaceAvatarUrl">
                   <span>{{ news.spaceDisplayName }}</span>
                 </a>
               </span>

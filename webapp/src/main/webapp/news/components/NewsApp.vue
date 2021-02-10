@@ -65,13 +65,13 @@
           <div class="newsInfo">
             <div class="newsOwner">
               <a :href="news.authorProfileURL">
-                <img :lazy-src="news.profileAvatarURL" :src="news.profileAvatarURL" eager/>
+                <img :lazy-src="news.authorAvatarUrl" :src="news.authorAvatarUrl" eager/>
                 <span>{{ news.authorFullName }}</span>
               </a>
-              <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
-              <span v-if="!news.hiddenSpace" class="newsSpace">
+              <i class="uiIconArrowNext"></i>
+              <span class="newsSpace">
                 <a :href="news.spaceUrl" class="newsSpaceName">
-                  <img :src="news.spaceAvatarUrl">
+                  <img :lazy-src="news.spaceAvatarUrl" :src="news.spaceAvatarUrl" eager/>
                   <span>{{ news.spaceDisplayName }}</span>
                 </a>
               </span>
@@ -195,7 +195,6 @@ export default {
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
     const spacesQueryParam = this.getQueryParam('spaces');
-    this.clearCache();
     if(filterQueryParam || searchQueryParam || spacesQueryParam) {
       if (filterQueryParam) {
         // set filter value, which will trigger news fetching
@@ -252,7 +251,6 @@ export default {
           spaceUrl: item.spaceUrl,
           url: item.url,
           authorFullName: item.authorDisplayName,
-          profileAvatarURL: `/portal/rest/v1/social/users/${item.author}/avatar`,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
@@ -261,6 +259,7 @@ export default {
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,
+          authorAvatarUrl: item.authorAvatarUrl,
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
@@ -340,13 +339,6 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
-    clearCache(){
-      caches.open('portal-pwa-resources-image').then(function(cache) {
-        cache.delete('/portal/rest/v1/social/users/root/avatar').then(function() {
-          console.debug('cache deleted');
-        });
-      });
-    }
   }
 };
 </script>

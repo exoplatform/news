@@ -3,6 +3,8 @@ package org.exoplatform.news;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -20,7 +22,7 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
@@ -64,6 +66,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -86,7 +89,13 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String      PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
+  private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
+
+  private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+
+  private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
+
+  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
 
   private RepositoryService        repositoryService;
 
@@ -656,9 +665,15 @@ public class NewsServiceImpl implements NewsService {
       news.setId(node.getUUID());
     }
 
+    String portalName = PortalContainer.getCurrentPortalContainerName();
+    String portalOwner = CommonsUtils.getCurrentPortalOwner();
+
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(formatMention(getStringProperty(node, "exo:body")));
+    String body = getStringProperty(node, "exo:body");
+    String sanitizedBody = HTMLSanitizer.sanitize(body);
+    sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
+    news.setBody(substituteUsernames(portalOwner, sanitizedBody));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -684,8 +699,6 @@ public class NewsServiceImpl implements NewsService {
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-        String portalName = PortalContainer.getCurrentPortalContainerName();
-        String portalOwner = CommonsUtils.getCurrentPortalOwner();
         StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
@@ -1191,33 +1204,48 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  public String formatMention(String text) {
-    if (text == null || text.isEmpty()) {
-      return text;
+  /**
+   * Substitute @username expressions by full user profile link
+   * 
+   * @param portalOwner Portal Site name, used to build
+   * @param message Message to process
+   * @return 
+   */
+  protected String substituteUsernames(String portalOwner, String message) {
+    if (message == null || message.trim().isEmpty()) {
+      return message;
     }
-    HTMLEntityEncoder encoder = HTMLEntityEncoder.getInstance();
-    StringBuilder sb = new StringBuilder();
-    StringTokenizer tokenizer = new StringTokenizer(text);
-    while (tokenizer.hasMoreElements()) {
-      String next = (String) tokenizer.nextElement();
-      if (next.length() == 0) {
+    //
+    Matcher matcher = MENTION_PATTERN.matcher(message);
+
+    // Replace all occurrences of pattern in input
+    StringBuffer buf = new StringBuffer();
+    while (matcher.find()) {
+      // Get the match result
+      String username = matcher.group().substring(1);
+      if (username == null || username.isEmpty()) {
         continue;
-      } else if (next.contains("@")) {
-        String username = "";
-        String[] splitTable = next.split("@");
-        if (splitTable.length > 1) {
-          username = splitTable[1];
-          org.exoplatform.social.core.identity.model.Identity identity = loadUser(username);
-          if (identity != null) {
-            next = splitTable[0] + "<a href=\"" + CommonsUtils.getCurrentDomain() + identity.getProfile().getUrl() + "\">"
-                    + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
-          }
-        }
       }
-      sb.append(next);
-      sb.append(' ');
+      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+      if (identity == null || identity.isDeleted() || !identity.isEnable()) {
+        continue;
+      }
+      try {
+        username = LinkProvider.getProfileLink(username, portalOwner);
+      } catch (Exception e) {
+        LOG.warn("Error while retrieving link for profile of user {}", username, e);
+        continue;
+      }
+      // Insert replacement
+      if (username != null) {
+        matcher.appendReplacement(buf, username);
+      }
     }
-    return sb.toString();
+    if (buf.length() > 0) {
+      matcher.appendTail(buf);
+      return buf.toString();
+    }
+    return message;
   }
 
 }

@@ -2942,6 +2942,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
+  @PrepareForTest({ LinkProvider.class, CommonsUtils.class })
   public void testFormatMention() throws Exception {
     //Given
     NewsServiceImpl newsServiceImpl = new NewsServiceImpl(repositoryService,
@@ -2963,17 +2964,17 @@ public class NewsServiceImplTest {
     Profile profile = posterIdentity.getProfile();
     profile.setUrl("/profile/john");
     profile.setProperty("fullName", "john john");
-    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME),
-            eq("john"),
-            anyBoolean())).thenReturn(posterIdentity);
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(posterIdentity);
     PowerMockito.mockStatic(CommonsUtils.class);
     PowerMockito.when(CommonsUtils.getCurrentDomain()).thenReturn("http://exoplatfom.com");
+    PowerMockito.mockStatic(LinkProvider.class);
+    PowerMockito.when(LinkProvider.getProfileLink(eq("john"), eq("dw"))).thenReturn("<a href=\"http://exoplatfom.com/portal/dw/profile/john\">john john</a>");
 
     //When
-    String article = newsServiceImpl.formatMention("test mention user in news @john");
+    String article = newsServiceImpl.substituteUsernames("dw", "test mention user in news <p>@john</p>");
 
     //Then
-    assertEquals("test mention user in news <a href=\"http://exoplatfom.com/profile/john\">john john</a> ", article);
+    assertEquals("test mention user in news <p><a href=\"http://exoplatfom.com/portal/dw/profile/john\">john john</a></p>", article);
   }
 
   @Test
@@ -2998,15 +2999,13 @@ public class NewsServiceImplTest {
     Profile profile = posterIdentity.getProfile();
     profile.setUrl("/profile/john");
     profile.setProperty("fullName", "john john");
-    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME),
-            eq("john"),
-            anyBoolean())).thenReturn(posterIdentity);
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(posterIdentity);
     PowerMockito.mockStatic(CommonsUtils.class);
     PowerMockito.when(CommonsUtils.getCurrentDomain()).thenReturn("http://exoplatfom.com");
 
     //When
-    String article = newsServiceImpl.formatMention("test mention user in news @ john");
+    String article = newsServiceImpl.substituteUsernames("dw", "test mention user in news @ john");
     //Then
-    assertEquals("test mention user in news @ john ", article);
+    assertEquals("test mention user in news @ john", article);
   }
 }

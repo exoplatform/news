@@ -2940,4 +2940,107 @@ public class NewsServiceImplTest {
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
   }
+  @Test
+  @PrepareForTest({ LinkProvider.class, CommonsUtils.class })
+  public void testFormatMention() throws Exception {
+    //Given
+    NewsServiceImpl newsServiceImpl = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+    Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = posterIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(posterIdentity);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.when(CommonsUtils.getCurrentDomain()).thenReturn("http://exoplatfom.com");
+    PowerMockito.mockStatic(LinkProvider.class);
+    PowerMockito.when(LinkProvider.getProfileLink(eq("john"), eq("dw"))).thenReturn("<a href=\"http://exoplatfom.com/portal/dw/profile/john\">john john</a>");
+
+    //When
+    String article = newsServiceImpl.substituteUsernames("dw", "test mention user in news <p>@john</p>");
+
+    //Then
+    assertEquals("test mention user in news <p><a href=\"http://exoplatfom.com/portal/dw/profile/john\">john john</a></p>", article);
+  }
+  @Test
+  public void testWrongFormatMention() throws Exception {
+    //Given
+    NewsServiceImpl newsServiceImpl = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+    Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = posterIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(posterIdentity);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.when(CommonsUtils.getCurrentDomain()).thenReturn("http://exoplatfom.com");
+
+    //When
+    String article = newsServiceImpl.substituteUsernames("dw", "test mention user in news @ john");
+    //Then
+    assertEquals("test mention user in news @ john", article);
+  }
+  @Test
+  public void testHTMLSanitization() throws Exception {
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService);
+  
+    Node newsNode = mock(Node.class);
+    when(newsNode.hasProperty(anyString())).thenReturn(true);
+    when(newsNode.hasProperty(eq("jcr:frozenUuid"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:dateCreated"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:dateModified"))).thenReturn(false);
+    when(newsNode.hasProperty(eq("exo:activities"))).thenReturn(false);
+  
+    Property property = mock(Property.class);
+    when(property.getString()).thenReturn("propertyValue");
+  
+    Property propertyBody = mock(Property.class);
+    when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
+    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
+    
+    
+    assertFalse(newsService.convertNodeToNews(newsNode).getBody().contains("<img"));
+    
+  }
 }

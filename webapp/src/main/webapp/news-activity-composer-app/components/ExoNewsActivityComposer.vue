@@ -275,19 +275,17 @@ export default {
         this.canCreatNews = canCreateNews;
         this.$nextTick(() => {
           if (this.canCreatNews) {
-            this.initCKEditor().then(editor => {
+            if(this.newsId) {
+              this.initNewsComposerData(this.newsId);
+            } else {
+              this.initCKEditor();
               const message = localStorage.getItem('exo-activity-composer-message');
               if(message) {
-                editor.setData(message);
+                this.initCKEditorData(message);
                 localStorage.removeItem('exo-activity-composer-message');
               }
-            }).then(() => {
-              if(this.newsId) {
-                this.initNewsComposerData(this.newsId);
-              } else {
-                this.initDone = true;
-              }
-            });
+              this.initDone = true;
+            }
           }
           this.loading = false;
         });
@@ -313,10 +311,11 @@ export default {
   },
   methods: {
     initCKEditor: function() {
-      if (typeof CKEDITOR.instances['newsContent'] !== 'undefined') {
+      if (CKEDITOR.instances['newsContent'] && CKEDITOR.instances['newsContent'].destroy) {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
       CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+      CKEDITOR.dtd.$removeEmpty['i'] = false;
       let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
@@ -331,45 +330,66 @@ export default {
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
 
-      const promiseCkeditor = new Promise(function(resolve) {
-        $('textarea#newsContent').ckeditor({
-          customConfig: '/commons-extension/ckeditorCustom/config.js',
-          extraPlugins: extraPlugins,
-          removePlugins: 'image,confirmBeforeReload,maximize,resize',
-          allowedContent: true,
-          typeOfRelation: 'mention_activity_stream',
-          spaceURL: self.spaceURL,
-          toolbarLocation: 'top',
-          removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-          toolbar: [
-            { name: 'format', items: ['Format'] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'fontsize', items: ['FontSize'] },
-            { name: 'colors', items: [ 'TextColor' ] },
-            { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-            { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
-          ],
-          format_tags: 'p;h1;h2;h3',
-          autoGrow_minHeight: self.newsFormContentHeight,
-          height: self.newsFormContentHeight,
-          bodyClass: 'newsContent',
-          dialog_noConfirmCancel: true,
-          sharedSpaces: {
-            top: 'newsTop'
+      $('textarea#newsContent').ckeditor({
+        customConfig: '/commons-extension/ckeditorCustom/config.js',
+        extraPlugins: extraPlugins,
+        removePlugins: 'image,confirmBeforeReload,maximize,resize',
+        allowedContent: true,
+        typeOfRelation: 'mention_activity_stream',
+        spaceURL: self.spaceURL,
+        toolbarLocation: 'top',
+        extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
+        removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
+        toolbar: [
+          { name: 'format', items: ['Format'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'fontsize', items: ['FontSize'] },
+          { name: 'colors', items: [ 'TextColor' ] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+        ],
+        format_tags: 'p;h1;h2;h3',
+        autoGrow_minHeight: self.newsFormContentHeight,
+        height: self.newsFormContentHeight,
+        bodyClass: 'newsContent',
+        dialog_noConfirmCancel: true,
+        sharedSpaces: {
+          top: 'newsTop'
+        },
+        on: {
+          instanceReady: function() {
+            $(CKEDITOR.instances['newsContent'].document.$)
+              .find('.atwho-inserted')
+              .each(function() {
+                $(this).on('click', '.remove', function() {
+                  $(this).closest('[data-atwho-at-query]').remove();
+                });
+              });
           },
-          on: {
-            instanceReady: function(evt) {
-              resolve(evt.editor);
-            },
-            change: function (evt) {
-              self.news.body = evt.editor.getData();
-            }
+          change: function (evt) {
+            self.news.body = evt.editor.getData();
           }
-        });
+        }
       });
-
-      return promiseCkeditor;
+    },
+    initCKEditorData: function(message) {
+      if (message) {
+        const tempdiv = $('<div class=\'temp\'/>').html(message);
+        tempdiv.find('a[href*="/profile"]')
+          .each(function() {
+            $(this).replaceWith(function() {
+              return $('<span/>', {
+                class:'atwho-inserted',
+                html: `<span class="exo-mention">${$(this).text()}<a data-cke-survive href="#" class="remove"><i data-cke-survive class="uiIconClose uiIconLightGray"></i></a></span>`
+              }).attr('data-atwho-at-query',`@${  $(this).attr('href').substring($(this).attr('href').lastIndexOf('/')+1)}`)
+                .attr('data-atwho-at-value',$(this).attr('href').substring($(this).attr('href').lastIndexOf('/')+1))
+                .attr('contenteditable','false');
+            });
+          });
+        message = `${tempdiv.html()  }&nbsp;`;
+      }
+      CKEDITOR.instances['newsContent'].setData(message);
     },
     displayFormTitle: function() {
       if(!this.editMode) {
@@ -393,7 +413,9 @@ export default {
             this.news.pinned = fetchedNode.pinned;
             this.news.archived = fetchedNode.archived;
             this.news.spaceId = fetchedNode.spaceId;
-            CKEDITOR.instances['newsContent'].setData(fetchedNode.body);
+            this.initCKEditor();
+            this.initCKEditorData(fetchedNode.body);
+
             if (fetchedNode.illustrationURL) {
               newsServices.importFileFromUrl(fetchedNode.illustrationURL)
                 .then(resp => resp.blob())

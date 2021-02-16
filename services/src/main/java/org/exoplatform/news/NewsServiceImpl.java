@@ -3,6 +3,8 @@ package org.exoplatform.news;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -65,6 +67,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -87,7 +90,13 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String      PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
+  private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
+
+  private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+
+  private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
+
+  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
 
   private RepositoryService        repositoryService;
 
@@ -657,9 +666,15 @@ public class NewsServiceImpl implements NewsService {
       news.setId(node.getUUID());
     }
 
+    String portalName = PortalContainer.getCurrentPortalContainerName();
+    String portalOwner = CommonsUtils.getCurrentPortalOwner();
+
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
-    news.setBody(getStringProperty(node, "exo:body"));
+    String body = getStringProperty(node, "exo:body");
+    String sanitizedBody = HTMLSanitizer.sanitize(body);
+    sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
+    news.setBody(substituteUsernames(portalOwner, sanitizedBody));
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -685,8 +700,6 @@ public class NewsServiceImpl implements NewsService {
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-        String portalName = PortalContainer.getCurrentPortalContainerName();
-        String portalOwner = CommonsUtils.getCurrentPortalOwner();
         StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
@@ -1178,5 +1191,62 @@ public class NewsServiceImpl implements NewsService {
     }
     newsNode.setProperty("exo:archived", false);
     newsNode.save();
+  }
+
+  public Identity loadUser(String username) {
+    if (username == null || username.isEmpty()) {
+      return null;
+    }
+    org.exoplatform.social.core.identity.model.Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username, true);
+
+    if (identity == null) {
+      return null;
+    } else {
+      return identity;
+    }
+  }
+
+  /**
+   * Substitute @username expressions by full user profile link
+   * 
+   * @param portalOwner Portal Site name, used to build
+   * @param message Message to process
+   * @return 
+   */
+  protected String substituteUsernames(String portalOwner, String message) {
+    if (message == null || message.trim().isEmpty()) {
+      return message;
+    }
+    //
+    Matcher matcher = MENTION_PATTERN.matcher(message);
+
+    // Replace all occurrences of pattern in input
+    StringBuffer buf = new StringBuffer();
+    while (matcher.find()) {
+      // Get the match result
+      String username = matcher.group().substring(1);
+      if (username == null || username.isEmpty()) {
+        continue;
+      }
+      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+      if (identity == null || identity.isDeleted() || !identity.isEnable()) {
+        continue;
+      }
+      try {
+        username = LinkProvider.getProfileLink(username, portalOwner);
+      } catch (Exception e) {
+        LOG.warn("Error while retrieving link for profile of user {}", username, e);
+        continue;
+      }
+      // Insert replacement
+      if (username != null) {
+        matcher.appendReplacement(buf, username);
+      }
+    }
+    if (buf.length() > 0) {
+      matcher.appendTail(buf);
+      return buf.toString();
+    }
+    return message;
   }
 }

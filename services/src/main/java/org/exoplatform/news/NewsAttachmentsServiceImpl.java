@@ -167,8 +167,8 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
     }
 
     List<String> updatedAttachmentsIds = updatedAttachments.stream()
-            .filter(attachment -> StringUtils.isNotEmpty(attachment.getId()))
-            .map(attachment -> attachment.getId())
+            .map(NewsAttachment::getId)
+            .filter(StringUtils::isNotEmpty)
             .collect(Collectors.toList());
 
     existingAttachmentsIds.stream()

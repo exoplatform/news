@@ -15,6 +15,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -22,7 +23,6 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
@@ -688,6 +688,7 @@ public class NewsServiceImpl implements NewsService {
     news.setSummary(getStringProperty(node, "exo:summary"));
     String body = getStringProperty(node, "exo:body");
     String sanitizedBody = HTMLSanitizer.sanitize(body);
+    sanitizedBody = StringEscapeUtils.unescapeHtml(sanitizedBody);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
     news.setBody(substituteUsernames(portalOwner, sanitizedBody));
     news.setAuthor(getStringProperty(node, "exo:author"));

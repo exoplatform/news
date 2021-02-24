@@ -2926,7 +2926,7 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).save();
   }
 
-  @PrepareForTest({ NewsUtils.class, LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class, CommonsUtils.class })
+  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class, CommonsUtils.class })
   @Test
   public void shouldUpdateNewsMentionedIdsWhenNewsBodyIsUpdated() throws Exception {
     // Given
@@ -2986,6 +2986,8 @@ public class NewsServiceImplTest {
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+
     when(newsNode.hasNode("illustration")).thenReturn(true);
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
@@ -3015,7 +3017,7 @@ public class NewsServiceImplTest {
                     "CONTEXT");
 
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
-    when(ctx.append(CONTENT_TITLE, "update title")).thenReturn(ctx);
+    when(ctx.append(CONTENT_TITLE, "Updated title")).thenReturn(ctx);
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
@@ -3036,16 +3038,18 @@ public class NewsServiceImplTest {
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
-    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Profile profile = johnIdentity.getProfile();
     profile.setUrl("/profile/john");
     profile.setProperty("fullName", "john john");
     Set<String> mentionedIds = new HashSet(Collections.singleton("john"));
     when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(johnIdentity);
+
     when(ctx.append(MENTIONED_IDS, mentionedIds)).thenReturn(ctx);
+
     News news = new News();
-    news.setTitle("update title");
+    news.setTitle("Updated title");
     news.setId("1234");
     news.setAuthor("root");
     news.setSummary("Updated summary");
@@ -3054,11 +3058,18 @@ public class NewsServiceImplTest {
     news.setCreationDate(new Date());
     news.setUploadId(null);
     news.setViewsCount((long) 10);
+
     // when
     newsService.updateNews(news);
+
     // then
     verify(workSpace, times(1)).move(any(), any());
     verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
+    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
+    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body @john"));
+    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+
   }
 
   private void setCurrentIdentity() {

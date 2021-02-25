@@ -1118,18 +1118,7 @@ public class NewsServiceImpl implements NewsService {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
       if(matcher.find()) {
-        Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
-        NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
-                .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
-                .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)
-                .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
-                .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
-                .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
-                .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-                .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
-                .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
-                .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
-        mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
+        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);

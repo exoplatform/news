@@ -1,5 +1,6 @@
 package org.exoplatform.news;
 
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -522,4 +523,58 @@ public class NewsAttachmentsServiceImplTest {
     verify(attachmentNode2, times(0)).removePermission(eq("*:/platform/users"));
     verify(attachmentNode3, times(1)).removePermission(eq("*:/platform/users"));
   }
+
+  @Test
+  public void shouldUpdateAttachments() throws Exception {
+    // Given
+    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+            repositoryService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            uploadService,
+            documentService);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    when(node.getUUID()).thenReturn("id123");
+    when(node.getName()).thenReturn("name123");
+    when(node.getSession()).thenReturn(session);
+    Property attachmentIdsProperty = mock(Property.class);
+    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    Node attachmentNode = mock(Node.class);
+    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
+    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
+    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
+    News news = mock(News.class);
+    List<NewsAttachment> newsAttachments = newsAttachmentsService.getNewsAttachments(node);
+
+    when(news.getAttachments()).thenReturn(newsAttachments);
+
+    NewsAttachment newsAttachmentFromUpload = mock(NewsAttachment.class);
+    newsAttachmentFromUpload.setUploadId("uploadID123");
+    newsAttachmentFromUpload.setId(null);
+    NewsAttachment newsAttachmentWithID = mock(NewsAttachment.class);
+    newsAttachmentWithID.setId("idNewAttach1");
+    newsAttachments.add(newsAttachmentFromUpload);
+    newsAttachments.add(newsAttachmentWithID);
+    news.setAttachments(newsAttachments);
+
+    // When
+
+    newsAttachments = newsAttachmentsService.updateNewsAttachments(news, node);
+
+    // Then
+    assertNotNull(newsAttachments);
+    assertEquals(5, newsAttachments.size());
+
+  }
+
 }

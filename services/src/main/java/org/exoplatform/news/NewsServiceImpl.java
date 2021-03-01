@@ -351,18 +351,17 @@ public class NewsServiceImpl implements NewsService {
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
-        }
-
-        //if it's an "update news" case
-        if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
-          News newMentionedNews = news;
-          if (!previousMentions.isEmpty()) {
-            //clear old mentions from news body before sending a custom object to notification context.
-            previousMentions.forEach(username -> {
-              newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
-            });
+          //if it's an "update news" case
+          if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
+            News newMentionedNews = news;
+            if (!previousMentions.isEmpty()) {
+              //clear old mentions from news body before sending a custom object to notification context.
+              previousMentions.forEach(username -> {
+                newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
+              });
+            }
+            sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
           }
-          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
         }
       }
 

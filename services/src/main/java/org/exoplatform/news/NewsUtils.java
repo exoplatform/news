@@ -19,44 +19,6 @@ import java.util.regex.Matcher;
 public class NewsUtils {
 
   /**
-   * Formats the body of the news to add profile link when mentioned
-   *
-   * @param news
-   * @return News with formatted body
-   */
-  public static News formatNews(News news) {
-    if (news == null || StringUtils.isBlank(news.getBody())) {
-      return news;
-    }
-    HTMLEntityEncoder encoder = HTMLEntityEncoder.getInstance();
-    StringBuilder sb = new StringBuilder();
-    StringTokenizer tokenizer = new StringTokenizer(news.getBody());
-    while (tokenizer.hasMoreElements()) {
-      String next = (String) tokenizer.nextElement();
-      if (next.length() == 0) {
-        continue;
-      } else if (next.contains("@")) {
-        String[] splitTable = next.split("@");
-        if (splitTable.length > 1) {
-          org.exoplatform.social.core.identity.model.Identity identity = loadUser(splitTable[1]);
-          if (identity != null) {
-            next = splitTable[0] + "<a href=\"" + identity.getProfile().getUrl() + "\">"
-                    + encoder.encodeHTML(identity.getProfile().getFullName()) + "</a>";
-          }
-        }
-      }
-      sb.append(next);
-      sb.append(' ');
-    }
-    try {
-      news.setBody(HTMLSanitizer.sanitize(sb.toString().trim()));
-    } catch (Exception e) {
-      // Do nothing
-    }
-    return news;
-  }
-
-  /**
    * Load the user identity
    *
    * @param username

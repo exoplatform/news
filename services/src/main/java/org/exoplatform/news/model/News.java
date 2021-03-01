@@ -59,6 +59,8 @@ public class News {
 
   private String spaceAvatarUrl;
 
+  private String authorAvatarUrl;
+
   private Boolean canEdit;
 
   private Set<Space> sharedInSpacesList;
@@ -305,5 +307,13 @@ public class News {
 
   public void setHiddenSpace(boolean hiddenSpace) {
     this.hiddenSpace = hiddenSpace;
+  }
+
+  public String getAuthorAvatarUrl() {
+    return authorAvatarUrl;
+  }
+
+  public void setAuthorAvatarUrl(String authorAvatarUrl) {
+    this.authorAvatarUrl = authorAvatarUrl;
   }
 }

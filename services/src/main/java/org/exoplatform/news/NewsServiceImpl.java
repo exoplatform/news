@@ -3,6 +3,8 @@ package org.exoplatform.news;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -20,7 +22,7 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
@@ -29,6 +31,7 @@ import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
@@ -64,6 +67,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -86,7 +90,13 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String      PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
+  private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
+
+  private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+
+  private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
+
+  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
 
   private RepositoryService        repositoryService;
 
@@ -308,6 +318,8 @@ public class NewsServiceImpl implements NewsService {
     try {
       Node newsNode = session.getNodeByUUID(news.getId());
       if (newsNode != null) {
+        String oldBody = newsNode.getProperty("exo:body").getString();
+        Set<String> previousMentions = NewsUtils.processMentions(oldBody);
         newsNode.setProperty("exo:title", news.getTitle());
         newsNode.setProperty("exo:name", news.getTitle());
         newsNode.setProperty("exo:summary", news.getSummary());
@@ -338,6 +350,18 @@ public class NewsServiceImpl implements NewsService {
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
+        }
+
+        //if it's an "update news" case
+        if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
+          News newMentionedNews = news;
+          if (!previousMentions.isEmpty()) {
+            //clear old mentions from news body before sending a custom object to notification context.
+            previousMentions.forEach(username -> {
+              newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
+            });
+          }
+          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
         }
       }
 
@@ -656,10 +680,12 @@ public class NewsServiceImpl implements NewsService {
       news.setId(node.getUUID());
     }
 
+    String portalName = PortalContainer.getCurrentPortalContainerName();
+    String portalOwner = CommonsUtils.getCurrentPortalOwner();
+
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
     news.setBody(getStringProperty(node, "exo:body"));
-
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCanArchive(canArchiveNews(news.getAuthor()));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -685,8 +711,6 @@ public class NewsServiceImpl implements NewsService {
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-        String portalName = PortalContainer.getCurrentPortalContainerName();
-        String portalOwner = CommonsUtils.getCurrentPortalOwner();
         StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
@@ -730,18 +754,17 @@ public class NewsServiceImpl implements NewsService {
       news.setSpaceDisplayName(spaceName);
       if(StringUtils.isNotEmpty(space.getGroupId())) {
         String spaceGroupId = space.getGroupId().split("/")[2];
-        StringBuilder spaceUrl = new StringBuilder().append("/portal/g/:spaces:").append(spaceGroupId)
-                .append("/").append(space.getPrettyName());
-        StringBuilder spaceAvatarUrl = new StringBuilder().append("/rest/v1/social/spaces/")
-                .append(space.getPrettyName()).append("/avatar");
-        news.setSpaceAvatarUrl(spaceAvatarUrl.toString());
-        news.setSpaceUrl(spaceUrl.toString());
+        news.setSpaceAvatarUrl(space.getAvatarUrl());
+        String spaceUrl = "/portal/g/:spaces:" + spaceGroupId +
+                                "/" + space.getPrettyName();
+        news.setSpaceUrl(spaceUrl);
       }
     }
 
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
     if (identity != null && identity.getProfile() != null) {
       news.setAuthorDisplayName(identity.getProfile().getFullName());
+      news.setAuthorAvatarUrl(identity.getProfile().getAvatarUrl());
     }
 
 
@@ -1063,6 +1086,7 @@ public class NewsServiceImpl implements NewsService {
     }
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
+    String contentBody = news.getBody();
     String lastSpaceIdActivityId = activities.split(";")[activities.split(";").length - 1];
     String contentSpaceId = lastSpaceIdActivityId.split(":")[0];
     String contentActivityId = lastSpaceIdActivityId.split(":")[1];
@@ -1087,11 +1111,32 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
-    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)) {
+      Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
+      if (mentionedIds != null && !mentionedIds.isEmpty()) {
+        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
+      }
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
+      sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
+    }  else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareNewsNotificationPlugin.ID))).execute(ctx);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
     }
+  }
+
+  private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String activityLink, String contentSpaceName) {
+    Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
+    NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
+            .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
+            .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)
+            .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
+            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
+            .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
+            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
+            .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+            .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+            .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
+    mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }
 
   private org.exoplatform.services.security.Identity getCurrentIdentity() {

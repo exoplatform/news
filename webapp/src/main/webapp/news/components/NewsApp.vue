@@ -65,7 +65,7 @@
           <div class="newsInfo">
             <div class="newsOwner">
               <a :href="news.authorProfileURL">
-                <img :src="news.profileAvatarURL">
+                <img :src="news.authorAvatarUrl">
                 <span>{{ news.authorFullName }}</span>
               </a>
               <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
@@ -251,7 +251,6 @@ export default {
           spaceUrl: item.spaceUrl,
           url: item.url,
           authorFullName: item.authorDisplayName,
-          profileAvatarURL: `/portal/rest/v1/social/users/${item.author}/avatar`,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
@@ -260,6 +259,7 @@ export default {
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,
+          authorAvatarUrl: item.authorAvatarUrl,
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,

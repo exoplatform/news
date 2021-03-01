@@ -8,7 +8,6 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
-
 import java.util.StringTokenizer;
 
 public class NewsUtils {

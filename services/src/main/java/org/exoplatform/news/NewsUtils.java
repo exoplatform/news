@@ -18,33 +18,6 @@ import java.util.regex.Matcher;
 
 public class NewsUtils {
   /**
-   * Processes Mentioners who has been mentioned via the news body.
-   *
-   * @param body
-   * @return set of mentioned users
-   */
-  public static Set<String> processMentions(String body) {
-    if (StringUtils.isEmpty(body)) {
-      return Collections.emptySet();
-    }
-
-    Set<String> mentions = new HashSet<>();
-    Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(body);
-    while (matcher.find()) {
-      String remoteId = matcher.group().substring(1);
-      if (mentions.contains(remoteId)) {
-        continue;
-      }
-      Identity identity = loadUser(remoteId);
-      // if not the right mention then ignore
-      if (identity != null) {
-        mentions.add(identity.getRemoteId());
-      }
-    }
-    return mentions;
-  }
-
-  /**
    * Load the user identity
    *
    * @param username

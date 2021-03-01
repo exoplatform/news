@@ -2913,14 +2913,24 @@ public class NewsServiceImplTest {
     when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
+    Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = johnIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    Set<String> mentionedIds = new HashSet(Collections.singleton("john"));
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(johnIdentity);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+
     News news = new News();
-    news.setTitle("update title");
-    news.setSummary("Updated summary");
-    news.setBody("Updated body");
+    news.setTitle("title");
+    news.setSummary("summary");
+    news.setBody("body <img alt=\"\" class=\"pull-left\" data-plugin-name=\"selectImage\" referrerpolicy=\"no-referrer\" src=\"/portal/rest/composer/image/thumbnail?uploadId=88b5af9\">");
     news.setUploadId(null);
     news.setViewsCount((long) 10);
     // when
-    newsService.updateNews(news);
+    news.setBody("Updated body @john <img alt=\"\" class=\"pull-left\" data-plugin-name=\"selectImage\" referrerpolicy=\"no-referrer\" src=\"/portal/rest/composer/image/thumbnail?uploadId=88b5af9\">");
+    News updatedNews = newsService.updateNews(news);
     // then
     verify(workSpace, times(1)).move(any(), any());
     verify(newsNode, times(1)).save();
@@ -3058,6 +3068,8 @@ public class NewsServiceImplTest {
     news.setCreationDate(new Date());
     news.setUploadId(null);
     news.setViewsCount((long) 10);
+    news.setPublicationState("published");
+    news.setPublicationDate(Calendar.getInstance().getTime());
 
     // when
     newsService.updateNews(news);

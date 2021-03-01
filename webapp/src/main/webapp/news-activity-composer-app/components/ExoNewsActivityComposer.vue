@@ -495,11 +495,12 @@ export default {
 
       this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       this.news.body = this.replaceImagesURLs(this.news.body);
+      const newsBody = this.replaceImagesURLs(this.getBody());
       const news = {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary,
-        body: this.getBody() ? this.getBody() : this.news.body,
+        body: this.getBody() ? newsBody : this.news.body,
         author: eXo.env.portal.userName,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
@@ -683,11 +684,12 @@ export default {
     },
     doUpdateNews: function () {
       this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
+      const newsBody = this.replaceImagesURLs(this.getBody());
       const updatedNews = {
         id: this.news.id,
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
-        body: this.getBody() ? this.getBody() : this.news.body,
+        body: this.getBody() ? newsBody : this.news.body,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         publicationState: 'published'

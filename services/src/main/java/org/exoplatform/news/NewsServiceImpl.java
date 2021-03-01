@@ -15,6 +15,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
@@ -22,7 +23,6 @@ import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
@@ -351,18 +351,17 @@ public class NewsServiceImpl implements NewsService {
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
-        }
-
-        //if it's an "update news" case
-        if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
-          News newMentionedNews = news;
-          if (!previousMentions.isEmpty()) {
-            //clear old mentions from news body before sending a custom object to notification context.
-            previousMentions.forEach(username -> {
-              newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
-            });
+          //if it's an "update news" case
+          if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
+            News newMentionedNews = news;
+            if (!previousMentions.isEmpty()) {
+              //clear old mentions from news body before sending a custom object to notification context.
+              previousMentions.forEach(username -> {
+                newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
+              });
+            }
+            sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
           }
-          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
         }
       }
 
@@ -688,6 +687,7 @@ public class NewsServiceImpl implements NewsService {
     news.setSummary(getStringProperty(node, "exo:summary"));
     String body = getStringProperty(node, "exo:body");
     String sanitizedBody = HTMLSanitizer.sanitize(body);
+    sanitizedBody = StringEscapeUtils.unescapeHtml(sanitizedBody);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
     news.setBody(substituteUsernames(portalOwner, sanitizedBody));
     news.setAuthor(getStringProperty(node, "exo:author"));
@@ -1115,8 +1115,8 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
-      Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
-      if (mentionedIds != null && !mentionedIds.isEmpty()) {
+      Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
+      if(matcher.find()) {
         sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {

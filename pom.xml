@@ -28,7 +28,7 @@
   </parent>
   <groupId>org.exoplatform.addons.news</groupId>
   <artifactId>news</artifactId>
-  <version>2.2.x-SNAPSHOT</version>
+  <version>2.2.x-news-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Add-on:: News</name>
   <description>News</description>
@@ -40,8 +40,8 @@
   </modules>
 
   <properties>
-    <org.exoplatform.social.version>6.2.x-SNAPSHOT</org.exoplatform.social.version>
-    <addon.exo.ecms.version>6.2.x-SNAPSHOT</addon.exo.ecms.version>
+    <org.exoplatform.social.version>6.2.x-news-SNAPSHOT</org.exoplatform.social.version>
+    <addon.exo.ecms.version>6.2.x-news-SNAPSHOT</addon.exo.ecms.version>
     <pitest.version>1.4.10</pitest.version>
   </properties>
 

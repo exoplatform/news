@@ -750,7 +750,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       if (StringUtils.isBlank(authenticatedUser) || !spaceService.isMember(space, authenticatedUser)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      return Response.ok(String.valueOf(SpaceUtils.isRedactor(authenticatedUser, space.getGroupId()))).build();
+      return Response.ok(String.valueOf(SpaceUtils.isRedactor(authenticatedUser, space.getGroupId()) || SpaceUtils.isSpaceManagerOrSuperManager(authenticatedUser, space.getGroupId()))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can create a news", e);
       return Response.serverError().build();

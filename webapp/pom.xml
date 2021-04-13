@@ -61,6 +61,7 @@
             <goals>
               <goal>install-node-and-npm</goal>
             </goals>
+            <phase>prepare-package</phase>
             <configuration>
               <nodeVersion>${node.version}</nodeVersion>
               <npmVersion>${npm.version}</npmVersion>
@@ -71,6 +72,7 @@
             <goals>
               <goal>npm</goal>
             </goals>
+            <phase>prepare-package</phase>
             <configuration>
               <arguments>install</arguments>
             </configuration>
@@ -80,6 +82,7 @@
             <goals>
               <goal>npm</goal>
             </goals>
+            <phase>prepare-package</phase>
             <configuration>
               <arguments>run build</arguments>
             </configuration>

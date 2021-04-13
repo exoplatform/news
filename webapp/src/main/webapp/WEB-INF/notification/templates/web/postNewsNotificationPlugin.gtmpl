@@ -39,9 +39,9 @@
         }
 
       %>
-      <div class="media-body" style="padding-left: 3px;">
+      <div class="media-body ps-2">
         <div class="contentSmall">
-        <div class="status" style="margin-left: 7px; color: #333333;">$notificationDescription</div>
+        <div class="status ms-2" style="color: #333333;">$notificationDescription</div>
         </div>
       </div>
     </a>

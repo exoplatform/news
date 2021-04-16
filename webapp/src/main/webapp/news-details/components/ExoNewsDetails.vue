@@ -1,5 +1,5 @@
 <template>
-  <div id="newsDetails">
+  <div id="newsDetails" class="VuetifyApp">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
@@ -85,9 +85,9 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
+    <exo-news-share-activity-drawer />
   </div>
 </template>
 <script>

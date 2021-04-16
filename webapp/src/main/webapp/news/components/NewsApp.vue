@@ -1,5 +1,5 @@
 <template>
-  <div class="newsApp">
+  <div class="newsApp VuetifyApp">
     <div class="newsAppToolBar">
       <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'" class="newsAppToolbarLeft">
         <h3 class="newsAppToolBarTitle">
@@ -124,6 +124,7 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
+    <exo-news-share-activity-drawer />
   </div>
 </template>
 

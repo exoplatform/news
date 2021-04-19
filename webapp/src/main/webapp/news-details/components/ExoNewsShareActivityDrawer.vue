@@ -98,17 +98,18 @@ export default {
           this.message = successMessage;
           this.messageType = 'success';
           this.showMessage = true;
+          this.$root.$emit('display-share-success-alert',this.message,this.messageType,this.showMessage);
         })
         .then(() => {
           this.closeShareNewsDrawer();
           this.$emit('newsShared', this.news.newsId);
-          this.$root.$emit('display-share-alert', this.showMessage);
         })
         .catch(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
           this.message = this.$t('news.share.message.error').replace('{0}', `<b>${escapedNewsTitle}</b>`);
           this.messageType = 'error';
           this.showMessage = true;
+          this.$root.$emit('display-share-success-alert',this.message,this.messageType,this.showMessage);
         });
     },
     closeShareNewsDrawer() {

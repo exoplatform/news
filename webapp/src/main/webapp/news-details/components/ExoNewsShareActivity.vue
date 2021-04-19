@@ -46,8 +46,10 @@ export default {
     }
   },
   created() {
-    this.$root.$on('display-share-alert', shareNews => {
-      this.showMessage = shareNews;
+    this.$root.$on('display-share-success-alert', (message,messageType,showMessage) => {
+      this.message = message;
+      this.messageType = messageType;
+      this.showMessage = showMessage;
     });
   }
 };

@@ -45,5 +45,10 @@ export default {
       }
     }
   },
+  created() {
+    this.$root.$on('display-share-alert', shareNews => {
+      this.showMessage = shareNews;
+    });
+  }
 };
 </script>

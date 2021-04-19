@@ -10,26 +10,6 @@
         +{{ activitiesList.length - 2 }}
       </a>
     </div>
-    <div :class="{open}" class="drawer">
-      <div class="header">
-        <span>{{ $t('news.app.sharedInSpaces') }}</span>
-        <a class="closebtn" href="javascript:void(0)" @click="closeSharedInSpacesDrawer()">×</a>
-      </div>
-      <div class="content">
-        <div class="spacesList">
-          <div v-for="(act) in sharedActivities" :key="act" class="spaceSharedIn">
-            <span class="space">
-              <img :src="act.spaceAvatar" :alt="act.spaceAvatar" class="avatarMini">
-              {{ act.spaceDisplayName }}
-            </span>
-            <a :href="act.activityUrl" type="button" class="btn">{{ $t('news.app.viewArticle') }}</a>
-            <br>
-          </div>
-        </div>
-      </div>
-      <div class="footer"></div>
-    </div>
-    <div v-show="open" class="drawer-backdrop" @click="closeSharedInSpacesDrawer()"></div>
   </div>
 </template>
 
@@ -87,8 +67,8 @@ export default {
       if (!this.sharedInSpacesUpdated) {
         this.updateSharedInSpaces();
       }
+      this.$root.$emit('news-spaces-drawer-open', this.sharedActivities);
       this.open = true;
-      document.body.style.overflow = 'hidden';
     },
     closeSharedInSpacesDrawer(){
       this.open = false;

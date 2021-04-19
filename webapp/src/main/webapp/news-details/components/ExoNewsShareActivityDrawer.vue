@@ -75,13 +75,6 @@ export default {
       return !this.spaces || this.spaces.filter(part => part !== '').length === 0;
     },
   },
-  watch: {
-    showMessage(newValue) {
-      if(newValue) {
-        setTimeout(() => {this.showMessage = false;}, this.messageDisplayTime);
-      }
-    }
-  },
   created() {
     this.$root.$on('news-share-drawer-open', news => {
       this.news = news;
@@ -109,6 +102,7 @@ export default {
         .then(() => {
           this.closeShareNewsDrawer();
           this.$emit('newsShared', this.news.newsId);
+          this.$root.$emit('display-share-alert', this.showMessage);
         })
         .catch(() => {
           const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);

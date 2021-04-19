@@ -45,9 +45,9 @@ export default {
     },
     spaceSuggesterLabels() {
       return {
-        searchPlaceholder: this.$t('news.share.spaces.placeholder'),
+        searchPlaceholder: this.$t('news.share.spaces.searchPlaceholder'),
         placeholder: this.$t('news.share.spaces.placeholder'),
-        noDataLabel: this.$t('agenda.noDataLabel'),
+        noDataLabel: this.$t('news.share.spaces.noDataLabel'),
       };
     },
   },

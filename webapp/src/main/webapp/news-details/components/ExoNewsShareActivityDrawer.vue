@@ -5,7 +5,7 @@
       body-classes="hide-scroll decrease-z-index-more"
       right>
       <template slot="title">
-        {{ $t('news.share.popupTitle') }}
+        {{ $t('news.share.drawer.popupTitle') }}
       </template>
       <template slot="content">
         <v-form
@@ -14,11 +14,8 @@
           class="flex news-form share-news"
           flat>
           <div class="d-flex flex-column flex-grow-1">
-            <div class="d-flex flex-row newsInformationCard">
-              <exo-news-information :news="news" class="ml-2 my-4"/>
-            </div>
             <div class="d-flex flex-row">
-              <span class="ml-2 mb-2">{{ $t('news.share.shareInSpaces') }} </span>
+              <span class="mt-4 ml-2 mb-2">{{ $t('news.share.shareInSpaces') }} </span>
             </div>
             <div class="d-flex flex-row flex-grow-1 newsSpaceSuggester">
               <exo-news-space-suggester :spaces="spaces" class="ml-2" />
@@ -39,11 +36,6 @@
             class="btn btn-primary mr-2"
             @click="shareNews">
             {{ $t('news.share.share') }}
-          </v-btn>
-          <v-btn
-            class="btn"
-            @click="closeShareNewsDrawer">
-            {{ $t('news.share.cancel') }}
           </v-btn>
         </div>
       </template>

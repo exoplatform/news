@@ -2,7 +2,7 @@
   <v-flex class="space-suggester text-truncate">
     <exo-identity-suggester
       ref="newsSpaceSuggester"
-      v-model="invitedSpaces"
+      v-model="sharingSpaces"
       :labels="spaceSuggesterLabels"
       :include-users="false"
       :width="220"
@@ -34,7 +34,7 @@ export default {
     return {
       displayedSpaces: [],
       currentUser: null,
-      invitedSpaces: []
+      sharingSpaces: []
     };
   },
   computed: {
@@ -52,8 +52,8 @@ export default {
     },
   },
   watch: {
-    invitedSpaces() {
-      if (!this.invitedSpaces) {
+    sharingSpaces() {
+      if (!this.sharingSpaces) {
         this.$nextTick(this.$refs.newsSpaceSuggester.$refs.selectAutoComplete.deleteCurrentItem);
         return;
       }
@@ -63,11 +63,11 @@ export default {
       const found = false;
       if (!found) {
         this.displayedSpaces.push({
-          identity: this.$suggesterService.convertSuggesterItemToIdentity(this.invitedSpaces),
+          identity: this.$suggesterService.convertSuggesterItemToIdentity(this.sharingSpaces),
         });
-        this.spaces.push(this.invitedSpaces.remoteId);
+        this.spaces.push(this.sharingSpaces.remoteId);
       }
-      this.invitedSpaces = null;
+      this.sharingSpaces = null;
     }
   },
   methods: {

@@ -125,7 +125,7 @@
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
     <exo-news-share-activity-drawer />
-    <news-spaces-shared-in-drawer />
+    <news-activity-sharing-spaces-drawer />
   </div>
 </template>
 

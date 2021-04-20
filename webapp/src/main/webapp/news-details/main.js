@@ -1,6 +1,10 @@
 import '../css/news.less';
 import './components/initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
+
+Vue.use(Vuetify);
+const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
+
 // get overridden components if exists
 if (extensionRegistry) {
   const components = extensionRegistry.loadComponents('NewsDetails');
@@ -50,7 +54,8 @@ export function init(params) {
                   :show-edit-button="showEditButton"
                   :show-pin-input="showPinInput"
                   :show-share-button="showShareButton" />`,
-      i18n
+      i18n,
+      vuetify
     }).$mount(appElement);
   });
 }

@@ -726,7 +726,8 @@ public class NewsServiceImpl implements NewsService {
         memberSpaceActivities.append(activities[0]).append(";");
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername)) {
+          ExoSocialActivity exoSocialActivity = activityManager.getActivity(activities[i].split(":")[1]);
+          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && exoSocialActivity != null) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }
@@ -775,7 +776,7 @@ public class NewsServiceImpl implements NewsService {
 
     return news;
   }
-
+  
   /**
    * Post the news activity in the given space
    * 

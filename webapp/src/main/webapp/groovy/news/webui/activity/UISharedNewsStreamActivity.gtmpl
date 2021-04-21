@@ -130,6 +130,12 @@ def streamOwner = activity.getStreamOwner();
   } else {
     illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
   }
+  def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
+  def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));
+  def labelConfirmbutton=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirm_Delete_Activity-Button"));
+  def labelClosebutton = StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Cancel_Delete_Activity-Button"));
+  def labelDelete = _ctx.appRes("UIActivity.label.Delete");
+  def activityDeletable = uicomponent.isActivityDeletable();
 %>
 
 <div class="activityStream uiActivityStreamWrapper uiNewsActivity uiSharedNewsActivity" id="activityContainer${activity.id}">
@@ -143,7 +149,7 @@ def streamOwner = activity.getStreamOwner();
                       <% _ctx.includeTemplates("UIActivityHeading") %>
                        <!-- three dots activity menu -->
                          <%
-                        if(activityEditable) {
+                        if(activityEditable || activityDeletable) {
                         %>
                         <div id="dropDownEditActivity${activity.id}"
                              class="btn-group uiDropdownWithIcon actionLink actLink">
@@ -160,6 +166,15 @@ def streamOwner = activity.getStreamOwner();
                                         <span class="actLink-label">${labelEdit}</span>
                                     </a>
                                 </li>
+                                <%
+                                }
+                                if (activityDeletable) { %>
+	                            <li class="actLink-item">
+	                              <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity" data-caption="$captionConfirmation" data-close="$labelClosebutton" data-ok="$labelConfirmbutton"  data-delete="<%=uicomponent.event("DeleteActivity", uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">
+	                                <i class="uiIcon uiIconTrashActivity actLink-icon"></i>
+	                                <span class="actLink-label">${labelDelete}</span>
+	                              </a>
+	                            </li>
                                 <%
                                 }
                                 %>

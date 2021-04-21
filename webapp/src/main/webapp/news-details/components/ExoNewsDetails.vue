@@ -1,11 +1,11 @@
 <template>
   <div id="newsDetails" class="VuetifyApp">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
-    <exo-news-share-activity-action-menu
-      v-if="showEditButton || showPinInput"
+    <exo-news-details-action-menu
+      v-if="showDeleteButton || showPinButton || showShareButton"
       :news="news"
-      :show-edit-button="showEditButton"
-      :show-pin-input="showPinInput"
+      :show-pin-button="showPinButton"
+      :show-delete-button="showDeleteButton"
       :show-share-button="showShareButton"
       @pin="$root.$emit('share-news-pin-activity', news)"/>
     <div v-if="news.archived && !news.canArchive">
@@ -124,7 +124,12 @@ export default {
       required: false,
       default: true
     },
-    showPinInput: {
+    showPinButton: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    showDeleteButton: {
       type: Boolean,
       required: false,
       default: true

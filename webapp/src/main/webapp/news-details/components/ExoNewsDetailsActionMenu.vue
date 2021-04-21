@@ -1,6 +1,6 @@
 <template>
   <v-menu
-    v-model="eventMenu"
+    v-model="actionMenu"
     eager
     bottom
     left
@@ -8,7 +8,7 @@
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
-        class="shareNewsActionMenu"
+        class="newsDetailsActionMenu"
         icon
         v-on="on">
         <v-icon>mdi-dots-vertical</v-icon>
@@ -16,17 +16,17 @@
     </template>
 
     <v-list>
-      <v-list-item v-if="showPinInput" @click="$emit('pin')">
+      <v-list-item v-if="showPinButton" @click="$emit('pin')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.pin') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showEditButton" @click="$emit('delete')">
+      <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.delete') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showShareButton" @click="$root.$emit('news-share-drawer-open',news)">
+      <v-list-item v-if="showShareButton" @click="$root.$emit('news-share-drawer-open', news)">
         <v-list-item-title>
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
@@ -43,38 +43,28 @@ export default {
       required: false,
       default: null
     },
-    showEditButton: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
     showShareButton: {
       type: Boolean,
       required: false,
       default: true
     },
-    showPinInput: {
+    showPinButton: {
       type: Boolean,
       required: false,
       default: true
     },
-    newsPinned: {
+    showDeleteButton: {
       type: Boolean,
-      required: true,
-      default: false
-    },
-    newsArchived: {
-      type: Boolean,
-      required: true,
-      default: false
+      required: false,
+      default: true
     },
   },
   data: () => ({
-    eventMenu: null,
+    actionMenu: null,
   }),
   mounted() {
     $('#singlePageApplicationContainer').parent().click(() => {
-      this.eventMenu = false;
+      this.actionMenu = false;
     });
   },
 };

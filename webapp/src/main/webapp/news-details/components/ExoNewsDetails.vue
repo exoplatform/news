@@ -1,6 +1,13 @@
 <template>
   <div id="newsDetails" class="VuetifyApp">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
+    <exo-news-share-activity-action-menu
+      v-if="showEditButton || showPinInput"
+      :news="news"
+      :show-edit-button="showEditButton"
+      :show-pin-input="showPinInput"
+      :show-share-button="showShareButton"
+      @pin="$root.$emit('share-news-pin-activity', news)"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">
@@ -15,12 +22,8 @@
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIconsShared">
-            <exo-news-share-activity v-if="showShareButton" :news="news"></exo-news-share-activity>
-          </div>
           <div class="newsDetailsIcons">
             <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :space-id="spaceId" :activity-id="activityId"></exo-news-activity-edit-composer>
-            <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
           </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle newsTitleMobile">
@@ -88,6 +91,7 @@
       </div>
     </div>
     <exo-news-share-activity-drawer />
+    <exo-news-pin-activity />
   </div>
 </template>
 <script>

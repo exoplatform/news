@@ -8,49 +8,31 @@
         </div>
       </transition>
     </div>
-    <a id="newsPinButton" :data-original-title="pinLabel" :class="[newsArchived ? 'unauthorizedPin' : '']"
-       class="btn"
-       rel="tooltip"
-       data-placement="bottom"
-       @click="confirmAction">
-      <i :class="[newsPinned ? '' : 'unpinned']" class="uiIconPin"> </i>
-    </a>
   </div>
 </template>
 
 <script>
 export default {
-  props: {
-    newsId: {
-      type: String,
-      required: false,
-      default: null
-    },
-    newsTitle: {
-      type: String,
-      required: true,
-      default: null
-    },
-    newsPinned: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
-    newsArchived: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
-  },
   data() {
     return {
       showPinMessage : false,
       messagePin : '',
       pinLabel: '',
       successPin: true,
+      newsId: '',
+      newsTitle: '',
+      newsPinned: true,
+      newsArchived: true,
     };
   },
   created() {
+    this.$root.$on('share-news-pin-activity', news => {
+      this.newsId = news.newsId;
+      this.newsTitle = news.title;
+      this.newsPinned = news.pinned;
+      this.newsArchived = news.archived;
+      this.confirmAction();
+    });
     if(!this.newsPinned) {
       this.pinLabel = this.$t('news.pin.action');
     } else {

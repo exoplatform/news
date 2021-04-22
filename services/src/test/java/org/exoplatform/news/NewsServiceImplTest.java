@@ -1126,6 +1126,8 @@ public class NewsServiceImplTest {
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
+    Property exoActivitiesProperty = mock(Property.class);
+    
 
     Space space1 = new Space();
     space1.setId("1");
@@ -1150,6 +1152,9 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(anyString())).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(newsNode.hasProperty("exo:activities")).thenReturn(true);
+    when(newsNode.getProperty("exo:activities")).thenReturn(exoActivitiesProperty);
+    when(exoActivitiesProperty.getString()).thenReturn("1:1;2:2;2:3");
 
     // When
     newsService.deleteNews("1");
@@ -1158,6 +1163,7 @@ public class NewsServiceImplTest {
     verify(session, times(1)).getNodeByUUID(anyString());
     verify(session, times(1)).save();
     verify(newsNode, times(1)).remove();
+    verify(activityManager, times(3)).deleteActivity(anyString());
   }
 
   @Test

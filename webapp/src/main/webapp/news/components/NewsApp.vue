@@ -51,7 +51,8 @@
         :width="4"
         indeterminate
         class="loadingRing"
-        color="#578dc9" /> </v-app>
+        color="#578dc9" />
+    </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
       <div v-for="news in newsList" :key="news.newsId" class="newsItem">
         <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
@@ -61,6 +62,15 @@
               <a :href="news.url">{{ news.title }} </a>
             </h3>
             <news-spaces-shared-in v-if="news.activities && news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
+            <exo-news-details-action-menu
+              v-if="news.canArchive || news.canEdit "
+              :news="news"
+              :show-pin-button="showPinButton"
+              :show-edit-button="news.canEdit"
+              :show-archive-button="news.canArchive"
+              @edit="editLink(news)"
+              @pin="$root.$emit('share-news-pin-activity', news)"
+              @archive="$root.$emit('share-news-archive-activity', news)"/>
           </div>
           <div class="newsInfo">
             <div class="newsOwner">
@@ -89,11 +99,6 @@
             <a :href="news.url">
               <p class="newsSummary" v-html="news.newsText"></p>
             </a>
-            <div class="newsActions">
-              <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
-              <exo-news-activity-edit-composer v-if="news.canEdit" :news-id="news.newsId" :space-id="news.spaceId" :activity-id="news.activityId" open-target="_blank"></exo-news-activity-edit-composer>
-              <exo-news-share-activity :news="news" @newsShared="reloadNews(news.newsId)"></exo-news-share-activity>
-            </div>
             <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
             <!--begin -->
             <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -126,6 +131,8 @@
     </div>
     <exo-news-share-activity-drawer />
     <news-activity-sharing-spaces-drawer />
+    <exo-news-pin-activity />
+    <exo-news-archive />
   </div>
 </template>
 
@@ -151,6 +158,7 @@ export default {
       showArchiveButton: true,
       loadingNews: true,
       initialized: false,
+      showPinButton: false,
     };
   },
   computed: {
@@ -341,6 +349,10 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
+    editLink(news) {
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
+      window.open(editUrl, '_blank');
+    }
   }
 };
 </script>

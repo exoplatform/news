@@ -8,48 +8,31 @@
         </div>
       </transition>
     </div>
-    <a :data-original-title="archiveLabel" class="btn newsArchiveButton"
-       rel="tooltip"
-       data-placement="bottom"
-       @click="confirmAction">
-      <i :class="[newsArchived ? 'uiIconArchived' : 'uiIconUnarchived']"> </i>
-    </a>
   </div>
 </template>
-
 <script>
+
 export default {
-  props: {
-    newsId: {
-      type: String,
-      required: false,
-      default: null
-    },
-    newsTitle: {
-      type: String,
-      required: true,
-      default: null
-    },
-    newsArchived: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
-    pinned: {
-      type: Boolean,
-      required: true,
-      default: false
-    }
-  },
   data() {
     return {
       showArchiveMessage : false,
       messageArchive : '',
       successArchive: true,
+      newsId:'',
+      newsTitle:'',
       archiveLabel: '',
+      newsArchived: false,
+      newsPinned: false,
     };
   },
   created() {
+    this.$root.$on('share-news-archive-activity', news => {
+      this.newsId = news.newsId;
+      this.newsTitle = news.title;
+      this.newsPinned = news.pinned;
+      this.newsArchived = news.archived;
+      this.confirmAction();
+    });
     if(!this.newsArchived) {
       this.archiveLabel = this.$t('news.archive.action');
     } else {
@@ -75,12 +58,12 @@ export default {
       if(this.newsArchived === false) {
         updatedNews = {
           archived: true,
-          pinned: this.pinned,
+          pinned: this.newsPinned,
         };
       } else {
         updatedNews = {
           archived: false,
-          pinned: this.pinned,
+          pinned: this.newsPinned,
         };
       }
 

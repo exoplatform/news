@@ -4,7 +4,8 @@
     eager
     bottom
     left
-    offset-y>
+    offset-y
+    min-width="108px" class="px-0 text-right mx-2">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
@@ -16,9 +17,19 @@
     </template>
 
     <v-list>
+      <v-list-item v-if="showEditButton" @click="$emit('edit')">
+        <v-list-item-title>
+          {{ $t('news.details.header.menu.edit') }}
+        </v-list-item-title>
+      </v-list-item>
       <v-list-item v-if="showPinButton" @click="$emit('pin')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.pin') }}
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item v-if="showArchiveButton" @click="$emit('archive')">
+        <v-list-item-title>
+          {{ $t('news.details.header.menu.archive') }}
         </v-list-item-title>
       </v-list-item>
       <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
@@ -56,14 +67,24 @@ export default {
     showDeleteButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
+    },
+    showEditButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showArchiveButton: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
   data: () => ({
     actionMenu: null,
   }),
   mounted() {
-    $('#singlePageApplicationContainer').parent().click(() => {
+    $('#UIPortalApplication').parent().click(() => {
       this.actionMenu = false;
     });
   },

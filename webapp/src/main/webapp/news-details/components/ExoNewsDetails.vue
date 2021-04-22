@@ -2,11 +2,12 @@
   <div id="newsDetails" class="VuetifyApp">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
-      v-if="showDeleteButton || showPinButton || showShareButton"
+      v-if="showDeleteButton || showPinButton || showShareButton || showEditButton"
       :news="news"
       :show-pin-button="showPinButton"
-      :show-delete-button="showDeleteButton"
+      :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
+      @edit="editLink"
       @pin="$root.$emit('share-news-pin-activity', news)"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
@@ -22,9 +23,6 @@
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIcons">
-            <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :space-id="spaceId" :activity-id="activityId"></exo-news-activity-edit-composer>
-          </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
@@ -146,7 +144,7 @@ export default {
   computed: {
     linkifiedSummary : function() {
       return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
-    }
+    },
   },
   created() {
     newsServices.getNewsById(this.newsId)
@@ -233,6 +231,10 @@ export default {
       } else {
         window.open('/', '_self');
       }
+    },
+    editLink() {
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
+      window.open(editUrl, '_self');
     }
   }
 };

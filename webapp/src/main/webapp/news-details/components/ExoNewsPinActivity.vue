@@ -21,8 +21,8 @@ export default {
       successPin: true,
       newsId: '',
       newsTitle: '',
-      newsPinned: true,
-      newsArchived: true,
+      newsPinned: false,
+      newsArchived: false,
     };
   },
   created() {

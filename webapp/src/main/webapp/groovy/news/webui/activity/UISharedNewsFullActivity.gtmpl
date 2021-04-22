@@ -229,8 +229,4 @@ if (activity && news) {
 </div><!--activityStream-->
 </div>
 <% } // News archived %>
-<% } else { // Activity deleted %>
-<% uiform.begin() %>
-<div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
-<% uiform.end() %>
-<% } %>
+<% }

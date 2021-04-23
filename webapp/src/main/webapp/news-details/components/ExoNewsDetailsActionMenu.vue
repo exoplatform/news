@@ -22,16 +22,6 @@
           {{ $t('news.details.header.menu.edit') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showPinButton" @click="$emit('pin')">
-        <v-list-item-title>
-          {{ pinLabel }}
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
-        <v-list-item-title>
-          {{ $t('news.details.header.menu.delete') }}
-        </v-list-item-title>
-      </v-list-item>
       <v-list-item v-if="showShareButton" @click="$root.$emit('news-share-drawer-open', news)">
         <v-list-item-title>
           {{ $t('news.details.header.menu.share') }}
@@ -55,25 +45,10 @@ export default {
       required: false,
       default: true
     },
-    showPinButton: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    showDeleteButton: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
     showEditButton: {
       type: Boolean,
       required: false,
       default: false
-    },
-    pinLabel: {
-      type: String,
-      required: false,
-      default: null
     },
   },
   data: () => ({

@@ -53,7 +53,6 @@ export function init(params) {
                   :activity-id="activityId"
                   :show-edit-button="showEditButton"
                   :show-pin-button="showPinButton"
-                  :show-delete-button="showEditButton"
                   :show-share-button="showShareButton" />`,
       i18n,
       vuetify

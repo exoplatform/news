@@ -2,13 +2,11 @@
   <div id="newsDetails" class="VuetifyApp">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
-      v-if="showPinButton || showShareButton || showEditButton"
+      v-if="showShareButton || showEditButton"
       :news="news"
       :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
-      :pin-label="pinLabel"
-      @edit="editLink"
-      @pin="pinNews" />
+      @edit="editLink"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">
@@ -31,7 +29,7 @@
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
             </div>
             <div v-if="news.archived" class="newsArchived">
-              <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
+              <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
@@ -129,11 +127,6 @@ export default {
       required: false,
       default: true
     },
-    showDeleteButton: {
-      type: Boolean,
-      required: false,
-      default: true
-    }
   },
   data() {
     return {
@@ -147,13 +140,6 @@ export default {
     linkifiedSummary : function() {
       return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
     },
-    pinLabel() {
-      if(this.news && this.news.pinned) {
-        return this.$t('news.details.header.menu.unpin');
-      } else {
-        return this.$t('news.details.header.menu.pin');
-      }
-    },
   },
   created() {
     newsServices.getNewsById(this.newsId)
@@ -164,9 +150,6 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
-    this.$root.$on('refresh-news', (news)=> {
-      this.refreshNews(news);
-    });
   },
   mounted() {
     this.updateViewsCount();
@@ -248,21 +231,6 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
-    pinNews() {
-      if(this.news && this.news.pinned) {
-        this.news.pinned = true;
-      } else {
-        this.news.pinned = false;
-      }
-      this.$root.$emit('pin-news', this.news);
-    },
-    refreshNews(news) {
-      const newsId = news && news.id || news.newsId;
-      newsServices.getNewsById(newsId)
-        .then(news => {
-          this.news.pinned = news.pinned;
-        });
-    }
   }
 };
 </script>

@@ -26,12 +26,12 @@ export default {
     };
   },
   created() {
-    this.$root.$on('share-news-pin-activity', news => {
+    this.$root.$on('pin-news', news => {
       this.newsId = news.newsId;
       this.newsTitle = news.title;
       this.newsPinned = news.pinned;
       this.newsArchived = news.archived;
-      this.confirmAction();
+      this.confirmAction(news);
     });
     if(!this.newsPinned) {
       this.pinLabel = this.$t('news.pin.action');
@@ -40,7 +40,7 @@ export default {
     }
   },
   methods: {
-    confirmAction : function() {
+    confirmAction : function(news) {
       if(!this.newsArchived) {
         let confirmText = this.$t('news.pin.confirm');
         let captionText = this.$t('news.pin.action');
@@ -50,10 +50,11 @@ export default {
           confirmText = this.$t('news.unpin.confirm').replace('{0}', this.newsTitle);
           captionText = this.$t('news.unpin.action');
         }
-        eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label : confirmButton}], captionText, confirmText, cancelButton);
+        eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField(news), label : confirmButton}], captionText, confirmText, cancelButton);
       }
     },
-    updatePinnedField : function () {
+    updatePinnedField : function (news) {
+      const newsId = news && news.id || news.newsId;
       const pinMessageTime = 5000;
       const context = this;
       let updatedNews = null;
@@ -67,7 +68,7 @@ export default {
         };
       }
 
-      fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/${this.newsId}`,{
+      fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/${newsId}`,{
         headers: {
           'Content-Type': 'application/json'
         },
@@ -88,7 +89,7 @@ export default {
         setTimeout(function () {
           context.showPinMessage = false;
         }, pinMessageTime);
-      })
+      }).then(() => this.$root.$emit('refresh-news', news))
         .catch (function() {
           context.showPinMessage = true;
           context.successPin = false;

@@ -24,12 +24,7 @@
       </v-list-item>
       <v-list-item v-if="showPinButton" @click="$emit('pin')">
         <v-list-item-title>
-          {{ $t('news.details.header.menu.pin') }}
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item v-if="showArchiveButton" @click="$emit('archive')">
-        <v-list-item-title>
-          {{ $t('news.details.header.menu.archive') }}
+          {{ pinLabel }}
         </v-list-item-title>
       </v-list-item>
       <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
@@ -47,6 +42,7 @@
 </template>
 
 <script>
+
 export default {
   props: {
     news: {
@@ -62,7 +58,7 @@ export default {
     showPinButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     showDeleteButton: {
       type: Boolean,
@@ -74,10 +70,10 @@ export default {
       required: false,
       default: false
     },
-    showArchiveButton: {
-      type: Boolean,
+    pinLabel: {
+      type: String,
       required: false,
-      default: false
+      default: null
     },
   },
   data: () => ({

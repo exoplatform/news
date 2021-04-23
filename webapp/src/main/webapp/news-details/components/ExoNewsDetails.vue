@@ -4,7 +4,6 @@
     <exo-news-details-action-menu
       v-if="showPinButton || showShareButton || showEditButton"
       :news="news"
-      :show-pin-button="showPinButton"
       :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
       :pin-label="pinLabel"
@@ -24,6 +23,9 @@
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
+          <div class="newsDetailsIcons">
+            <exo-news-pin v-if="showPinButton" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin>
+          </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
@@ -90,7 +92,6 @@
       </div>
     </div>
     <exo-news-share-activity-drawer />
-    <exo-news-pin />
   </div>
 </template>
 <script>

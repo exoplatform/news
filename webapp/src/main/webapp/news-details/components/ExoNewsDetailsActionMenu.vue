@@ -27,6 +27,11 @@
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
       </v-list-item>
+      <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
+        <v-list-item-title>
+          {{ $t('news.details.header.menu.delete') }}
+        </v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -46,6 +51,11 @@ export default {
       default: true
     },
     showEditButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showDeleteButton: {
       type: Boolean,
       required: false,
       default: false

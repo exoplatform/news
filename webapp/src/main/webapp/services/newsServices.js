@@ -259,3 +259,16 @@ export function canUserCreateNews(spaceId) {
     return resp;
   });
 }
+
+export function deleteNews(newsId) {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}`, {
+    credentials: 'include',
+    method: 'DELETE'
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      resp.json();
+    } else {
+      throw new Error('Error deleting news');
+    }
+  });
+}

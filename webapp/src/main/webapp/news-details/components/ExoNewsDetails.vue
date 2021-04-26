@@ -1,5 +1,5 @@
 <template>
-  <div id="newsDetails" class="VuetifyApp">
+  <div id="newsDetails">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
       v-if="showShareButton || showEditButton"

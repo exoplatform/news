@@ -57,7 +57,8 @@ export default {
     },
   },
   created() {
-    // window.setTimeout(() => this.displayAlert = false, 5000);
+    const time = 5000;
+    window.setTimeout(() => this.displayAlert = false, time);
   },
 };
 </script>

@@ -260,8 +260,11 @@ export function canUserCreateNews(spaceId) {
   });
 }
 
-export function deleteNews(newsId) {
-  return fetch(`${newsConstants.NEWS_API}/${newsId}`, {
+export function deleteNews(newsId, delay) {
+  if (delay > 0) {
+    localStorage.setItem('deletedNews', newsId);
+  }
+  return fetch(`${newsConstants.NEWS_API}/${newsId}?delay=${delay || 0}`, {
     credentials: 'include',
     method: 'DELETE'
   }).then((resp) => {
@@ -269,6 +272,19 @@ export function deleteNews(newsId) {
       resp.json();
     } else {
       throw new Error('Error deleting news');
+    }
+  });
+}
+
+export function undoDeleteNews(newsId) {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}/undoDelete`, {
+    method: 'POST',
+    credentials: 'include',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      localStorage.removeItem('deletedNews');
+    } else {
+      throw new Error('Error undoing deleting news');
     }
   });
 }

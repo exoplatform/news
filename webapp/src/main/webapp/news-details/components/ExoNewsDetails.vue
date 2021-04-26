@@ -235,15 +235,19 @@ export default {
         window.open('/', '_self');
       }
     },
+    reloadNews(newsId) {
+      newsServices.getNewsById(newsId).then(newsUpdated => {
+        this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
+      });
+    },
     editLink() {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
     deleteNews() {
-      this.$root.$emit('news-deleted', this.news);
-      /* newsServices.deleteNews(this.newsId)
+      const deleteDelay = 10;
+      newsServices.deleteNews(this.newsId, deleteDelay)
         .then(() => this.$root.$emit('news-deleted', this.news));
-       */
     }
   }
 };

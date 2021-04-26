@@ -9,7 +9,7 @@
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
-        class="pull-right"
+        class="newsDetailsActionMenu pull-right"
         icon
         v-on="on">
         <v-icon>mdi-dots-vertical</v-icon>

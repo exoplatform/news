@@ -165,7 +165,7 @@
   //make sures commentFormFocused is set to false to prevent any refresh to focus, only focus after post a comment
   uicomponent.setCommentFormFocused(false);
 %>
-
+<div class="VuetifyApp">
   <div class="activityStream uiActivityStreamWrapper uiNewsActivity" id="activityContainer${activity.id}">
     <% uiform.begin() %>
     <div class="boxContainer" id="boxContainer">
@@ -188,6 +188,7 @@
     <% if (!news.archived || (news.archived && news.canArchive)) {
       uiform.end()
     }%>
+  </div>
   </div><!--activityStream-->
   <% } // News archived %>
   <% } else { // Activity deleted %>

@@ -4,7 +4,6 @@
       :value="displayAlerts"
       color="transparent"
       elevation="0"
-      absolute
       app
       left>
       <exo-news-notification-alert
@@ -17,6 +16,8 @@
 </template>
 
 <script>
+import * as newsServices from '../../services/newsServices';
+
 export default {
   props: {
     name: {
@@ -41,7 +42,7 @@ export default {
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'success',
-          click: () => this.undoDeleteEvent(),
+          click: () => this.undoDeleteNews(news.newsId),
           clickMessage,
         });
       }
@@ -52,8 +53,9 @@ export default {
       this.alerts.splice(index, 1);
       this.$forceUpdate();
     },
-    undoDeleteEvent() {
-      this.$forceUpdate();
+    undoDeleteNews(newsId) {
+      return newsServices.undoDeleteNews(newsId)
+        .then(() => this.$forceUpdate());
     }
   },
 };

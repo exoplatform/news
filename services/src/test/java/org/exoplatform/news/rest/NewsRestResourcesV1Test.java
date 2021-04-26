@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
@@ -59,6 +60,9 @@ public class NewsRestResourcesV1Test {
   @Mock
   ActivityManager        activityManager;
 
+  @Mock
+  PortalContainer        container;
+
   @Before
   public void setup() {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -70,7 +74,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -97,7 +102,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -119,7 +125,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -141,7 +148,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -159,7 +167,7 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsSpacesWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager);
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService, newsAttachmentsService, spaceService, identityManager,container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -199,7 +207,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News existingNews = new News();
@@ -237,7 +246,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -276,7 +286,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -298,7 +309,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -319,7 +331,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -365,7 +378,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -414,7 +428,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -464,7 +479,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -514,7 +530,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -564,7 +581,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -619,7 +637,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -665,7 +684,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -708,7 +728,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -730,7 +751,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -773,7 +795,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -822,7 +845,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -867,7 +891,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -887,7 +912,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
 
@@ -906,7 +932,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
@@ -926,7 +953,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -953,7 +981,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -981,7 +1010,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1007,7 +1037,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1028,7 +1059,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1055,7 +1087,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1079,7 +1112,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1100,7 +1134,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1121,7 +1156,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1154,7 +1190,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1183,7 +1220,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("");
     News news = new News();
@@ -1211,7 +1249,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(null);
@@ -1234,7 +1273,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1250,7 +1290,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1");
+    Response response = newsRestResourcesV1.deleteNews(request, "1", 0L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1263,7 +1303,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1279,7 +1320,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1");
+    Response response = newsRestResourcesV1.deleteNews(request, "1", 0L);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1292,7 +1333,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1304,7 +1346,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1");
+    Response response = newsRestResourcesV1.deleteNews(request, "1", 0L);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1317,7 +1359,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1326,7 +1369,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1");
+    Response response = newsRestResourcesV1.deleteNews(request, "1", 0L);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -1339,7 +1382,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(newsService.getNewsById(anyString())).thenReturn(null);
@@ -1348,7 +1392,7 @@ public class NewsRestResourcesV1Test {
     when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, null);
+    Response response = newsRestResourcesV1.deleteNews(request, null, 0L);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -1361,7 +1405,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1384,7 +1429,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     News news = new News();
     news.setId("1");
@@ -1404,7 +1450,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1432,7 +1479,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1461,7 +1509,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news1 = new News();
@@ -1489,7 +1538,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     NewsFilter newsFilter = new NewsFilter();
@@ -1511,7 +1561,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1539,7 +1590,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -1561,7 +1613,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     News news1 = new News();
@@ -1608,7 +1661,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1662,7 +1716,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1713,7 +1768,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1768,7 +1824,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1800,7 +1857,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1849,7 +1907,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));
@@ -1900,7 +1959,8 @@ public class NewsRestResourcesV1Test {
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
                                                                       spaceService,
-                                                                      identityManager);
+                                                                      identityManager,
+                                                                      container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     when(request.getLocale()).thenReturn(new Locale("en"));

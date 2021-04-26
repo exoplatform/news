@@ -6,6 +6,8 @@
       :news="news"
       :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
+      :show-delete-button="showDeleteButton"
+      @delete="deleteNews"
       @edit="editLink"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
@@ -90,6 +92,7 @@
       </div>
     </div>
     <exo-news-share-activity-drawer />
+    <exo-news-notification-alerts class="d-flex"/>
   </div>
 </template>
 <script>
@@ -123,6 +126,11 @@ export default {
       default: true
     },
     showPinButton: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    showDeleteButton: {
       type: Boolean,
       required: false,
       default: true
@@ -231,6 +239,12 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
+    deleteNews() {
+      this.$root.$emit('news-deleted', this.news);
+      /* newsServices.deleteNews(this.newsId)
+        .then(() => this.$root.$emit('news-deleted', this.news));
+       */
+    }
   }
 };
 </script>

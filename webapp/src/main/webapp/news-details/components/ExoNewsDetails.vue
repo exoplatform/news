@@ -92,7 +92,7 @@
       </div>
     </div>
     <exo-news-share-activity-drawer />
-    <exo-news-notification-alerts class="d-flex"/>
+    <exo-news-notification-alerts />
   </div>
 </template>
 <script>

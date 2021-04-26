@@ -9,6 +9,7 @@ let config = {
   entry: {
     suggesterComponent :'./src/main/webapp/components/suggester/main.js',
     modalComponent :'./src/main/webapp/components/modal/main.js',
+    snackbarComponent :'./src/main/webapp/components/snackbar/main.js',
     fileDropComponent :'./src/main/webapp/components/fileDrop/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',

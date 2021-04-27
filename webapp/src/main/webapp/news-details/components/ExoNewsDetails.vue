@@ -1,6 +1,12 @@
 <template>
   <div id="newsDetails">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
+    <exo-news-details-action-menu
+      v-if="showShareButton || showEditButton"
+      :news="news"
+      :show-edit-button="showEditButton"
+      :show-share-button="showShareButton"
+      @edit="editLink"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">
@@ -15,12 +21,8 @@
           <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIconsShared">
-            <exo-news-share-activity v-if="showShareButton" :news="news"></exo-news-share-activity>
-          </div>
           <div class="newsDetailsIcons">
-            <exo-news-activity-edit-composer v-if="showEditButton" :news-id="newsId" :space-id="spaceId" :activity-id="activityId"></exo-news-activity-edit-composer>
-            <exo-news-pin-activity v-if="showPinInput" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin-activity>
+            <exo-news-pin v-if="showPinButton" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin>
           </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle newsTitleMobile">
@@ -85,9 +87,9 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
+    <exo-news-share-activity-drawer />
   </div>
 </template>
 <script>
@@ -120,11 +122,11 @@ export default {
       required: false,
       default: true
     },
-    showPinInput: {
+    showPinButton: {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
   },
   data() {
     return {
@@ -137,7 +139,7 @@ export default {
   computed: {
     linkifiedSummary : function() {
       return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
-    }
+    },
   },
   created() {
     newsServices.getNewsById(this.newsId)
@@ -224,7 +226,11 @@ export default {
       } else {
         window.open('/', '_self');
       }
-    }
+    },
+    editLink() {
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
+      window.open(editUrl, '_self');
+    },
   }
 };
 </script>

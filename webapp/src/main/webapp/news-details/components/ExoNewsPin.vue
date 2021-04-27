@@ -84,7 +84,6 @@ export default {
           pinned: false,
         };
       }
-
       fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/${this.newsId}`,{
         headers: {
           'Content-Type': 'application/json'

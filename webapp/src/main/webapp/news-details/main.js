@@ -1,6 +1,10 @@
 import '../css/news.less';
 import './components/initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
+
+Vue.use(Vuetify);
+const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
+
 // get overridden components if exists
 if (extensionRegistry) {
   const components = extensionRegistry.loadComponents('NewsDetails');
@@ -37,7 +41,7 @@ export function init(params) {
           newsId: params.newsId,
           activityId: params.activityId,
           showEditButton: params.showEditButton,
-          showPinInput: params.showPinInput,
+          showPinButton: params.showPinInput,
           showShareButton : params.showShareButton,
         };
       },
@@ -48,9 +52,10 @@ export function init(params) {
                   :news-id="newsId"
                   :activity-id="activityId"
                   :show-edit-button="showEditButton"
-                  :show-pin-input="showPinInput"
+                  :show-pin-button="showPinButton"
                   :show-share-button="showShareButton" />`,
-      i18n
+      i18n,
+      vuetify
     }).$mount(appElement);
   });
 }

@@ -8,9 +8,7 @@ Vue.component('news-app', NewsApp);
 
 Vue.use(Vuetify);
 
-const vuetify = new Vuetify({
-  iconfont: '',
-});
+const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
 
 // get overridden components if exists
 if (extensionRegistry) {

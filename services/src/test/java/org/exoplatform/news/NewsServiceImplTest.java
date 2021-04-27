@@ -8,13 +8,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -2919,17 +2913,175 @@ public class NewsServiceImplTest {
     when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
+    Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = johnIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    Set<String> mentionedIds = new HashSet(Collections.singleton("john"));
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(johnIdentity);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+
     News news = new News();
-    news.setTitle("update title");
-    news.setSummary("Updated summary");
-    news.setBody("Updated body");
+    news.setTitle("title");
+    news.setSummary("summary");
+    news.setBody("body <img alt=\"\" class=\"pull-left\" data-plugin-name=\"selectImage\" referrerpolicy=\"no-referrer\" src=\"/portal/rest/composer/image/thumbnail?uploadId=88b5af9\">");
     news.setUploadId(null);
     news.setViewsCount((long) 10);
     // when
-    newsService.updateNews(news);
+    news.setBody("Updated body @john <img alt=\"\" class=\"pull-left\" data-plugin-name=\"selectImage\" referrerpolicy=\"no-referrer\" src=\"/portal/rest/composer/image/thumbnail?uploadId=88b5af9\">");
+    News updatedNews = newsService.updateNews(news);
     // then
     verify(workSpace, times(1)).move(any(), any());
     verify(newsNode, times(1)).save();
+  }
+
+  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class, CommonsUtils.class })
+  @Test
+  public void shouldUpdateNewsMentionedIdsWhenNewsBodyIsUpdated() throws Exception {
+    // Given
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService);
+
+    Node newsNode = mock(Node.class);
+    Node parentNode = mock(Node.class);
+    Node illustrationNode = mock(Node.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(newsNode.getName()).thenReturn("Untitled");
+    when(newsNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22/Untitled");
+    when(newsNode.getParent()).thenReturn(parentNode);
+    when(parentNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22");
+    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
+    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setDisplayName("space1");
+    space1.setGroupId("space1");
+    space1.setPrettyName("space1");
+    space1.setVisibility("private");
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
+    when(spaceService.isMember(space1, "root")).thenReturn(true);
+    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
+    when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+
+    when(newsNode.hasNode("illustration")).thenReturn(true);
+    PowerMockito.mockStatic(PropertyManager.class);
+    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
+
+    PowerMockito.mockStatic(LinkProvider.class);
+    when(LinkProvider.getSingleActivityUrl("1")).thenReturn("portal/intranet/activity?id=1");
+    PowerMockito.mockStatic(NotificationContextImpl.class);
+    NotificationContext ctx = mock(NotificationContext.class);
+    NotificationExecutor executor = mock(NotificationExecutor.class);
+
+    ArgumentLiteral<String> CONTENT_TITLE = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
+
+    ArgumentLiteral<String> CONTENT_AUTHOR = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
+
+    ArgumentLiteral<String> CONTENT_SPACE = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
+
+    ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
+
+    ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
+
+    ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
+
+    ArgumentLiteral<Set> MENTIONED_IDS = new ArgumentLiteral<Set>(Set.class, "MENTIONED_IDS");
+
+    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
+            new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
+                    "CONTEXT");
+
+    when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
+    when(ctx.append(CONTENT_TITLE, "Updated title")).thenReturn(ctx);
+    when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
+    when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
+    when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/1234/illustration")).thenReturn(ctx);
+    when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=1")).thenReturn(ctx);
+    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)).thenReturn(ctx);
+
+    when(ctx.getNotificationExecutor()).thenReturn(executor);
+    PowerMockito.mockStatic(PluginKey.class);
+    PluginKey plugin = mock(PluginKey.class);
+    when(PluginKey.key("PostNewsNotificationPlugin")).thenReturn(plugin);
+    when(PluginKey.key("MentionInNewsNotificationPlugin")).thenReturn(plugin);
+    NotificationCommand notificationCommand = mock(NotificationCommand.class);
+    when(ctx.makeCommand(plugin)).thenReturn(notificationCommand);
+    NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
+    when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
+    when(notificationExecutor.execute(ctx)).thenReturn(true);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+
+    Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Profile profile = johnIdentity.getProfile();
+    profile.setUrl("/profile/john");
+    profile.setProperty("fullName", "john john");
+    Set<String> mentionedIds = new HashSet(Collections.singleton("john"));
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("john"))).thenReturn(johnIdentity);
+
+    when(ctx.append(MENTIONED_IDS, mentionedIds)).thenReturn(ctx);
+
+    News news = new News();
+    news.setTitle("Updated title");
+    news.setId("1234");
+    news.setAuthor("root");
+    news.setSummary("Updated summary");
+    news.setActivities("1:1;");
+    news.setBody("Updated body @john");
+    news.setCreationDate(new Date());
+    news.setUploadId(null);
+    news.setViewsCount((long) 10);
+    news.setPublicationState("published");
+    news.setPublicationDate(Calendar.getInstance().getTime());
+
+    // when
+    newsService.updateNews(news);
+
+    // then
+    verify(workSpace, times(1)).move(any(), any());
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
+    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
+    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body @john"));
+    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+
   }
 
   private void setCurrentIdentity() {

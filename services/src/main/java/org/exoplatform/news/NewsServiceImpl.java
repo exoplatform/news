@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -17,6 +19,7 @@ import javax.jcr.query.QueryManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchContext;
@@ -642,7 +645,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public void deleteNews(String newsId) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
 
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
@@ -652,6 +655,13 @@ public class NewsServiceImpl implements NewsService {
 
     try {
       Node node = session.getNodeByUUID(newsId);
+      if (node.hasProperty("exo:activities")) {
+        String newActivities = node.getProperty("exo:activities").getString();
+        List<String> newsActivitiesIds = Stream.of(newActivities.split(";")).map(activity -> activity.split(":")[1]).collect(Collectors.toList());
+        for (String newsActivityId : newsActivitiesIds) {
+          activityManager.deleteActivity(newsActivityId);
+        }
+      }
       node.remove();
       session.save();
     } finally {
@@ -700,11 +710,15 @@ public class NewsServiceImpl implements NewsService {
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
     }
-    news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
+    if (originalNode.hasProperty("exo:pinned")) {
+      news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
+    }
     if (originalNode.hasProperty("exo:archived")) {
       news.setArchived(originalNode.getProperty("exo:archived").getBoolean());
     }
-    news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    if (originalNode.hasProperty("exo:spaceId")) {
+      news.setSpaceId(node.getProperty("exo:spaceId").getString());
+    }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();

@@ -242,4 +242,4 @@ def streamOwner = activity.getStreamOwner();
     </div> <!-- #boxContainer-->
     <% uiform.end() %>
 </div><!--activityStream-->
-<% }
+<% } %>

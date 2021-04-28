@@ -145,6 +145,7 @@
       newsId: '${news.id}',
       archived: ${news.archived},
       canArchive: ${news.canArchive},
+      canDelete: ${news.canDelete},
       profileAvatarURL: '${ownerAvatar}',
       spaceDisplayName: "${news.spaceDisplayName}",
       spaceUrl:'${news.spaceUrl}',
@@ -191,4 +192,4 @@
   </div>
   </div><!--activityStream-->
   <% } // News archived %>
-  <% }
+  <% } %>

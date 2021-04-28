@@ -271,7 +271,7 @@ export function deleteNews(newsId, delay) {
     if (resp && resp.ok) {
       resp.json();
     } else {
-      throw new Error('Error deleting news');
+      throw new Error('Error when deleting news');
     }
   });
 }
@@ -284,7 +284,7 @@ export function undoDeleteNews(newsId) {
     if (resp && resp.ok) {
       localStorage.removeItem('deletedNews');
     } else {
-      throw new Error('Error undoing deleting news');
+      throw new Error('Error when undoing deleting news');
     }
   });
 }

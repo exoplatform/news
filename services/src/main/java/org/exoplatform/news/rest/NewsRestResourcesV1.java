@@ -745,8 +745,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(news.getAuthor()) || !authenticatedUser.equals(news.getAuthor())) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
+      boolean isDeletedNews = false;
       if (delay > 0) {
         newsToDeleteQueue.put(id, authenticatedUser);
+        isDeletedNews = newsToDeleteQueue.containsKey(id);
         scheduledExecutor.schedule(() -> {
           if (newsToDeleteQueue.containsKey(id)) {
             ExoContainerContext.setCurrentContainer(container);
@@ -757,7 +759,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", authenticatedUser, e);
             } catch (Exception e) {
-              LOG.warn("Error deleting an news", e);
+              LOG.warn("Error when deleting a news", e);
             } finally {
               RequestLifeCycle.end();
             }
@@ -767,14 +769,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         newsToDeleteQueue.remove(id);
         newsService.deleteNews(id);
       }
-      return Response.ok().build();
+      return Response.ok(String.valueOf(isDeletedNews)).build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news with id " + id, e);
       return Response.serverError().build();
     }
   }
 
-  @Path("{newsId}/undoDelete")
+  @Path("{id}/undoDelete")
   @POST
   @RolesAllowed("users")
   @ApiOperation(
@@ -792,21 +794,21 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   )
   public Response undoDeleteNews(
                                   @Context HttpServletRequest request,
-                                  @ApiParam(value = "News technical identifier", required = true)
+                                  @ApiParam(value = "News node identifier", required = true)
                                   @PathParam(
-                                    "newsId"
-                                  ) String newsId) {
-    if (StringUtils.isBlank(newsId)) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("News identifier must be a positive integer").build();
+                                    "id"
+                                  ) String id) {
+    if (StringUtils.isBlank(id)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("News identifier must not be null or empty").build();
     }
-    if (newsToDeleteQueue.containsKey(newsId)) {
+    if (newsToDeleteQueue.containsKey(id)) {
       String authenticatedUser = request.getRemoteUser();
-      String originalModifierUser = newsToDeleteQueue.get(newsId);
+      String originalModifierUser = newsToDeleteQueue.get(id);
       if (!originalModifierUser.equals(authenticatedUser)) {
         LOG.warn("User {} attempts to cancel deletion of a news deleted by user {}", authenticatedUser, originalModifierUser);
         return Response.status(Response.Status.FORBIDDEN).build();
       }
-      newsToDeleteQueue.remove(newsId);
+      newsToDeleteQueue.remove(id);
       return Response.noContent().build();
     } else {
       return Response.status(Response.Status.BAD_REQUEST)

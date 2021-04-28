@@ -55,7 +55,10 @@ export default {
     },
     undoDeleteNews(newsId) {
       return newsServices.undoDeleteNews(newsId)
-        .then(() => this.$forceUpdate());
+        .then(() => {
+          this.$root.$emit('undoDelete');
+          this.$forceUpdate();
+        });
     }
   },
 };

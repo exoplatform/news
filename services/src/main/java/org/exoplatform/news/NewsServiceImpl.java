@@ -42,6 +42,7 @@ import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -132,6 +133,8 @@ public class NewsServiceImpl implements NewsService {
 
   private NewsAttachmentsService   newsAttachmentsService;
 
+  private UserACL                  userACL;
+
   private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(RepositoryService repositoryService,
@@ -148,7 +151,8 @@ public class NewsServiceImpl implements NewsService {
                          PublicationManager publicationManager,
                          WCMPublicationService wCMPublicationService,
                          NewsSearchConnector newsSearchConnector,
-                         NewsAttachmentsService newsAttachmentsService) {
+                         NewsAttachmentsService newsAttachmentsService,
+                         UserACL userACL) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -164,6 +168,7 @@ public class NewsServiceImpl implements NewsService {
     this.wCMPublicationService = wCMPublicationService;
     this.newsSearchConnector = newsSearchConnector;
     this.newsAttachmentsService = newsAttachmentsService;
+    this.userACL = userACL;
   }
 
   /**
@@ -720,6 +725,7 @@ public class NewsServiceImpl implements NewsService {
       news.setSpaceId(node.getProperty("exo:spaceId").getString());
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
+    news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();
       if(StringUtils.isNotEmpty(strActivities)) {
@@ -1242,6 +1248,17 @@ public class NewsServiceImpl implements NewsService {
     }
     newsNode.setProperty("exo:archived", false);
     newsNode.save();
+  }
+
+  @Override
+  public boolean canDeleteNews(String posterId, String spaceId) {
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    if (currentIdentity == null) {
+      return false;
+    }
+    String authenticatedUser = currentIdentity.getUserId();
+    Space currentSpace = spaceService.getSpaceById(spaceId);
+    return userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser) || spaceService.isManager(currentSpace, authenticatedUser);
   }
 
   protected String substituteUsernames(String portalOwner, String message) {

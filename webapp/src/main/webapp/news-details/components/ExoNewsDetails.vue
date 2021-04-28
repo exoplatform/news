@@ -235,19 +235,32 @@ export default {
         window.open('/', '_self');
       }
     },
-    reloadNews(newsId) {
-      newsServices.getNewsById(newsId).then(newsUpdated => {
-        this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
-      });
-    },
     editLink() {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
     deleteNews() {
-      const deleteDelay = 10;
+      const deleteDelay = 6;
+      const redirectionTime = 1000;
       newsServices.deleteNews(this.newsId, deleteDelay)
-        .then(() => this.$root.$emit('news-deleted', this.news));
+        .then(() => {
+          this.$root.$emit('news-deleted', this.news);
+          this.$root.$on('undoDelete', () => {
+            localStorage.removeItem('deletedNews');
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              window.location.href = this.news.spaceUrl;
+            }
+          });
+          this.$root.$on('undo-delete-redirection', () => {
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              setTimeout(() => {
+                window.location.href = this.news.spaceUrl;
+              }, redirectionTime);
+            }
+          });
+        });
     }
   }
 };

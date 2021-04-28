@@ -43,6 +43,7 @@ export function init(params) {
           showEditButton: params.showEditButton,
           showPinButton: params.showPinInput,
           showShareButton : params.showShareButton,
+          showDeleteButton : params.news.canDelete,
         };
       },
       template: `<exo-news-details

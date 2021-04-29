@@ -745,10 +745,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (!news.isCanDelete()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      boolean isDeletedNews = false;
       if (delay > 0) {
         newsToDeleteQueue.put(id, authenticatedUser);
-        isDeletedNews = newsToDeleteQueue.containsKey(id);
         scheduledExecutor.schedule(() -> {
           if (newsToDeleteQueue.containsKey(id)) {
             ExoContainerContext.setCurrentContainer(container);
@@ -769,7 +767,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         newsToDeleteQueue.remove(id);
         newsService.deleteNews(id);
       }
-      return Response.ok(String.valueOf(isDeletedNews)).build();
+      return Response.ok().build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news with id " + id, e);
       return Response.serverError().build();

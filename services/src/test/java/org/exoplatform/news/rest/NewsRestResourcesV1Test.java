@@ -1281,6 +1281,7 @@ public class NewsRestResourcesV1Test {
     news.setId("1");
     news.setAuthor("john");
     news.setSpaceId("1");
+    news.setCanDelete(true);
     when(newsService.getNewsById(anyString())).thenReturn(news);
     Space space1 = new Space();
     space1.setId("1");
@@ -1311,6 +1312,7 @@ public class NewsRestResourcesV1Test {
     news.setId("1");
     news.setAuthor("mary");
     news.setSpaceId("1");
+    news.setCanDelete(true);
     when(newsService.getNewsById(anyString())).thenReturn(news);
     Space space1 = new Space();
     space1.setId("1");
@@ -1323,8 +1325,8 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.deleteNews(request, "1", 0L);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1");
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    verify(newsService).deleteNews("1");
   }
 
   @Test
@@ -1339,6 +1341,7 @@ public class NewsRestResourcesV1Test {
     when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
     news.setId("1");
+    news.setCanDelete(false);
     news.setSpaceId("1");
     when(newsService.getNewsById(anyString())).thenReturn(news);
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());

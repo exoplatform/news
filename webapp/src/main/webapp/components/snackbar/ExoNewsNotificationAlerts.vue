@@ -7,10 +7,10 @@
       app
       left>
       <exo-news-notification-alert
-        v-for="(alert, index) in alerts"
-        :key="index"
+        v-for="alert in alerts"
+        :key="alert.message"
         :alert="alert"
-        @dismissed="deleteAlert(index)" />
+        @dismissed="deleteAlert(alert)" />
     </v-snackbar>
   </v-app>
 </template>
@@ -49,15 +49,27 @@ export default {
     });
   },
   methods: {
-    deleteAlert(index) {
+    addAlert(alert) {
+      const time = 5000;
+      if (alert) {
+        this.alerts.push(alert);
+        window.setTimeout(() => this.deleteAlert(alert), time);
+      }
+    },
+    deleteAlert(alert) {
+      const index = this.alerts.indexOf(alert);
       this.alerts.splice(index, 1);
       this.$forceUpdate();
     },
-    undoDeleteNews(newsId) {
+    undoDeleteNews(newsId, alert) {
       return newsServices.undoDeleteNews(newsId)
         .then(() => {
           this.$root.$emit('undoDelete');
-          this.$forceUpdate();
+          this.deleteAlert(alert);
+          this.addAlert({
+            message: this.$t('news.details.deleteCanceled'),
+            type: 'success',
+          });
         });
     }
   },

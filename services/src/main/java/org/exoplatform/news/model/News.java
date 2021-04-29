@@ -319,7 +319,7 @@ public class News {
     this.authorAvatarUrl = authorAvatarUrl;
   }
 
-  public Boolean getCanDelete() {
+  public Boolean isCanDelete() {
     return canDelete;
   }
 

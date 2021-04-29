@@ -1258,7 +1258,8 @@ public class NewsServiceImpl implements NewsService {
     }
     String authenticatedUser = currentIdentity.getUserId();
     Space currentSpace = spaceService.getSpaceById(spaceId);
-    return userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser) || spaceService.isManager(currentSpace, authenticatedUser);
+    return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
+        || spaceService.isManager(currentSpace, authenticatedUser);
   }
 
   protected String substituteUsernames(String portalOwner, String message) {

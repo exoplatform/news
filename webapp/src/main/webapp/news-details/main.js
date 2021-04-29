@@ -55,7 +55,7 @@ export function init(params) {
                   :show-edit-button="showEditButton"
                   :show-pin-button="showPinButton"
                   :show-share-button="showShareButton" 
-                  :show-delete-button="showEditButton"/>`,
+                  :show-delete-button="showDeleteButton"/>`,
       i18n,
       vuetify
     }).$mount(appElement);

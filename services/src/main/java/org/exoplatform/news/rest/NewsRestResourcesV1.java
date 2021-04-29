@@ -812,7 +812,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.noContent().build();
     } else {
       return Response.status(Response.Status.BAD_REQUEST)
-                     .entity("News id was already deleted or isn't planned to be deleted")
+                     .entity("News with id {} was already deleted or isn't planned to be deleted" + id)
                      .build();
     }
   }

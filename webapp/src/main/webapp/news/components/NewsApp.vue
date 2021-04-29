@@ -66,6 +66,8 @@
               v-if="news.canEdit "
               :news="news"
               :show-edit-button="news.canEdit"
+              :show-delete-button="news.canDelete"
+              @delete="deleteNews(news)"
               @edit="editLink(news)"/>
           </div>
           <div class="newsInfo">
@@ -130,6 +132,7 @@
     </div>
     <exo-news-share-activity-drawer />
     <news-activity-sharing-spaces-drawer />
+    <exo-news-notification-alerts />
   </div>
 </template>
 
@@ -261,6 +264,7 @@ export default {
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,
+          canDelete: item.canDelete,
           archived: item.archived,
           canArchive: item.canArchive,
           pinned: item.pinned,
@@ -335,11 +339,6 @@ export default {
       url.searchParams.set(paramName, paramValue);
       return url.href;
     },
-    reloadNews(newsId) {
-      newsServices.getNewsById(newsId).then(newsUpdated => {
-        this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
-      });
-    },
     removeQueryParam(paramName) {
       const url = new URL(window.location);
       url.searchParams.delete(paramName);
@@ -349,6 +348,29 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
       window.open(editUrl, '_blank');
     },
+    deleteNews(news) {
+      const deleteDelay = 6;
+      const redirectionTime = 1000;
+      newsServices.deleteNews(news.newsId, deleteDelay)
+        .then(() => {
+          this.$root.$emit('news-deleted', news);
+          this.$root.$on('undoDelete', () => {
+            localStorage.removeItem('deletedNews');
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news`;
+            }
+          });
+          this.$root.$on('undo-delete-redirection', () => {
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              setTimeout(() => {
+                window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news`;
+              }, redirectionTime);
+            }
+          });
+        });
+    }
   }
 };
 </script>

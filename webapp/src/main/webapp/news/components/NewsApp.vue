@@ -1,5 +1,5 @@
 <template>
-  <div class="newsApp VuetifyApp">
+  <div class="newsApp">
     <div class="newsAppToolBar">
       <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'" class="newsAppToolbarLeft">
         <h3 class="newsAppToolBarTitle">
@@ -54,7 +54,7 @@
         color="#578dc9" />
     </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
-      <div v-for="news in newsList" :key="news.newsId" class="newsItem">
+      <div v-for="(news,index) in newsList" :key="news.newsId" class="newsItem">
         <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
@@ -67,8 +67,15 @@
               :news="news"
               :show-edit-button="news.canEdit"
               :show-delete-button="news.canDelete"
-              @delete="deleteNews(news)"
+              @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)"/>
+            <exo-confirm-dialog
+              ref="deleteConfirmDialog"
+              :message="$t('news.message.confirmDeleteNews')"
+              :title="$t('news.title.confirmDeleteNews')"
+              :ok-label="$t('news.button.ok')"
+              :cancel-label="$t('news.button.cancel')"
+              @ok="deleteNews(news)" />
           </div>
           <div class="newsInfo">
             <div class="newsOwner">
@@ -347,6 +354,9 @@ export default {
     editLink(news) {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
       window.open(editUrl, '_blank');
+    },
+    deleteConfirmDialog(index) {
+      this.$refs.deleteConfirmDialog[index].open();
     },
     deleteNews(news) {
       const deleteDelay = 6;

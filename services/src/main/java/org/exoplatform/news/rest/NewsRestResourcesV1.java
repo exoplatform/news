@@ -742,7 +742,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
       String authenticatedUser = request.getRemoteUser();
 
-      if (StringUtils.isBlank(news.getAuthor()) || !authenticatedUser.equals(news.getAuthor())) {
+      if (!news.isCanDelete()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       boolean isDeletedNews = false;

@@ -35,7 +35,7 @@ export default {
   },
   created() {
     this.$root.$on('news-notification-alert', alert => this.alerts.push(alert));
-    this.$root.$on('news-deleted', news => {
+    this.$root.$on('confirm-news-deletion', news => {
       if (news && news.newsId) {
         const clickMessage = this.$t('news.details.undoDelete');
         const message = this.$t('news.details.deleteSuccess');

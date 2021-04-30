@@ -53,7 +53,7 @@ export default {
     displayAlert() {
       if (!this.displayAlert) {
         this.$emit('dismissed');
-        this.$root.$emit('undo-delete-redirection');
+        this.$root.$emit('news-deleted');
       }
     },
   },

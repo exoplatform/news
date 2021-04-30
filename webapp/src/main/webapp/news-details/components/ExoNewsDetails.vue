@@ -244,7 +244,7 @@ export default {
       const redirectionTime = 1000;
       newsServices.deleteNews(this.newsId, deleteDelay)
         .then(() => {
-          this.$root.$emit('news-deleted', this.news);
+          this.$root.$emit('confirm-news-deletion', this.news);
           this.$root.$on('undoDelete', () => {
             localStorage.removeItem('deletedNews');
             const deletedNews = localStorage.getItem('deletedNews');
@@ -252,7 +252,7 @@ export default {
               window.location.href = this.news.spaceUrl;
             }
           });
-          this.$root.$on('undo-delete-redirection', () => {
+          this.$root.$on('news-deleted', () => {
             const deletedNews = localStorage.getItem('deletedNews');
             if (deletedNews != null) {
               setTimeout(() => {

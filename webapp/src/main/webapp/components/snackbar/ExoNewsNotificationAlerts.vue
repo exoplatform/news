@@ -64,7 +64,6 @@ export default {
     undoDeleteNews(newsId, alert) {
       return newsServices.undoDeleteNews(newsId)
         .then(() => {
-          this.$root.$emit('undoDelete');
           this.deleteAlert(alert);
           this.addAlert({
             message: this.$t('news.details.deleteCanceled'),

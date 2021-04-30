@@ -1,5 +1,5 @@
 <template>
-  <div class="newsApp VuetifyApp">
+  <div class="newsApp">
     <div class="newsAppToolBar">
       <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'" class="newsAppToolbarLeft">
         <h3 class="newsAppToolBarTitle">
@@ -54,7 +54,7 @@
         color="#578dc9" />
     </v-app>
     <div v-if="newsList.length" id="newsListItems" class="newsListItems">
-      <div v-for="news in newsList" :key="news.newsId" class="newsItem">
+      <div v-for="(news,index) in newsList" :key="news.newsId" class="newsItem">
         <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
@@ -66,7 +66,16 @@
               v-if="news.canEdit "
               :news="news"
               :show-edit-button="news.canEdit"
+              :show-delete-button="news.canDelete"
+              @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)"/>
+            <exo-confirm-dialog
+              ref="deleteConfirmDialog"
+              :message="$t('news.message.confirmDeleteNews')"
+              :title="$t('news.title.confirmDeleteNews')"
+              :ok-label="$t('news.button.ok')"
+              :cancel-label="$t('news.button.cancel')"
+              @ok="deleteNews(news)" />
           </div>
           <div class="newsInfo">
             <div class="newsOwner">
@@ -130,6 +139,7 @@
     </div>
     <exo-news-share-activity-drawer />
     <news-activity-sharing-spaces-drawer />
+    <exo-news-notification-alerts />
   </div>
 </template>
 
@@ -198,6 +208,7 @@ export default {
     }
   },
   created() {
+    const redirectionTime = 1000;
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
     const spacesQueryParam = this.getQueryParam('spaces');
@@ -220,6 +231,14 @@ export default {
     } else {
       this.fetchNews();
     }
+    this.$root.$on('news-deleted', () => {
+      const deletedNews = localStorage.getItem('deletedNews');
+      if (deletedNews != null) {
+        setTimeout(() => {
+          this.fetchNews(false);
+        }, redirectionTime);
+      }
+    });
   },
   methods: {
     getNewsText(newsSummary, newsBody) {
@@ -261,6 +280,7 @@ export default {
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,
+          canDelete: item.canDelete,
           archived: item.archived,
           canArchive: item.canArchive,
           pinned: item.pinned,
@@ -335,11 +355,6 @@ export default {
       url.searchParams.set(paramName, paramValue);
       return url.href;
     },
-    reloadNews(newsId) {
-      newsServices.getNewsById(newsId).then(newsUpdated => {
-        this.newsList.find(news => news.newsId === newsId).activities = newsUpdated.activities;
-      });
-    },
     removeQueryParam(paramName) {
       const url = new URL(window.location);
       url.searchParams.delete(paramName);
@@ -349,6 +364,16 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
       window.open(editUrl, '_blank');
     },
+    deleteConfirmDialog(index) {
+      this.$refs.deleteConfirmDialog[index].open();
+    },
+    deleteNews(news) {
+      const deleteDelay = 6;
+      newsServices.deleteNews(news.newsId, deleteDelay)
+        .then(() => {
+          this.$root.$emit('confirm-news-deletion', news);
+        });
+    }
   }
 };
 </script>

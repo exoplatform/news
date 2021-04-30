@@ -62,6 +62,8 @@ public class News {
   private String authorAvatarUrl;
 
   private Boolean canEdit;
+  
+  private Boolean canDelete;
 
   private Set<Space> sharedInSpacesList;
 
@@ -96,7 +98,7 @@ public class News {
   public String getBody() {
     return body;
   }
-
+  
   public void setBody(String body) {
     this.body = body;
   }
@@ -315,5 +317,13 @@ public class News {
 
   public void setAuthorAvatarUrl(String authorAvatarUrl) {
     this.authorAvatarUrl = authorAvatarUrl;
+  }
+
+  public Boolean isCanDelete() {
+    return canDelete;
+  }
+
+  public void setCanDelete(Boolean canDelete) {
+    this.canDelete = canDelete;
   }
 }

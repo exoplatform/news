@@ -195,6 +195,9 @@
       <module>modalComponent</module>
     </depends>
     <depends>
+      <module>snackbarComponent</module>
+    </depends>
+    <depends>
       <module>commons-editor</module>
       <as>editor</as>
     </depends>
@@ -273,6 +276,17 @@
     <script>
       <minify>false</minify>
       <path>/js/modalComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>snackbarComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/snackbarComponent.bundle.js</path>
     </script>
     <depends>
       <module>vue</module>

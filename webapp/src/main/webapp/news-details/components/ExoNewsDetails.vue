@@ -6,6 +6,8 @@
       :news="news"
       :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
+      :show-delete-button="showDeleteButton"
+      @delete="deleteNews"
       @edit="editLink"/>
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
@@ -90,6 +92,7 @@
       </div>
     </div>
     <exo-news-share-activity-drawer />
+    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -126,6 +129,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    showDeleteButton: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
   data() {
@@ -231,6 +239,29 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
+    deleteNews() {
+      const deleteDelay = 6;
+      const redirectionTime = 1000;
+      newsServices.deleteNews(this.newsId, deleteDelay)
+        .then(() => {
+          this.$root.$emit('news-deleted', this.news);
+          this.$root.$on('undoDelete', () => {
+            localStorage.removeItem('deletedNews');
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              window.location.href = this.news.spaceUrl;
+            }
+          });
+          this.$root.$on('undo-delete-redirection', () => {
+            const deletedNews = localStorage.getItem('deletedNews');
+            if (deletedNews != null) {
+              setTimeout(() => {
+                window.location.href = this.news.spaceUrl;
+              }, redirectionTime);
+            }
+          });
+        });
+    }
   }
 };
 </script>

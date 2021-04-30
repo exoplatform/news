@@ -2,10 +2,10 @@ package org.exoplatform.news.rest;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +26,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.common.http.HTTPStatus;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
@@ -49,10 +53,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.jaxrs.PATCH;
+import org.picocontainer.Startable;
 
 @Path("v1/news")
 @Api(tags = "v1/news", value = "v1/news", description = "Managing news")
-public class NewsRestResourcesV1 implements ResourceContainer {
+public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private static final Log       LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
 
@@ -74,6 +79,12 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
   private IdentityManager        identityManager;
 
+  private ScheduledExecutorService scheduledExecutor;
+
+  private PortalContainer        container;
+
+  private Map<String, String>    newsToDeleteQueue = new HashMap<>();
+
   private enum FilterType {
     PINNED, MYPOSTED, ARCHIVED, ALL
   }
@@ -81,13 +92,28 @@ public class NewsRestResourcesV1 implements ResourceContainer {
   public NewsRestResourcesV1(NewsService newsService,
                              NewsAttachmentsService newsAttachmentsService,
                              SpaceService spaceService,
-                             IdentityManager identityManager) {
+                             IdentityManager identityManager,
+                             PortalContainer container) {
 
     this.newsService = newsService;
     this.newsAttachmentsService = newsAttachmentsService;
     this.spaceService = spaceService;
     this.identityManager = identityManager;
+    this.container = container;
   }
+
+  @Override
+  public void start() {
+    scheduledExecutor = Executors.newScheduledThreadPool(1);
+  }
+
+  @Override
+  public void stop() {
+    if (scheduledExecutor != null) {
+      scheduledExecutor.shutdown();
+    }
+  }
+
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -690,7 +716,7 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
   @DELETE
   @Path("{id}")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Delete news", httpMethod = "DELETE", response = Response.class, notes = "This deletes the news", consumes = "application/json")
   @ApiResponses(value = { @ApiResponse(code = 200, message = "News deleted"),
@@ -698,7 +724,12 @@ public class NewsRestResourcesV1 implements ResourceContainer {
       @ApiResponse(code = 401, message = "User not authorized to delete the news"),
       @ApiResponse(code = 500, message = "Internal server error") })
   public Response deleteNews(@Context HttpServletRequest request,
-                             @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+                             @ApiParam(value = "News id", required = true)
+                             @PathParam("id") String id,
+                             @ApiParam(value = "Time to effectively delete news", required = false)
+                             @QueryParam(
+                               "delay"
+                             ) long delay) {
     try {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
@@ -711,16 +742,76 @@ public class NewsRestResourcesV1 implements ResourceContainer {
 
       String authenticatedUser = request.getRemoteUser();
 
-      if (StringUtils.isBlank(news.getAuthor()) || !authenticatedUser.equals(news.getAuthor())) {
+      if (!news.isCanDelete()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-
-      newsService.deleteNews(id);
-
+      if (delay > 0) {
+        newsToDeleteQueue.put(id, authenticatedUser);
+        scheduledExecutor.schedule(() -> {
+          if (newsToDeleteQueue.containsKey(id)) {
+            ExoContainerContext.setCurrentContainer(container);
+            RequestLifeCycle.begin(container);
+            try {
+              newsToDeleteQueue.remove(id);
+              newsService.deleteNews(id);
+            } catch (IllegalAccessException e) {
+              LOG.error("User '{}' attempts to delete a non authorized news", authenticatedUser, e);
+            } catch (Exception e) {
+              LOG.warn("Error when deleting a news", e);
+            } finally {
+              RequestLifeCycle.end();
+            }
+          }
+        }, delay, TimeUnit.SECONDS);
+      } else {
+        newsToDeleteQueue.remove(id);
+        newsService.deleteNews(id);
+      }
       return Response.ok().build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news with id " + id, e);
       return Response.serverError().build();
+    }
+  }
+
+  @Path("{id}/undoDelete")
+  @POST
+  @RolesAllowed("users")
+  @ApiOperation(
+      value = "Undo deleting news if not yet effectively deleted.",
+      httpMethod = "POST",
+      response = Response.class
+  )
+  @ApiResponses(
+      value = {
+          @ApiResponse(code = HTTPStatus.NO_CONTENT, message = "Request fulfilled"),
+          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+          @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
+          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), }
+  )
+  public Response undoDeleteNews(
+                                  @Context HttpServletRequest request,
+                                  @ApiParam(value = "News node identifier", required = true)
+                                  @PathParam(
+                                    "id"
+                                  ) String id) {
+    if (StringUtils.isBlank(id)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("News identifier must not be null or empty").build();
+    }
+    if (newsToDeleteQueue.containsKey(id)) {
+      String authenticatedUser = request.getRemoteUser();
+      String originalModifierUser = newsToDeleteQueue.get(id);
+      if (!originalModifierUser.equals(authenticatedUser)) {
+        LOG.warn("User {} attempts to cancel deletion of a news deleted by user {}", authenticatedUser, originalModifierUser);
+        return Response.status(Response.Status.FORBIDDEN).build();
+      }
+      newsToDeleteQueue.remove(id);
+      return Response.noContent().build();
+    } else {
+      return Response.status(Response.Status.BAD_REQUEST)
+                     .entity("News with id {} was already deleted or isn't planned to be deleted" + id)
+                     .build();
     }
   }
 

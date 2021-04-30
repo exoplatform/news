@@ -43,6 +43,7 @@ export function init(params) {
           showEditButton: params.showEditButton,
           showPinButton: params.showPinInput,
           showShareButton : params.showShareButton,
+          showDeleteButton : params.news.canDelete,
         };
       },
       template: `<exo-news-details
@@ -53,7 +54,8 @@ export function init(params) {
                   :activity-id="activityId"
                   :show-edit-button="showEditButton"
                   :show-pin-button="showPinButton"
-                  :show-share-button="showShareButton" />`,
+                  :show-share-button="showShareButton" 
+                  :show-delete-button="showDeleteButton"/>`,
       i18n,
       vuetify
     }).$mount(appElement);

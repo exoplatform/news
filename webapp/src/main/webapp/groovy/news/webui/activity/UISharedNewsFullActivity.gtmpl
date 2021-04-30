@@ -160,6 +160,7 @@ if (activity && news) {
        newsId: '${news.id}',
        archived: ${news.archived},
        canArchive: ${news.canArchive},
+       canDelete: ${news.canDelete},
        profileAvatarURL: '${ownerAvatar}',
        spaceDisplayName: "${news.spaceDisplayName}",
        spaceUrl:'${news.spaceUrl}',
@@ -229,8 +230,4 @@ if (activity && news) {
 </div><!--activityStream-->
 </div>
 <% } // News archived %>
-<% } else { // Activity deleted %>
-<% uiform.begin() %>
-<div class="activityStream deleted">$labelActivityHasBeenDeleted</div>
-<% uiform.end() %>
 <% } %>

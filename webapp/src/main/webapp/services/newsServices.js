@@ -269,7 +269,7 @@ export function deleteNews(newsId, delay) {
     method: 'DELETE'
   }).then((resp) => {
     if (resp && resp.ok) {
-      resp.json();
+      resp.text();
     } else {
       throw new Error('Error when deleting news');
     }

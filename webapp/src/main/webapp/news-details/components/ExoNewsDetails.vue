@@ -8,7 +8,7 @@
       :show-share-button="showShareButton"
       :show-delete-button="showDeleteButton"
       @delete="deleteConfirmDialog"
-      @edit="editLink"/>
+      @edit="editLink" />
     <exo-confirm-dialog
       ref="deleteConfirmDialog"
       :message="$t('news.message.confirmDeleteNews')"
@@ -27,18 +27,32 @@
     <div v-else class="newsDetails-description">
       <div :class="[news.illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="news.illustrationURL" class="illustration">
-          <img :src="news.illustrationURL" class="newsDetailsImage illustrationPicture" alt="News"/>
+          <img
+            :src="news.illustrationURL"
+            class="newsDetailsImage illustrationPicture"
+            alt="News">
         </div>
         <div class="newsDetails">
           <div class="newsDetailsIcons">
-            <exo-news-pin v-if="showPinButton" :news-id="newsId" :news-pinned="news.pinned" :news-archived="news.archived" :news-title="news.title"></exo-news-pin>
+            <exo-news-pin
+              v-if="showPinButton"
+              :news-id="newsId"
+              :news-pinned="news.pinned"
+              :news-archived="news.archived"
+              :news-title="news.title" />
           </div>
           <div class="news-top-information">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
             </div>
             <div v-if="news.archived" class="newsArchived">
-              <exo-news-archive v-if="news.archived" :news-id="newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @update-archived-field="updateArchivedField"></exo-news-archive>
+              <exo-news-archive
+                v-if="news.archived"
+                :news-id="newsId"
+                :news-archived="news.archived"
+                :news-title="news.title"
+                :pinned="news.pinned"
+                @update-archived-field="updateArchivedField" />
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
@@ -71,19 +85,24 @@
                       <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
                       <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div v-if="news.summary" id="newsSummary" class="summary">
-            <span v-html="linkifiedSummary"></span>
+          <div
+            v-if="news.summary"
+            id="newsSummary"
+            class="summary">
+            <span v-sanitized-html="news.summary"></span>
           </div>
 
-          <div id="newsBody" :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']" class="fullDetailsBody clearfix">
-            <span v-html="news.body"></span>
+          <div
+            id="newsBody"
+            :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
+            class="fullDetailsBody clearfix">
+            <span v-sanitized-html="news.body"></span>
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
@@ -91,8 +110,12 @@
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachments">
-            <div v-for="attachedFile in news.attachments" :key="attachedFile.id" class="newsAttachment" @click="openPreview(attachedFile)">
-              <exo-attachment-item :file="attachedFile"></exo-attachment-item>
+            <div
+              v-for="attachedFile in news.attachments"
+              :key="attachedFile.id"
+              class="newsAttachment"
+              @click="openPreview(attachedFile)">
+              <exo-attachment-item :file="attachedFile" />
             </div>
           </div>
         </div>
@@ -103,8 +126,6 @@
   </div>
 </template>
 <script>
-import * as  newsServices from '../../services/newsServices';
-
 export default {
   props: {
     news: {
@@ -151,14 +172,9 @@ export default {
       spaceDisplayName: this.news.spaceDisplayName,
     };
   },
-  computed: {
-    linkifiedSummary : function() {
-      return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
-    },
-  },
   created() {
     const redirectionTime = 1000;
-    newsServices.getNewsById(this.newsId)
+    this.$newsServices.getNewsById(this.newsId)
       .then(news => {
         this.spaceId = news.spaceId;
         return this.$nextTick();
@@ -195,7 +211,7 @@ export default {
       }
     });
     
-    if(this.showPinInput) {
+    if (this.showPinInput) {
       const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
       if (pinButton) {
         pinButton.style.display = '';
@@ -204,10 +220,11 @@ export default {
   },
   methods: {
     updateArchivedField() {
+      // eslint-disable-next-line vue/no-mutating-props
       this.news.archived = false;
     },
     updateViewsCount: function () {
-      newsServices.incrementViewsNumberOfNews(this.newsId);
+      this.$newsServices.incrementViewsNumberOfNews(this.newsId);
     },
     openPreview(attachedFile) {
       const self = this;
@@ -236,7 +253,7 @@ export default {
 
       const commentsPanel = document.querySelector('.uiDocumentPreview .commentArea');
       const collapsedCommentsButton = document.querySelector('.uiDocumentPreview .resizeButton');
-      if(commentsPanel != null && collapsedCommentsButton != null) {
+      if (commentsPanel != null && collapsedCommentsButton != null) {
         commentsPanel.style.display = 'none';
         collapsedCommentsButton.style.display = 'none';
         document.querySelector('.uiDocumentPreview').classList += ' collapsed';
@@ -245,7 +262,7 @@ export default {
       }
     },
     goBack() {
-      if( history.length > 1) {
+      if ( history.length > 1) {
         history.back();
       } else {
         window.open('/', '_self');
@@ -260,7 +277,7 @@ export default {
     },
     deleteNews() {
       const deleteDelay = 6;
-      newsServices.deleteNews(this.newsId, deleteDelay)
+      this.$newsServices.deleteNews(this.newsId, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
         });

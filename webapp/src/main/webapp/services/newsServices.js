@@ -1,5 +1,4 @@
 import {newsConstants} from '../js/newsConstants.js';
-import anchorme from 'anchorme';
 
 export function getNewsById(id) {
   return fetch(`${newsConstants.NEWS_API}/${id}`, {
@@ -37,19 +36,19 @@ export function getNewsDrafts(spaceId) {
 
 export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
   let url = `${newsConstants.NEWS_API}?author=${newsConstants.userName}&publicationState=published&filter=${filter}`;
-  if(searchText) {
+  if (searchText) {
     url += `&text=${searchText}`;
   }
-  if(spaces) {
+  if (spaces) {
     url += `&spaces=${spaces}`;
   }
-  if(!isNaN(offset)) {
+  if (!isNaN(offset)) {
     url += `&offset=${offset}`;
   }
-  if(!isNaN(limit)) {
+  if (!isNaN(limit)) {
     url += `&limit=${limit}`;
   }
-  if(returnSize) {
+  if (returnSize) {
     url += `&returnSize=${returnSize}`;
   }
   return fetch(url, {
@@ -154,41 +153,6 @@ export function incrementViewsNumberOfNews(newsId) {
   return fetch(`${newsConstants.NEWS_API}/${newsId}/view`, {
     credentials: 'include',
     method: 'POST',
-  });
-}
-
-export function linkifyText(text) {
-  return anchorme(text, {
-    attributes: [
-      {
-        name: 'target',
-        value: '_blank'
-      },
-    ]
-  });
-}
-
-export function linkifyHTML(html, ckeditorInstanceName) {
-  return anchorme(html, {
-    attributes: [
-      {
-        name: 'target',
-        value: '_blank'
-      },
-    ],
-    exclude: function (UrlObj) {
-      const newsBodyElem = CKEDITOR.instances[ckeditorInstanceName].document.$.body;
-      const newsBodyP = newsBodyElem.querySelectorAll('p');
-      for (let indexp = 0; indexp < newsBodyP.length; indexp++) {
-        const links = newsBodyP[indexp].getElementsByTagName('a');
-        for (let index = 0; index < links.length; index++) {
-          if (links [index].innerText === UrlObj.raw) {
-            return true;
-          }
-        }
-      }
-
-    }
   });
 }
 

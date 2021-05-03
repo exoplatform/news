@@ -1,6 +1,6 @@
-import '../css/news.less';
-import './components/initComponents.js';
+import './initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
+
 // get overridden components if exists
 if (extensionRegistry) {
   const components = extensionRegistry.loadComponents('latestNews');
@@ -46,7 +46,7 @@ export function initLatestNews(params) {
 }
 
 export function destroy() {
-  if(latestNewsDetails) {
+  if (latestNewsDetails) {
     latestNewsDetails.$destroy();
   }
 }

@@ -1,17 +1,22 @@
 <template>
   <div id="archiveNews">
-    <div v-if="showArchiveMessage" id="messageArchive" class="confirmPinMessage">
+    <div
+      v-if="showArchiveMessage"
+      id="messageArchive"
+      class="confirmPinMessage">
       <transition name="fade">
         <div :class="[successArchive ? 'alert-success' : 'alert-error']" class="alert">
-          <i :class="[successArchive ? 'uiIconSuccess' : 'uiIconError']" ></i>
+          <i :class="[successArchive ? 'uiIconSuccess' : 'uiIconError']"></i>
           <span>{{ messageArchive }}</span>
         </div>
       </transition>
     </div>
-    <a :data-original-title="archiveLabel" class="btn newsArchiveButton"
-       rel="tooltip"
-       data-placement="bottom"
-       @click="confirmAction">
+    <a
+      :data-original-title="archiveLabel"
+      class="btn newsArchiveButton"
+      rel="tooltip"
+      data-placement="bottom"
+      @click="confirmAction">
       <i :class="[newsArchived ? 'uiIconArchived' : 'uiIconUnarchived']"> </i>
     </a>
   </div>
@@ -43,36 +48,36 @@ export default {
   },
   data() {
     return {
-      showArchiveMessage : false,
-      messageArchive : '',
+      showArchiveMessage: false,
+      messageArchive: '',
       successArchive: true,
       archiveLabel: '',
     };
   },
   created() {
-    if(!this.newsArchived) {
+    if (!this.newsArchived) {
       this.archiveLabel = this.$t('news.archive.action');
     } else {
       this.archiveLabel = this.$t('news.unarchive.action');
     }
   },
   methods: {
-    confirmAction : function() {
+    confirmAction: function() {
       let confirmText = this.$t('news.archive.confirm');
       let captionText = this.$t('news.archive.action');
       const confirmButton = this.$t('news.archive.btn.confirm');
       const cancelButton = this.$t('news.archive.btn.cancel');
-      if(this.newsArchived === true) {
+      if (this.newsArchived === true) {
         confirmText = this.$t('news.unarchive.confirm').replace('{0}', this.newsTitle);
         captionText = this.$t('news.unarchive.action');
       }
-      eXo.social.PopupConfirmation.confirm('newsArchiveButton', [{action: this.updateArchivedField, label : confirmButton}], captionText, confirmText, cancelButton);
+      eXo.social.PopupConfirmation.confirm('newsArchiveButton', [{action: this.updateArchivedField, label: confirmButton}], captionText, confirmText, cancelButton);
     },
-    updateArchivedField : function () {
+    updateArchivedField: function () {
       const pinMessageTime = 5000;
       const context = this;
       let updatedNews = null;
-      if(this.newsArchived === false) {
+      if (this.newsArchived === false) {
         updatedNews = {
           archived: true,
           pinned: this.pinned,
@@ -93,17 +98,19 @@ export default {
         body: JSON.stringify(updatedNews)
       }).then (function() {
         context.$emit('refresh-news-list');
-        if(context.newsArchived === true) {
+        if (context.newsArchived === true) {
           context.$emit('update-archived-field');
         }
         context.showArchiveMessage = true;
-        if(context.newsArchived === false) {
+        if (context.newsArchived === false) {
           context.messageArchive = context.$t('news.archive.success');
           context.archiveLabel = context.$t('news.unarchive.action');
+          // eslint-disable-next-line vue/no-mutating-props
           context.newsArchived = true;
         } else {
           context.messageArchive = context.$t('news.unarchive.success');
           context.archiveLabel = context.$t('news.archive.action');
+          // eslint-disable-next-line vue/no-mutating-props
           context.newsArchived = false;
         }
         setTimeout(function () {
@@ -113,7 +120,7 @@ export default {
         .catch (function() {
           context.showArchiveMessage = true;
           context.successArchive = false;
-          if(context.newsArchived === false) {
+          if (context.newsArchived === false) {
             context.messageArchive = context.$t('news.archive.error');
           } else {
             context.messageArchive = context.$t('news.unarchive.error');

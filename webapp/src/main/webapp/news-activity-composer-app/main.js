@@ -1,4 +1,4 @@
-import './components/initComponents.js';
+import './initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
 
 Vue.use(Vuetify);
@@ -49,14 +49,14 @@ export function init(showPin, maxToUpload, maxFileSize) {
 }
 
 export function destroy() {
-  if(newsActivityComposerApp) {
+  if (newsActivityComposerApp) {
     newsActivityComposerApp.$destroy();
   }
 }
 
 function getURLQueryParam(paramName) {
   const urlParams = new URLSearchParams(window.location.search);
-  if(urlParams.has(paramName)) {
+  if (urlParams.has(paramName)) {
     return urlParams.get(paramName);
   }
 }

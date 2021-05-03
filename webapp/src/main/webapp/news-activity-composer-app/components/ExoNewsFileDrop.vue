@@ -1,18 +1,30 @@
 <template>
   <div class="fileDrop">
     <div class="dropZone">
-      <label :class="files.length >0 ? 'imageUploaded' : '' " class="dropMsg" for="uploadedFile">
+      <label
+        :class="files.length >0 ? 'imageUploaded' : '' "
+        class="dropMsg"
+        for="uploadedFile">
         <i class="uiIcon uiIconIllustrationUpload"></i>
         <i class="uiIcon uiIconPlusCircled"></i>
       </label>
-      <input id="uploadedFile" :value="selectedFile" type="file" class="attachFile"/>
+      <input
+        id="uploadedFile"
+        :value="selectedFile"
+        type="file"
+        class="attachFile">
       <div v-show="error" class="uploadError alert alert-error v-content">
         {{ error }}
       </div>
       <div class="uploadedFile">
         <div v-if="files.length > 0" class="abortFile">
-          <div :title="$t('news.composer.btn.remove')" class="removeButton" href="#" rel="tooltip"
-               data-placement="top" @click="abortUpload(files[0].name)">
+          <div
+            :title="$t('news.composer.btn.remove')"
+            class="removeButton"
+            href="#"
+            rel="tooltip"
+            data-placement="top"
+            @click="abortUpload(files[0].name)">
             <i class="uiIconRemove"></i>
           </div>
         </div>
@@ -108,7 +120,7 @@ export default {
           thiss.$forceUpdate();
         };
         reader.readAsDataURL(file);
-        // Add file to list
+        // eslint-disable-next-line vue/no-mutating-props
         thiss.files.push(fileDetails);
       },
       uploadFinished: function () {
@@ -132,6 +144,7 @@ export default {
     deleteFile(name) {
       const idx = this.files.findIndex(f => f.name === name);
       const file = this.files[idx];
+      // eslint-disable-next-line vue/no-mutating-props
       this.files.splice(idx, 1);
       this.$emit('change', this.files);
 

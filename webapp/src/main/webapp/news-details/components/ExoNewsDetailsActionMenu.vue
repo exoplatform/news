@@ -5,8 +5,9 @@
     bottom
     left
     offset-y
-    min-width="108px" class="px-0 text-right mx-2">
-    <template v-slot:activator="{ on, attrs }">
+    min-width="108px"
+    class="px-0 text-right mx-2">
+    <template #activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
         class="newsDetailsActionMenu pull-right"

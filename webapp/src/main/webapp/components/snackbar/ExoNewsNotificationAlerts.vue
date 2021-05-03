@@ -47,6 +47,16 @@ export default {
         });
       }
     });
+    this.$root.$on('news-shared', (news, spaces) => {
+      if (news && news.newsId && spaces && spaces.length > 0) {
+        let message = this.$t('news.share.message');
+        spaces.forEach(space => message += `${space}, `);
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+        });
+      }
+    });
   },
   methods: {
     addAlert(alert) {

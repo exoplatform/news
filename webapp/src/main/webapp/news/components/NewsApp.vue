@@ -208,7 +208,6 @@ export default {
     }
   },
   created() {
-    const redirectionTime = 1000;
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
     const spacesQueryParam = this.getQueryParam('spaces');
@@ -234,9 +233,7 @@ export default {
     this.$root.$on('news-deleted', () => {
       const deletedNews = localStorage.getItem('deletedNews');
       if (deletedNews != null) {
-        setTimeout(() => {
-          this.fetchNews(false);
-        }, redirectionTime);
+        this.fetchNews(false);
       }
     });
   },

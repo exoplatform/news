@@ -48,21 +48,11 @@ import * as newsServices from '../../services/newsServices';
 
 export default {
   data:() => ({
-    showShareNewsDrawer: false,
     news: null,
     spaces: [],
-    spacesItems: [],
     description: '',
-    message: '',
-    showMessage: false,
-    messageType: 'success',
-    messageDisplayTime: 5000,
-    newsIllustrationURL: '',
   }),
   computed:{
-    newsTitleUnescaped: function() {
-      return this.news.title ? this.news.title.replace(/&#39;/g, '\'') : this.news.title;
-    },
     shareDisabled: function() {
       return !this.spaces || this.spaces.filter(part => part !== '').length === 0;
     },
@@ -82,26 +72,8 @@ export default {
     shareNews() {
       newsServices.shareNews(this.news.newsId, this.news.activityId, this.description, this.spaces)
         .then(() => {
-          const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
-          let successMessage = this.$t('news.share.message.success').replace('{0}', `<b>${escapedNewsTitle}</b>`);
-          successMessage += '<ul>';
-          this.spaces.forEach(space => successMessage += `<li>${space}</li>`);
-          successMessage += '</ul>';
-          this.message = successMessage;
-          this.messageType = 'success';
-          this.showMessage = true;
-          this.$root.$emit('display-share-success-alert',this.message,this.messageType,this.showMessage);
-        })
-        .then(() => {
+          this.$root.$emit('news-shared', this.news, this.spaces);
           this.closeShareNewsDrawer();
-          this.$emit('newsShared', this.news.newsId);
-        })
-        .catch(() => {
-          const escapedNewsTitle = this.escapeHTML(this.newsTitleUnescaped);
-          this.message = this.$t('news.share.message.error').replace('{0}', `<b>${escapedNewsTitle}</b>`);
-          this.messageType = 'error';
-          this.showMessage = true;
-          this.$root.$emit('display-share-success-alert',this.message,this.messageType,this.showMessage);
         });
     },
     closeShareNewsDrawer() {
@@ -109,9 +81,6 @@ export default {
       this.spaces = [];
       this.description = '';
     },
-    escapeHTML(html) {
-      return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-    }
   }
 };
 </script>

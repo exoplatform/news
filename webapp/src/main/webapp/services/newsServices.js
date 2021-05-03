@@ -268,9 +268,7 @@ export function deleteNews(newsId, delay) {
     credentials: 'include',
     method: 'DELETE'
   }).then((resp) => {
-    if (resp && resp.ok) {
-      resp.json();
-    } else {
+    if (resp && !resp.ok) {
       throw new Error('Error when deleting news');
     }
   });

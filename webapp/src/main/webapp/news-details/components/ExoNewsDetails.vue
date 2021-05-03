@@ -7,8 +7,15 @@
       :show-edit-button="showEditButton"
       :show-share-button="showShareButton"
       :show-delete-button="showDeleteButton"
-      @delete="deleteNews"
+      @delete="deleteConfirmDialog"
       @edit="editLink"/>
+    <exo-confirm-dialog
+      ref="deleteConfirmDialog"
+      :message="$t('news.message.confirmDeleteNews')"
+      :title="$t('news.title.confirmDeleteNews')"
+      :ok-label="$t('news.button.ok')"
+      :cancel-label="$t('news.button.cancel')"
+      @ok="deleteNews" />
     <div v-if="news.archived && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">
@@ -150,6 +157,7 @@ export default {
     },
   },
   created() {
+    const redirectionTime = 1000;
     newsServices.getNewsById(this.newsId)
       .then(news => {
         this.spaceId = news.spaceId;
@@ -158,6 +166,14 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
+    this.$root.$on('news-deleted', () => {
+      const deletedNews = localStorage.getItem('deletedNews');
+      if (deletedNews != null) {
+        setTimeout(() => {
+          window.location.href = this.news.spaceUrl;
+        }, redirectionTime);
+      }
+    });
   },
   mounted() {
     this.updateViewsCount();
@@ -239,20 +255,14 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_self');
     },
+    deleteConfirmDialog() {
+      this.$refs.deleteConfirmDialog.open();
+    },
     deleteNews() {
       const deleteDelay = 6;
-      const redirectionTime = 1000;
       newsServices.deleteNews(this.newsId, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
-          this.$root.$on('news-deleted', () => {
-            const deletedNews = localStorage.getItem('deletedNews');
-            if (deletedNews != null) {
-              setTimeout(() => {
-                window.location.href = this.news.spaceUrl;
-              }, redirectionTime);
-            }
-          });
         });
     }
   }

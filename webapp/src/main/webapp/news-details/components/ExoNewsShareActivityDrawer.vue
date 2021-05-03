@@ -77,6 +77,7 @@ export default {
         });
     },
     closeShareNewsDrawer() {
+      this.$root.$emit('news-share-drawer-closed');
       this.$refs.shareNewsDrawer.close();
       this.spaces = [];
       this.description = '';

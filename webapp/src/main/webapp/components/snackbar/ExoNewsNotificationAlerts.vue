@@ -50,7 +50,7 @@ export default {
     this.$root.$on('news-shared', (news, spaces) => {
       if (news && news.newsId && spaces && spaces.length > 0) {
         let message = this.$t('news.share.message');
-        spaces.forEach(space => message += `${space}, `);
+        spaces.forEach(space => message = `${message } ${space} `);
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'success',

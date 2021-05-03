@@ -51,12 +51,8 @@ export default {
   },
   watch: {
     displayAlert() {
-      const deletedNews = localStorage.getItem('deletedNews');
       if (!this.displayAlert) {
         this.$emit('dismissed');
-        if (deletedNews != null) {
-          this.$root.$emit('news-deleted');
-        }
       }
     },
   },

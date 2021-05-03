@@ -63,14 +63,6 @@ export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
     } else {
       throw new Error('Error getting news list');
     }
-  }).then((data) => {
-    let ListNews = data && data.news || [];
-    const deletedNewsId = localStorage.getItem('deletedNews');
-    if (deletedNewsId) {
-      ListNews = ListNews.filter(news => news.id !== deletedNewsId);
-      data.news = ListNews;
-    }
-    return data;
   });
 }
 

@@ -230,9 +230,8 @@ export default {
     } else {
       this.fetchNews();
     }
-    this.$root.$on('news-deleted', () => {
-      const deletedNews = localStorage.getItem('deletedNews');
-      if (deletedNews != null) {
+    this.$root.$on('news-shared', (news) => {
+      if(news && news.spaceId) {
         this.fetchNews(false);
       }
     });
@@ -366,10 +365,17 @@ export default {
     },
     deleteNews(news) {
       const deleteDelay = 6;
+      const redirectionTime = 6100;
       newsServices.deleteNews(news.newsId, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', news);
         });
+      setTimeout(() => {
+        const deletedNews = localStorage.getItem('deletedNews');
+        if (deletedNews != null) {
+          this.fetchNews(false);
+        }
+      }, redirectionTime);
     }
   }
 };

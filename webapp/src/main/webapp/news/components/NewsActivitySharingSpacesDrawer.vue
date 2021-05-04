@@ -9,7 +9,10 @@
       </template>
       <template slot="content">
         <v-list>
-          <v-list-item v-for="(act) in sharedActivities" :key="act" class="spaceSharedIn">
+          <v-list-item
+            v-for="(act) in sharedActivities"
+            :key="act"
+            class="spaceSharedIn">
             <v-list-item-avatar>
               <v-avatar size="28" class="rounded">
                 <v-img :src="act.spaceAvatar" :alt="act.spaceAvatar" />
@@ -52,7 +55,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-
-</style>

@@ -8,7 +8,10 @@
     <div :class="{open}" class="drawer filterSpacesDrawer">
       <div class="header">
         <span>{{ $t('news.app.filter.bySpaces') }}</span>
-        <a class="closebtn" href="javascript:void(0)" @click="closeFilterNewsDrawer()">×</a>
+        <a
+          class="closebtn"
+          href="javascript:void(0)"
+          @click="closeFilterNewsDrawer()">×</a>
       </div>
       <div class="content">
         <div class="searchSpacesInput ">
@@ -21,9 +24,17 @@
         <div v-if="!noSpacesFound" class="spacesList">
           <div v-for="(space) in userSpaces" :key="space">
             <span :for="space.displayName" class="uiCheckbox">
-              <input v-model="selectedSpaces" :id="space.displayName" :value="space.id" type="checkbox" class="checkbox">
+              <input
+                v-model="selectedSpaces"
+                :id="space.displayName"
+                :value="space.id"
+                type="checkbox"
+                class="checkbox">
               <span class="spaceCheckbox">
-                <img :src="space.avatarUrl" :alt="space.avatarUrl" class="avatarMini">
+                <img
+                  :src="space.avatarUrl"
+                  :alt="space.avatarUrl"
+                  class="avatarMini">
                 {{ space.displayName }}</span>
             </span>
             <br>
@@ -39,17 +50,36 @@
         </div>
       </div>
       <div class="footer">
-        <button :disabled="selectedSpaces.length === 0" type="button" class="btn reset" @click="resetSelectedSpaces()">{{ $t('news.app.filter.drawer.reset') }}</button>
-        <button :disabled="disableApplyButton" type="button" class="btn btn-primary" @click="applySpaceFilter()">{{ $t('news.app.filter.drawer.apply') }}</button>
-        <button type="button" class="btn" @click="closeFilterNewsDrawer()">{{ $t('news.app.filter.drawer.cancel') }}</button>
+        <button
+          :disabled="selectedSpaces.length === 0"
+          type="button"
+          class="btn reset"
+          @click="resetSelectedSpaces()">
+          {{ $t('news.app.filter.drawer.reset') }}
+        </button>
+        <button
+          :disabled="disableApplyButton"
+          type="button"
+          class="btn btn-primary"
+          @click="applySpaceFilter()">
+          {{ $t('news.app.filter.drawer.apply') }}
+        </button>
+        <button
+          type="button"
+          class="btn"
+          @click="closeFilterNewsDrawer()">
+          {{ $t('news.app.filter.drawer.cancel') }}
+        </button>
       </div>
     </div>
-    <div v-show="showFilterNews" class="drawer-backdrop" @click="closeFilterNewsDrawer()"></div>
+    <div
+      v-show="showFilterNews"
+      class="drawer-backdrop"
+      @click="closeFilterNewsDrawer()"></div>
   </div>
 </template>
 
 <script>
-import * as  newsServices from '../../services/newsServices';
 export default {
   props: {
     value: {
@@ -78,12 +108,12 @@ export default {
       return !this.filterApplied && !this.filterChanged || this.filterApplied && !this.filterChanged || !this.filterApplied && this.filterChanged && this.selectedSpaces.length === 0;
     }
   },
-  watch:{
+  watch: {
     searchSpaceText() {
-      if(this.searchSpaceText.trim()) {
+      if (this.searchSpaceText.trim()) {
         clearTimeout(this.searchSpaces);
         this.searchSpaces = setTimeout(() => {
-          newsServices.searchSpaces(this.searchSpaceText).then((spaces) => {
+          this.$newsServices.searchSpaces(this.searchSpaceText).then((spaces) => {
             if (spaces.length) {
               this.noSpacesFound = false;
               spaces.forEach(space => {
@@ -124,7 +154,7 @@ export default {
     }
     this.loadUserSpaces();
   },
-  methods:{
+  methods: {
     openFilterNewsDrawer() {
       this.open = true;
       this.showFilterNews = true;
@@ -143,7 +173,7 @@ export default {
     },
     loadUserSpaces() {
       this.showLoadMore = true;
-      newsServices.getUserSpaces(0, this.limit,'member').then(data => {
+      this.$newsServices.getUserSpaces(0, this.limit,'member').then(data => {
         if (data.size < this.limit) {
           this.showLoadMore = false;
         }
@@ -156,7 +186,7 @@ export default {
       });
     },
     loadMoreSpaces() {
-      newsServices.getUserSpaces(this.limit, 0 ,'member').then((resp) => resp.spaces).then(spaces => {
+      this.$newsServices.getUserSpaces(this.limit, 0 ,'member').then((resp) => resp.spaces).then(spaces => {
         spaces.forEach(space => {
           space.avatarUrl = space.avatarUrl ? space.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
           this.userSpaces.push(space);
@@ -165,6 +195,7 @@ export default {
       this.showLoadMore = false;
     },
     applySpaceFilter() {
+      // eslint-disable-next-line vue/no-mutating-props
       this.value = this.selectedSpaces;
       this.$emit('input', this.value);
 

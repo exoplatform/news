@@ -58,6 +58,7 @@ export default {
         return;
       }
       if (!this.spaces) {
+        // eslint-disable-next-line vue/no-mutating-props
         this.spaces = [];
       }
       const found = false;
@@ -65,6 +66,7 @@ export default {
         this.displayedSpaces.push({
           identity: this.$suggesterService.convertSuggesterItemToIdentity(this.sharingSpaces),
         });
+        // eslint-disable-next-line vue/no-mutating-props
         this.spaces.push(this.sharingSpaces.remoteId);
       }
       this.sharingSpaces = null;

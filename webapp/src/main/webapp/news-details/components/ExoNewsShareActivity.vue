@@ -1,15 +1,22 @@
 <template>
   <div id="newsShareActivity">
     <transition name="fade">
-      <div v-show="showMessage" :class="'alert-' + messageType" class="alert">
-        <i :class="messageIconClass"></i> <span v-html="message"></span>
+      <div
+        v-show="showMessage"
+        :class="'alert-' + messageType"
+        class="alert">
+        <i :class="messageIconClass"></i> <span v-sanitized-html="message"></span>
       </div>
     </transition>
 
-    <a id="newsShareButton" :data-original-title="$t('news.share.share')" :class="[newsArchived ? 'unauthorizedPin' : '']" class="btn"
-       rel="tooltip"
-       data-placement="bottom"
-       @click="$root.$emit('news-share-drawer-open',news)">
+    <a
+      id="newsShareButton"
+      :data-original-title="$t('news.share.share')"
+      :class="[newsArchived ? 'unauthorizedPin' : '']"
+      class="btn"
+      rel="tooltip"
+      data-placement="bottom"
+      @click="$root.$emit('news-share-drawer-open',news)">
       <i :class="[newsArchived ? 'disabledIcon' : '']" class="uiIconShare"></i>
     </a>
   </div>
@@ -33,14 +40,14 @@ export default {
       messageDisplayTime: 5000,
     };
   },
-  computed:{
+  computed: {
     messageIconClass: function() {
       return `uiIcon${this.messageType.charAt(0).toUpperCase()}${this.messageType.slice(1)}`;
     }
   },
   watch: {
     showMessage(newValue) {
-      if(newValue) {
+      if (newValue) {
         setTimeout(() => {this.showMessage = false;}, this.messageDisplayTime);
       }
     }

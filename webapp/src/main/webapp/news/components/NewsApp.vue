@@ -22,12 +22,14 @@
             :width="3"
             indeterminate
             class="loadingRing"
-            color="#578dc9" /> </v-app>
+            color="#578dc9" />
+        </v-app>
       </div>
       <div class="newsAppToolbarRight">
         <div class="newsTypes">
           <div class="btn-group newsTypesSelectBox">
-            <button class="btn dropdown-toggle" data-toggle="dropdown">{{ newsStatusLabel }}
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              {{ newsStatusLabel }}
               <i class="uiIconMiniArrowDown uiIconLightGray"></i>
             </button>
             <ul class="dropdown-menu">
@@ -39,7 +41,7 @@
           </div>
         </div>
         <div class="newsAppFilterOptions">
-          <news-spaces-selector v-model="spacesFilter"></news-spaces-selector>
+          <news-spaces-selector v-model="spacesFilter" />
         </div>
       </div>
     </div>
@@ -53,22 +55,34 @@
         class="loadingRing"
         color="#578dc9" />
     </v-app>
-    <div v-if="newsList.length" id="newsListItems" class="newsListItems">
-      <div v-for="(news,index) in newsList" :key="news.newsId" class="newsItem">
-        <a :href="news.url" :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }" class="newsSmallIllustration"></a>
+    <div
+      v-if="newsList.length"
+      id="newsListItems"
+      class="newsListItems">
+      <div
+        v-for="(news,index) in newsList"
+        :key="news.newsId"
+        class="newsItem">
+        <a
+          :href="news.url"
+          :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
+          class="newsSmallIllustration"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
               <a :href="news.url">{{ news.title }} </a>
             </h3>
-            <news-spaces-shared-in v-if="news.activities && news.activities.split(';')[1]" :news-id="news.newsId" :activities="news.activities"></news-spaces-shared-in>
+            <news-spaces-shared-in
+              v-if="news.activities && news.activities.split(';')[1]"
+              :news-id="news.newsId"
+              :activities="news.activities" />
             <exo-news-details-action-menu
               v-if="news.canEdit "
               :news="news"
               :show-edit-button="news.canEdit"
               :show-delete-button="news.canDelete"
               @delete="deleteConfirmDialog(index)"
-              @edit="editLink(news)"/>
+              @edit="editLink(news)" />
             <exo-confirm-dialog
               ref="deleteConfirmDialog"
               :message="$t('news.message.confirmDeleteNews')"
@@ -102,10 +116,16 @@
           </div>
           <div class="newsItemContentDetails">
             <a :href="news.url">
-              <p class="newsSummary" v-html="news.newsText"></p>
+              <p class="newsSummary" v-sanitized-html="news.newsText"></p>
             </a>
             <div class="newsActions">
-              <exo-news-archive v-if="news.canArchive" :news-id="news.newsId" :news-archived="news.archived" :news-title="news.title" :pinned="news.pinned" @refresh-news-list="fetchNews(false)"></exo-news-archive>
+              <exo-news-archive
+                v-if="news.canArchive"
+                :news-id="news.newsId"
+                :news-archived="news.archived"
+                :news-title="news.title"
+                :pinned="news.pinned"
+                @refresh-news-list="fetchNews(false)" />
             </div>
             <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
             <!--begin -->
@@ -144,7 +164,6 @@
 </template>
 
 <script>
-import * as  newsServices from '../../services/newsServices';
 export default {
   name: 'NewsApp',
   data() {
@@ -199,7 +218,7 @@ export default {
         this.fetchNews(false);
         if (this.spacesFilter.length > 0) {
           window.history.pushState('', 'News', this.setQueryParam('spaces', this.spacesFilter.toString().replace(/,/g, '_')));
-        }else {
+        } else {
           window.history.pushState('', 'News', this.removeQueryParam('spaces'));
         }
 
@@ -212,7 +231,7 @@ export default {
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
     const spacesQueryParam = this.getQueryParam('spaces');
-    if(filterQueryParam || searchQueryParam || spacesQueryParam) {
+    if (filterQueryParam || searchQueryParam || spacesQueryParam) {
       if (filterQueryParam) {
         // set filter value, which will trigger news fetching
         this.newsFilter = filterQueryParam;
@@ -291,7 +310,7 @@ export default {
           spaceId: item.spaceId,
         });
       });
-      if(append) {
+      if (append) {
         this.newsList = this.newsList.concat(result);
       } else {
         this.newsList = result;
@@ -313,9 +332,9 @@ export default {
       const searchTerm = this.searchText.trim().toLowerCase();
       const offset = append ? this.newsList.length : 0;
       this.loadingNews = true;
-      return newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
+      return this.$newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
         if (data.news && data.news.length) {
-          if(data.news.length > this.newsPerPage) {
+          if (data.news.length > this.newsPerPage) {
             this.showLoadMoreButton = true;
             data.news.pop();
             this.updateNewsList(data.news, append);
@@ -323,14 +342,14 @@ export default {
             this.showLoadMoreButton = false;
             this.updateNewsList(data.news, append);
           }
-        } else if(!append) {
+        } else if (!append) {
           this.showLoadMoreButton = false;
           this.newsList = [];
         }
         this.loadingNews = false;
-        if(searchTerm){
+        if (searchTerm){
           window.history.pushState('', 'News', this.setQueryParam('search', this.searchText));
-        }else {
+        } else {
           window.history.pushState('', 'News', this.removeQueryParam('search'));
         }
         return this.$nextTick();
@@ -369,7 +388,7 @@ export default {
     },
     deleteNews(news) {
       const deleteDelay = 6;
-      newsServices.deleteNews(news.newsId, deleteDelay)
+      this.$newsServices.deleteNews(news.newsId, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', news);
         });

@@ -2,11 +2,23 @@
   <div class="sharedIn">
     <span class="newsSpaceLabel">{{ $t('news.app.sharedIn') }}</span>
     <div class="sharedInSpaces">
-      <a v-for="(act,index) in sharedActivities.slice(0, 2)" :key="index" class="space" target="_blank"
-         @click="openSharedInSpacesDrawer()">
-        <img :src="act.spaceAvatar" :title="act.spaceDisplayName" rel="tooltip" data-placement="top">
+      <a
+        v-for="(act,index) in sharedActivities.slice(0, 2)"
+        :key="index"
+        class="space"
+        target="_blank"
+        @click="openSharedInSpacesDrawer()">
+        <img
+          :src="act.spaceAvatar"
+          :title="act.spaceDisplayName"
+          rel="tooltip"
+          data-placement="top">
       </a>
-      <a v-if="activitiesList.length > 2" class="plusSpaces" target="_blank" @click="openSharedInSpacesDrawer()">
+      <a
+        v-if="activitiesList.length > 2"
+        class="plusSpaces"
+        target="_blank"
+        @click="openSharedInSpacesDrawer()">
         +{{ activitiesList.length - 2 }}
       </a>
     </div>
@@ -14,9 +26,8 @@
 </template>
 
 <script>
-import * as  newsServices from '../../services/newsServices';
 export default {
-  props:{
+  props: {
     newsId: {
       type: String,
       default: ''
@@ -49,7 +60,7 @@ export default {
     activitiesList.forEach(activity => {
       const spaceId = activity.split(':')[0];
       if (spaceId) {
-        newsServices.getSpaceById(spaceId).then(space => {
+        this.$newsServices.getSpaceById(spaceId).then(space => {
           space.avatarUrl = space.avatarUrl ? space.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
           this.sharedActivities.push({
             spaceId: spaceId,
@@ -76,7 +87,7 @@ export default {
     },
     updateSharedInSpaces() {
       this.sharedActivities = [];
-      newsServices.getNewsSpaces(this.newsId).then(news => {
+      this.$newsServices.getNewsSpaces(this.newsId).then(news => {
         this.activitiesList.forEach(activity => {
           const spaceId = activity.split(':')[0];
           if (spaceId) {

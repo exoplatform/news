@@ -4,42 +4,71 @@
       <div class="VuetifyApp loadingComposer">
         <v-progress-circular
           indeterminate
-          color="primary"
-        ></v-progress-circular>
+          color="primary" />
       </div>
     </div>
-    <div v-show="canCreatNews && !loading" id="newsActivityComposer" class="newsComposer">
+    <div
+      v-show="canCreatNews && !loading"
+      id="newsActivityComposer"
+      class="newsComposer">
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
-            <img src="/news/images/newsImageDefault.png" />
+            <img src="/news/images/newsImageDefault.png">
             <span class="newsFormTitle">{{ newsFormTitle }}</span>
           </div>
-          <div v-show="showPinInput" class="pinArticleContent " @click="news.pinned">
-            <a id="newsPinButton" :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')" :class="[news.archived ? 'unauthorizedPin' : '']" class="pinArticle"
-               rel="tooltip"
-               data-placement="bottom"
-               @click="!news.archived ? news.pinned = !news.pinned : null">
-              <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin" > </i>
+          <div
+            v-show="showPinInput"
+            class="pinArticleContent "
+            @click="news.pinned">
+            <a
+              id="newsPinButton"
+              :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')"
+              :class="[news.archived ? 'unauthorizedPin' : '']"
+              class="pinArticle"
+              rel="tooltip"
+              data-placement="bottom"
+              @click="!news.archived ? news.pinned = !news.pinned : null">
+              <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin"> </i>
             </a>
           </div>
           <div v-show="!editMode" class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
             <div class="newsDrafts">
-              <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft"/>
+              <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft" />
             </div>
             <div class="VuetifyApp">
               <v-app>
-                <v-btn id="newsPost" :loading="postingNews" :disabled="postDisabled || postingNews" elevation="0" class="btn btn-primary" @click="postNews">{{ $t("news.composer.post") }}</v-btn>
+                <v-btn
+                  id="newsPost"
+                  :loading="postingNews"
+                  :disabled="postDisabled || postingNews"
+                  elevation="0"
+                  class="btn btn-primary"
+                  @click="postNews">
+                  {{ $t("news.composer.post") }}
+                </v-btn>
               </v-app>
             </div>
           </div>
           <div v-show="editMode" class="newsFormRightActions">
-            <button id="newsEdit" :disabled="updateDisabled" class="btn btn-primary" @click.prevent="updateNews"> {{ $t("news.edit.update") }}
+            <button
+              id="newsEdit"
+              :disabled="updateDisabled"
+              class="btn btn-primary"
+              @click.prevent="updateNews">
+              {{ $t("news.edit.update") }}
             </button>
-            <button id="newsUpdateAndPost" :disabled="news.archived ? true: updateDisabled" :class="[news.archived ? 'unauthorizedPin' : '']" class="btn" @click.prevent="updateAndPostNews"> {{ $t("news.edit.update.post") }}
+            <button
+              id="newsUpdateAndPost"
+              :disabled="news.archived ? true: updateDisabled"
+              :class="[news.archived ? 'unauthorizedPin' : '']"
+              class="btn"
+              @click.prevent="updateAndPostNews">
+              {{ $t("news.edit.update.post") }}
             </button>
-            <button class="btn" @click="goBack"> {{ $t("news.composer.btn.cancel") }}
+            <button class="btn" @click="goBack">
+              {{ $t("news.composer.btn.cancel") }}
             </button>
           </div>
         </div>
@@ -51,27 +80,34 @@
           <div class="newsFormAttachment">
             <div class="control-group attachments">
               <div class="controls">
-                <exo-file-drop v-model="news.illustration" @change="autoSave"/>
+                <exo-news-file-drop v-model="news.illustration" @change="autoSave" />
               </div>
             </div>
           </div>
           <div class="formInputGroup newsTitle">
-            <input id="newsTitle" v-model="news.title" :maxlength="titleMaxLength" :placeholder="newsFormTitlePlaceholder" type="text">
+            <input
+              id="newsTitle"
+              v-model="news.title"
+              :maxlength="titleMaxLength"
+              :placeholder="newsFormTitlePlaceholder"
+              type="text">
           </div>
           <div class="formInputGroup">
-            <textarea id="newsSummary"
-                      v-model="news.summary"
-                      :maxlength="summaryMaxLength"
-                      :placeholder="newsFormSummaryPlaceholder"
-                      class="newsFormInput">
+            <textarea
+              id="newsSummary"
+              v-model="news.summary"
+              :maxlength="summaryMaxLength"
+              :placeholder="newsFormSummaryPlaceholder"
+              class="newsFormInput">
             </textarea>
           </div>
           <div class="formInputGroup">
-            <textarea id="newsContent"
-                      v-model="news.content"
-                      :placeholder="newsFormContentPlaceholder"
-                      class="newsFormInput"
-                      name="newsContent">
+            <textarea
+              id="newsContent"
+              v-model="news.content"
+              :placeholder="newsFormContentPlaceholder"
+              class="newsFormInput"
+              name="newsContent">
             </textarea>
           </div>
         </div>
@@ -86,8 +122,7 @@
             right
             fab
             x-large
-            @click="openApp()"
-          >
+            @click="openApp()">
             <i class="uiIconAttachment"></i>
             <v-progress-circular
               :class="uploading ? 'uploading' : ''"
@@ -97,7 +132,12 @@
           </v-btn>
         </v-app>
       </div>
-      <exo-attachments ref="attachmentsComponent" :space-id="news.spaceId" v-model="news.attachments" @HideAttachmentsDrawer="onHideAttachmentsDrawer" @uploadingCountChanged="setUploadingCount"></exo-attachments>
+      <exo-attachments
+        ref="attachmentsComponent"
+        :space-id="news.spaceId"
+        v-model="news.attachments"
+        @HideAttachmentsDrawer="onHideAttachmentsDrawer"
+        @uploadingCountChanged="setUploadingCount" />
       <!-- The following bloc is needed in order to display the pin confirmation popup -->
       <!--begin -->
       <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
@@ -121,12 +161,12 @@
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
       <div id="form_msg_error" class="alert alert-error">
-        <span data-dismiss="alert" >
+        <span data-dismiss="alert">
           <i class="uiIconColorError pull-left"></i>
         </span>
         <div class="msg_error">
           <div>
-            <span class="msg_permission_denied" >{{ $t("news.permission.denied") }}</span>
+            <span class="msg_permission_denied">{{ $t("news.permission.denied") }}</span>
           </div>
           <div>
             <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
@@ -138,7 +178,6 @@
 </template>
 
 <script>
-import * as newsServices from '../../services/newsServices';
 import autosize from 'autosize';
 export default {
   props: {
@@ -205,7 +244,7 @@ export default {
       showDraftNews: false,
       postingNews: false,
       savingDraft: false,
-      saveDraft : '',
+      saveDraft: '',
       draftSavingStatus: '',
       illustrationChanged: false,
       attachmentsChanged: false,
@@ -226,15 +265,15 @@ export default {
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment
-      if(this.uploading) {
+      if (this.uploading) {
         return true;
       }
       // disable update button if a mandatory field is empty
-      if(!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
+      if (!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
         return true;
       }
       // disable update button nothing has changed
-      if(!this.illustrationChanged && !this.attachmentsChanged
+      if (!this.illustrationChanged && !this.attachmentsChanged
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.news.body === this.originalNews.body
@@ -246,17 +285,17 @@ export default {
     }
   },
   watch: {
-    'news.title': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
-    'news.summary': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
-    'news.body': function(newValue, oldValue) { if(newValue !== oldValue) { this.autoSave(); } },
+    'news.title': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
+    'news.summary': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
+    'news.body': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
     'news.attachments': function() {
-      if(this.initDone) {
+      if (this.initDone) {
         this.attachmentsChanged = true;
       }
       this.autoSave();
     },
     'news.illustration': function() {
-      if(this.initIllustrationDone) {
+      if (this.initIllustrationDone) {
         this.illustrationChanged = true;
         this.autoSave();
       }
@@ -266,21 +305,21 @@ export default {
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
     
-    newsServices.getSpaceById(this.spaceId).then(space => {
+    this.$newsServices.getSpaceById(this.spaceId).then(space => {
       this.currentSpace = space;
       this.spaceURL = this.currentSpace.prettyName;
       this.displayFormTitle();
 
-      newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
+      this.$newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
         this.canCreatNews = canCreateNews;
         this.$nextTick(() => {
           if (this.canCreatNews) {
-            if(this.newsId) {
+            if (this.newsId) {
               this.initNewsComposerData(this.newsId);
             } else {
               this.initCKEditor();
               const message = localStorage.getItem('exo-activity-composer-message');
-              if(message) {
+              if (message) {
                 this.initCKEditorData(message);
                 localStorage.removeItem('exo-activity-composer-message');
               }
@@ -380,7 +419,7 @@ export default {
           .each(function() {
             $(this).replaceWith(function() {
               return $('<span/>', {
-                class:'atwho-inserted',
+                class: 'atwho-inserted',
                 html: `<span class="exo-mention">${$(this).text()}<a data-cke-survive href="#" class="remove"><i data-cke-survive class="uiIconClose uiIconLightGray"></i></a></span>`
               }).attr('data-atwho-at-query',`@${  $(this).attr('href').substring($(this).attr('href').lastIndexOf('/')+1)}`)
                 .attr('data-atwho-at-value',$(this).attr('href').substring($(this).attr('href').lastIndexOf('/')+1))
@@ -392,8 +431,8 @@ export default {
       CKEDITOR.instances['newsContent'].setData(message);
     },
     displayFormTitle: function() {
-      if(!this.editMode) {
-        newsServices.getSpaceById(this.spaceId).then(space => {
+      if (!this.editMode) {
+        this.$newsServices.getSpaceById(this.spaceId).then(space => {
           this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
         });
       } else {
@@ -403,9 +442,9 @@ export default {
 
     initNewsComposerData: function(newsId) {
       const self = this;
-      newsServices.getNewsById(newsId)
+      this.$newsServices.getNewsById(newsId)
         .then(fetchedNode => {
-          if(fetchedNode){
+          if (fetchedNode){
             this.news.id = fetchedNode.id;
             this.news.title = fetchedNode.title;
             this.news.summary = fetchedNode.summary;
@@ -417,7 +456,7 @@ export default {
             this.initCKEditorData(fetchedNode.body);
 
             if (fetchedNode.illustrationURL) {
-              newsServices.importFileFromUrl(fetchedNode.illustrationURL)
+              this.$newsServices.importFileFromUrl(fetchedNode.illustrationURL)
                 .then(resp => resp.blob())
                 .then(fileData => {
                   const illustrationFile = new File([fileData], `illustration${newsId}`);
@@ -452,11 +491,11 @@ export default {
 
     autoSave: function() {
       // No draft saving if init not done or in edit mode for the moment
-      if(!this.initDone || this.editMode) {
+      if (!this.initDone || this.editMode) {
         return;
       }
       // if the News is being posted, no need to autosave anymore
-      if(this.postingNews) {
+      if (this.postingNews) {
         return;
       }
       clearTimeout(this.saveDraft);
@@ -468,12 +507,12 @@ export default {
     },
 
     postNews: function () {
-      if(this.news.pinned === true) {
+      if (this.news.pinned === true) {
         const confirmText = this.$t('news.pin.confirm');
         const captionText = this.$t('news.pin.action');
         const confirmButton = this.$t('news.pin.btn.confirm');
         const cancelButton = this.$t('news.edit.cancel');
-        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label : confirmButton}], captionText, confirmText, cancelButton);
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
         this.doPostNews();
       }
@@ -481,7 +520,7 @@ export default {
     doPostNews: function () {
       this.postingNews = true;
       // if the News draft is being saved, we have to wait until it is done before posting the News
-      if(this.savingDraft) {
+      if (this.savingDraft) {
         this.$on('draftCreated', this.saveNews);
         this.$on('draftUpdated', this.saveNews);
       } else {
@@ -493,7 +532,6 @@ export default {
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
 
-      this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       this.news.body = this.replaceImagesURLs(this.news.body);
       const newsBody = this.replaceImagesURLs(this.getBody());
       const news = {
@@ -508,19 +546,19 @@ export default {
         publicationState: 'published'
       };
 
-      if(this.news.illustration.length > 0) {
+      if (this.news.illustration.length > 0) {
         news.uploadId = this.news.illustration[0].uploadId;
       }
 
-      newsServices.saveNews(news).then((createdNews) => {
+      this.$newsServices.saveNews(news).then((createdNews) => {
         let createdNewsActivity = null;
-        if(createdNews.activities) {
+        if (createdNews.activities) {
           const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
-          if(createdNewsActivities.length > 1) {
+          if (createdNewsActivities.length > 1) {
             createdNewsActivity = createdNewsActivities[1];
           }
         }
-        if(createdNewsActivity) {
+        if (createdNewsActivity) {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
         } else {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
@@ -546,7 +584,7 @@ export default {
 
       const uploadedPercent = 100;
       this.news.attachments.forEach(attachment => {
-        if(attachment.id || attachment.uploadProgress === uploadedPercent) {
+        if (attachment.id || attachment.uploadProgress === uploadedPercent) {
           news.attachments.push({
             id: attachment.id,
             uploadId: attachment.uploadId,
@@ -556,11 +594,11 @@ export default {
       });
 
       if (this.news.id) {
-        if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
+        if (this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
           news.id = this.news.id;
-          newsServices.updateNews(news)
+          this.$newsServices.updateNews(news)
             .then((updatedNews) => {
-              if(this.news.body !== updatedNews.body) {
+              if (this.news.body !== updatedNews.body) {
                 // Images URLs may have been updated in body to transform temporary URLs to permanent URLs.
                 // Updated URLs are extracted here and re-applied on save.
                 // The goal is to avoid modifying the editor data, which can impact the editing experience.
@@ -570,15 +608,15 @@ export default {
             .then(() => this.$emit('draftUpdated'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
         } else {
-          newsServices.deleteDraft(this.news.id)
+          this.$newsServices.deleteDraft(this.news.id)
             .then(() => this.$emit('draftDeleted'))
             .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
           this.news.id = null;
         }
         this.savingDraft = false;
-      } else if(this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
+      } else if (this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
         news.publicationState = 'draft';
-        newsServices.saveNews(news).then((createdNews) => {
+        this.$newsServices.saveNews(news).then((createdNews) => {
           this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
           this.news.id = createdNews.id;
           this.savingDraft = false;
@@ -604,7 +642,7 @@ export default {
       originalImages.each(function(index, element) {
         const originalImageURL = $(element).attr('src');
         const updatedImageURL = $(updatedImages[index]).attr('src');
-        if(updatedImageURL !== originalImageURL) {
+        if (updatedImageURL !== originalImageURL) {
           imagesURLs.set(originalImageURL, updatedImageURL);
         }
       });
@@ -642,7 +680,7 @@ export default {
       if (!this.news.archived) {
         const self = this;
         this.confirmAndUpdateNews().then(() => {
-          if(self.activityId)
+          if (self.activityId)
           {
             const activity = {
               id: self.activityId,
@@ -655,7 +693,7 @@ export default {
               updateDate: new Date().getTime()
             };
 
-            return newsServices.updateAndPostNewsActivity(activity);
+            return this.$newsServices.updateAndPostNewsActivity(activity);
           }
         }).then(() => {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
@@ -665,25 +703,24 @@ export default {
       }
     },
     confirmAndUpdateNews: function() {
-      if(this.news.pinned !== this.originalNews.pinned) {
+      if (this.news.pinned !== this.originalNews.pinned) {
         let confirmText = this.$t('news.pin.confirm');
         let captionText = this.$t('news.pin.action');
         const confirmButton = this.$t('news.pin.btn.confirm');
         const cancelButton = this.$t('news.pin.btn.cancel');
-        if(this.news.pinned === false) {
+        if (this.news.pinned === false) {
           confirmText = this.$t('news.unpin.confirm').replace('{0}', this.news.title);
           captionText = this.$t('news.unpin.action');
         }
         const self = this;
         return new Promise(function(resolve) {
-          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews().then(resolve()); }, label : confirmButton}], captionText, confirmText, cancelButton);
+          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews().then(resolve()); }, label: confirmButton}], captionText, confirmText, cancelButton);
         });
       } else {
         return this.doUpdateNews();
       }
     },
     doUpdateNews: function () {
-      this.news.body = newsServices.linkifyHTML(this.news.body, 'newsContent');
       const newsBody = this.replaceImagesURLs(this.getBody());
       const updatedNews = {
         id: this.news.id,
@@ -694,17 +731,17 @@ export default {
         pinned: this.news.pinned,
         publicationState: 'published'
       };
-      if(this.news.illustration != null && this.news.illustration.length > 0) {
+      if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;
-      } else if(this.originalNews.illustrationURL !== null) {
+      } else if (this.originalNews.illustrationURL !== null) {
         // an empty uploadId means the illustration must be deleted
         updatedNews.uploadId = '';
       }
 
-      return newsServices.updateNews(updatedNews);
+      return this.$newsServices.updateNews(updatedNews);
     },
     goBack() {
-      if( history.length > 1) {
+      if ( history.length > 1) {
         history.back();
       } else {
         window.open('/', '_self');

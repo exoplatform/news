@@ -21,9 +21,10 @@
               <exo-news-space-suggester :spaces="spaces" class="ml-2" />
             </div>
             <div class="d-flex flex-row">
-              <textarea v-model="description"
-                        :placeholder="$t('news.share.sharedActivityPlaceholder')"
-                        class="ml-2 ignore-vuetify-classes newsShareDescription">
+              <textarea
+                v-model="description"
+                :placeholder="$t('news.share.sharedActivityPlaceholder')"
+                class="ml-2 ignore-vuetify-classes newsShareDescription">
               </textarea>
             </div>
           </div>
@@ -47,7 +48,7 @@
 import * as newsServices from '../../services/newsServices';
 
 export default {
-  data:() => ({
+  data: () => ({
     showShareNewsDrawer: false,
     news: null,
     spaces: [],
@@ -59,7 +60,7 @@ export default {
     messageDisplayTime: 5000,
     newsIllustrationURL: '',
   }),
-  computed:{
+  computed: {
     newsTitleUnescaped: function() {
       return this.news.title ? this.news.title.replace(/&#39;/g, '\'') : this.news.title;
     },

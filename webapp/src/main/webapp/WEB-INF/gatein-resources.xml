@@ -59,16 +59,13 @@
         <as>$</as>
       </depends>
       <depends>
-        <module>fileDropComponent</module>
-      </depends>
-      <depends>
-        <module>modalComponent</module>
-      </depends>
-      <depends>
-        <module>suggesterComponent</module>
-      </depends>
-      <depends>
         <module>socialUtil</module>
+      </depends>
+      <depends>
+        <module>suggester</module>
+      </depends>
+      <depends>
+        <module>filedrop</module>
       </depends>
       <depends>
         <module>ExoAttachmentsApp</module>
@@ -130,43 +127,6 @@
   </module>
 
   <module>
-    <name>suggesterComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/suggesterComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-      <as>$</as>
-    </depends>
-    <depends>
-      <module>suggester</module>
-    </depends>
-  </module>
-
-
-  <module>
-    <name>fileDropComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/fileDropComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-      <as>$</as>
-    </depends>
-    <depends>
-      <module>filedrop</module>
-    </depends>
-  </module>
-
-  <module>
     <name>newsDetails</name>
     <script>
       <minify>false</minify>
@@ -186,15 +146,6 @@
       <module>extensionRegistry</module>
     </depends>
     <depends>
-      <module>fileDropComponent</module>
-    </depends>
-    <depends>
-      <module>suggesterComponent</module>
-    </depends>
-    <depends>
-      <module>modalComponent</module>
-    </depends>
-    <depends>
       <module>snackbarComponent</module>
     </depends>
     <depends>
@@ -205,7 +156,10 @@
       <module>documentPreview</module>
     </depends>
     <depends>
-      <module>newsAttachmentComponent</module>
+      <module>suggester</module>
+    </depends>
+    <depends>
+      <module>filedrop</module>
     </depends>
     <depends>
       <module>ExoAttachmentsApp</module>
@@ -226,9 +180,6 @@
     </depends>
     <depends>
       <module>extensionRegistry</module>
-    </depends>
-    <depends>
-      <module>modalComponent</module>
     </depends>
     <depends>
       <module>vuetify</module>
@@ -257,28 +208,6 @@
     <depends>
       <module>jquery</module>
       <as>$</as>
-    </depends>
-  </module>
-
-  <module>
-    <name>newsAttachmentComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/newsAttachmentComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>modalComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/modalComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
     </depends>
   </module>
 

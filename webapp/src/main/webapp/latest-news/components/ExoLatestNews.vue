@@ -11,9 +11,10 @@
         <v-flex class="px-3 border-box-sizing">
           <v-layout class="d-flex mx-0 align-center border-box-sizing">
             <v-flex class="d-flex text-truncate">
-              <v-card v-if="isShowHeader"
-                      flat
-                      color="transparent">
+              <v-card
+                v-if="isShowHeader"
+                flat
+                color="transparent">
                 <v-card-text class="body-1 text-truncate text-uppercase grey--text px-0">
                   {{ header }}
                 </v-card-text>
@@ -23,7 +24,10 @@
               <v-btn
                 depressed
                 small
-                class="caption text-uppercase grey--text d-sm-flex" @click="openAllNewsPinned(url)" > {{ seeAll }}</v-btn>
+                class="caption text-uppercase grey--text d-sm-flex"
+                @click="openAllNewsPinned(url)">
+                {{ seeAll }}
+              </v-btn>
             </v-flex>
           </v-layout>
         </v-flex>
@@ -53,7 +57,10 @@
                     <v-list-item>
                       <v-list-item-content>
                         <v-list-item-title class="subtitle-1 font-weight-bold text-uppercase white--text contentTitle" @click="openNews(newsInfo[0].url)">{{ newsInfo[0].title }}</v-list-item-title>
-                        <v-list-item-subtitle class="body-2 white--text contentBody" @click="openNews(newsInfo[0].url)" v-html="newsInfo[0].body"/>
+                        <v-list-item-subtitle
+                          class="body-2 white--text contentBody"
+                          @click="openNews(newsInfo[0].url)"
+                          v-sanitized-html="newsInfo[0].body" />
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
@@ -82,17 +89,23 @@
                         tile
                         size="95"
                         class="mr-2 my-0">
-                        <v-img :src="item.illustrationURL" @click="openNews(item.url)"/>
+                        <v-img :src="item.illustrationURL" @click="openNews(item.url)" />
                       </v-list-item-avatar>
 
                       <v-list-item-content class="pt-0 pl-3">
-                        <v-list-item-title class="subtitle-2 font-weight-bold text-uppercase  rightTitle" style="margin-bottom: 0px" @click="openNews(item.url)" v-html="item.title"/>
-                        <v-list-item-subtitle class=" grey-color rightBody" @click="openNews(item.url)" v-html="item.body"/>
+                        <v-list-item-title
+                          class="subtitle-2 font-weight-bold text-uppercase  rightTitle"
+                          style="margin-bottom: 0px"
+                          @click="openNews(item.url)"
+                          v-sanitized-html="item.title" />
+                        <v-list-item-subtitle
+                          class=" grey-color rightBody"
+                          @click="openNews(item.url)"
+                          v-sanitized-html="item.body" />
                       </v-list-item-content>
                     </v-list-item>
                   </template>
                 </v-list>
-
               </v-layout>
             </v-flex>
             <div v-if="newsInfo.length === 0" class="noNews mx-auto">
@@ -124,8 +137,14 @@
                 <v-list three-line class="flex item-lightbox">
                   <v-list-item class="px-2">
                     <v-list-item-content class="py-0">
-                      <v-list-item-title class="font-weight-bold text-uppercase white--text" @click="openNews(slide.url)" v-html="slide.title"></v-list-item-title>
-                      <v-list-item-subtitle class="body-2 white--text" @click="openNews(slide.url)" v-html="slide.body"></v-list-item-subtitle>
+                      <v-list-item-title
+                        class="font-weight-bold text-uppercase white--text"
+                        @click="openNews(slide.url)"
+                        v-sanitized-html="slide.title" />
+                      <v-list-item-subtitle
+                        class="body-2 white--text"
+                        @click="openNews(slide.url)"
+                        v-sanitized-html="slide.body" />
                     </v-list-item-content>
                   </v-list-item>
                 </v-list>
@@ -176,7 +195,8 @@ export default {
   },
   created() {
     for (let i=0; i<this.newsInfo.length; i++){
-      if(this.newsInfo[i].illustrationURL === null) {
+      if (this.newsInfo[i].illustrationURL === null) {
+        // eslint-disable-next-line vue/no-mutating-props
         this.newsInfo[i].illustrationURL = '/news/images/newsImageDefault.png';
       }
     }
@@ -184,7 +204,7 @@ export default {
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
   },
-  methods:{
+  methods: {
     openNews(url){
       if (url !== null){
         window.location.href =url;

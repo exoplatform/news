@@ -1,5 +1,4 @@
-import '../css/news.less';
-import './components/initComponents.js';
+import './initComponents.js';
 import { newsConstants } from '../js/newsConstants.js';
 
 Vue.use(Vuetify);
@@ -42,8 +41,8 @@ export function init(params) {
           activityId: params.activityId,
           showEditButton: params.showEditButton,
           showPinButton: params.showPinInput,
-          showShareButton : params.showShareButton,
-          showDeleteButton : params.news.canDelete,
+          showShareButton: params.showShareButton,
+          showDeleteButton: params.news.canDelete,
         };
       },
       template: `<exo-news-details
@@ -63,7 +62,7 @@ export function init(params) {
 }
 
 export function destroy() {
-  if(newsDetails) {
+  if (newsDetails) {
     newsDetails.$destroy();
   }
 }

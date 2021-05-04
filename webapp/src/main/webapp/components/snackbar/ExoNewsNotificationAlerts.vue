@@ -53,8 +53,7 @@ export default {
           this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
             spacesList.push(data.displayName);
           }).then(() => {
-            let message = this.$t('news.share.message');
-            message += spacesList.join();
+            const message = `${this.$t('news.share.message')}${spacesList.join(', ')}`;
             this.$root.$emit('news-notification-alert', {
               message,
               type: 'success',

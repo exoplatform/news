@@ -173,7 +173,6 @@ export default {
     };
   },
   created() {
-    const redirectionTime = 1000;
     this.$newsServices.getNewsById(this.newsId)
       .then(news => {
         this.spaceId = news.spaceId;
@@ -182,14 +181,6 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
-    this.$root.$on('news-deleted', () => {
-      const deletedNews = localStorage.getItem('deletedNews');
-      if (deletedNews != null) {
-        setTimeout(() => {
-          window.location.href = this.news.spaceUrl;
-        }, redirectionTime);
-      }
-    });
   },
   mounted() {
     this.updateViewsCount();
@@ -277,10 +268,17 @@ export default {
     },
     deleteNews() {
       const deleteDelay = 6;
+      const redirectionTime = 6100;
       this.$newsServices.deleteNews(this.newsId, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
         });
+      setTimeout(() => {
+        const deletedNews = localStorage.getItem('deletedNews');
+        if (deletedNews != null) {
+          window.location.href = this.news.spaceUrl;
+        }
+      }, redirectionTime);
     }
   }
 };

@@ -48,12 +48,19 @@ export default {
       }
     });
     this.$root.$on('news-shared', (news, spaces) => {
+      const spacesList = [];
       if (news && news.newsId && spaces && spaces.length > 0) {
-        let message = this.$t('news.share.message');
-        spaces.forEach(space => message = `${message } ${space} `);
-        this.$root.$emit('news-notification-alert', {
-          message,
-          type: 'success',
+        spaces.forEach(space => {
+          this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
+            spacesList.push(data.displayName);
+          }).then(() => {
+            let message = this.$t('news.share.message');
+            message += spacesList.join();
+            this.$root.$emit('news-notification-alert', {
+              message,
+              type: 'success',
+            });
+          });
         });
       }
     });

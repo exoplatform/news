@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import * as newsServices from '../../services/newsServices';
 
 export default {
   props: {
@@ -47,6 +46,18 @@ export default {
         });
       }
     });
+    this.$root.$on('news-shared', (news, spaces) => {
+      const spacesList = [];
+      if (news && news.newsId && spaces && spaces.length > 0) {
+        spaces.forEach(space => spacesList.push(this.truncateString(space)));
+        const message = `${this.$t('news.share.message')}${spacesList.join(', ')}`;
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+          spaces,
+        });
+      }
+    });
   },
   methods: {
     addAlert(alert) {
@@ -62,7 +73,7 @@ export default {
       this.$forceUpdate();
     },
     undoDeleteNews(newsId, alert) {
-      return newsServices.undoDeleteNews(newsId)
+      return this.$newsServices.undoDeleteNews(newsId)
         .then(() => {
           this.deleteAlert(alert);
           this.addAlert({
@@ -70,6 +81,12 @@ export default {
             type: 'success',
           });
         });
+    },
+    truncateString(str) {
+      if (str.length <= 10) {
+        return str;
+      }
+      return str.slice(0, 10).concat('...');
     }
   },
 };

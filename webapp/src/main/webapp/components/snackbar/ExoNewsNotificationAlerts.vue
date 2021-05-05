@@ -49,16 +49,12 @@ export default {
     this.$root.$on('news-shared', (news, spaces) => {
       const spacesList = [];
       if (news && news.newsId && spaces && spaces.length > 0) {
-        spaces.forEach(space => {
-          this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
-            spacesList.push(data.displayName);
-          }).then(() => {
-            const message = `${this.$t('news.share.message')}${spacesList.join(', ')}`;
-            this.$root.$emit('news-notification-alert', {
-              message,
-              type: 'success',
-            });
-          });
+        spaces.forEach(space => spacesList.push(this.truncateString(space)));
+        const message = `${this.$t('news.share.message')}${spacesList.join(', ')}`;
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+          spaces,
         });
       }
     });
@@ -85,6 +81,12 @@ export default {
             type: 'success',
           });
         });
+    },
+    truncateString(str) {
+      if (str.length <= 10) {
+        return str;
+      }
+      return str.slice(0, 10).concat('...');
     }
   },
 };

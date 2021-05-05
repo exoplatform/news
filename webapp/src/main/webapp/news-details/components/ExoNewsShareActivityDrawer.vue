@@ -70,9 +70,15 @@ export default {
       }
     },
     shareNews() {
+      const spacesList = [];
+      this.spaces.forEach(space => {
+        this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
+          spacesList.push(data.displayName);
+        });
+      });
       this.$newsServices.shareNews(this.news.newsId, this.news.activityId, this.description, this.spaces)
         .then(() => {
-          this.$root.$emit('news-shared', this.news, this.spaces);
+          this.$root.$emit('news-shared', this.news, spacesList);
           this.closeShareNewsDrawer();
         });
     },

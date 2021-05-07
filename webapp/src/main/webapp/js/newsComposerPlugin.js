@@ -6,7 +6,7 @@ const newsActivityComposerPlugin = {
   description: 'news.composer.write.description',
   iconClass: 'newsComposerIcon',
   enabled: false,
-  onExecute: function () {
+  onExecute: function (attachments) {
     let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
     if (eXo.env.portal.spaceId) {
       url += `?spaceId=${eXo.env.portal.spaceId}`;
@@ -16,6 +16,7 @@ const newsActivityComposerPlugin = {
     if (editor) {
       const message = CKEDITOR.instances['activityContent'].getData();
       localStorage.setItem('exo-activity-composer-message', message);
+	  localStorage.setItem('exo-activity-composer-attachments', JSON.stringify(attachments));
     }
 
     window.open(url, '_blank');

@@ -82,6 +82,9 @@
         <path>/js/news.bundle.js</path>
       </script>
       <depends>
+        <module>ShareActivityDrawer</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
@@ -132,6 +135,9 @@
       <minify>false</minify>
       <path>/js/newsDetails.bundle.js</path>
     </script>
+    <depends>
+      <module>ShareActivityDrawer</module>
+    </depends>
     <depends>
       <module>vue</module>
     </depends>

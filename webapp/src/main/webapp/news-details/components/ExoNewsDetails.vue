@@ -121,7 +121,13 @@
         </div>
       </div>
     </div>
-    <exo-news-share-activity-drawer />
+    <v-app>
+      <share-activity-drawer
+        ref="shareNewsDrawer"
+        class="shareNewsDrawer"
+        :activity-id="activityId"
+        @share-activity="shareNews" />
+    </v-app>
     <exo-news-notification-alerts />
   </div>
 </template>
@@ -181,6 +187,10 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
+    this.$root.$on('news-share-drawer-open', news => {
+      this.news = news;
+      this.open();
+    });
   },
   mounted() {
     this.updateViewsCount();
@@ -251,6 +261,27 @@ export default {
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
       }
+    },
+    open() {
+      if (this.$refs.shareNewsDrawer) {
+        this.$refs.shareNewsDrawer.open();
+      }
+    },
+    close() {
+      this.$refs.shareNewsDrawer.close();
+    },
+    shareNews(spaces, description) {
+      const spacesList = [];
+      spaces.forEach(space => {
+        this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
+          spacesList.push(data.displayName);
+        });
+      });
+      this.$newsServices.shareNews(this.news.newsId, this.news.activityId, description, spaces)
+        .then(() => {
+          this.$root.$emit('news-shared', this.news, spacesList);
+          this.close();
+        });
     },
     goBack() {
       if ( history.length > 1) {

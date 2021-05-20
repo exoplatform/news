@@ -1,0 +1,55 @@
+{
+  "properties": {
+    "id": {
+      "type": "text"
+    },
+    "title": {
+      "type": "text",
+      "analyzer": "whitespace_lowercase_asciifolding"
+    },
+    "posterId": {
+      "type": "text"
+    },
+    "posterName": {
+      "type": "text",
+      "index_options": "offsets",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        },
+        "whitespace": {
+          "type": "text",
+          "analyzer": "whitespace_lowercase_asciifolding"
+        }
+      }
+    },
+    "permissions": {
+      "type": "long"
+    },
+    "spaceDisplayName": {
+      "type": "text"
+    },
+    "newsActivityId": {
+      "type": "text"
+    },
+    "postedTime": {
+      "type": "long"
+    },
+    "lastUpdatedTime": {
+      "type": "long"
+    },
+    "body": {
+      "type": "text",
+      "index_options": "offsets",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        },
+        "whitespace": {
+          "type": "text",
+          "analyzer": "whitespace_lowercase_asciifolding"
+        }
+      }
+    }
+  }
+}

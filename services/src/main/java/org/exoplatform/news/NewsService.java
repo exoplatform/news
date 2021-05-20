@@ -4,9 +4,12 @@ import java.util.List;
 
 import javax.jcr.Node;
 
+import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.news.search.NewsESSearchResult;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.space.model.Space;
 
 public interface NewsService {
@@ -50,4 +53,5 @@ public interface NewsService {
 
   public boolean canDeleteNews(String posterId, String spaceId);
 
+  public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit);
 }

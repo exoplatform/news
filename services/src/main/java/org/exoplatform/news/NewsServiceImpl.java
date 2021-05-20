@@ -25,6 +25,7 @@ import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
@@ -42,6 +43,9 @@ import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
+import org.exoplatform.news.search.NewsESSearchConnector;
+import org.exoplatform.news.search.NewsESSearchResult;
+import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
@@ -372,7 +376,10 @@ public class NewsServiceImpl implements NewsService {
           }
         }
       }
-
+      IndexingService indexingService = CommonsUtils.getService(IndexingService.class);
+      if (indexingService != null) {
+        indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+      }
       return news;
     } finally {
       if (session != null) {
@@ -973,6 +980,19 @@ public class NewsServiceImpl implements NewsService {
     return news;
   }
 
+  /**
+   * Search news by term
+   *
+   * @param term
+   * @param offset
+   * @param limit
+   * @return News Search Result
+   */
+  public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit) {
+    NewsESSearchConnector newsESSearchConnector = CommonsUtils.getService(NewsESSearchConnector.class);
+    return newsESSearchConnector.search(currentUser,term, offset, limit);
+  }
+  
   /**
    * Return the date of the first published version of the node
    * 

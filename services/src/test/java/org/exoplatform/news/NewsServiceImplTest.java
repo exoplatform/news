@@ -39,6 +39,7 @@ import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
@@ -364,6 +365,7 @@ public class NewsServiceImplTest {
     assertEquals("mary", news.getUpdater());
   }
 
+  @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
     // Given
@@ -386,6 +388,8 @@ public class NewsServiceImplTest {
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -418,6 +422,7 @@ public class NewsServiceImplTest {
     verify(illustrationNode, times(0)).remove();
   }
 
+  @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
     // Given
@@ -440,6 +445,8 @@ public class NewsServiceImplTest {
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);

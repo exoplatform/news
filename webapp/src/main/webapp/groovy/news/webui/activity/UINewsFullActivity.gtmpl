@@ -179,7 +179,7 @@
         <% if (!news.archived || (news.archived && news.canArchive)) { %>
         <div class="actionsDetailsWrapper">
           <% _ctx.includeTemplates("UIActivityListLiked") %>
-          <% _ctx.includeTemplates("UIActivityActionBar-actions") %>
+          <% _ctx.includeTemplates("UIActivityNewsActionBar-actions") %>
         </div><!--end actionBar and list like people wrapper-->
         <%}%>
       <% _ctx.includeTemplates("UIActivityCommentBox") %>

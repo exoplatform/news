@@ -187,8 +187,8 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
-    this.$root.$on('news-share-drawer-open', news => {
-      this.news = news;
+    this.$root.$on('news-share-drawer-open', params => {
+      this.newsId = params.news.newsId;
       this.open();
     });
   },

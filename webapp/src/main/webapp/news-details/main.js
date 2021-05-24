@@ -37,11 +37,11 @@ export function init(params) {
       data: function() {
         return {
           news: params.news,
-          newsId: params.newsId,
+          newsId: params.news.newsId,
           activityId: params.activityId,
-          showEditButton: params.showEditButton,
-          showPinButton: params.showPinInput,
-          showShareButton: params.showShareButton,
+          showEditButton: params.news.showEditButton,
+          showPinButton: params.news.showPinInput,
+          showShareButton: params.news.showShareButton,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -59,6 +59,12 @@ export function init(params) {
       vuetify
     }).$mount(appElement);
   });
+}
+
+export function openShareActivityDrawer(params) {
+  if (newsDetails) {
+    newsDetails.$root.$emit('news-share-drawer-open', params);
+  }
 }
 
 export function destroy() {

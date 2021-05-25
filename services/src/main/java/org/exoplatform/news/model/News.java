@@ -54,6 +54,8 @@ public class News {
   private Long                 viewsCount;
 
   private String               activities;
+  
+  private String               activityId;
 
   private List<NewsAttachment> attachments;
 
@@ -245,6 +247,20 @@ public class News {
 
   public void setActivities(String activities) {
     this.activities = activities;
+  }
+  
+  /**
+   * @return the activityId
+   */
+  public String getActivityId() {
+    return activityId;
+  }
+
+  /**
+   * @param activityId the activityId to set
+   */
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
   public List<NewsAttachment> getAttachments() {

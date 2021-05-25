@@ -571,7 +571,8 @@ public class NewsServiceImpl implements NewsService {
         activity.setUserId(poster.getId());
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("newsId", sharedNews.getNewsId());
-        templateParams.put("originalActivityId", sharedNews.getActivityId());
+        News news = getNewsById(sharedNews.getNewsId());
+        templateParams.put("originalActivityId", news.getActivityId());
         activity.setTemplateParams(templateParams);
         activityManager.saveActivityNoReturn(spaceIdentity, activity);
 
@@ -590,7 +591,6 @@ public class NewsServiceImpl implements NewsService {
             }
           }
           newsNode.save();
-          News news = getNewsById(sharedNews.getNewsId());
           sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
           sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
         }
@@ -735,6 +735,7 @@ public class NewsServiceImpl implements NewsService {
         org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
+        news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
         StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {

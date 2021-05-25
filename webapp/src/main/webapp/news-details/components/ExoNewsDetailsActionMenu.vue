@@ -23,7 +23,7 @@
           {{ $t('news.details.header.menu.edit') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showShareButton && isNewsApps" @click="$root.$emit('news-share-drawer-open', news)">
+      <v-list-item v-if="showShareButton" @click="$root.$emit('news-share-drawer-open', news)">
         <v-list-item-title>
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
@@ -49,7 +49,7 @@ export default {
     showShareButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     showEditButton: {
       type: Boolean,
@@ -57,11 +57,6 @@ export default {
       default: false
     },
     showDeleteButton: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    isNewsApps: {
       type: Boolean,
       required: false,
       default: false

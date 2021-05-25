@@ -136,7 +136,7 @@
       <path>/js/newsDetails.bundle.js</path>
     </script>
     <depends>
-      <module>ShareActivityDrawer</module>
+      <module>shareNewsActivityDrawer</module>
     </depends>
     <depends>
       <module>vue</module>
@@ -225,6 +225,32 @@
     </script>
     <depends>
       <module>vue</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>shareNewsActivityDrawer</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/shareNewsActivityDrawer.bundle.js</path>
+    </script>
+    <depends>
+      <module>ShareActivityDrawer</module>
+    </depends>
+    <depends>
+      <module>snackbarComponent</module>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
     </depends>
   </module>
 

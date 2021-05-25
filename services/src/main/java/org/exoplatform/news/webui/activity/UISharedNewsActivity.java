@@ -5,10 +5,14 @@ import java.util.Map;
 import com.drew.lang.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.webui.Utils;
 import org.exoplatform.social.webui.activity.BaseUIActivity;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -70,4 +74,37 @@ public class UISharedNewsActivity extends UINewsActivity {
       return null;
     }
   }
+
+  public ExoSocialActivity getOriginalActivity() {
+    Map<String, String> activityTemplateParams = this.getActivity().getTemplateParams();
+    if (activityTemplateParams == null || activityTemplateParams.get("originalActivityId") == null) {
+      return null;
+    }
+    return Utils.getActivityManager().getActivity(activityTemplateParams.get("originalActivityId"));
+  }
+
+  public Identity getOriginalActivityOwnerIdentity() {
+    return getOriginalActivity() != null ? Utils.getIdentityManager().getIdentity(getOriginalActivity().getUserId()) : null;
+  }
+
+  public boolean isUserOriginalActivity() {
+    boolean isUserActivity = false;
+    if (getOriginalActivityOwnerIdentity() != null) {
+      isUserActivity = getOriginalActivityOwnerIdentity().getProviderId().equals(OrganizationIdentityProvider.NAME);
+    }
+    return isUserActivity;
+  }
+
+  public boolean isSpaceOriginalActivity() {
+    boolean isSpaceActivity = false;
+    if (getOriginalActivityOwnerIdentity() != null) {
+      isSpaceActivity = getOriginalActivityOwnerIdentity().getProviderId().equals(SpaceIdentityProvider.NAME);
+    }
+    return isSpaceActivity;
+  }
+
+  protected boolean isOriginalActivitySpaceStreamOwner() {
+    return getOriginalActivity().getActivityStream().getType().name().equalsIgnoreCase(SpaceIdentityProvider.NAME);
+  }
+
 }

@@ -39,9 +39,9 @@ export function init(params) {
           news: params.news,
           newsId: params.news.newsId,
           activityId: params.activityId,
-          showEditButton: params.news.showEditButton,
-          showPinButton: params.news.showPinInput,
-          showShareButton: params.news.showShareButton,
+          showEditButton: params.showEditButton,
+          showPinButton: params.showPinInput,
+          showShareButton: params.showShareButton,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -61,7 +61,7 @@ export function init(params) {
   });
 }
 
-export function openShareActivityDrawer(params) {
+export function openShareNewsDrawer(params) {
   if (newsDetails) {
     newsDetails.$root.$emit('news-share-drawer-open', params);
   }

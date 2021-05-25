@@ -5,7 +5,6 @@
       v-if="showShareButton || showEditButton"
       :news="news"
       :show-edit-button="showEditButton"
-      :show-share-button="showShareButton"
       :show-delete-button="showDeleteButton"
       @delete="deleteConfirmDialog"
       @edit="editLink" />
@@ -122,13 +121,11 @@
       </div>
     </div>
     <v-app>
-      <share-activity-drawer
+      <share-news-activity-drawer
         ref="shareNewsDrawer"
         class="shareNewsDrawer"
-        :activity-id="activityId"
-        @share-activity="shareNews" />
+        :activity-id="activityId" />
     </v-app>
-    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -169,6 +166,10 @@ export default {
       required: false,
       default: false
     },
+    id: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -261,27 +262,6 @@ export default {
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
       }
-    },
-    open() {
-      if (this.$refs.shareNewsDrawer) {
-        this.$refs.shareNewsDrawer.open();
-      }
-    },
-    close() {
-      this.$refs.shareNewsDrawer.close();
-    },
-    shareNews(spaces, description) {
-      const spacesList = [];
-      spaces.forEach(space => {
-        this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
-          spacesList.push(data.displayName);
-        });
-      });
-      this.$newsServices.shareNews(this.news.newsId, this.news.activityId, description, spaces)
-        .then(() => {
-          this.$root.$emit('news-shared', this.news, spacesList);
-          this.close();
-        });
     },
     goBack() {
       if ( history.length > 1) {

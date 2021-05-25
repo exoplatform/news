@@ -81,7 +81,7 @@
               :news="news"
               :show-edit-button="news.canEdit"
               :show-delete-button="news.canDelete"
-              :is-news-apps="true"
+              :show-share-button="news.canEdit"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog

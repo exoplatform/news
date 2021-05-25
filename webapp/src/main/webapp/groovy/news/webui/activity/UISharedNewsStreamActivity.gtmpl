@@ -198,9 +198,17 @@ def streamOwner = activity.getStreamOwner();
                         </div>
                     </div>
                 </div>
-                <div class="description <%=isArchived ? "newsArchived" : ""%>">
-                    <div class="sharedNewsTitle">${activity.title}</div>
-                    <div class="sharedNewsDetails">
+                <div class="sharedNewsTitle">${activity.title}</div>
+				<div class="shareActivityContainer">
+                    <div class="heading">
+                      <div class="activityHeader">
+                         <% _ctx.includeTemplates("UISharedActivityHeading") %>
+                      </div>
+                    <!--end activityHeader-->
+                    </div>
+                    <!--end heading-->
+
+                    <div class="description <%=isArchived ? "newsArchived" : ""%>">
                         <img src="$illustrationURL" class="newsSmallIllustration" alt="News"/>
                         <div class="newsDetails">
                             <div class="newsTitle">
@@ -222,13 +230,6 @@ def streamOwner = activity.getStreamOwner();
                                   </div>
                                 <% } %>
                             </div>
-                        </div>
-                        <div class="originalSpace">
-                        <% if(originalSpace && !hiddenSpace) { %>
-                            ${labelOriginalSpace} <img class="avatarMini" alt="$originalSpaceName" src="$originalSpaceImageSource"/> $originalSpaceName
-                        <% } else { %>
-                          ${labelOriginalSpace} $labelSpaceHidden
-                        <% } %>
                         </div>
                     </div>
                 </div>

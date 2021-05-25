@@ -15,10 +15,6 @@ def params = """ {
     activityId: '${activity.id}',
     news: {
       newsId: '${news.id}',
-      showShareButton: true,
-      showEditButton: $showEditButton,
-      showPinInput: $showPinInput,
-      canDelete: ${news.canDelete},
     },
   } """;
 %>
@@ -50,21 +46,21 @@ def commentLink = "";
 </a>
     </li>
 <% _ctx.includeTemplates("UIActivityActionBar-actions-after") %>
-<li class="share-link" onclick="javascript:openDrawer($params);">
+<li class="share-link" onclick="javascript:openDrawerNews($params);">
       <i class="uiIconShare uiIcon16x16"></i>
       <span class="share-text">$labelShare</span>
 </li>
   </ul>
 <div class="VuetifyApp">
-<div id="shareActivity-${activity.id}">
+<div id="shareNewsActivityDrawer-${activity.id}">
 <script type="text/javascript">
-  require(["SHARED/newsDetails"], newsDetails => newsDetails.init($params));
+  require(["SHARED/shareNewsActivityDrawer"], shareNewsActivityDrawer => shareNewsActivityDrawer.init($params));
 </script>
     </div>
 </div>
 <script type="text/javascript">
-  function openDrawer(params) {
-    require(["SHARED/newsDetails"], newsDetails => newsDetails.openShareActivityDrawer(params));
+  function openDrawerNews(params) {
+    require(["SHARED/shareNewsActivityDrawer"], shareNewsActivityDrawer => shareNewsActivityDrawer.openShareNewsActivityDrawer(params));
   }
 </script>
 

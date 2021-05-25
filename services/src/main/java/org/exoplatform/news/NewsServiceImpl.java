@@ -571,6 +571,7 @@ public class NewsServiceImpl implements NewsService {
         activity.setUserId(poster.getId());
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("newsId", sharedNews.getNewsId());
+        templateParams.put("originalActivityId", sharedNews.getActivityId());
         activity.setTemplateParams(templateParams);
         activityManager.saveActivityNoReturn(spaceIdentity, activity);
 

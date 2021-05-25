@@ -136,6 +136,10 @@ public class NewsServiceImpl implements NewsService {
   private NewsSearchConnector      newsSearchConnector;
 
   private NewsAttachmentsService   newsAttachmentsService;
+  
+  private IndexingService          indexingService;
+  
+  private NewsESSearchConnector    newsESSearchConnector;
 
   private UserACL                  userACL;
 
@@ -156,7 +160,7 @@ public class NewsServiceImpl implements NewsService {
                          WCMPublicationService wCMPublicationService,
                          NewsSearchConnector newsSearchConnector,
                          NewsAttachmentsService newsAttachmentsService,
-                         UserACL userACL) {
+                         IndexingService indexingService, NewsESSearchConnector newsESSearchConnector, UserACL userACL) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -172,6 +176,8 @@ public class NewsServiceImpl implements NewsService {
     this.wCMPublicationService = wCMPublicationService;
     this.newsSearchConnector = newsSearchConnector;
     this.newsAttachmentsService = newsAttachmentsService;
+    this.indexingService = indexingService;
+    this.newsESSearchConnector = newsESSearchConnector;
     this.userACL = userACL;
   }
 
@@ -376,10 +382,7 @@ public class NewsServiceImpl implements NewsService {
           }
         }
       }
-      IndexingService indexingService = CommonsUtils.getService(IndexingService.class);
-      if (indexingService != null) {
-        indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
-      }
+      indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
       return news;
     } finally {
       if (session != null) {
@@ -989,7 +992,6 @@ public class NewsServiceImpl implements NewsService {
    * @return News Search Result
    */
   public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit) {
-    NewsESSearchConnector newsESSearchConnector = CommonsUtils.getService(NewsESSearchConnector.class);
     return newsESSearchConnector.search(currentUser,term, offset, limit);
   }
   

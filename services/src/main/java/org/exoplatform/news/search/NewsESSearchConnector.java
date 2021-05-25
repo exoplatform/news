@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 eXo Platform SAS.
+ * Copyright (C) 2021 eXo Platform SAS.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -42,7 +42,6 @@ import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.spi.SpaceService;
 
 public class NewsESSearchConnector {
   private static final Log             LOG                          = ExoLogger.getLogger(NewsESSearchConnector.class);
@@ -52,9 +51,7 @@ public class NewsESSearchConnector {
   private final ConfigurationManager   configurationManager;
 
   private final IdentityManager        identityManager;
-
-  private final SpaceService           spaceService;
-
+  
   private final ActivityStorage        activityStorage;
 
   private final ElasticSearchingClient client;
@@ -69,13 +66,11 @@ public class NewsESSearchConnector {
 
   public NewsESSearchConnector(ConfigurationManager configurationManager,
                                IdentityManager identityManager,
-                               SpaceService spaceService,
                                ActivityStorage activityStorage,
                                ElasticSearchingClient client,
                                InitParams initParams) {
     this.configurationManager = configurationManager;
     this.identityManager = identityManager;
-    this.spaceService = spaceService;
     this.activityStorage = activityStorage;
     this.client = client;
 
@@ -169,8 +164,7 @@ public class NewsESSearchConnector {
         if (highlightSource != null) {
           JSONArray bodyExcepts = (JSONArray) highlightSource.get("body");
           if (bodyExcepts != null) {
-            String[] bodyExceptsArray = (String[]) bodyExcepts.toArray(new String[0]);
-            excerpts = Arrays.asList(bodyExceptsArray);
+            excerpts = Arrays.asList((String[]) bodyExcepts.toArray(new String[0]));
           }
         }
         newsSearchResult.setId(id);
@@ -194,7 +188,7 @@ public class NewsESSearchConnector {
 
         results.add(newsSearchResult);
       } catch (Exception e) {
-        LOG.warn("Error processing activity search result item, ignore it from results", e);
+        LOG.warn("Error processing news search result item, ignore it from results", e);
       }
     }
     return results;

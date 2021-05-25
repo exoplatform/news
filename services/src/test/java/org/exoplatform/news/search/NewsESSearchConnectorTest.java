@@ -11,7 +11,6 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.space.spi.SpaceService;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -42,9 +41,6 @@ public class NewsESSearchConnectorTest {
 
   @Mock
   ActivityStorage             activityStorage;
-
-  @Mock
-  SpaceService                spaceService;
 
   @Mock
   ConfigurationManager        configurationManager;
@@ -81,7 +77,6 @@ public class NewsESSearchConnectorTest {
   public void testSearchArguments() {
     NewsESSearchConnector newsESSearchConnector = new NewsESSearchConnector(configurationManager,
                                                                             identityManager,
-                                                                            spaceService,
                                                                             activityStorage,
                                                                             client,
                                                                             getParams());
@@ -117,7 +112,6 @@ public class NewsESSearchConnectorTest {
   public void testSearchNoResult() {
     NewsESSearchConnector newsESSearchConnector = new NewsESSearchConnector(configurationManager,
                                                                             identityManager,
-                                                                            spaceService,
                                                                             activityStorage,
                                                                             client,
                                                                             getParams());
@@ -141,7 +135,6 @@ public class NewsESSearchConnectorTest {
   public void testSearchWithResult() {
     NewsESSearchConnector newsESSearchConnector = new NewsESSearchConnector(configurationManager,
                                                                             identityManager,
-                                                                            spaceService,
                                                                             activityStorage,
                                                                             client,
                                                                             getParams());
@@ -174,7 +167,6 @@ public class NewsESSearchConnectorTest {
   public void testSearchWithIdentityResult() throws IOException {// NOSONAR
     NewsESSearchConnector newsESSearchConnector = new NewsESSearchConnector(configurationManager,
                                                                             identityManager,
-                                                                            spaceService,
                                                                             activityStorage,
                                                                             client,
                                                                             getParams());

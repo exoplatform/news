@@ -7,7 +7,11 @@ import java.util.Date;
 
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.social.core.activity.model.ActivityStream;
+import org.exoplatform.social.core.activity.model.ActivityStreamImpl;
+import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -31,9 +35,12 @@ public class NewsIndexingServiceConnectorTest {
   @Mock
   IdentityManager              identityManager;
 
+  @Mock
+  ActivityManager              activityManager;
+
   @Test
   public void testGetAllIds() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
     try {
       newsIndexingServiceConnector.getAllIds(0, 10);
       fail("getAllIds shouldn't be supported");
@@ -44,19 +51,19 @@ public class NewsIndexingServiceConnectorTest {
 
   @Test
   public void testCanReindex() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
     assertFalse(newsIndexingServiceConnector.canReindex());
   }
 
   @Test
   public void testGetType() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
     assertEquals(NewsIndexingServiceConnector.TYPE, newsIndexingServiceConnector.getType());
   }
 
   @Test
   public void testCreate() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
 
     try {
       newsIndexingServiceConnector.create(null);
@@ -78,7 +85,22 @@ public class NewsIndexingServiceConnectorTest {
     news.setAuthor("root");
     news.setCreationDate(new Date());
     news.setUpdateDate(new Date());
-    news.setActivities(":1:3");
+    news.setActivities("1:1;1:2;1:3");
+
+    ExoSocialActivityImpl activity = new ExoSocialActivityImpl();
+    activity.setId("1");
+    activity.setParentId("2");
+    activity.setParentCommentId("3");
+    activity.setType("type");
+    activity.setPosterId("posterId");
+    activity.setPostedTime(1234L);
+    activity.setUpdated(4321L);
+
+    ActivityStreamImpl activityStream = new ActivityStreamImpl();
+    activity.setActivityStream(activityStream);
+    activityStream.setId("id");
+    activityStream.setPrettyId("prettyId");
+    activityStream.setType(ActivityStream.Type.SPACE);
 
     Identity posterIdentity = new Identity("posterId");
     Profile posterProfile = new Profile(posterIdentity);
@@ -90,6 +112,10 @@ public class NewsIndexingServiceConnectorTest {
       e.printStackTrace();
     }
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(posterIdentity);
+    when(activityManager.getActivity("1")).thenReturn(activity);
+
+    Identity streamOwner = new Identity("streamOwner");
+    when(identityManager.getOrCreateIdentity(ActivityStream.Type.SPACE.getProviderId(), "prettyId")).thenReturn(streamOwner);
 
     Document document = newsIndexingServiceConnector.create("1");
     assertNotNull(document);

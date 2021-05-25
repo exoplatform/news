@@ -1,18 +1,18 @@
 /*
- * This file is part of the Meeds project (https://meeds.io/).
- * Copyright (C) 2020 Meeds Association
- * contact@meeds.io
+ * Copyright (C) 2021 eXo Platform SAS.
+ *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 package org.exoplatform.news.search;
 
@@ -32,8 +32,11 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.social.core.activity.model.ActivityStream;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnector {
@@ -47,10 +50,16 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
 
   private final IdentityManager identityManager;
 
-  public NewsIndexingServiceConnector(IdentityManager identityManager, InitParams initParams, NewsService newsService) {
+  private final ActivityManager activityManager;
+
+  public NewsIndexingServiceConnector(IdentityManager identityManager,
+                                      InitParams initParams,
+                                      NewsService newsService,
+                                      ActivityManager activityManager) {
     super(initParams);
     this.newsService = newsService;
     this.identityManager = identityManager;
+    this.activityManager = activityManager;
   }
 
   @Override
@@ -85,22 +94,19 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     LOG.debug("Index document for news id={}", id);
     Document document = new Document();
     News news = null;
-    String spaceId = null;
     SessionProvider systemProvider = SessionProvider.createSystemProvider();
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
     sessionProviderService.setSessionProvider(null, systemProvider);
     try {
       news = newsService.getNewsById(id);
     } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      sessionProviderService.removeSessionProvider(null);
+      LOG.error("Error when getting the news " + id, e);
     }
     if (news == null) {
       throw new IllegalStateException("news with id '" + id + "' is mandatory");
     }
     Map<String, String> fields = new HashMap<>();
-    fields.put("id", news.getId().replace("comment", ""));
+    fields.put("id", news.getId());
 
     fields.put("title", news.getTitle());
 
@@ -108,7 +114,17 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     if (StringUtils.isBlank(body)) {
       body = news.getTitle();
     }
-    fields.put("body", body);
+    // Ensure to index text only without html tags
+    if (StringUtils.isNotBlank(body)) {
+      body = StringEscapeUtils.unescapeHtml(body);
+      try {
+        body = HTMLSanitizer.sanitize(body);
+      } catch (Exception e) {
+        LOG.warn("Error sanitizing news '{}' body", news.getId());
+      }
+      body = htmlToText(body);
+      fields.put("body", body);
+    }
 
     if (StringUtils.isNotBlank(news.getAuthor())) {
       fields.put("posterId", news.getAuthor());
@@ -118,14 +134,31 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
         fields.put("posterName", posterIdentity.getProfile().getFullName());
       }
     }
-    spaceId = news.getSpaceId();
-    if (spaceId != null) {
-      fields.put("spaceDisplayName", String.valueOf(news.getSpaceDisplayName()));
+    if (news.getSpaceDisplayName() != null) {
+      fields.put("spaceDisplayName", news.getSpaceDisplayName());
     }
 
-    String newsActivityId = news.getActivities();
-    if (newsActivityId != null) {
-      fields.put("newsActivityId", newsActivityId.split(":")[1].substring(0, 1));
+    String newsActivities = news.getActivities();
+    String ownerIdentityId = null;
+
+    if (newsActivities != null) {
+      String newsActivityId = newsActivities.split(";")[0].split(":")[1];
+      fields.put("newsActivityId", newsActivityId);
+      ExoSocialActivity newsActivity = activityManager.getActivity(newsActivityId);
+      ActivityStream activityStream = newsActivity.getActivityStream();
+
+      if (newsActivity.getParentId() != null
+          && (activityStream == null || activityStream.getType() == null || StringUtils.isBlank(activityStream.getPrettyId()))) {
+        ExoSocialActivity parentActivity = activityManager.getActivity(newsActivity.getParentId());
+        activityStream = parentActivity.getActivityStream();
+      }
+
+      if (activityStream != null && activityStream.getType() != null && StringUtils.isNotBlank(activityStream.getPrettyId())) {
+        String prettyId = activityStream.getPrettyId();
+        String providerId = activityStream.getType().getProviderId();
+        Identity streamOwner = identityManager.getOrCreateIdentity(providerId, prettyId);
+        ownerIdentityId = streamOwner.getId();
+      }
     } else {
       return null;
     }
@@ -136,20 +169,8 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
       fields.put("lastUpdatedTime", String.valueOf(news.getUpdateDate().getTime()));
     }
 
-    document = new Document(TYPE, id, null, news.getUpdateDate(), Collections.singleton(spaceId), fields);
-    body = document.getFields().get("body");
+    document = new Document(TYPE, id, null, news.getUpdateDate(), Collections.singleton(ownerIdentityId), fields);
 
-    // Ensure to index text only without html tags
-    if (StringUtils.isNotBlank(body)) {
-      body = StringEscapeUtils.unescapeHtml(body);
-      try {
-        body = HTMLSanitizer.sanitize(body);
-      } catch (Exception e) {
-        LOG.warn("Error sanitizing news '{}' body", news.getId());
-      }
-      body = htmlToText(body);
-      document.addField("body", body);
-    }
     return document;
   }
 

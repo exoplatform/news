@@ -30,6 +30,7 @@ import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
@@ -153,6 +154,12 @@ public class NewsServiceImplTest {
   NewsAttachmentsService     newsAttachmentsService;
   
   @Mock
+  IndexingService indexingService;
+  
+  @Mock
+  NewsESSearchConnector    newsESSearchConnector;
+  
+  @Mock
   UserACL                    userACL;
 
   @Rule
@@ -176,6 +183,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
     Node node = mock(Node.class);
     Property property = mock(Property.class);
@@ -232,6 +241,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
@@ -267,6 +278,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
     Node node = mock(Node.class);
     Property property = mock(Property.class);
@@ -384,6 +397,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
@@ -441,6 +456,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
@@ -497,6 +514,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     ExtendedNode newsNode = mock(ExtendedNode.class);
     Property property = mock(Property.class);
@@ -574,6 +593,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
@@ -640,6 +661,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setTitle("new pinned news title");
@@ -725,6 +748,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -793,6 +818,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -840,6 +867,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -876,6 +905,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -936,6 +967,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -996,6 +1029,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
@@ -1063,6 +1098,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     Node newsFolderNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
@@ -1149,6 +1186,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
@@ -1217,6 +1256,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
@@ -1282,6 +1323,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
@@ -1344,6 +1387,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -1424,6 +1469,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -1480,6 +1527,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setId("id123");
@@ -1528,6 +1577,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setId("id123");
@@ -1567,7 +1618,7 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
-                                                      userACL);
+            indexingService, newsESSearchConnector, userACL);
     News news = new News();
     news.setId("id123");
     news.setViewsCount((long) 5);
@@ -1612,6 +1663,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setId("id123");
@@ -1660,6 +1713,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setId("id123");
@@ -1700,6 +1755,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     Space currentSpace = mock(Space.class);
@@ -1744,6 +1801,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     Space currentSpace = mock(Space.class);
@@ -1788,6 +1847,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     Space currentSpace = mock(Space.class);
@@ -1832,6 +1893,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     Space currentSpace = mock(Space.class);
@@ -1876,6 +1939,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     Space currentSpace = mock(Space.class);
@@ -1920,6 +1985,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
@@ -1958,6 +2025,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     setCurrentIdentity();
@@ -1990,6 +2059,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setAuthor("root");
@@ -2042,6 +2113,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     News news = new News();
     news.setAuthor("root");
@@ -2094,6 +2167,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2204,6 +2279,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     News news = new News();
@@ -2240,6 +2317,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     News news = new News();
@@ -2299,6 +2378,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     News news = new News();
@@ -2405,6 +2486,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     News news = new News();
@@ -2512,6 +2595,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     News news = new News();
@@ -2615,6 +2700,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2696,6 +2783,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2742,6 +2831,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -2801,6 +2892,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -2852,6 +2945,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -2903,6 +2998,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -2953,6 +3050,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
 
     Node newsNode = mock(Node.class);
@@ -3019,6 +3118,8 @@ public class NewsServiceImplTest {
                                                   wcmPublicationServiceImpl,
                                                   newsSearchConnector,
                                                   newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
                                                   userACL);
 
     Node newsNode = mock(Node.class);
@@ -3178,7 +3279,7 @@ public class NewsServiceImplTest {
                                                           wcmPublicationServiceImpl,
                                                           newsSearchConnector,
                                                           newsAttachmentsService,
-                                                          userACL);
+            indexingService, newsESSearchConnector, userACL);
     Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Profile profile = posterIdentity.getProfile();
     profile.setUrl("/profile/john");
@@ -3213,6 +3314,8 @@ public class NewsServiceImplTest {
                                                           wcmPublicationServiceImpl,
                                                           newsSearchConnector,
                                                           newsAttachmentsService,
+                                                          indexingService,
+                                                          newsESSearchConnector,
                                                           userACL);
     Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Profile profile = posterIdentity.getProfile();
@@ -3244,6 +3347,8 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
                                                       userACL);
   
     Node newsNode = mock(Node.class);

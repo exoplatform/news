@@ -244,7 +244,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @RolesAllowed("users")
   @ApiOperation(value = "Search the list of news available with query", httpMethod = "GET", response = Response.class, produces = "application/json")
   @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-      @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+      @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
       @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
   public Response search(@Context UriInfo uriInfo,
                          @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,

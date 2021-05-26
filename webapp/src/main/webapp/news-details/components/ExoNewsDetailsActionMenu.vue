@@ -49,7 +49,7 @@ export default {
     showShareButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     showEditButton: {
       type: Boolean,

@@ -567,7 +567,7 @@ public class NewsServiceImplTest {
     ExoSocialActivity activityCaptorValue = activityCaptor.getValue();
     assertEquals("shared_news", activityCaptorValue.getType());
     assertEquals("Description of shared news", activityCaptorValue.getTitle());
-    assertEquals(1, activityCaptorValue.getTemplateParams().size());
+    assertEquals(2, activityCaptorValue.getTemplateParams().size());
     assertEquals("1", activityCaptorValue.getTemplateParams().get("newsId"));
   }
 

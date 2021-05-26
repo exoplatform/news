@@ -37,11 +37,10 @@ export function init(params) {
       data: function() {
         return {
           news: params.news,
-          newsId: params.newsId,
+          newsId: params.news.newsId,
           activityId: params.activityId,
           showEditButton: params.showEditButton,
           showPinButton: params.showPinInput,
-          showShareButton: params.showShareButton,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -53,7 +52,6 @@ export function init(params) {
                   :activity-id="activityId"
                   :show-edit-button="showEditButton"
                   :show-pin-button="showPinButton"
-                  :show-share-button="showShareButton" 
                   :show-delete-button="showDeleteButton"/>`,
       i18n,
       vuetify

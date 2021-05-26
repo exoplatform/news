@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2003-2011 eXo Platform SAS.
+    Copyright (C) 2003-2021 eXo Platform SAS.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -101,6 +101,9 @@
       </depends>
       <depends>
         <module>latestNews</module>
+      </depends>
+	  <depends>
+        <module>ShareNewsActivity</module>
       </depends>
       <depends>
         <module>socialUtil</module>
@@ -248,4 +251,30 @@
       <module>extensionRegistry</module>
     </depends>
   </module>
+  <module>
+    <name>ShareNewsActivity</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/shareNewsActivity.bundle.js</path>
+    </script>
+    <depends>
+      <module>ShareActivityDrawer</module>
+    </depends>
+    <depends>
+      <module>snackbarComponent</module>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+  </module>
+
 </gatein-resources>

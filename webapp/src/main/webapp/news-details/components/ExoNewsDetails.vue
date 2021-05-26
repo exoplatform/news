@@ -2,10 +2,9 @@
   <div id="newsDetails">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
-      v-if="showShareButton || showEditButton"
+      v-if="showEditButton"
       :news="news"
       :show-edit-button="showEditButton"
-      :show-share-button="showShareButton"
       :show-delete-button="showDeleteButton"
       @delete="deleteConfirmDialog"
       @edit="editLink" />
@@ -121,8 +120,6 @@
         </div>
       </div>
     </div>
-    <exo-news-share-activity-drawer />
-    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -148,11 +145,6 @@ export default {
       required: false,
       default: false
     },
-    showShareButton: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
     showPinButton: {
       type: Boolean,
       required: false,
@@ -162,7 +154,7 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
+    }
   },
   data() {
     return {

@@ -46,9 +46,9 @@ export default {
         });
       }
     });
-    this.$root.$on('news-shared', (news, spaces) => {
+    this.$root.$on('news-shared', (newsId, spaces) => {
       const spacesList = [];
-      if (news && news.newsId && spaces && spaces.length > 0) {
+      if (newsId && spaces && spaces.length > 0) {
         spaces.forEach(space => spacesList.push(this.truncateString(space)));
         const message = `${this.$t('news.share.message')} ${spacesList.join(', ')}`;
         this.$root.$emit('news-notification-alert', {

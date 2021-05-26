@@ -127,11 +127,10 @@ export function findUserSpaces(spaceName) {
   }).then(resp => resp.json()).then(json => json.options);
 }
 
-export function shareNews(newsId, activityId, sharedDescription, sharedSpaces) {
+export function shareNews(newsId, sharedDescription, sharedSpaces) {
   const sharedNews = {
     description: sharedDescription,
-    spacesNames: sharedSpaces,
-    activityId: activityId
+    spacesNames: sharedSpaces
   };
   return fetch(`${newsConstants.NEWS_API}/${newsId}/share`, {
     headers: {

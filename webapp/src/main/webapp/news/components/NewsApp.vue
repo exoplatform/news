@@ -81,6 +81,7 @@
               :news="news"
               :show-edit-button="news.canEdit"
               :show-delete-button="news.canDelete"
+              :show-share-button="showShareButton"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -157,9 +158,8 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
-    <exo-news-share-activity-drawer />
+    <share-news-activity ref="shareNewsActivity" class="shareNewsDrawer" />
     <news-activity-sharing-spaces-drawer />
-    <exo-news-notification-alerts />
   </div>
 </template>
 
@@ -182,8 +182,9 @@ export default {
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,
+      showShareButton: true,
       loadingNews: true,
-      initialized: false,
+      initialized: false
     };
   },
   computed: {
@@ -396,6 +397,6 @@ export default {
         }
       }, redirectionTime);
     }
-  }
+  },
 };
 </script>

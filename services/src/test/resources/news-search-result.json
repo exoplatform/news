@@ -1,0 +1,53 @@
+{
+  "hits" : {
+    "total" : 2,
+    "hits" : [
+      {
+        "_index" : "news_v1",
+        "_type" : "news",
+        "_id" : "6",
+        "_score" : 1,
+        "highlight" : {
+          "body": ["term"]
+        },
+        "_source" : {
+          "lastUpdatedDate" : 1592227545759,
+          "spaceDisplayName" : "news space",
+          "posterName" : "root root",
+          "permissions" : [
+            "10"
+          ],
+          "postedTime" : "1592227545758",
+          "lastUpdatedTime" : "1592227545758",
+          "id" : "6",
+          "title": "test news",
+          "body" : "term\r\n",
+          "posterId": "root"
+        }
+      },
+      {
+        "_index" : "news_v1",
+        "_type" : "news",
+        "_id" : "8",
+        "_score" : 1,
+        "highlight" : {
+          "body": ["term"]
+        },
+        "_source" : {
+          "lastUpdatedDate" : 1592227545759,
+          "spaceDisplayName" : "news space",
+          "posterName" : "root root",
+          "permissions" : [
+            "503"
+          ],
+          "postedTime" : "1592227545758",
+          "lastUpdatedTime" : "1592227545758",
+          "id" : "8",
+          "title": "news",
+          "body": "test",
+          "posterId": "root"
+        }
+      }
+    ]
+  }
+}

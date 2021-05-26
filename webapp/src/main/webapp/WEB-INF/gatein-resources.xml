@@ -82,9 +82,6 @@
         <path>/js/news.bundle.js</path>
       </script>
       <depends>
-        <module>ShareActivityDrawer</module>
-      </depends>
-      <depends>
         <module>vue</module>
       </depends>
       <depends>

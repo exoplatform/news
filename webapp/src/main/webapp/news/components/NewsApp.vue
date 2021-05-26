@@ -81,7 +81,7 @@
               :news="news"
               :show-edit-button="news.canEdit"
               :show-delete-button="news.canDelete"
-              :show-share-button="news.canEdit"
+              :show-share-button="showShareButton"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -158,15 +158,8 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
-    <v-app>
-      <share-activity-drawer
-        ref="shareNewsDrawer"
-        class="shareNewsDrawer"
-        :activity-id="activityId"
-        @share-activity="shareNews" />
-    </v-app>
+    <share-news-activity ref="shareNewsActivity" class="shareNewsDrawer" />
     <news-activity-sharing-spaces-drawer />
-    <exo-news-notification-alerts />
   </div>
 </template>
 
@@ -189,9 +182,9 @@ export default {
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,
+      showShareButton: true,
       loadingNews: true,
-      initialized: false,
-      activityId: null
+      initialized: false
     };
   },
   computed: {
@@ -261,11 +254,6 @@ export default {
       if (news && news.spaceId) {
         this.fetchNews(false);
       }
-    });
-    this.$root.$on('news-share-drawer-open', news => {
-      this.news = news;
-      this.activityId = news.activityId;
-      this.open();
     });
   },
   methods: {
@@ -408,28 +396,7 @@ export default {
           this.fetchNews(false);
         }
       }, redirectionTime);
-    },
-    open() {
-      if (this.$refs.shareNewsDrawer) {
-        this.$refs.shareNewsDrawer.open();
-      }
-    },
-    close() {
-      this.$refs.shareNewsDrawer.close();
-    },
-    shareNews(spaces, description) {
-      const spacesList = [];
-      spaces.forEach(space => {
-        this.$spaceService.getSpaceByPrettyName(space,'identity').then(data => {
-          spacesList.push(data.displayName);
-        });
-      });
-      this.$newsServices.shareNews(this.news.newsId, this.news.activityId, description, spaces)
-        .then(() => {
-          this.$root.$emit('news-shared', this.news, spacesList);
-          this.close();
-        });
-    },
+    }
   },
 };
 </script>

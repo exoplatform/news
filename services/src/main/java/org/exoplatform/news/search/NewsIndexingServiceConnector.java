@@ -111,6 +111,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     fields.put("title", news.getTitle());
 
     String body = news.getBody();
+    String summary = news.getSummary();
     if (StringUtils.isBlank(body)) {
       body = news.getTitle();
     }
@@ -124,6 +125,17 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
       }
       body = htmlToText(body);
       fields.put("body", body);
+    }
+
+    if (StringUtils.isNotBlank(summary)) {
+      summary = StringEscapeUtils.unescapeHtml(summary);
+      try {
+        summary = HTMLSanitizer.sanitize(summary);
+      } catch (Exception e) {
+        LOG.warn("Error sanitizing news '{}' summary", news.getId());
+      }
+      summary = htmlToText(summary);
+      fields.put("summary", summary);
     }
 
     if (StringUtils.isNotBlank(news.getAuthor())) {

@@ -50,6 +50,19 @@
           "analyzer": "whitespace_lowercase_asciifolding"
         }
       }
+    },    
+    "summary": {
+      "type": "text",
+      "index_options": "offsets",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        },
+        "whitespace": {
+          "type": "text",
+          "analyzer": "whitespace_lowercase_asciifolding"
+        }
+      }
     }
   }
 }

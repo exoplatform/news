@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.common.http.HTTPStatus;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -36,6 +38,7 @@ import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.model.SharedNews;
+import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -53,6 +56,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.jaxrs.PATCH;
+import org.exoplatform.social.rest.api.EntityBuilder;
 import org.picocontainer.Startable;
 
 @Path("v1/news")
@@ -234,6 +238,44 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
   }
 
+  @Path("search")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Search the list of news available with query", httpMethod = "GET", response = Response.class, produces = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
+      @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
+  public Response search(@Context UriInfo uriInfo,
+                         @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,
+                         @ApiParam(value = "Properties to expand", required = false) @QueryParam("expand") String expand,
+                         @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam("offset") int offset,
+                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit) throws Exception {
+
+    if (StringUtils.isBlank(query)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("'query' parameter is mandatory").build();
+    }
+
+    String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+    Identity currentUser = CommonsUtils.getService(IdentityManager.class)
+                                       .getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser);
+
+    if (offset < 0) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Offset must be 0 or positive").build();
+    }
+    if (limit < 0) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Limit must be positive").build();
+    }
+    List<NewsESSearchResult> searchResults = newsService.search(currentUser, query, offset, limit);
+    List<NewsSearchResultEntity> results = searchResults.stream().map(searchResult -> {
+      NewsSearchResultEntity entity = new NewsSearchResultEntity(searchResult);
+      entity.setPoster(EntityBuilder.buildEntityIdentity(searchResult.getPoster(), uriInfo.getPath(), "all"));
+      return entity;
+    }).collect(Collectors.toList());
+
+    return Response.ok(results).build();
+  }
+  
   private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
     NewsFilter newsFilter = new NewsFilter();
 

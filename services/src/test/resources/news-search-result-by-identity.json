@@ -1,0 +1,27 @@
+{
+  "hits" : {
+    "total" : 1,
+    "hits" : [
+      {
+        "_index" : "news_v1",
+        "_type" : "news",
+        "_id" : "7",
+        "_score" : 1.0,
+        "_source" : {
+          "lastUpdatedDate" : 1592227545759,
+          "spaceDisplayName" : "news space",
+          "permissions" : [
+            "10"
+          ],
+          "postedTime" : "1592227545758",
+          "lastUpdatedTime" : "1592227545758",
+          "id" : "6",
+          "title": "test news",
+          "body" : "term\r\n",
+          "posterId": "john",
+          "posterName" : "John Doe"
+        }
+      }
+    ]
+  }
+}

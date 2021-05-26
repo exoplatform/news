@@ -41,7 +41,6 @@ export function init(params) {
           activityId: params.activityId,
           showEditButton: params.showEditButton,
           showPinButton: params.showPinInput,
-          showShareButton: params.showShareButton,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -53,18 +52,11 @@ export function init(params) {
                   :activity-id="activityId"
                   :show-edit-button="showEditButton"
                   :show-pin-button="showPinButton"
-                  :show-share-button="showShareButton" 
                   :show-delete-button="showDeleteButton"/>`,
       i18n,
       vuetify
     }).$mount(appElement);
   });
-}
-
-export function openShareNewsDrawer(params) {
-  if (newsDetails) {
-    newsDetails.$root.$emit('news-share-drawer-open', params);
-  }
 }
 
 export function destroy() {

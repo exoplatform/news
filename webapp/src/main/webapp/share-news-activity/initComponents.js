@@ -1,7 +1,7 @@
-import ShareNewsActivityDrawer from './components/ShareNewsActivityDrawer.vue';
+import ShareNewsActivity from './components/ShareNewsActivity.vue';
 
 const components = {
-  'share-news-activity-drawer': ShareNewsActivityDrawer,
+  'share-news-activity': ShareNewsActivity,
 };
 for (const key in components) {
   Vue.component(key, components[key]);

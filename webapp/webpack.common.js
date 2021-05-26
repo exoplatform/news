@@ -6,7 +6,7 @@ let config = {
   // set the entry point of the application
   // can use multiple entry
   entry: {
-    shareNewsActivityDrawer :'./src/main/webapp/news-share-activity-drawer/main.js',
+    shareNewsActivity :'./src/main/webapp/share-news-activity/main.js',
     snackbarComponent :'./src/main/webapp/components/snackbar/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',

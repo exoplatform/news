@@ -2,7 +2,7 @@
   <div id="newsDetails">
     <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
-      v-if="showShareButton || showEditButton"
+      v-if="showEditButton"
       :news="news"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton"
@@ -120,12 +120,6 @@
         </div>
       </div>
     </div>
-    <v-app>
-      <share-news-activity-drawer
-        ref="shareNewsDrawer"
-        class="shareNewsDrawer"
-        :activity-id="activityId" />
-    </v-app>
   </div>
 </template>
 <script>
@@ -151,11 +145,6 @@ export default {
       required: false,
       default: false
     },
-    showShareButton: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
     showPinButton: {
       type: Boolean,
       required: false,
@@ -165,10 +154,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    id: {
-      type: String,
-      default: ''
     }
   },
   data() {
@@ -188,10 +173,6 @@ export default {
       .finally(() => {
         this.$root.$emit('application-loaded');
       });
-    this.$root.$on('news-share-drawer-open', params => {
-      this.newsId = params.news.newsId;
-      this.open();
-    });
   },
   mounted() {
     this.updateViewsCount();

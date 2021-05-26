@@ -3,7 +3,6 @@
     <share-activity-drawer
       ref="shareNewsDrawer"
       class="shareNewsDrawer"
-      :activity-id="activityId"
       @share-activity="shareNews" />
     <exo-news-notification-alerts />
   </v-app>
@@ -11,23 +10,14 @@
 <script>
 export default {
   props: {
-    news: {
-      type: Object,
-      required: false,
-      default: function() { return new Object(); }
-    },
     id: {
       type: String,
       default: ''
     }
   },
-  data: () => ({
-    activityId: '',
-    activityType: '',
-  }),
   created() {
     this.$root.$on('news-share-drawer-open', params => {
-      this.newsId = params.news.newsId;
+      this.newsId = params.newsId;
       this.openDrawer();
     });
   },
@@ -42,9 +32,9 @@ export default {
           spacesList.push(data.displayName);
         });
       });
-      this.$newsServices.shareNews(this.news.newsId, this.news.activityId, description, spaces)
+      this.$newsServices.shareNews(this.newsId, description, spaces)
         .then(() => {
-          this.$root.$emit('news-shared', this.news, spacesList);
+          this.$root.$emit('news-shared', this.newsId, spacesList);
           this.close();
         });
     },

@@ -153,7 +153,6 @@
       url: '${news.url}',
       hiddenSpace: ${news.hiddenSpace},
     },
-    showShareButton: true,
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,
   } """
@@ -179,7 +178,7 @@
         <% if (!news.archived || (news.archived && news.canArchive)) { %>
         <div class="actionsDetailsWrapper">
           <% _ctx.includeTemplates("UIActivityListLiked") %>
-          <% _ctx.includeTemplates("UIActivityNewsActionBar-actions") %>
+          <% _ctx.includeTemplates("UINewsActivityActionBar-actions") %>
         </div><!--end actionBar and list like people wrapper-->
         <%}%>
       <% _ctx.includeTemplates("UIActivityCommentBox") %>

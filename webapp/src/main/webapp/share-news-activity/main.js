@@ -14,7 +14,7 @@ const urls = [
 ];
 // get overrided components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('shareNewsActivityDrawer');
+  const components = extensionRegistry.loadComponents('ShareNewsActivity');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -23,7 +23,7 @@ if (extensionRegistry) {
 }
 let shareNewsApp;
 export function init(params) {
-  const appId = `shareNewsActivityDrawer-${params.activityId}`;
+  const appId = `shareNewsActivity-${params.newsId}`;
 
   const appElement = document.createElement('div');
   appElement.id = appId;
@@ -31,21 +31,9 @@ export function init(params) {
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale ressources are ready
     shareNewsApp = new Vue({
-      data: function() {
-        return {
-          news: params.news,
-          newsId: params.news.newsId,
-          activityId: params.activityId,
-          showEditButton: params.news.showEditButton,
-          showPinButton: params.news.showPinInput,
-          showShareButton: params.news.showShareButton,
-          showDeleteButton: params.news.canDelete,
-        };
-      },
-      template: `<share-news-activity-drawer
+      template: `<share-news-activity
                   v-cacheable="{cacheId: '${appId}'}"
-                  id="${appId}"
-                  :news="news"/>`,
+                  id="${appId}"/>`,
       i18n,
       vuetify,
     }).$mount(appElement);

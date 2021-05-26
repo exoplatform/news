@@ -35,6 +35,7 @@ export default {
       this.$newsServices.shareNews(this.newsId, description, spaces)
         .then(() => {
           this.$root.$emit('news-shared', this.newsId, spacesList);
+          this.$root.$emit('clear-suggester', this.newsId, spacesList);
           this.close();
         });
     },

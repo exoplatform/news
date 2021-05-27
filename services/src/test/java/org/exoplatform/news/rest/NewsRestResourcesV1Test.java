@@ -62,7 +62,7 @@ public class NewsRestResourcesV1Test {
 
   @Mock
   PortalContainer        container;
-
+  
   @Before
   public void setup() {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -1235,6 +1235,7 @@ public class NewsRestResourcesV1Test {
     newsDrafts.add(news2);
     when(newsService.getNewsDrafts(anyString(), anyString())).thenReturn(newsDrafts);
     when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "mike", "1", "draft", "", null, 0, 10, false);
@@ -1524,6 +1525,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", null, "published", "", null, 0, 10, false);
@@ -1546,6 +1549,8 @@ public class NewsRestResourcesV1Test {
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRemoteUser()).thenReturn("john");
     NewsFilter newsFilter = new NewsFilter();
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     when(newsService.getNews(newsFilter)).thenReturn(null);
 
     // When
@@ -1636,6 +1641,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     when(newsService.getNews(any())).thenReturn(allNews);
     when(newsService.getNewsCount(any())).thenReturn(allNews.size());
 
@@ -1691,7 +1698,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "", text, 0, 5, false);
@@ -1746,8 +1754,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
-
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "published", "", text, 0, 10, false);
 
@@ -1801,7 +1809,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "pinned", text, 0, 10, false);
@@ -1845,7 +1854,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(false);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(false);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", "pinned", text, 0, 10, false);
@@ -1887,7 +1897,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", null, "published", filter, null, 0, 10, false);
@@ -1938,7 +1949,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.getNews(any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, null, 0, 10, false);
@@ -1990,7 +2002,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     allNews.add(news3);
     when(newsService.searchNews(any(), any())).thenReturn(allNews);
-    when(spaceService.isMember(anyString(), any())).thenReturn(true);
+    when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
     Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "published", filter, text, 0, 10, false);

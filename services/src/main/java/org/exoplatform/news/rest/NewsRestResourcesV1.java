@@ -26,7 +26,9 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
@@ -56,7 +58,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.jaxrs.PATCH;
+
 import org.exoplatform.social.rest.api.EntityBuilder;
+
 import org.picocontainer.Startable;
 
 @Path("v1/news")
@@ -64,10 +68,6 @@ import org.picocontainer.Startable;
 public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private static final Log       LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
-
-  private static final String    REDACTOR_MEMBERSHIP_NAME        = "redactor";
-
-  private static final String    MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private static final String    PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
@@ -134,13 +134,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
 
     String authenticatedUser = request.getRemoteUser();
-
     Space space = spaceService.getSpaceById(news.getSpaceId());
-    if (space == null || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
-      return Response.status(Response.Status.UNAUTHORIZED).build();
-    }
-
     try {
+      if (!canCreateNews(authenticatedUser, space)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       News createdNews;
       if ("published".equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
@@ -182,8 +180,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if ("draft".equals(publicationState)) {
         if (StringUtils.isNotEmpty(spaces)) {
           Space space = spaceService.getSpaceById(spaces);
-          if (space == null
-              || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          if (!canViewNews(authenticatedUser, space)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
           }
           List<News> drafts = newsService.getNewsDrafts(spaces, author);
@@ -197,12 +194,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         List<String> spacesList = new ArrayList<>();
         // Set spaces to search news in
         if (StringUtils.isNotEmpty(spaces)) {
-          for (String space : spaces.split(",")) {
-            if (space == null
-                || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+          for (String spaceId : spaces.split(",")) {
+            Space space = spaceService.getSpaceById(spaceId);
+            if (!canViewNews(authenticatedUser, space)) {
               return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-            spacesList.add(space);
+            spacesList.add(spaceId);
           }
         }
         NewsFilter newsFilter = buildFilter(spacesList, filter, text, author, limit, offset);
@@ -276,46 +273,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     return Response.ok(results).build();
   }
   
-  private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
-    NewsFilter newsFilter = new NewsFilter();
-
-    newsFilter.setSpaces(spaces);
-    if (StringUtils.isNotEmpty(filter)) {
-      FilterType filterType = FilterType.valueOf(filter.toUpperCase());
-      switch (filterType) {
-      case PINNED: {
-        newsFilter.setPinnedNews(true);
-        break;
-      }
-
-      case MYPOSTED: {
-        if (StringUtils.isNotEmpty(author)) {
-          newsFilter.setAuthor(author);
-        }
-        break;
-      }
-
-      case ARCHIVED: {
-        newsFilter.setArchivedNews(true);
-        break;
-      }
-
-      }
-    }
-    // Set text to search news with
-    if (text != null && StringUtils.isNotEmpty(text)) {
-      newsFilter.setSearchText(text);
-      newsFilter.setOrder("jcr:score");
-    } else {
-      newsFilter.setOrder("exo:dateModified");
-    }
-
-    newsFilter.setLimit(limit);
-    newsFilter.setOffset(offset);
-
-    return newsFilter;
-  }
-
   @GET
   @Path("{id}")
   @RolesAllowed("users")
@@ -342,8 +299,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         String authenticatedUser = request.getRemoteUser();
 
         Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (space == null
-            || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+        if (!canViewNews(authenticatedUser, space)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
       }
@@ -742,8 +698,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
       if (!news.isPinned()) {
         Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (space == null
-            || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+        if (StringUtils.isBlank(authenticatedUser) || !canViewNews(authenticatedUser, space)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
       }
@@ -880,13 +835,63 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
       String authenticatedUser = request.getRemoteUser();
 
-      if (StringUtils.isBlank(authenticatedUser) || !spaceService.isMember(space, authenticatedUser)) {
+      if (StringUtils.isBlank(authenticatedUser) || !canViewNews(authenticatedUser, space)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      return Response.ok(String.valueOf(SpaceUtils.isRedactor(authenticatedUser, space.getGroupId()) || SpaceUtils.isSpaceManagerOrSuperManager(authenticatedUser, space.getGroupId()))).build();
+      return Response.ok(String.valueOf(canCreateNews(authenticatedUser, space))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can create a news", e);
       return Response.serverError().build();
     }
+  }
+  
+  private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
+    NewsFilter newsFilter = new NewsFilter();
+
+    newsFilter.setSpaces(spaces);
+    if (StringUtils.isNotEmpty(filter)) {
+      FilterType filterType = FilterType.valueOf(filter.toUpperCase());
+      switch (filterType) {
+      case PINNED: {
+        newsFilter.setPinnedNews(true);
+        break;
+      }
+
+      case MYPOSTED: {
+        if (StringUtils.isNotEmpty(author)) {
+          newsFilter.setAuthor(author);
+        }
+        break;
+      }
+
+      case ARCHIVED: {
+        newsFilter.setArchivedNews(true);
+        break;
+      }
+
+      }
+    }
+    // Set text to search news with
+    if (text != null && StringUtils.isNotEmpty(text)) {
+      newsFilter.setSearchText(text);
+      newsFilter.setOrder("jcr:score");
+    } else {
+      newsFilter.setOrder("exo:dateModified");
+    }
+
+    newsFilter.setLimit(limit);
+    newsFilter.setOffset(offset);
+
+    return newsFilter;
+  }
+  
+  private boolean canCreateNews(String authenticatedUser, Space space) throws Exception {
+    return space != null && 
+          (spaceService.isSuperManager(authenticatedUser) || spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser) ||
+          spaceService.isMember(space, authenticatedUser) && ArrayUtils.isEmpty(space.getRedactors()));
+  }
+  
+  private boolean canViewNews(String authenticatedUser, Space space) throws Exception {
+    return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
   }
 }

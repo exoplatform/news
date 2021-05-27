@@ -397,7 +397,8 @@ export default {
           top: 'newsTop'
         },
         on: {
-          instanceReady: function() {
+          instanceReady: function(evt) {
+            self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
               .each(function() {

@@ -5,7 +5,6 @@ const newsActivityComposerPlugin = {
   labelKey: 'news.composer.write',
   description: 'news.composer.write.description',
   iconClass: 'newsComposerIcon',
-  enabled: false,
   onExecute: function (attachments) {
     let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
     if (eXo.env.portal.spaceId) {
@@ -20,6 +19,11 @@ const newsActivityComposerPlugin = {
     }
 
     window.open(url, '_blank');
+  },
+  enabled: function () {
+    return  canUserCreateNews(eXo.env.portal.spaceId).then(canCreateNews => {
+      return (eXo.env.portal.spaceId !== "") && (canCreateNews === 'true');
+    });
   }
 };
 
@@ -48,16 +52,8 @@ const switchToArticleActivityComposerPlugin = {
 
 require(['SHARED/extensionRegistry'], function (extensionRegistry) {
   extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-hint-action', switchToArticleActivityComposerPlugin);
+  extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-action', newsActivityComposerPlugin);
   document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));
-  if (eXo.env.portal.spaceId) {
-    canUserCreateNews().then(canCreateNews => {
-      newsActivityComposerPlugin.enabled = eXo.env.portal.spaceId && (canCreateNews === 'true');
-      extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-action', newsActivityComposerPlugin);
-      document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));
-    });
-  } else {
-    newsActivityComposerPlugin.enabled = false;
-  }
 });
 
 function canUserCreateNews() {

@@ -45,6 +45,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -60,6 +61,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.jaxrs.PATCH;
 
 import org.exoplatform.social.rest.api.EntityBuilder;
+import org.exoplatform.social.webui.Utils;
 
 import org.picocontainer.Startable;
 
@@ -423,11 +425,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-      String authenticatedUser = request.getRemoteUser();
-
-      Space space = spaceService.getSpaceById(news.getSpaceId());
-      if (space == null
-          || (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser))) {
+      if (!news.isCanEdit()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
 
@@ -610,7 +608,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      String authenticatedUser = request.getRemoteUser();
       Space space = spaceService.getSpaceById(news.getSpaceId());
       if (space == null) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -653,7 +650,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       boolean isUpdatedIllustration =
                                     (updatedNews.getUploadId() != null) && !updatedNews.getUploadId().equals(news.getUploadId());
       if (isUpdatedTitle || isUpdatedSummary || isUpdatedBody || isUpdatedIllustration) {
-        if (!spaceService.isMember(space, authenticatedUser) && !spaceService.isSuperManager(authenticatedUser)) {
+        if (!news.isCanEdit()) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         if (isUpdatedTitle) {

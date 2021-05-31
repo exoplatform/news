@@ -21,8 +21,8 @@ const newsActivityComposerPlugin = {
     window.open(url, '_blank');
   },
   enabled: function () {
-    return  canUserCreateNews(eXo.env.portal.spaceId).then(canCreateNews => {
-      return (eXo.env.portal.spaceId !== "") && (canCreateNews === 'true');
+    return  eXo.env.portal.spaceId && canUserCreateNews().then(canCreateNews => {
+      return canCreateNews === 'true';
     });
   }
 };

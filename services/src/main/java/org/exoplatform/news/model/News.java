@@ -279,7 +279,7 @@ public class News {
     this.spaceAvatarUrl = spaceAvatarUrl;
   }
 
-  public Boolean getCanEdit() {
+  public Boolean isCanEdit() {
     return canEdit;
   }
 

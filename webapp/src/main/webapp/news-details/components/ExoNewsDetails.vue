@@ -1,6 +1,6 @@
 <template>
   <div id="newsDetails">
-    <a class="backBtn" @click="goBack()"><i class="uiIconBack"></i></a>
+    <a class="backBtn" :href="news.spaceUrl"><i class="uiIconBack"></i></a>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -242,13 +242,6 @@ export default {
         document.querySelector('.uiDocumentPreview').classList += ' collapsed';
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
-      }
-    },
-    goBack() {
-      if ( history.length > 1) {
-        history.back();
-      } else {
-        window.open('/', '_self');
       }
     },
     editLink() {

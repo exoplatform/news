@@ -13,6 +13,7 @@ let config = {
     latestNews:'./src/main/webapp/latest-news/main.js',
     news :'./src/main/webapp/news/main.js',
     newsSearchCard: './src/main/webapp/news-search/main.js',
+    newsExtensions: './src/main/webapp/news-extensions/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',

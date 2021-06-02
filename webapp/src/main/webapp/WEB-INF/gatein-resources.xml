@@ -115,19 +115,25 @@
     </module>
   </portlet>
 
-  <javascript>
-    <param>
-      <js-module>newsComposerPlugin</js-module>
-      <js-path>/js/newsComposerPlugin.js</js-path>
-    </param>
-  </javascript>
-
-  <module>
-    <name>newsComposerIntegration</name>
-    <script>
-      <path>/js/newsComposerIntegration.js</path>
-    </script>
-  </module>
+  <portlet>
+    <name>NewsExtensions</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/newsExtensions.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+    </module>
+  </portlet>
 
   <module>
     <name>newsDetails</name>

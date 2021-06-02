@@ -98,6 +98,9 @@
             <field name="pluginId">
               <string>ShareNewsNotificationPlugin</string>
             </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.articleShared</string>
+            </field>
             <field name="order">
               <string>2</string>
             </field>
@@ -133,6 +136,9 @@
           <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>ShareMyNewsNotificationPlugin</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.postedArticleShared</string>
             </field>
             <field name="order">
               <string>3</string>
@@ -170,6 +176,9 @@
             <field name="pluginId">
               <string>LikeNewsNotificationPlugin</string>
             </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.articleLiked</string>
+            </field>
             <field name="order">
               <string>4</string>
             </field>
@@ -205,6 +214,9 @@
           <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>LikeSharedNewsNotificationPlugin</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.sharedArticleLiked</string>
             </field>
             <field name="order">
               <string>5</string>
@@ -242,6 +254,9 @@
             <field name="pluginId">
               <string>CommentNewsNotificationPlugin</string>
             </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.articleCommented</string>
+            </field>
             <field name="order">
               <string>6</string>
             </field>
@@ -278,6 +293,9 @@
             <field name="pluginId">
               <string>CommentSharedNewsNotificationPlugin</string>
             </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.sharedArticleCommented</string>
+            </field>
             <field name="order">
               <string>7</string>
             </field>
@@ -313,6 +331,9 @@
           <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
             <field name="pluginId">
               <string>MentionInNewsNotificationPlugin</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.mentionInArticle</string>
             </field>
             <field name="order">
               <string>8</string>

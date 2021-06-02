@@ -222,7 +222,7 @@ export default {
       return this.newsId !== null;
     },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
+      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment
@@ -358,7 +358,8 @@ export default {
           top: 'newsTop'
         },
         on: {
-          instanceReady: function() {
+          instanceReady: function(evt) {
+            self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
               .each(function() {

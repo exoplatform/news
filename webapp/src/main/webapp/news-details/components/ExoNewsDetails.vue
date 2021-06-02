@@ -101,7 +101,7 @@
             id="newsBody"
             :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
-            <span v-sanitized-html="news.body"></span>
+            <span v-html="newsBody"></span>
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
@@ -164,6 +164,11 @@ export default {
       spaceDisplayName: this.news.spaceDisplayName,
     };
   },
+  computed: {
+    newsBody() {
+      return this.news && this.news.body;
+    }
+  },
   created() {
     this.$newsServices.getNewsById(this.newsId)
       .then(news => {
@@ -187,13 +192,7 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
-    const linkContentElements = document.querySelectorAll('#newsDetails a');
-    linkContentElements.forEach(function(linkContentElement) {
-      if (linkContentElement && !linkContentElement.href.includes(`${document.location.host}${eXo.env.portal.context}`)) {
-        linkContentElement.setAttribute('target', '_blank');
-      }
-    });
-    
+    this.news.body = this.targetBlank(this.news.body);
     if (this.showPinInput) {
       const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
       if (pinButton) {
@@ -264,7 +263,20 @@ export default {
           window.location.href = this.news.spaceUrl;
         }
       }, redirectionTime);
-    }
+    },
+    targetBlank: function(content) {
+      let internal = location.host.replace('www.', '');
+      internal = new RegExp(internal, 'i');
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      const links = docElement.getElementsByTagName('a');
+      links.forEach(function(link) {
+        if (link && !internal.test(link.host)) {
+          link.setAttribute('target', '_blank');
+        }
+      });
+      return docElement.innerHTML;
+    },
   }
 };
 </script>

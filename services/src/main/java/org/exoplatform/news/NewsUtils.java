@@ -2,10 +2,12 @@ package org.exoplatform.news;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
-import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -13,24 +15,50 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
 public class NewsUtils {
 
-  /**
-   * Load the user identity
-   *
-   * @param username
-   * @return Identity of user
-   */
-  private static Identity loadUser(String username) {
-    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-    if (username == null || username.isEmpty()) {
-      return null;
+  private static final Log   LOG               = ExoLogger.getLogger(NewsUtils.class);
+
+  public static final String POST_ARTICLE_NEWS = "exo.news.postArticle";
+
+  private static String      defaultSite;
+
+  public static void broadcastEvent(ListenerService listenerService, String eventName, Object source, Object data) {
+    try {
+      listenerService.broadcast(eventName, source, data);
+    } catch (Exception e) {
+      LOG.warn("Error broadcasting event '" + eventName + "' using source '" + source + "' and data " + data, e);
     }
-    return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
   }
+
+  public static String getNewsURL(News news) {
+    String currentSite = getDefaultSite();
+    String currentDomain = CommonsUtils.getCurrentDomain();
+    if (!currentDomain.endsWith("/")) {
+      currentDomain += "/";
+    }
+    String newsURL = "";
+    if (news != null) {
+      if (StringUtils.isNotBlank(news.getActivityId())) {
+        newsURL = currentDomain + "portal/" + currentSite + "/activity?id=" + news.getActivityId();
+      }
+    } else {
+      newsURL = currentDomain + "portal/" + currentSite + "/news";
+    }
+    return newsURL;
+  }
+
+  public static String getDefaultSite() {
+    if (defaultSite != null) {
+      return defaultSite;
+    }
+    UserPortalConfigService portalConfig = CommonsUtils.getService(UserPortalConfigService.class);
+    defaultSite = portalConfig.getDefaultPortal();
+    return defaultSite;
+  }
+
 
   /**
    * Processes Mentioners who has been mentioned via the news body.
@@ -62,4 +90,19 @@ public class NewsUtils {
     }
     return mentions;
   }
+
+  /**
+   * Load the user identity
+   *
+   * @param username
+   * @return Identity of user
+   */
+  private static Identity loadUser(String username) {
+    IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+    if (username == null || username.isEmpty()) {
+      return null;
+    }
+    return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+  }
+
 }

@@ -138,7 +138,7 @@
               <string>ShareMyNewsNotificationPlugin</string>
             </field>
             <field name="resourceBundleKey">
-              <string>UINotification.label.articlePostedShared</string>
+              <string>UINotification.label.postedArticleShared</string>
             </field>
             <field name="order">
               <string>3</string>
@@ -216,7 +216,7 @@
               <string>LikeSharedNewsNotificationPlugin</string>
             </field>
             <field name="resourceBundleKey">
-              <string>UINotification.label.articleSharedLiked</string>
+              <string>UINotification.label.sharedArticleLiked</string>
             </field>
             <field name="order">
               <string>5</string>
@@ -294,7 +294,7 @@
               <string>CommentSharedNewsNotificationPlugin</string>
             </field>
             <field name="resourceBundleKey">
-              <string>UINotification.label.articleSharedCommented</string>
+              <string>UINotification.label.sharedArticleCommented</string>
             </field>
             <field name="order">
               <string>7</string>

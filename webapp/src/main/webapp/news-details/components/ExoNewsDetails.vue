@@ -94,14 +94,14 @@
             v-if="news.summary"
             id="newsSummary"
             class="summary">
-            <span v-sanitized-html="news.summary"></span>
+            <span v-html="news.summary"></span>
           </div>
 
           <div
             id="newsBody"
             :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
-            <span v-html="newsBody"></span>
+            <span v-html="news.body"></span>
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
@@ -164,11 +164,6 @@ export default {
       spaceDisplayName: this.news.spaceDisplayName,
     };
   },
-  computed: {
-    newsBody() {
-      return this.news && this.news.body;
-    }
-  },
   created() {
     this.$newsServices.getNewsById(this.newsId)
       .then(news => {
@@ -193,6 +188,7 @@ export default {
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
     this.news.body = this.targetBlank(this.news.body);
+    this.news.summary = this.targetBlank(this.news.summary);
     if (this.showPinInput) {
       const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
       if (pinButton) {

@@ -273,6 +273,7 @@ export default {
       links.forEach(function(link) {
         if (link && !internal.test(link.host)) {
           link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
         }
       });
       return docElement.innerHTML;

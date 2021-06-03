@@ -1,13 +1,5 @@
 package org.exoplatform.news.notification.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import javax.jcr.Node;
-import javax.jcr.Session;
-
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.ExoContainerContext;
@@ -26,11 +18,19 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.jcr.Node;
+import javax.jcr.Session;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
 public class NotificationUtilsTest {
 
-  @PrepareForTest({ ExoContainerContext.class, PortalContainer.class, PropertyManager.class })
+  @PrepareForTest({ExoContainerContext.class, PortalContainer.class, PropertyManager.class})
   @Test
   public void shouldGetTheSpaceUrlWhenTheUserIsNotMember() {
     // Given
@@ -51,7 +51,36 @@ public class NotificationUtilsTest {
     assertEquals("http://localhost:8080/portal/g/:spaces:space1/space1", activityUrl);
   }
 
-  @PrepareForTest({ PropertyManager.class, CommonsUtils.class })
+  @PrepareForTest({ExoContainerContext.class, PortalContainer.class, PropertyManager.class})
+  @Test
+  public void shouldGetTheSpaceUrlWhenTheUserIsNotMemberAndAfterUpdatingSpaceName() {
+    // Given
+    Space space = new Space();
+    space.setId("4");
+    space.setDisplayName("Space1");
+    space.setPrettyName(space.getDisplayName());
+    space.setGroupId("space1");
+
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    PowerMockito.mockStatic(PortalContainer.class);
+    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    PowerMockito.mockStatic(PropertyManager.class);
+    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
+
+    // When
+    String activityUrl = NotificationUtils.getNotificationActivityLink(space, "13", false);
+
+    assertEquals("http://localhost:8080/portal/g/:spaces:space1/space1", activityUrl);
+
+    Space updatedSpace = space;
+    updatedSpace.setDisplayName("Space One");
+    updatedSpace.setPrettyName(updatedSpace.getDisplayName());
+
+    activityUrl = NotificationUtils.getNotificationActivityLink(updatedSpace, "13", false);
+    assertEquals("http://localhost:8080/portal/g/:spaces:space1/space_one", activityUrl);
+  }
+
+  @PrepareForTest({PropertyManager.class, CommonsUtils.class})
   @Test
   public void shouldGetTheDefaultIllustrationWhenTheNodeHasNotIllustration() throws Exception {
     // Given

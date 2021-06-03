@@ -76,9 +76,9 @@ public class NotificationUtils {
   public static String getNotificationActivityLinkForNotSpaceMembers(Space space) {
     return "/".concat(PortalContainer.getCurrentPortalContainerName())
               .concat("/g/:spaces:")
-              .concat(space.getPrettyName())
+              .concat(space.getGroupId().replaceFirst("/spaces/", ""))
               .concat("/")
-              .concat(space.getDisplayName());
+              .concat(space.getPrettyName());
   }
 
 }

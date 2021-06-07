@@ -24,11 +24,11 @@ export function initExtensions() {
     }
   };
 
-  const switchToArticleActivityComposerPlugin = Object.assign({
+  const switchToArticleActivityComposerPlugin = Object.assign({}, newsActivityComposerPlugin, {
     key: 'switchToArticle',
     rank: 10,
     labelKey: 'news.composer.switch.article'
-  }, newsActivityComposerPlugin);
+  });
 
   extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-hint-action', switchToArticleActivityComposerPlugin);
   document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));

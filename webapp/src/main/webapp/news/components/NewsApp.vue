@@ -110,7 +110,7 @@
             </div>
             <div class="newsDate">
               <i class="uiIconClock"></i>
-              <span>{{ news.creationDate }}</span>
+              <span>{{ news.updatedDate }}</span>
             </div>
             <div class="newsViews" v-if="!news.draft">
               <i class="uiIconWatch"></i>
@@ -290,7 +290,7 @@ export default {
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          creationDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
+          updatedDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
           url: item.url,

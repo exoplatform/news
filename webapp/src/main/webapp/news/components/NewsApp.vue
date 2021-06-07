@@ -37,6 +37,7 @@
               <li><a @click="newsFilter = 'pinned'">{{ $t('news.app.filter.pinned') }}</a></li>
               <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
               <li><a @click="newsFilter = 'archived'">{{ $t('news.app.filter.archived') }}</a></li>
+              <li><a @click="newsFilter = 'drafts'">{{ $t('news.app.filter.drafts') }}</a></li>
             </ul>
           </div>
         </div>
@@ -79,9 +80,10 @@
             <exo-news-details-action-menu
               v-if="news.canEdit "
               :news="news"
-              :show-edit-button="news.canEdit"
+              :show-edit-button="news.canEdit && !news.draft"
               :show-delete-button="news.canDelete"
-              :show-share-button="showShareButton"
+              :show-share-button="showShareButton && !news.draft"
+              :show-resume-button="news.draft"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -110,7 +112,7 @@
               <i class="uiIconClock"></i>
               <span>{{ news.creationDate }}</span>
             </div>
-            <div class="newsViews">
+            <div class="newsViews" v-if="!news.draft">
               <i class="uiIconWatch"></i>
               <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
             </div>
@@ -119,7 +121,7 @@
             <a :href="news.url">
               <p class="newsSummary" v-sanitized-html="news.newsText"></p>
             </a>
-            <div class="newsActions">
+            <div class="newsActions" v-if="!news.draft">
               <exo-news-archive
                 v-if="news.canArchive"
                 :news-id="news.newsId"
@@ -278,7 +280,8 @@ export default {
       const options = {year: 'numeric', month: 'short', day: 'numeric'};
 
       data.forEach((item) => {
-        const newsPublicationDate = new Date(item.publicationDate.time).toLocaleDateString(local, options);
+        const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time).toLocaleDateString(local, options) : null;
+        const newsUpdateDate = new Date(item.updateDate.time).toLocaleDateString(local, options);
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
@@ -287,7 +290,7 @@ export default {
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          creationDate: newsPublicationDate,
+          creationDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
           url: item.url,
@@ -298,6 +301,7 @@ export default {
           canEdit: item.canEdit,
           canDelete: item.canDelete,
           archived: item.archived,
+          draft: item.publicationState === 'draft',
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,

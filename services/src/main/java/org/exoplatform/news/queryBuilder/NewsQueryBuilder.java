@@ -62,9 +62,16 @@ public class NewsQueryBuilder {
         if (StringUtils.isNotEmpty(filter.getAuthor())) {
           sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");
         }
-        sqlQuery.append("publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY ")
-                .append(filter.getOrder())
-                .append(" DESC");
+        if (filter.isDraftNews()) {
+          sqlQuery.append("publication:currentState = 'draft' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY ")
+                  .append(filter.getOrder())
+                  .append(" DESC");
+        } else {
+          sqlQuery.append("publication:currentState = 'published' AND jcr:path LIKE '/Groups/spaces/%' ORDER BY ")
+                  .append(filter.getOrder())
+                  .append(" DESC");
+        }
+
       } else {
         throw new Exception("Unable to build query, filter is null");
       }

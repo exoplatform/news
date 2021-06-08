@@ -67,12 +67,18 @@
             </div>
           </div>
 
-          <div v-if="news.summary" id="newsSummary" class="summary">
-            <span v-html="linkifiedSummary"></span>
+          <div
+            v-if="newsSummary"
+            id="newsSummary"
+            class="summary">
+            <span v-html="news.summary"></span>
           </div>
 
-          <div id="newsBody" :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']" class="fullDetailsBody clearfix">
-            <span v-html="news.body"></span>
+          <div
+            id="newsBody"
+            :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
+            class="fullDetailsBody clearfix">
+            <span v-html="newsBody"></span>
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
@@ -135,8 +141,16 @@ export default {
     };
   },
   computed: {
+<<<<<<< HEAD
     linkifiedSummary : function() {
       return newsServices.linkifyText(newsServices.escapeHTML(this.news.summary));
+=======
+    newsBody() {
+      return this.targetBlank(this.news.body);
+    },
+    newsSummary() {
+      return this.targetBlank(this.news.summary);
+>>>>>>> 380f41e... Task-40470: Open news externals links in new tab (#124)
     }
   },
   created() {
@@ -162,6 +176,7 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
+<<<<<<< HEAD
     const linkContentElements = document.querySelectorAll('#newsDetails a');
     linkContentElements.forEach(function(linkContentElement) {
       if (linkContentElement && !linkContentElement.href.includes(`${document.location.host}${eXo.env.portal.context}`)) {
@@ -170,6 +185,9 @@ export default {
     });
     
     if(this.showPinInput) {
+=======
+    if (this.showPinInput) {
+>>>>>>> 380f41e... Task-40470: Open news externals links in new tab (#124)
       const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
       if (pinButton) {
         pinButton.style.display = '';
@@ -218,6 +236,7 @@ export default {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
       }
     },
+<<<<<<< HEAD
     goBack() {
       if( history.length > 1) {
         history.back();
@@ -225,6 +244,46 @@ export default {
         window.open('/', '_self');
       }
     }
+=======
+    editLink() {
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
+      window.open(editUrl, '_self');
+    },
+    deleteConfirmDialog() {
+      this.$refs.deleteConfirmDialog.open();
+    },
+    deleteNews() {
+      const deleteDelay = 6;
+      const redirectionTime = 6100;
+      this.$newsServices.deleteNews(this.newsId, deleteDelay)
+        .then(() => {
+          this.$root.$emit('confirm-news-deletion', this.news);
+        });
+      setTimeout(() => {
+        const deletedNews = localStorage.getItem('deletedNews');
+        if (deletedNews != null) {
+          window.location.href = this.news.spaceUrl;
+        }
+      }, redirectionTime);
+    },
+    targetBlank: function (content) {
+      const internal = location.host + eXo.env.portal.context;
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      const links = docElement.getElementsByTagName('a');
+      links.forEach(function (link) {
+        let href = link.href.replace(/(^\w+:|^)\/\//, '');
+        if (href.endsWith('/')) {
+          href = href.slice(0, -1);
+        }
+        if (link && href !== location.host && !href.startsWith(internal)) {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+      return docElement.innerHTML;
+    },
+>>>>>>> 380f41e... Task-40470: Open news externals links in new tab (#124)
   }
 };
 </script>

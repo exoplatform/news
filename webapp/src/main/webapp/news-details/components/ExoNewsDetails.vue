@@ -266,14 +266,13 @@ export default {
         }
       }, redirectionTime);
     },
-    targetBlank: function(content) {
-      const internal = location.host + eXo.env.portal.context;
+    targetBlank: function (content) {
+      const internal = location.origin + eXo.env.portal.context;
       const domParser = new DOMParser();
       const docElement = domParser.parseFromString(content, 'text/html').documentElement;
       const links = docElement.getElementsByTagName('a');
-      links.forEach(function(link) {
-        const href = link.href.replace(/(^\w+:|^)\/\//, '');
-        if (link && !href.startsWith(internal)) {
+      links.forEach(function (link) {
+        if (link && !link.href.startsWith(internal)) {
           link.setAttribute('target', '_blank');
           link.setAttribute('rel', 'noopener noreferrer');
         }

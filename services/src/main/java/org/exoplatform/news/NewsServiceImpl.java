@@ -144,8 +144,6 @@ public class NewsServiceImpl implements NewsService {
 
   private UserACL                  userACL;
 
-  private ListenerService          listenerService;
-
   private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(RepositoryService repositoryService,
@@ -165,8 +163,7 @@ public class NewsServiceImpl implements NewsService {
                          NewsAttachmentsService newsAttachmentsService,
                          IndexingService indexingService,
                          NewsESSearchConnector newsESSearchConnector,
-                         UserACL userACL,
-                         ListenerService listenerService) {
+                         UserACL userACL) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -185,7 +182,6 @@ public class NewsServiceImpl implements NewsService {
     this.indexingService = indexingService;
     this.newsESSearchConnector = newsESSearchConnector;
     this.userACL = userACL;
-    this.listenerService = listenerService;
   }
 
   /**
@@ -222,7 +218,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(listenerService, NewsUtils.POST_ARTICLE_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
     return news;
   }
 

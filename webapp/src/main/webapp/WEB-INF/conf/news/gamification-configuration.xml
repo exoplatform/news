@@ -8,7 +8,7 @@
   PURPOSE. See the GNU Lesser General Public License for more details. You 
   should have received a copy of the GNU Lesser General Public License along 
   with this software; if not, write to the Free Software Foundation, Inc., 
-  51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site: 
+  51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site:
   http://www.fsf.org. -->
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
@@ -25,17 +25,17 @@
   <external-component-plugins>
     <target-component>org.exoplatform.addons.gamification.service.setting.rule.RuleRegistry</target-component>
     <component-plugin>
-      <name>rule.PostNews</name>
+      <name>rule.PostArticle</name>
       <set-method>addPlugin</set-method>
       <type>org.exoplatform.addons.gamification.service.setting.rule.model.RuleConfig</type>
       <init-params>
         <value-param>
           <name>rule-title</name>
-          <value>PostNews</value>
+          <value>PostArticle</value>
         </value-param>
         <value-param>
           <name>rule-description</name>
-          <value>Post a news</value>
+          <value>Post an article</value>
         </value-param>
         <value-param>
           <name>rule-score</name>

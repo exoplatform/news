@@ -17,11 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NewsGamificationIntegrationListener extends Listener<String, String> {
-  private static final Log   LOG                                 = ExoLogger.getLogger(NewsGamificationIntegrationListener.class);
+  private static final Log   LOG                                       =
+                                 ExoLogger.getLogger(NewsGamificationIntegrationListener.class);
 
-  public static final String GAMIFICATION_GENERIC_EVENT          = "exo.gamification.generic.action";
+  public static final String GAMIFICATION_GENERIC_EVENT                = "exo.gamification.generic.action";
 
-  public static final String GAMIFICATION_CREATE_NEWS_RULE_TITLE = "PostNews";
+  public static final String GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE = "PostArticle";
 
   private PortalContainer    container;
 
@@ -29,9 +30,10 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
 
   private NewsService        newsService;
 
-  public NewsGamificationIntegrationListener(PortalContainer container, ListenerService listenerService) {
+  public NewsGamificationIntegrationListener(PortalContainer container, ListenerService listenerService, NewsService newsService) {
     this.container = container;
     this.listenerService = listenerService;
+    this.newsService = newsService;
   }
 
   @Override
@@ -42,30 +44,23 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
       String eventName = event.getEventName();
       String newsId = event.getSource();
       String earnerId = event.getData();
-      News news = getNewsService().getNewsById(newsId);
+      News news = newsService.getNewsById(newsId);
       String ruleTitle = "";
-      if (StringUtils.equals(eventName, NewsUtils.POST_ARTICLE_NEWS)) {
-        ruleTitle = GAMIFICATION_CREATE_NEWS_RULE_TITLE;
+      if (StringUtils.equals(eventName, NewsUtils.POST_NEWS)) {
+        ruleTitle = GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE;
       }
       try {
-        Map<String, String> gam = new HashMap<>();
-        gam.put("ruleTitle", ruleTitle);
-        gam.put("object", NewsUtils.getNewsURL(news));
-        gam.put("senderId", String.valueOf(earnerId)); // matches the gamification's earner id
-        gam.put("receiverId", String.valueOf(earnerId));
-        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gam, String.valueOf(news.getId()));
+        Map<String, String> gamificationMap = new HashMap<>();
+        gamificationMap.put("ruleTitle", ruleTitle);
+        gamificationMap.put("object", news.getUrl());
+        gamificationMap.put("senderId", String.valueOf(earnerId)); // matches the gamification's earner id
+        gamificationMap.put("receiverId", String.valueOf(earnerId));
+        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gamificationMap, news.getId());
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }
     } finally {
       RequestLifeCycle.end();
     }
-  }
-
-  public NewsService getNewsService() {
-    if (newsService == null) {
-      newsService = ExoContainerContext.getService(NewsService.class);
-    }
-    return newsService;
   }
 }

@@ -19,46 +19,17 @@ import java.util.regex.Matcher;
 
 public class NewsUtils {
 
-  private static final Log   LOG               = ExoLogger.getLogger(NewsUtils.class);
+  private static final Log   LOG       = ExoLogger.getLogger(NewsUtils.class);
 
-  public static final String POST_ARTICLE_NEWS = "exo.news.postArticle";
+  public static final String POST_NEWS = "exo.news.postArticle";
 
-  private static String      defaultSite;
-
-  public static void broadcastEvent(ListenerService listenerService, String eventName, Object source, Object data) {
+  public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
-      listenerService.broadcast(eventName, source, data);
+      CommonsUtils.getService(ListenerService.class).broadcast(eventName, source, data);
     } catch (Exception e) {
       LOG.warn("Error broadcasting event '" + eventName + "' using source '" + source + "' and data " + data, e);
     }
   }
-
-  public static String getNewsURL(News news) {
-    String currentSite = getDefaultSite();
-    String currentDomain = CommonsUtils.getCurrentDomain();
-    if (!currentDomain.endsWith("/")) {
-      currentDomain += "/";
-    }
-    String newsURL = "";
-    if (news != null) {
-      if (StringUtils.isNotBlank(news.getActivityId())) {
-        newsURL = currentDomain + "portal/" + currentSite + "/activity?id=" + news.getActivityId();
-      }
-    } else {
-      newsURL = currentDomain + "portal/" + currentSite + "/news";
-    }
-    return newsURL;
-  }
-
-  public static String getDefaultSite() {
-    if (defaultSite != null) {
-      return defaultSite;
-    }
-    UserPortalConfigService portalConfig = CommonsUtils.getService(UserPortalConfigService.class);
-    defaultSite = portalConfig.getDefaultPortal();
-    return defaultSite;
-  }
-
 
   /**
    * Processes Mentioners who has been mentioned via the news body.

@@ -40,7 +40,7 @@ public class NewsGamificationIntegrationListenerTest {
     news.setActivityId("10");
 
     AtomicBoolean executeListener = new AtomicBoolean(true);
-    listenerService.addListener(NewsUtils.POST_ARTICLE_NEWS, new Listener<Long, Long>() {
+    listenerService.addListener(NewsUtils.POST_NEWS, new Listener<Long, Long>() {
       @Override
       public void onEvent(Event<Long, Long> event) throws Exception {
         executeListener.set(true);

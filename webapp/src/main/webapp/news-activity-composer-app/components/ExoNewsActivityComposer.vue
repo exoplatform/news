@@ -265,9 +265,6 @@ export default {
     editMode: function() {
       return this.newsId !== null;
     },
-    draftResume: function() {
-      return this.draftId !== null;
-    },
     postDisabled: function () {
       return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
     },

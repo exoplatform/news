@@ -152,13 +152,13 @@ public class NewsServiceImplTest {
 
   @Mock
   NewsAttachmentsService     newsAttachmentsService;
-
+  
   @Mock
   IndexingService indexingService;
-
+  
   @Mock
   NewsESSearchConnector    newsESSearchConnector;
-
+  
   @Mock
   UserACL                    userACL;
 
@@ -1193,7 +1193,7 @@ public class NewsServiceImplTest {
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
     Property exoActivitiesProperty = mock(Property.class);
-
+    
 
     Space space1 = new Space();
     space1.setId("1");
@@ -3350,24 +3350,24 @@ public class NewsServiceImplTest {
                                                       indexingService,
                                                       newsESSearchConnector,
                                                       userACL);
-
+  
     Node newsNode = mock(Node.class);
     when(newsNode.hasProperty(anyString())).thenReturn(true);
     when(newsNode.hasProperty(eq("jcr:frozenUuid"))).thenReturn(false);
     when(newsNode.hasProperty(eq("exo:dateCreated"))).thenReturn(false);
     when(newsNode.hasProperty(eq("exo:dateModified"))).thenReturn(false);
     when(newsNode.hasProperty(eq("exo:activities"))).thenReturn(false);
-
+  
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("propertyValue");
-
+  
     Property propertyBody = mock(Property.class);
     when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
     when(newsNode.getProperty(anyString())).thenReturn(property);
     when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
-
-
+    
+    
     assertFalse(newsService.convertNodeToNews(newsNode).getBody().contains("<img"));
-
+    
   }
 }

@@ -25,7 +25,8 @@ public class NewsUtils {
 
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
-      CommonsUtils.getService(ListenerService.class).broadcast(eventName, source, data);
+      ListenerService listenerService = CommonsUtils.getService(ListenerService.class);
+      listenerService.broadcast(eventName, source, data);
     } catch (Exception e) {
       LOG.warn("Error broadcasting event '" + eventName + "' using source '" + source + "' and data " + data, e);
     }

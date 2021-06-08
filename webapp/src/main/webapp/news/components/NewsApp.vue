@@ -85,7 +85,8 @@
               :show-share-button="showShareButton && !news.draft"
               :show-resume-button="news.draft"
               @delete="deleteConfirmDialog(index)"
-              @edit="editLink(news)" />
+              @edit="editLink(news)"
+              @resume="resume(news)" />
             <exo-confirm-dialog
               ref="deleteConfirmDialog"
               :message="$t('news.message.confirmDeleteNews')"
@@ -382,6 +383,10 @@ export default {
     },
     editLink(news) {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
+      window.open(editUrl, '_blank');
+    },
+    resume(news) {
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&draftId=${news.newsId}`;
       window.open(editUrl, '_blank');
     },
     deleteConfirmDialog(index) {

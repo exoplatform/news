@@ -34,6 +34,7 @@ export function init(showPin, maxToUpload, maxFileSize) {
       data: function() {
         return {
           newsId: getURLQueryParam('newsId'),
+          draftId: getURLQueryParam('draftId'),
           spaceId: getURLQueryParam('spaceId'),
           activityId: getURLQueryParam('activityId'),
           showPinInput: showPin,
@@ -41,7 +42,7 @@ export function init(showPin, maxToUpload, maxFileSize) {
           maxFileSize: maxFileSize
         };
       },
-      template: '<exo-news-activity-composer :news-id="newsId" :space-id="spaceId" :activity-id="activityId" :show-pin-input="showPinInput" :max-to-upload="maxToUpload" :max-file-size="maxFileSize"></exo-news-activity-composer>',
+      template: '<exo-news-activity-composer :news-id="newsId" :draft-id="draftId" :space-id="spaceId" :activity-id="activityId" :show-pin-input="showPinInput" :max-to-upload="maxToUpload" :max-file-size="maxFileSize"></exo-news-activity-composer>',
       i18n,
       vuetify
     });

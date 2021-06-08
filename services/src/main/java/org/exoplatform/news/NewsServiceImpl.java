@@ -676,9 +676,10 @@ public class NewsServiceImpl implements NewsService {
       Node node = session.getNodeByUUID(newsId);
       if (node.hasProperty("exo:activities")) {
         String newActivities = node.getProperty("exo:activities").getString();
-        List<String> newsActivitiesIds = Stream.of(newActivities.split(";")).map(activity -> activity.split(":")[1]).collect(Collectors.toList());
-        for (String newsActivityId : newsActivitiesIds) {
-          activityManager.deleteActivity(newsActivityId);
+        if (StringUtils.isNotEmpty(newActivities)) {
+          Stream.of(newActivities.split(";"))
+                  .map(activity -> activity.split(":")[1])
+                  .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
         }
       }
       node.remove();

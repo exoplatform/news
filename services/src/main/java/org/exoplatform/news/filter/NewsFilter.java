@@ -8,6 +8,8 @@ public class NewsFilter {
 
   private boolean      archivedNews;
 
+  private boolean      draftNews;
+
   private String       searchText;
 
   private String       order;
@@ -37,6 +39,14 @@ public class NewsFilter {
 
   public void setArchivedNews(boolean archivedNews) {
     this.archivedNews = archivedNews;
+  }
+
+  public boolean isDraftNews() {
+    return draftNews;
+  }
+
+  public void setDraftNews(boolean draftNews) {
+    this.draftNews = draftNews;
   }
 
   public String getSearchText() {

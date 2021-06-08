@@ -28,6 +28,11 @@
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
       </v-list-item>
+      <v-list-item v-if="showResumeButton">
+        <v-list-item-title>
+          {{ $t('news.details.header.menu.resume') }}
+        </v-list-item-title>
+      </v-list-item>
       <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.delete') }}
@@ -52,6 +57,11 @@ export default {
       default: false
     },
     showEditButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showResumeButton: {
       type: Boolean,
       required: false,
       default: false

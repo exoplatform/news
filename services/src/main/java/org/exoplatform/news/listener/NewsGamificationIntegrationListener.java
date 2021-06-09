@@ -24,7 +24,7 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
 
   public static final String GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE  = "PostArticle";
 
-  public static final String GAMIFICATION_SHARE_NEWS_ARTICLE_RULE_TITLE = "ShareNews";
+  public static final String GAMIFICATION_SHARE_NEWS_ARTICLE_RULE_TITLE = "ShareArticle";
 
   private PortalContainer    container;
 
@@ -50,7 +50,7 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
       String ruleTitle = "";
       if (StringUtils.equals(eventName, NewsUtils.POST_NEWS)) {
         ruleTitle = GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE;
-      } else if (StringUtils.equals(eventName, NewsUtils.SHARE_ARTICLE_NEWS)) {
+      } else if (StringUtils.equals(eventName, NewsUtils.SHARE_NEWS)) {
         ruleTitle = GAMIFICATION_SHARE_NEWS_ARTICLE_RULE_TITLE;
       }
       try {

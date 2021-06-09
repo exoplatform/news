@@ -261,7 +261,7 @@ export default {
       return this.newsId !== null;
     },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, '').trim();
+      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment

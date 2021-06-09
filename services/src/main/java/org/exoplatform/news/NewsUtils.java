@@ -1,10 +1,7 @@
 package org.exoplatform.news;
 
-import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -19,9 +16,11 @@ import java.util.regex.Matcher;
 
 public class NewsUtils {
 
-  private static final Log   LOG       = ExoLogger.getLogger(NewsUtils.class);
+  private static final Log   LOG                = ExoLogger.getLogger(NewsUtils.class);
 
-  public static final String POST_NEWS = "exo.news.postArticle";
+  public static final String POST_NEWS          = "exo.news.postArticle";
+
+  public static final String SHARE_ARTICLE_NEWS = "exo.news.shareArticle";
 
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {

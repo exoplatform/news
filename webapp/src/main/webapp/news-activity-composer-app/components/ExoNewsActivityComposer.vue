@@ -34,9 +34,6 @@
           </div>
           <div v-show="!editMode" class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-            <div class="newsDrafts">
-              <exo-news-draft :space-id="spaceId" @draftSelected="onSelectDraft" />
-            </div>
             <div class="VuetifyApp">
               <v-app>
                 <v-btn
@@ -626,11 +623,6 @@ export default {
         this.draftSavingStatus = '';
       }
     },
-    onSelectDraft: function(draftId){
-      this.resetNewsActivity();
-      this.initNewsComposerData(draftId);
-    },
-
     extractImagesURLsDiffs: function(originalHTMLString, updatedHTMLString) {
       const imagesURLs = new Map();
 

@@ -67,11 +67,12 @@
         <a
           :href="news.url"
           :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
-          class="newsSmallIllustration"></a>
+          class="newsSmallIllustration"
+          :target="news.draft ? '_blank' : '_self'"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
-              <a :href="news.url">{{ news.title }} </a>
+              <a :href="news.url" :target="news.draft ? '_blank' : '_self'">{{ news.title }} </a>
             </h3>
             <news-spaces-shared-in
               v-if="news.activities && news.activities.split(';')[1]"
@@ -85,8 +86,7 @@
               :show-share-button="showShareButton && !news.draft"
               :show-resume-button="news.draft"
               @delete="deleteConfirmDialog(index)"
-              @edit="editLink(news)"
-              @resume="resume(news)" />
+              @edit="editLink(news)" />
             <exo-confirm-dialog
               ref="deleteConfirmDialog"
               :message="$t('news.message.confirmDeleteNews')"
@@ -119,7 +119,7 @@
             </div>
           </div>
           <div class="newsItemContentDetails">
-            <a :href="news.url">
+            <a :href="news.url" :target="news.draft ? '_blank' : '_self'">
               <p class="newsSummary" v-sanitized-html="news.newsText"></p>
             </a>
             <div class="newsActions" v-if="!news.draft">
@@ -294,7 +294,7 @@ export default {
           updatedDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: item.url,
+          url: item.publicationState === 'draft' ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
@@ -383,10 +383,6 @@ export default {
     },
     editLink(news) {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
-      window.open(editUrl, '_blank');
-    },
-    resume(news) {
-      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&draftId=${news.newsId}`;
       window.open(editUrl, '_blank');
     },
     deleteConfirmDialog(index) {

@@ -28,7 +28,7 @@
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showResumeButton" @click="$emit('resume')">
+      <v-list-item v-if="showResumeButton" @click="$emit('edit')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.resume') }}
         </v-list-item-title>

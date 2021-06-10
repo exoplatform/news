@@ -186,11 +186,6 @@ export default {
       required: false,
       default: null
     },
-    draftId: {
-      type: String,
-      required: false,
-      default: null
-    },
     spaceId: {
       type: String,
       required: true
@@ -263,7 +258,7 @@ export default {
   },
   computed: {
     editMode: function() {
-      return this.newsId !== null;
+      return this.activityId && this.activityId !== '';
     },
     postDisabled: function () {
       return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();
@@ -321,8 +316,6 @@ export default {
           if (this.canCreatNews) {
             if (this.newsId) {
               this.initNewsComposerData(this.newsId);
-            } else if (this.draftId) {
-              this.initNewsComposerData(this.draftId);
             } else {
               this.initCKEditor();
               const message = localStorage.getItem('exo-activity-composer-message');

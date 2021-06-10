@@ -92,7 +92,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private Map<String, String>    newsToDeleteQueue = new HashMap<>();
 
   private enum FilterType {
-    PINNED, MYPOSTED, ARCHIVED, ALL
+    PINNED, MYPOSTED, ARCHIVED, DRAFTS, ALL
   }
 
   public NewsRestResourcesV1(NewsService newsService,
@@ -865,7 +865,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         newsFilter.setArchivedNews(true);
         break;
       }
-
+      case DRAFTS: {
+        if (StringUtils.isNotEmpty(author)) {
+          newsFilter.setAuthor(author);
+        }
+        newsFilter.setDraftNews(true);
+        break;
+      }
       }
     }
     // Set text to search news with

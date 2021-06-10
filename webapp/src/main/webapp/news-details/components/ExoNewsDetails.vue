@@ -91,17 +91,17 @@
           </div>
 
           <div
-            v-if="news.summary"
+            v-if="newsSummary"
             id="newsSummary"
             class="summary">
-            <span v-sanitized-html="news.summary"></span>
+            <span v-html="news.summary"></span>
           </div>
 
           <div
             id="newsBody"
             :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
-            <span v-sanitized-html="news.body"></span>
+            <span v-html="newsBody"></span>
           </div>
 
           <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
@@ -164,6 +164,14 @@ export default {
       spaceDisplayName: this.news.spaceDisplayName,
     };
   },
+  computed: {
+    newsBody() {
+      return this.targetBlank(this.news.body);
+    },
+    newsSummary() {
+      return this.targetBlank(this.news.summary);
+    }
+  },
   created() {
     this.$newsServices.getNewsById(this.newsId)
       .then(news => {
@@ -187,13 +195,6 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
-    const linkContentElements = document.querySelectorAll('#newsDetails a');
-    linkContentElements.forEach(function(linkContentElement) {
-      if (linkContentElement && !linkContentElement.href.includes(`${document.location.host}${eXo.env.portal.context}`)) {
-        linkContentElement.setAttribute('target', '_blank');
-      }
-    });
-    
     if (this.showPinInput) {
       const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
       if (pinButton) {
@@ -264,7 +265,24 @@ export default {
           window.location.href = this.news.spaceUrl;
         }
       }, redirectionTime);
-    }
+    },
+    targetBlank: function (content) {
+      const internal = location.host + eXo.env.portal.context;
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      const links = docElement.getElementsByTagName('a');
+      links.forEach(function (link) {
+        let href = link.href.replace(/(^\w+:|^)\/\//, '');
+        if (href.endsWith('/')) {
+          href = href.slice(0, -1);
+        }
+        if (link && href !== location.host && !href.startsWith(internal)) {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+      return docElement.innerHTML;
+    },
   }
 };
 </script>

@@ -61,6 +61,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -160,7 +161,9 @@ public class NewsServiceImpl implements NewsService {
                          WCMPublicationService wCMPublicationService,
                          NewsSearchConnector newsSearchConnector,
                          NewsAttachmentsService newsAttachmentsService,
-                         IndexingService indexingService, NewsESSearchConnector newsESSearchConnector, UserACL userACL) {
+                         IndexingService indexingService,
+                         NewsESSearchConnector newsESSearchConnector,
+                         UserACL userACL) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -215,7 +218,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
     return news;
   }
 

@@ -68,11 +68,11 @@
           :href="news.url"
           :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
           class="newsSmallIllustration"
-          :target="news.draft ? '_blank' : '_self'"></a>
+          :target="news.target"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
-              <a :href="news.url" :target="news.draft ? '_blank' : '_self'">{{ news.title }} </a>
+              <a :href="news.url" :target="news.target">{{ news.title }} </a>
             </h3>
             <news-spaces-shared-in
               v-if="news.activities && news.activities.split(';')[1]"
@@ -119,7 +119,7 @@
             </div>
           </div>
           <div class="newsItemContentDetails">
-            <a :href="news.url" :target="news.draft ? '_blank' : '_self'">
+            <a :href="news.url" :target="news.target">
               <p class="newsSummary" v-sanitized-html="news.newsText"></p>
             </a>
             <div class="newsActions" v-if="!news.draft">
@@ -310,6 +310,7 @@ export default {
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
+          target: item.publicationState === 'draft' ? '_blank' : '_self',
         });
       });
       if (append) {

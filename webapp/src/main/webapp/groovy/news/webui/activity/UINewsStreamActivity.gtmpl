@@ -119,20 +119,20 @@
   }
 
 
-  def labelPin = _ctx.appRes("news.pin.label");
-  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("news.pin.action"));
+  def labelPin = _ctx.appRes("news.broadcast.label");
+  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("news.broadcast.action"));
   def labelCancelbutton = _ctx.appRes("news.edit.cancel");
-  def labelConfirmButn = _ctx.appRes("news.pin.btn.confirm");
-  def labelConfirmPin =  _ctx.appRes("news.pin.confirm");
-  def messageSuccessPin =  _ctx.appRes("news.pin.success");
+  def labelConfirmButn = _ctx.appRes("news.broadcast.btn.confirm");
+  def labelConfirmPin =  _ctx.appRes("news.broadcast.confirm");
+  def messageSuccessPin =  _ctx.appRes("news.broadcast.success");
 
-  def messageErrorPin =  _ctx.appRes("news.pin.error");
+  def messageErrorPin =  _ctx.appRes("news.broadcast.error");
 
-  def labelUnpin = _ctx.appRes("news.unpin.label");
-  def captionUnpin = _ctx.appRes("news.unpin.action");
-  def labelConfirmUnpin =  _ctx.appRes("news.unpin.confirm").replace("{0}",newsTitle);
-  def messageSuccessUnpin =  _ctx.appRes("news.unpin.success");
-  def messageErrorUnpin =  _ctx.appRes("news.unpin.error");
+  def labelUnpin = _ctx.appRes("news.unbroadcast.label");
+  def captionUnpin = _ctx.appRes("news.unbroadcast.action");
+  def labelConfirmUnpin =  _ctx.appRes("news.unbroadcast.confirm").replace("{0}",newsTitle);
+  def messageSuccessUnpin =  _ctx.appRes("news.unbroadcast.success");
+  def messageErrorUnpin =  _ctx.appRes("news.unbroadcast.error");
   
   def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
   def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));

@@ -19,7 +19,10 @@
       rel="tooltip"
       data-placement="bottom"
       @click="confirmAction">
-      <i :class="[newsPinned ? '' : 'unpinned']" class="uiIconPin"> </i>
+      <v-icon
+        dense
+        :style="broadcastIconStyle"
+        class="fas fa-bullhorn" />
     </a>
   </div>
 </template>
@@ -56,23 +59,32 @@ export default {
       successPin: true,
     };
   },
+  computed: {
+    broadcastIconStyle() {
+      if (this.newsPinned) {
+        return 'color: #578dc9 !important';
+      } else {
+        return 'color: #a8b3c5 !important';
+      }
+    }
+  },
   created() {
     if (!this.newsPinned) {
-      this.pinLabel = this.$t('news.pin.action');
+      this.pinLabel = this.$t('news.broadcast.action');
     } else {
-      this.pinLabel = this.$t('news.unpin.action');
+      this.pinLabel = this.$t('news.unbroadcast.action');
     }
   },
   methods: {
     confirmAction: function() {
       if (!this.newsArchived) {
-        let confirmText = this.$t('news.pin.confirm');
-        let captionText = this.$t('news.pin.action');
-        const confirmButton = this.$t('news.pin.btn.confirm');
-        const cancelButton = this.$t('news.pin.btn.cancel');
+        let confirmText = this.$t('news.broadcast.confirm');
+        let captionText = this.$t('news.broadcast.action');
+        const confirmButton = this.$t('news.broadcast.btn.confirm');
+        const cancelButton = this.$t('news.broadcast.btn.cancel');
         if (this.newsPinned === true) {
-          confirmText = this.$t('news.unpin.confirm').replace('{0}', this.newsTitle);
-          captionText = this.$t('news.unpin.action');
+          confirmText = this.$t('news.unbroadcast.confirm').replace('{0}', this.newsTitle);
+          captionText = this.$t('news.unbroadcast.action');
         }
         eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label: confirmButton}], captionText, confirmText, cancelButton);
       }
@@ -100,13 +112,13 @@ export default {
       }).then (function() {
         context.showPinMessage = true;
         if (context.newsPinned === false) {
-          context.messagePin = context.$t('news.pin.success');
-          context.pinLabel = context.$t('news.unpin.action');
+          context.messagePin = context.$t('news.broadcast.success');
+          context.pinLabel = context.$t('news.unbroadcast.action');
           // eslint-disable-next-line vue/no-mutating-props
           context.newsPinned = true;
         } else {
-          context.messagePin = context.$t('news.unpin.success');
-          context.pinLabel = context.$t('news.pin.action');
+          context.messagePin = context.$t('news.unbroadcast.success');
+          context.pinLabel = context.$t('news.broadcast.action');
           // eslint-disable-next-line vue/no-mutating-props
           context.newsPinned = false;
         }
@@ -118,9 +130,9 @@ export default {
           context.showPinMessage = true;
           context.successPin = false;
           if (context.newsPinned === false) {
-            context.messagePin = context.$t('news.pin.error');
+            context.messagePin = context.$t('news.broadcast.error');
           } else {
-            context.messagePin = context.$t('news.unpin.error');
+            context.messagePin = context.$t('news.unbroadcast.error');
           }
           setTimeout(function () {
             context.successPin = true;

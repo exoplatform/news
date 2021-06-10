@@ -23,13 +23,16 @@
             @click="news.pinned">
             <a
               id="newsPinButton"
-              :data-original-title=" news.pinned ? $t('news.unpin.action') : $t('news.pin.action')"
+              :data-original-title=" news.pinned ? $t('news.unbroadcast.action') : $t('news.broadcast.action')"
               :class="[news.archived ? 'unauthorizedPin' : '']"
               class="pinArticle"
               rel="tooltip"
               data-placement="bottom"
               @click="!news.archived ? news.pinned = !news.pinned : null">
-              <i :class="[news.pinned ? '' : 'unpinned']" class="uiIconPin"> </i>
+              <v-icon
+                dense
+                :style="broadcastIconStyle"
+                class="fas fa-bullhorn" />
             </a>
           </div>
           <div v-show="!editMode" class="newsFormRightActions">
@@ -279,6 +282,13 @@ export default {
       }
 
       return false;
+    },
+    broadcastIconStyle() {
+      if (this.news.pinned) {
+        return 'color: #578dc9 !important';
+      } else {
+        return 'color: #a8b3c5 !important';
+      }
     }
   },
   watch: {
@@ -505,9 +515,9 @@ export default {
 
     postNews: function () {
       if (this.news.pinned === true) {
-        const confirmText = this.$t('news.pin.confirm');
-        const captionText = this.$t('news.pin.action');
-        const confirmButton = this.$t('news.pin.btn.confirm');
+        const confirmText = this.$t('news.broadcast.confirm');
+        const captionText = this.$t('news.broadcast.action');
+        const confirmButton = this.$t('news.broadcast.btn.confirm');
         const cancelButton = this.$t('news.edit.cancel');
         eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
@@ -696,13 +706,13 @@ export default {
     },
     confirmAndUpdateNews: function() {
       if (this.news.pinned !== this.originalNews.pinned) {
-        let confirmText = this.$t('news.pin.confirm');
-        let captionText = this.$t('news.pin.action');
-        const confirmButton = this.$t('news.pin.btn.confirm');
-        const cancelButton = this.$t('news.pin.btn.cancel');
+        let confirmText = this.$t('news.broadcast.confirm');
+        let captionText = this.$t('news.broadcast.action');
+        const confirmButton = this.$t('news.broadcast.btn.confirm');
+        const cancelButton = this.$t('news.broadcast.btn.cancel');
         if (this.news.pinned === false) {
-          confirmText = this.$t('news.unpin.confirm').replace('{0}', this.news.title);
-          captionText = this.$t('news.unpin.action');
+          confirmText = this.$t('news.unbroadcast.confirm').replace('{0}', this.news.title);
+          captionText = this.$t('news.unbroadcast.action');
         }
         const self = this;
         return new Promise(function(resolve) {

@@ -383,9 +383,11 @@ public class NewsServiceImpl implements NewsService {
             }
             sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
           }
+          indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+        } else if ("draft".equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, "draft", new HashMap<>());
         }
       }
-      indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
       return news;
     } finally {
       if (session != null) {

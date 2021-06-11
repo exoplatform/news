@@ -45,9 +45,50 @@ export function initExtensions() {
   }
 
   const newsActivityTypeExtensionOptions = {
-    init: null,
+    init: (activity) => {
+      const newsId = activity && activity.templateParams && activity.templateParams.newsId;
+      if (newsId) {
+        return Vue.prototype.$newsService.getNewsById(newsId)
+          .then(news => activity.news = news);
+      }
+    },
     canEdit: () => false,
-    getBody: activity => activity && activity.templateParams && activity.templateParams.comment || '',
+    supportsThumbnail: true,
+    getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL,
+    defaultIcon: {
+      icon: 'far fa-newspaper',
+      size: '150',
+    },
+    getTitle: (activity) => {
+      const news = activity && activity.news;
+      if (news && news.title) {
+        return news.title;
+      }
+      return '';
+    },
+    getSourceLink: (activity) => `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activity.id}`,
+    getSummary: (activity) => {
+      const news = activity && activity.news;
+      if (news && news.summary) {
+        return news.summary;
+      } else if (news && news.body) {
+        try {
+          const element = new DOMParser().parseFromSrting(news.body, 'text/xml');
+          return element.innerText;
+        } catch (e) {
+          return news.body.replace(/<[^>]+>/g, '');
+        }
+      }
+      return '';
+    },
+    getBody: (activity, isActivityDetail) => {
+      if (isActivityDetail) {
+        const news = activity && activity.news;
+        return news && news.body;
+      }
+      return '';
+    },
+    getTooltip: (activity, isActivityDetail) => !isActivityDetail && activity && 'news.activity.clickToShowDetail',
   };
 
   extensionRegistry.registerExtension('activity', 'type', {

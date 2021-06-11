@@ -258,7 +258,7 @@ export default {
   },
   computed: {
     editMode: function() {
-      return this.newsId !== null;
+      return this.activityId && this.activityId !== '';
     },
     postDisabled: function () {
       return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim();

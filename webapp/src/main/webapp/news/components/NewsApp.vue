@@ -67,11 +67,12 @@
         <a
           :href="news.url"
           :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
-          class="newsSmallIllustration"></a>
+          class="newsSmallIllustration"
+          :target="news.target"></a>
         <div class="newsItemContent">
           <div class="newsItemContentHeader">
             <h3>
-              <a :href="news.url">{{ news.title }} </a>
+              <a :href="news.url" :target="news.target">{{ news.title }} </a>
             </h3>
             <news-spaces-shared-in
               v-if="news.activities && news.activities.split(';')[1]"
@@ -118,7 +119,7 @@
             </div>
           </div>
           <div class="newsItemContentDetails">
-            <a :href="news.url">
+            <a :href="news.url" :target="news.target">
               <p class="newsSummary" v-sanitized-html="news.newsText"></p>
             </a>
             <div class="newsActions" v-if="!news.draft">
@@ -293,7 +294,7 @@ export default {
           updatedDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: item.url,
+          url: item.publicationState === 'draft' ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
@@ -309,6 +310,7 @@ export default {
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
+          target: item.publicationState === 'draft' ? '_blank' : '_self',
         });
       });
       if (append) {

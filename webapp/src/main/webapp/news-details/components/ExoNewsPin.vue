@@ -61,19 +61,11 @@ export default {
   },
   computed: {
     broadcastArticleClass() {
-      if (this.newsPinned) {
-        return 'broadcastArticle';
-      } else {
-        return 'unbroadcastArticle';
-      }
+      return this.newsPinned ? 'broadcastArticle' : 'unbroadcastArticle';
     }
   },
   created() {
-    if (!this.newsPinned) {
-      this.pinLabel = this.$t('news.broadcast.action');
-    } else {
-      this.pinLabel = this.$t('news.unbroadcast.action');
-    }
+    this.pinLabel = !this.newsPinned ? this.$t('news.broadcast.action') : this.$t('news.unbroadcast.action');
   },
   methods: {
     confirmAction: function() {

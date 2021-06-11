@@ -284,18 +284,10 @@ export default {
       return false;
     },
     broadcastArticleClass() {
-      if (this.news.pinned) {
-        return 'broadcastArticle';
-      } else {
-        return 'unbroadcastArticle';
-      }
+      return this.news.pinned ? 'broadcastArticle' : 'unbroadcastArticle';
     },
     originalTitle() {
-      if (this.news.pinned) {
-        return this.$t('news.unbroadcast.action');
-      } else {
-        return this.$t('news.broadcast.action');
-      }
+      return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
     },
   },
   watch: {

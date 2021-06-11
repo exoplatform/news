@@ -2179,10 +2179,8 @@ public class NewsServiceImplTest {
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
-    Query query = mock(Query.class);
-    String queryString =
-                       "SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = 'root'AND exo:spaceId='1'";
-    when(qm.createQuery(queryString, "sql")).thenReturn(query);
+    QueryImpl query = mock(QueryImpl.class);
+    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);

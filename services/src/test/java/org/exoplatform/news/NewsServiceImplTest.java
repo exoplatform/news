@@ -2247,7 +2247,13 @@ public class NewsServiceImplTest {
 
     when(poster.getProfile()).thenReturn(p1);
     // When
-    List<News> newsList = newsService.getNewsDrafts("1", "root");
+    List<String> spaces = new ArrayList<>();
+    spaces.add("1");
+    NewsFilter newsFilter = new NewsFilter();
+    newsFilter.setAuthor("root");
+    newsFilter.setDraftNews(true);
+    newsFilter.setSpaces(spaces);
+    List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
     assertNotNull(newsList);

@@ -18,22 +18,6 @@ export function getNewsSpaces(newsId) {
   });
 }
 
-
-export function getNewsDrafts(spaceId) {
-  return fetch(`${newsConstants.NEWS_API}?author=${newsConstants.userName}&spaces=${spaceId}&publicationState=draft`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'GET'
-  }).then((resp) => {
-    if (resp && resp.ok) {
-      return resp.json();
-    } else {
-      throw new Error('Error getting news draft list');
-    }
-  });
-}
-
 export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
   let url = `${newsConstants.NEWS_API}?author=${newsConstants.userName}&publicationState=published&filter=${filter}`;
   if (searchText) {

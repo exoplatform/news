@@ -1,15 +1,9 @@
+@import "./variables.less";
 @images-path: "/news/images";
 
-@baseColorDark: #333333;
 @primaryColor: #2f5e92;
-@globalLoadingBorder: #333;
 @colorIconPrimary: @primaryColor;
-@header-popup-bg: #484848;
 @color-appNews-information: #676767;
-@textLightColor: #999999;
-@btnDisableColor: #c6c6c6;
-@primaryColorDefault: #578dc9;
-@greyColorLighten1Default: #a8b3c5;
 
 //Heading color
 @headingColor: #4d5466;
@@ -108,7 +102,7 @@
     font-weight: bold;
 
     a {
-      color: @baseColorDark;
+      color: @textColorDefault;
     }
   }
   .newsArchived {
@@ -280,7 +274,7 @@
         max-width: 80%;
         margin: 20px auto 0;
         .newsTitleLink {
-          color: @baseColorDark;
+          color: @textColorDefault;
           font-size: 24px;
           line-height: 3.5rem;
         }
@@ -331,7 +325,7 @@
         }
 
           a {
-            color: @globalLoadingBorder;
+            color: @grayDark;
             &:hover {
               color: @primaryColor;
             }

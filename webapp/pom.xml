@@ -57,10 +57,10 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/src/main/webapp/css</outputDirectory>
+              <outputDirectory>${project.build.directory}/src/main/webapp/skin/less</outputDirectory>
               <resources>
                 <resource>
-                  <directory>src/main/webapp/css</directory>
+                  <directory>src/main/webapp/skin/less</directory>
                 </resource>
               </resources>
               <overwrite>true</overwrite>
@@ -91,8 +91,8 @@
           <execution>
             <id>news</id>
             <configuration>
-              <sourceDirectory>${project.build.directory}/src/main/webapp/css</sourceDirectory>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/css</outputDirectory>
+              <sourceDirectory>${project.build.directory}/src/main/webapp/skin/less</sourceDirectory>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/skin/css</outputDirectory>
               <compress>false</compress>
               <includes>
                 <include>news.less</include>

@@ -31,8 +31,8 @@
               @click="!news.archived ? news.pinned = !news.pinned : null">
               <v-icon
                 dense
-                :style="broadcastIconStyle"
-                class="fas fa-bullhorn" />
+                :class="[newsPinned ? '' : 'unbroadcastArticle']"
+                class="fas fa-bullhorn broadcastArticle" />
             </a>
           </div>
           <div v-show="!editMode" class="newsFormRightActions">
@@ -283,13 +283,6 @@ export default {
 
       return false;
     },
-    broadcastIconStyle() {
-      if (this.news.pinned) {
-        return 'color: #578dc9 !important';
-      } else {
-        return 'color: #a8b3c5 !important';
-      }
-    }
   },
   watch: {
     'news.title': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },

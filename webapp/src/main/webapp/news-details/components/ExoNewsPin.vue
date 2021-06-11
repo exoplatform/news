@@ -21,8 +21,8 @@
       @click="confirmAction">
       <v-icon
         dense
-        :class="[newsPinned ? '' : 'unbroadcastArticle']"
-        class="fas fa-bullhorn broadcastArticle" />
+        :class="broadcastArticleClass"
+        class="fas fa-bullhorn" />
     </a>
   </div>
 </template>
@@ -58,6 +58,15 @@ export default {
       pinLabel: '',
       successPin: true,
     };
+  },
+  computed: {
+    broadcastArticleClass() {
+      if (this.newsPinned) {
+        return 'broadcastArticle';
+      } else {
+        return 'unbroadcastArticle';
+      }
+    }
   },
   created() {
     if (!this.newsPinned) {

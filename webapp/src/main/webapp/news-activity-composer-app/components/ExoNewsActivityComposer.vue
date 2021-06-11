@@ -23,7 +23,7 @@
             @click="news.pinned">
             <a
               id="newsPinButton"
-              :data-original-title=" news.pinned ? $t('news.unbroadcast.action') : $t('news.broadcast.action')"
+              :data-original-title="originalTitle"
               :class="[news.archived ? 'unauthorizedPin' : '']"
               class="pinArticle"
               rel="tooltip"
@@ -31,8 +31,8 @@
               @click="!news.archived ? news.pinned = !news.pinned : null">
               <v-icon
                 dense
-                :class="[newsPinned ? '' : 'unbroadcastArticle']"
-                class="fas fa-bullhorn broadcastArticle" />
+                :class="broadcastArticleClass"
+                class="fas fa-bullhorn" />
             </a>
           </div>
           <div v-show="!editMode" class="newsFormRightActions">
@@ -282,6 +282,20 @@ export default {
       }
 
       return false;
+    },
+    broadcastArticleClass() {
+      if (this.news.pinned) {
+        return 'broadcastArticle';
+      } else {
+        return 'unbroadcastArticle';
+      }
+    },
+    originalTitle() {
+      if (this.news.pinned) {
+        return this.$t('news.unbroadcast.action');
+      } else {
+        return this.$t('news.broadcast.action');
+      }
     },
   },
   watch: {

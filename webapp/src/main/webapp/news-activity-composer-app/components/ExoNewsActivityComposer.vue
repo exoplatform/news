@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="VuetifyApp">
     <div v-show="loading">
       <div class="VuetifyApp loadingComposer">
         <v-progress-circular
@@ -11,6 +11,7 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
+      <exo-news-publish-drawer ref="publishNewsDrawer" @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -44,31 +45,35 @@
                   :disabled="postDisabled || postingNews"
                   elevation="0"
                   class="btn btn-primary"
-                  @click="postNews">
+                  @click="openDrawer">
                   {{ $t("news.composer.post") }}
                 </v-btn>
               </v-app>
             </div>
           </div>
-          <div v-show="editMode" class="newsFormRightActions">
-            <button
-              id="newsEdit"
-              :disabled="updateDisabled"
-              class="btn btn-primary"
-              @click.prevent="updateNews">
-              {{ $t("news.edit.update") }}
-            </button>
-            <button
-              id="newsUpdateAndPost"
-              :disabled="news.archived ? true: updateDisabled"
-              :class="[news.archived ? 'unauthorizedPin' : '']"
-              class="btn"
-              @click.prevent="updateAndPostNews">
-              {{ $t("news.edit.update.post") }}
-            </button>
-            <button class="btn" @click="goBack">
-              {{ $t("news.composer.btn.cancel") }}
-            </button>
+          <div v-show="editMode" class="VuetifyApp">
+            <v-app>
+              <div class="d-flex flex-row">
+                <v-btn
+                  id="newsEdit"
+                  :disabled="updateDisabled"
+                  class="btn btn-primary mr-2 "
+                  @click.prevent="updateNews">
+                  {{ $t("news.edit.update") }}
+                </v-btn>
+                <v-btn
+                  id="newsUpdateAndPost"
+                  :disabled="news.archived ? true: updateDisabled"
+                  :class="[news.archived ? 'unauthorizedPin' : '']"
+                  class="btn mr-2"
+                  @click.prevent="updateAndPostNews">
+                  {{ $t("news.edit.update.post") }}
+                </v-btn>
+                <v-btn class="btn mr-6" @click="goBack">
+                  {{ $t("news.composer.btn.cancel") }}
+                </v-btn>
+              </div>
+            </v-app>
           </div>
         </div>
         <div id="newsTop"></div>
@@ -155,7 +160,7 @@
           </div>
         </div>
       </div>
-    <!-- end -->
+      <!-- end -->
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -518,7 +523,11 @@ export default {
         });
       }, this.autoSaveDelay);
     },
-
+    openDrawer() {
+      if (this.$refs.publishNewsDrawer) {
+        this.$refs.publishNewsDrawer.open();
+      }
+    },
     postNews: function () {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');

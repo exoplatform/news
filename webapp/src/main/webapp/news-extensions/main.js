@@ -1,7 +1,7 @@
 import * as  newsServices from '../services/newsServices';
 
-if (!Vue.prototype.$newsService) {
-  window.Object.defineProperty(Vue.prototype, '$newsService', {
+if (!Vue.prototype.$newsServices) {
+  window.Object.defineProperty(Vue.prototype, '$newsServices', {
     value: newsServices,
   });
 }

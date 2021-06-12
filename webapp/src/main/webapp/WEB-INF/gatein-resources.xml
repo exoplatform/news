@@ -102,7 +102,7 @@
       <depends>
         <module>latestNews</module>
       </depends>
-	  <depends>
+	    <depends>
         <module>ShareNewsActivity</module>
       </depends>
       <depends>
@@ -124,6 +124,15 @@
       </script>
       <depends>
         <module>vue</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>newsDetails</module>
       </depends>
       <depends>
         <module>extensionRegistry</module>
@@ -153,6 +162,9 @@
     </depends>
     <depends>
       <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
     </depends>
     <depends>
       <module>snackbarComponent</module>

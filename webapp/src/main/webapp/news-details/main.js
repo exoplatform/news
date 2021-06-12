@@ -25,7 +25,7 @@ export function init(params) {
     `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.attachmentsSelector.attachments-${lang}.json`
   ];
 
-  const appId = 'newsDetails';
+  const appId = 'newsDetailsApp';
   const cacheId = `${appId}_${params.activityId}`;
 
   const appElement = document.createElement('div');
@@ -44,15 +44,15 @@ export function init(params) {
           showDeleteButton: params.news.canDelete,
         };
       },
-      template: `<exo-news-details
-                  v-cacheable="{cacheId: '${cacheId}'}"
-                  id="${appId}"
-                  :news="news"
-                  :news-id="newsId"
-                  :activity-id="activityId"
-                  :show-edit-button="showEditButton"
-                  :show-pin-button="showPinButton"
-                  :show-delete-button="showDeleteButton"/>`,
+      template: `<v-app id="${appId}" v-cacheable="{cacheId: '${cacheId}'}">
+                  <exo-news-details
+                    :news="news"
+                    :news-id="newsId"
+                    :activity-id="activityId"
+                    :show-edit-button="showEditButton"
+                    :show-pin-button="showPinButton"
+                    :show-delete-button="showDeleteButton"/>
+                 </v-app>`,
       i18n,
       vuetify
     }).$mount(appElement);

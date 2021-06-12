@@ -40,7 +40,7 @@
               :news-archived="news.archived"
               :news-title="news.title" />
           </div>
-          <div class="news-top-information">
+          <div class="news-top-information d-flex">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
             </div>
@@ -59,30 +59,43 @@
             <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content">
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
                 <div class="activityAvatar avatarCircle">
-                  <a :href="news.authorProfileURL">
-                    <img :src="news.profileAvatarURL" class="avatar">
+                  <a :href="authorProfileURL">
+                    <img :src="authorAvatarURL" class="avatar">
                   </a>
                 </div>
               </div>
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
-                  <a :href="news.authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ news.authorFullName }} </a>
+                  <a :href="authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ authorFullName }} </a>
                   <span v-if="!news.hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
                   <div v-if="!news.hiddenSpace" class="newsSpace">
                     <a :href="news.spaceUrl" class="newsInformationLabel news-details-information">{{ news.spaceDisplayName }}</a>
                   </div>
-                  <span class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>
+                  <template v-if="publicationDate">
+                    -
+                    <date-format
+                      :value="publicationDate"
+                      :format="dateFormat"
+                      class="newsInformationValue newsPostedDate news-details-information" />
+                  </template>
+                  <span v-else-if="news.postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>
                 </div>
                 <div v-if="showUpdateInfo" class="newsUpdater">
                   <div>
                     <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
                   </div>
                   <div>
-                    <span class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</span>
+                    <template v-if="updatedDate">
+                      <date-format
+                        :value="updatedDate"
+                        :format="dateFormat"
+                        class="newsInformationValue newsUpdatedDate" />
+                    </template>
+                    <div v-else-if="news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
 
-                    <div v-if="news.authorFullName != news.updaterFullName ">
+                    <div v-if="notSameUpdater">
                       <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
-                      <a :href="news.updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ news.updaterFullName }}</a>
+                      <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
                     </div>
                   </div>
                 </div>
@@ -159,28 +172,69 @@ export default {
   data() {
     return {
       spaceId: null,
-      showUpdateInfo: this.news.updatedDate  !== 'null' ,
+      updaterIdentity: null,
       BYTES_IN_MB: 1048576,
       spaceDisplayName: this.news.spaceDisplayName,
+      dateFormat: {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      },
     };
   },
   computed: {
     newsBody() {
       return this.targetBlank(this.news.body);
     },
+    showUpdateInfo() {
+      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
+    },
+    authorFullName() {
+      return this.news && (this.news.authorFullName || this.news.authorDisplayName);
+    },
+    authorProfileURL() {
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+    },
+    authorAvatarURL() {
+      return this.news && (this.news.profileAvatarURL || this.news.authorAvatarUrl);
+    },
+    updaterFullName() {
+      return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
+    },
+    updaterProfileURL() {
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+    },
+    notSameUpdater() {
+      return this.news && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
+    },
+    publicationDate() {
+      return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
+    },
+    updatedDate() {
+      return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
+    },
     newsSummary() {
       return this.targetBlank(this.news.summary);
     }
   },
   created() {
-    this.$newsServices.getNewsById(this.newsId)
-      .then(news => {
-        this.spaceId = news.spaceId;
-        return this.$nextTick();
-      })
-      .finally(() => {
-        this.$root.$emit('application-loaded');
-      });
+    if (!this.news || !this.news.spaceId) {
+      this.$newsServices.getNewsById(this.newsId)
+        .then(news => {
+          this.spaceId = news.spaceId;
+          return this.$nextTick();
+        })
+        .finally(() => {
+          this.$root.$emit('application-loaded');
+        });
+    } else {
+      this.spaceId = this.news && this.news.spaceId;
+      if (this.notSameUpdater && this.news && this.news.updater) {
+        this.$identityService.getIdentityByProviderIdAndRemoteId('organization', this.news.updater)
+          .then(identity => this.updaterIdentity = identity);
+      }
+      this.$root.$emit('application-loaded');
+    }
   },
   mounted() {
     this.updateViewsCount();

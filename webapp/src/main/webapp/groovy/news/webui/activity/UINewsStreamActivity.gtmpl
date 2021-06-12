@@ -224,7 +224,7 @@
 			</div><!--end heading-->
 			<div class="description <%=isArchived ? "newsArchived" : ""%>">
           <img src="$illustrationURL" class="newsSmallIllustration" alt="News"/>
-          <div class="newsDetails">
+          <div class="newsDetailsApp">
               <div class="newsTitle">
                 <% if (isArchived) { %>
                   <i class="uiIconArchived" data-original-title="$archivedLabel" rel="tooltip" data-placement="bottom"></i>

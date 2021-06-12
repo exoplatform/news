@@ -165,15 +165,15 @@
   //make sures commentFormFocused is set to false to prevent any refresh to focus, only focus after post a comment
   uicomponent.setCommentFormFocused(false);
 %>
-<div class="VuetifyApp">
   <div class="activityStream uiActivityStreamWrapper uiNewsActivity" id="activityContainer${activity.id}">
     <% uiform.begin() %>
     <div class="boxContainer" id="boxContainer">
     <div id="ContextBox${activity.id}" class="uiBox contentBox clearfix">
-      <div id="ActivityContextBox${activity.id}">
-
-       <div id="newsDetails">
-         <v-cacheable-dom-app cache-id="newsDetails_${activity.id}"></v-cacheable-dom-app>
+      <div id="ActivityContextBox${activity.id}" class="VuetifyApp">
+       <div data-app="true"
+            class="v-application transparent v-application--is-ltr theme--light peopleList"
+            flat="" id="newsDetailsApp">
+         <v-cacheable-dom-app cache-id="newsDetailsApp_${activity.id}"></v-cacheable-dom-app>
        </div>
         <% if (!news.archived || (news.archived && news.canArchive)) { %>
         <div class="actionsDetailsWrapper">
@@ -189,6 +189,5 @@
       uiform.end()
     }%>
   </div>
-  </div><!--activityStream-->
   <% } // News archived %>
   <% } %>

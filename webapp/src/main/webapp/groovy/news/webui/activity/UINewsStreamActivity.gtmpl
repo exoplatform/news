@@ -19,7 +19,6 @@
   def activity = uicomponent.getActivity();
   def news = uicomponent.getNews();
   def activityCommentAndLikable = uicomponent.isActivityCommentAndLikable();
-  def canPinNews = uicomponent.canPinNews();
   def streamOwner = activity.getStreamOwner();
 %>
 
@@ -117,22 +116,6 @@
   } else {
     illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
   }
-
-
-  def labelPin = _ctx.appRes("news.broadcast.label");
-  def captionPin = StringEscapeUtils.escapeHtml(_ctx.appRes("news.broadcast.action"));
-  def labelCancelbutton = _ctx.appRes("news.edit.cancel");
-  def labelConfirmButn = _ctx.appRes("news.broadcast.btn.confirm");
-  def labelConfirmPin =  _ctx.appRes("news.broadcast.confirm");
-  def messageSuccessPin =  _ctx.appRes("news.broadcast.success");
-
-  def messageErrorPin =  _ctx.appRes("news.broadcast.error");
-
-  def labelUnpin = _ctx.appRes("news.unbroadcast.label");
-  def captionUnpin = _ctx.appRes("news.unbroadcast.action");
-  def labelConfirmUnpin =  _ctx.appRes("news.unbroadcast.confirm").replace("{0}",newsTitle);
-  def messageSuccessUnpin =  _ctx.appRes("news.unbroadcast.success");
-  def messageErrorUnpin =  _ctx.appRes("news.unbroadcast.error");
   
   def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
   def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));
@@ -141,28 +124,9 @@
   def labelDelete = _ctx.appRes("UIActivity.label.Delete");
   def activityDeletable = uicomponent.isActivityDeletable();
   
-  boolean isPinned = news.pinned;
 %>
 
 <div class="activityStream uiActivityStreamWrapper uiNewsActivity" id="activityContainer${activity.id}" style="position: relative;">
-
-    <div id="messagePin${activity.id}" style="display: none;" class="confirmPinMessage">
-        <transition name="fade">
-            <div  id="alertMessagePin${activity.id}" class="alert">
-                <i id="iconMessagePin${activity.id}"></i>
-                <span id="messagePinBody${activity.id}" data-success-pin="$messageSuccessPin" data-error-pin="$messageErrorPin" data-success-unpin="$messageSuccessUnpin" data-error-unpin="$messageErrorUnpin"></span>
-            </div>
-        </transition>
-    </div>
-
-    <div id="errorUnpin${activity.id}" style="display: none;" class="confirmPinMessage">
-        <transition name="fade">
-             <div  class="alert-error alert">
-                 <i class="uiIconError"></i>
-                 <span>$messageErrorUnpin</span>
-             </div>
-        </transition>
-    </div>
 
   <% uiform.begin() %>
   <div class="boxContainer" id="boxContainer">
@@ -176,7 +140,7 @@
 
         <!-- three dots activity menu -->
           <%
-			  		if(canPinNews || activityDeletable){
+			  		if(activityDeletable){
 			    %>
                     <div id="dropDownEditActivity${activity.id}" class="btn-group uiDropdownWithIcon actLink ">
                         <div class="dropdown-toggle" data-toggle="dropdown">
@@ -185,36 +149,12 @@
                         </div>
 
                         <ul class="dropdown-menu actLink-items pull-right" role="menu">
-                          <% if (canPinNews) {
-                            if (isPinned) { %>
-                        	  <li class="actLink-item">
-								  <a href="javascript:void(0)" data-confirm="<span>${labelConfirmUnpin}</span>" data-caption="$captionUnpin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="unpinActivity${activity.id}"" data-newsId="${news.id}">
-                                    <i class="uiIcon uiIconPinNews actLink-icon"></i>
-                                    <span class="actLink-label">${labelUnpin}</span>
-                                  </a>
-                              </li>
-                            <% } else { %>
-                              <% if (isArchived) { %>
-                                  <span class="controllPin unauthorizedPin">${labelPin}</span>
-                              <% } else {%>
-                              <li class="actLink-item">
-                                 <a href="javascript:void(0)" data-confirm="<span>${labelConfirmPin}</span>" data-caption="$captionPin" data-close="$labelCancelbutton" data-ok="$labelConfirmButn" class="controllPin" id="PinActivity${activity.id}"" data-newsId="${news.id}">
-                            <i class="uiIcon uiIconPinNews actLink-icon"></i>
-                            <span class="actLink-label">${labelPin}</span>
-                                 </a>
-                              </li>
-                          <%
-                              }
-                            }
-                            }
-                            if (activityDeletable) { %>
                             <li class="actLink-item">
                               <a href="javascript:void(0)" data-confirm="$labelToDeleteThisActivity" data-caption="$captionConfirmation" data-close="$labelClosebutton" data-ok="$labelConfirmbutton"  data-delete="<%=uicomponent.event("HideActivity", uicomponent.getId(), "");%>" class="controllDelete" id="DeleteActivityButton${activity.id}">
                                 <i class="uiIcon uiIconTrashActivity actLink-icon"></i>
                                 <span class="actLink-label">${labelDelete}</span>
                               </a>
                             </li>
-                          <%} %>
                         </ul>
                     </div>
 			    <%

@@ -35,8 +35,6 @@ public interface NewsService {
 
   News createNewsDraft(News news) throws Exception;
 
-  List<News> getNewsDrafts(String spaceId, String author) throws Exception;
-
   void deleteNews(String id) throws Exception;
 
   public boolean canEditNews(String posterId, String spaceId);

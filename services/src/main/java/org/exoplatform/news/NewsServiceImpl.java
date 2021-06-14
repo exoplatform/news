@@ -616,48 +616,6 @@ public class NewsServiceImpl implements NewsService {
   }
 
   /**
-   * Get news drafts
-   * 
-   * @param spaceId News space
-   * @param author News drafts author
-   * @return The news drafts
-   * @throws Exception when error
-   */
-  public List<News> getNewsDrafts(String spaceId, String author) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
-    List<News> newsDrafts = new ArrayList<>();
-
-    try {
-      StringBuilder sqlQuery =
-                             new StringBuilder("SELECT * FROM exo:news WHERE publication:currentState = 'draft' AND exo:author = '").append(author)
-                                                                                                                                    .append("'")
-                                                                                                                                    .append("AND exo:spaceId='")
-                                                                                                                                    .append(spaceId)
-                                                                                                                                    .append("'");
-      QueryManager qm = session.getWorkspace().getQueryManager();
-      Query query = qm.createQuery(sqlQuery.toString(), Query.SQL);
-      NodeIterator it = query.execute().getNodes();
-      while (it.hasNext()) {
-        Node iterNode = it.nextNode();
-        newsDrafts.add(convertNodeToNews(iterNode));
-      }
-      return (newsDrafts);
-    } catch (ItemNotFoundException e) {
-      return null;
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
-    }
-  }
-
-  /**
    * Delete news
    * 
    * @param newsId the news id to delete

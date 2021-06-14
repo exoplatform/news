@@ -165,7 +165,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response getNews(@Context HttpServletRequest request,
                           @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
                           @ApiParam(value = "News spaces", required = true) @QueryParam("spaces") String spaces,
-                          @ApiParam(value = "News publication state", required = true) @QueryParam("publicationState") String publicationState,
                           @ApiParam(value = "News filter", required = true) @QueryParam("filter") String filter,
                           @ApiParam(value = "search text", required = true) @QueryParam("text") String text,
                           @ApiParam(value = "News pagination offset", defaultValue = "0") @QueryParam("offset") int offset,
@@ -179,60 +178,41 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
       NewsEntity newsEntity = new NewsEntity();
       //Get news drafts by space
-      if ("draft".equals(publicationState)) {
-        if (StringUtils.isNotEmpty(spaces)) {
-          Space space = spaceService.getSpaceById(spaces);
+      List<String> spacesList = new ArrayList<>();
+      // Set spaces to search news in
+      if (StringUtils.isNotEmpty(spaces)) {
+        for (String spaceId : spaces.split(",")) {
+          Space space = spaceService.getSpaceById(spaceId);
           if (!canViewNews(authenticatedUser, space)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
           }
-          List<News> drafts = newsService.getNewsDrafts(spaces, author);
-          if (drafts != null) {
-            List<News> news = drafts;
-            newsEntity.setNews(news);
-          }
+          spacesList.add(spaceId);
         }
-        return Response.ok(newsEntity).build();
-      } else if ("published".equals(publicationState)) {
-        List<String> spacesList = new ArrayList<>();
-        // Set spaces to search news in
-        if (StringUtils.isNotEmpty(spaces)) {
-          for (String spaceId : spaces.split(",")) {
-            Space space = spaceService.getSpaceById(spaceId);
-            if (!canViewNews(authenticatedUser, space)) {
-              return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-            spacesList.add(spaceId);
-          }
-        }
-        NewsFilter newsFilter = buildFilter(spacesList, filter, text, author, limit, offset);
-        List<News> news;
-        //Set text to search news with
-        if (StringUtils.isNotEmpty(text)) {
-          String lang = request.getLocale().getLanguage();
-          news = newsService.searchNews(newsFilter, lang);
-        } else {
-          news = newsService.getNews(newsFilter);
-        }
-        if (news != null && news.size() != 0) {
-          for (News newsItem : news) {
-            newsItem.setIllustration(null);
-          }
-        }
-
-        newsEntity.setNews(news);
-        newsEntity.setOffset(offset);
-        newsEntity.setLimit(limit);
-        if(returnSize) {
-          newsEntity.setSize(newsService.getNewsCount(newsFilter));
-        }
-
-        return Response.ok(newsEntity).build();
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
       }
+      NewsFilter newsFilter = buildFilter(spacesList, filter, text, author, limit, offset);
+      List<News> news;
+      //Set text to search news with
+      if (StringUtils.isNotEmpty(text)) {
+        String lang = request.getLocale().getLanguage();
+        news = newsService.searchNews(newsFilter, lang);
+      } else {
+        news = newsService.getNews(newsFilter);
+      }
+      if (news != null && news.size() != 0) {
+        for (News newsItem : news) {
+          newsItem.setIllustration(null);
+        }
+      }
+      newsEntity.setNews(news);
+      newsEntity.setOffset(offset);
+      newsEntity.setLimit(limit);
+      if (returnSize) {
+        newsEntity.setSize(newsService.getNewsCount(newsFilter));
+      }
+      return Response.ok(newsEntity).build();
     } catch (Exception e) {
-      LOG.error("Error when getting the news with params author=" + author + ", spaces=" + spaces + ", publicationState="
-          + publicationState, e);
+
+      LOG.error("Error when getting the news with params author=" + author + ", spaces=" + spaces, e);
       return Response.serverError().build();
     }
   }

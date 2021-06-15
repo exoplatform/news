@@ -13,7 +13,7 @@
 
 .VuetifyApp {
   #newsDetails .newsDetailsActionMenu {
-    margin: 1.5rem;
+    margin: 20px 20px 0 0;
   }
 }
 
@@ -237,12 +237,11 @@
 
   #newsShareButton, #newsEditButton, #newsPinButton {
     border: none !important;
-    padding: 9px 10px;
-    margin-top: 20px;
+    margin-top: 18px;
     float: right ~'; /** orientation=lt */ ';
     float: left ~'; /** orientation=rt */ ';
     i {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
 
@@ -583,14 +582,17 @@
       }
 
       .pinArticleContent {
-        padding-top: 0.5rem;
-        margin-right: 40px ~'; /** orientation=lt */ ';
-        margin-left: 40px ~'; /** orientation=rt */ ';
+        padding-top: 10px;
+        margin-right: 10px ~'; /** orientation=lt */ ';
+        margin-left: 10px ~'; /** orientation=rt */ ';
         cursor: pointer;
 
         #newsPinButton {
           float: right ~'; /** orientation=lt */ ';
           float: left ~'; /** orientation=rt */ ';
+          i {
+            font-size: 18px;
+          }
 
           &.unauthorizedPin {
             cursor: not-allowed;

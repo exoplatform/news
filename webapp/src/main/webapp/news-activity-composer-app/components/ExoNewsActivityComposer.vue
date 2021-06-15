@@ -30,7 +30,6 @@
               data-placement="bottom"
               @click="!news.archived ? news.pinned = !news.pinned : null">
               <v-icon
-                dense
                 :class="broadcastArticleClass"
                 class="fas fa-bullhorn" />
             </a>

@@ -20,7 +20,6 @@
       data-placement="bottom"
       @click="confirmAction">
       <v-icon
-        dense
         :class="broadcastArticleClass"
         class="fas fa-bullhorn" />
     </a>

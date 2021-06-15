@@ -109,7 +109,7 @@
     }
     def updatedDate = LocalDateTime.ofInstant(news.updateDate.toInstant(), TimeZone.getDefault().toZoneId());
     def newsUpdatedDate = updatedDate.format(mediumDateFormat);
-    if( news.updateDate.getTime() == newsPublicationDate.getTime() ){
+    if(news.updateDate != null && newsPublicationDate != null && news.updateDate.getTime() == newsPublicationDate.getTime()){
       newsUpdatedDate = null;
     }
     def newsTitle = news.title.replaceAll("'", "\\\\'").replaceAll("</script", "</scr\\\\ipt");

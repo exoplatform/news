@@ -276,7 +276,8 @@ export default {
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.news.body === this.originalNews.body
-                 && this.news.pinned === this.originalNews.pinned) {
+                 && this.news.pinned === this.originalNews.pinned
+                 && this.news.publicationState !== 'draft') {
         return true;
       }
 
@@ -457,6 +458,7 @@ export default {
             this.news.pinned = fetchedNode.pinned;
             this.news.archived = fetchedNode.archived;
             this.news.spaceId = fetchedNode.spaceId;
+            this.news.publicationState = fetchedNode.publicationState;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 

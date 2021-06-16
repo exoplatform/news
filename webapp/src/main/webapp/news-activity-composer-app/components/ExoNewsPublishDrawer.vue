@@ -66,7 +66,14 @@ export default {
       }
     },
     selectPostMode() {
-      this.$emit('post-article', this.postArticleMode);
+      const newDate = new Date(this.datePublished);
+      newDate.setFullYear(newDate.getFullYear());
+      newDate.setMonth(newDate.getMonth());
+      newDate.setDate(newDate.getDate());
+      newDate.setHours(this.datePublishedTime.getHours());
+      newDate.setMinutes(this.datePublishedTime.getMinutes());
+      newDate.setSeconds(0);
+      this.$emit('post-article', newDate);
     },
   }
 };

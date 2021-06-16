@@ -5,8 +5,11 @@
   NewsService newsService = CommonsUtils.getService(NewsService.class);
   boolean showPinInput = newsService.canPinNews();
 %>
+<div class="VuetifyApp">
+  <div id="NewsComposerApp">
+  </div>
+</div>
 
-<div id="NewsComposerApp"></div>
 
 <script>
 require(['PORTLET/news/NewsComposer'], function(newsComposer) {

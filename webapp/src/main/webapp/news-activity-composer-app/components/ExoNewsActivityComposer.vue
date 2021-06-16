@@ -1,7 +1,7 @@
 <template>
-  <div class="VuetifyApp">
+  <v-app>
     <div v-show="loading">
-      <div class="VuetifyApp loadingComposer">
+      <div class="loadingComposer">
         <v-progress-circular
           indeterminate
           color="primary" />
@@ -37,43 +37,38 @@
           </div>
           <div class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-            <div v-show="!editMode" class="VuetifyApp">
-              <v-app>
-                <v-btn
-                  id="newsPost"
-                  :loading="postingNews"
-                  :disabled="postDisabled || postingNews"
-                  elevation="0"
-                  class="btn btn-primary"
-                  @click="openDrawer">
-                  {{ $t("news.composer.post") }}
-                </v-btn>
-              </v-app>
-            </div>
+            <v-btn
+              v-show="!editMode"
+              id="newsPost"
+              :loading="postingNews"
+              :disabled="postDisabled || postingNews"
+              elevation="0"
+              class="btn btn-primary"
+              @click="openDrawer">
+              {{ $t("news.composer.post") }}
+            </v-btn>
           </div>
-          <div v-show="editMode" class="VuetifyApp">
-            <v-app>
-              <div class="d-flex flex-row">
-                <v-btn
-                  id="newsEdit"
-                  :disabled="updateDisabled"
-                  class="btn btn-primary mr-2 "
-                  @click.prevent="updateNews">
-                  {{ $t("news.edit.update") }}
-                </v-btn>
-                <v-btn
-                  id="newsUpdateAndPost"
-                  :disabled="news.archived ? true: updateDisabled"
-                  :class="[news.archived ? 'unauthorizedPin' : '']"
-                  class="btn mr-2"
-                  @click.prevent="updateAndPostNews">
-                  {{ $t("news.edit.update.post") }}
-                </v-btn>
-                <v-btn class="btn mr-6" @click="goBack">
-                  {{ $t("news.composer.btn.cancel") }}
-                </v-btn>
-              </div>
-            </v-app>
+          <div v-show="editMode">
+            <div class="d-flex flex-row">
+              <v-btn
+                id="newsEdit"
+                :disabled="updateDisabled"
+                class="btn btn-primary mr-2 "
+                @click.prevent="updateNews">
+                {{ $t("news.edit.update") }}
+              </v-btn>
+              <v-btn
+                id="newsUpdateAndPost"
+                :disabled="news.archived ? true: updateDisabled"
+                :class="[news.archived ? 'unauthorizedPin' : '']"
+                class="btn mr-2"
+                @click.prevent="updateAndPostNews">
+                {{ $t("news.edit.update.post") }}
+              </v-btn>
+              <v-btn class="btn mr-6" @click="goBack">
+                {{ $t("news.composer.btn.cancel") }}
+              </v-btn>
+            </div>
           </div>
         </div>
         <div id="newsTop"></div>
@@ -116,26 +111,21 @@
           </div>
         </div>
       </form>
-
-      <div class="VuetifyApp">
-        <v-app>
-          <v-btn
-            class="attachmentsButton"
-            fixed
-            bottom
-            right
-            fab
-            x-large
-            @click="openApp()">
-            <i class="uiIconAttachment"></i>
-            <v-progress-circular
-              :class="uploading ? 'uploading' : ''"
-              indeterminate>
-              {{ news.attachments.length }}
-            </v-progress-circular>
-          </v-btn>
-        </v-app>
-      </div>
+      <v-btn
+        class="attachmentsButton"
+        fixed
+        bottom
+        right
+        fab
+        x-large
+        @click="openApp()">
+        <i class="uiIconAttachment"></i>
+        <v-progress-circular
+          :class="uploading ? 'uploading' : ''"
+          indeterminate>
+          {{ news.attachments.length }}
+        </v-progress-circular>
+      </v-btn>
       <exo-attachments
         ref="attachmentsComponent"
         :space-id="news.spaceId"
@@ -178,7 +168,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script>

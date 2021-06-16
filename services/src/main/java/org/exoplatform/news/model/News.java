@@ -65,19 +65,21 @@ public class News {
 
   private List<NewsAttachment> attachments;
 
-  private String spaceAvatarUrl;
+  private String               spaceAvatarUrl;
 
-  private String authorAvatarUrl;
+  private String               authorAvatarUrl;
 
-  private Boolean canEdit;
-  
-  private Boolean canDelete;
+  private Boolean              canEdit;
 
-  private Set<Space> sharedInSpacesList;
+  private Boolean              canDelete;
 
-  private String url;
+  private Set<Space>           sharedInSpacesList;
 
-  private boolean hiddenSpace;
+  private String               url;
+
+  private boolean              hiddenSpace;
+
+  private Date                 schedulePostDate;
 
   public String getId() {
     return id;
@@ -370,5 +372,13 @@ public class News {
 
   public void setCanDelete(Boolean canDelete) {
     this.canDelete = canDelete;
+  }
+
+  public Date getSchedulePostDate() {
+    return schedulePostDate;
+  }
+
+  public void setSchedulePostDate(Date schedulePostDate) {
+    this.schedulePostDate = schedulePostDate;
   }
 }

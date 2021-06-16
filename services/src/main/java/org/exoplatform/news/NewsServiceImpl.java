@@ -2,6 +2,7 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,6 +115,8 @@ public class NewsServiceImpl implements NewsService {
   private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
 
   private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
+
+  private static final String      START_TIME_PROPERTY             = "publication:startPublishedDate";
 
   private RepositoryService        repositoryService;
 
@@ -957,10 +960,15 @@ public class NewsServiceImpl implements NewsService {
     Node spaceNewsRootNode = getSpaceNewsRootNode(news.getSpaceId(), session);
 
     Calendar creationCalendar = Calendar.getInstance();
+    Calendar scheduleCalendar = Calendar.getInstance();
     if (news.getCreationDate() != null) {
       creationCalendar.setTime(news.getCreationDate());
     } else {
       news.setCreationDate(creationCalendar.getTime());
+    }
+
+    if (news.getSchedulePostDate() != null) {
+      scheduleCalendar.setTime(news.getSchedulePostDate());
     }
     String newsNodeName = !news.getTitle().equals("") ? news.getTitle() : "Untitled";
     Node newsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, getNodeRelativePath(creationCalendar));
@@ -974,6 +982,10 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:viewsCount", 0);
     newsDraftNode.setProperty("exo:viewers", "");
     newsDraftNode.setProperty("exo:activities", "");
+    if(news.getSchedulePostDate() != null) {
+      newsDraftNode.setProperty("publication:currentState", "staged");
+      newsDraftNode.setProperty("publication:startPublishedDate", scheduleCalendar);
+    }
     Calendar updateCalendar = Calendar.getInstance();
     if (news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());
@@ -1121,6 +1133,29 @@ public class NewsServiceImpl implements NewsService {
   public boolean canPinNews() {
     return  getCurrentIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
             getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  public News scheduleNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+            repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+
+    try {
+      if (StringUtils.isEmpty(news.getId())) {
+        news = createNewsDraft(news);
+      } else {
+        postNewsActivity(news);
+      }
+
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+    return news;
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {

@@ -34,9 +34,9 @@
                 class="fas fa-bullhorn" />
             </a>
           </div>
-          <div v-show="!editMode" class="newsFormRightActions">
+          <div class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
-            <div class="VuetifyApp">
+            <div v-show="!editMode" class="VuetifyApp">
               <v-app>
                 <v-btn
                   id="newsPost"
@@ -276,7 +276,8 @@ export default {
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.news.body === this.originalNews.body
-                 && this.news.pinned === this.originalNews.pinned) {
+                 && this.news.pinned === this.originalNews.pinned
+                 && this.news.publicationState !== 'draft') {
         return true;
       }
 
@@ -457,6 +458,7 @@ export default {
             this.news.pinned = fetchedNode.pinned;
             this.news.archived = fetchedNode.archived;
             this.news.spaceId = fetchedNode.spaceId;
+            this.news.publicationState = fetchedNode.publicationState;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -496,7 +498,7 @@ export default {
 
     autoSave: function() {
       // No draft saving if init not done or in edit mode for the moment
-      if (!this.initDone || this.editMode) {
+      if (!this.initDone) {
         return;
       }
       // if the News is being posted, no need to autosave anymore
@@ -507,7 +509,13 @@ export default {
       this.saveDraft = setTimeout(() => {
         this.savingDraft = true;
         this.draftSavingStatus = this.$t('news.composer.draft.savingDraftStatus');
-        Vue.nextTick(() => this.saveNewsDraft());
+        Vue.nextTick(() => {
+          if (this.activityId) {
+            this.doUpdateNews('draft');
+          } else {
+            this.saveNewsDraft();
+          }
+        });
       }, this.autoSaveDelay);
     },
 
@@ -714,13 +722,13 @@ export default {
         }
         const self = this;
         return new Promise(function(resolve) {
-          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews().then(resolve()); }, label: confirmButton}], captionText, confirmText, cancelButton);
+          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews('published').then(resolve()); }, label: confirmButton}], captionText, confirmText, cancelButton);
         });
       } else {
-        return this.doUpdateNews();
+        return this.doUpdateNews('published');
       }
     },
-    doUpdateNews: function () {
+    doUpdateNews: function (publicationState) {
       const newsBody = this.replaceImagesURLs(this.getBody());
       const updatedNews = {
         id: this.news.id,
@@ -729,7 +737,7 @@ export default {
         body: this.getBody() ? newsBody : this.news.body,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
-        publicationState: 'published'
+        publicationState: publicationState
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;
@@ -738,7 +746,7 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return this.$newsServices.updateNews(updatedNews);
+      return this.$newsServices.updateNews(updatedNews).then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
     },
     goBack() {
       if ( history.length > 1) {

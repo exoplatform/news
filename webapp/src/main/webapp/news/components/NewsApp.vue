@@ -286,21 +286,22 @@ export default {
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
+        const isDraft = item.publicationState === 'draft';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          updatedDate: item.publicationState !== 'draft' ? newsPublicationDate : newsUpdateDate,
+          updatedDate: !isDraft ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: item.publicationState === 'draft' ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}` : item.url,
+          url: isDraft ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,
-          canDelete: item.canDelete,
+          canDelete: item.canDelete && !(isDraft && activityId),
           archived: item.archived,
           draft: item.publicationState === 'draft',
           canArchive: item.canArchive,

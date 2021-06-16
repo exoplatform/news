@@ -247,7 +247,7 @@ export default {
       canCreatNews: false,
       loading: true,
       currentSpace: {},
-      spaceURL: null
+      spaceURL: null,
     };
   },
   computed: {
@@ -519,7 +519,7 @@ export default {
         this.$refs.publishNewsDrawer.open();
       }
     },
-    postNews: function () {
+    postNews: function (datePublish) {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');
         const captionText = this.$t('news.broadcast.action');
@@ -527,20 +527,20 @@ export default {
         const cancelButton = this.$t('news.edit.cancel');
         eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
-        this.doPostNews();
+        this.doPostNews(datePublish);
       }
     },
-    doPostNews: function () {
+    doPostNews: function (datePublish) {
       this.postingNews = true;
       // if the News draft is being saved, we have to wait until it is done before posting the News
       if (this.savingDraft) {
         this.$on('draftCreated', this.saveNews);
         this.$on('draftUpdated', this.saveNews);
       } else {
-        this.saveNews();
+        this.saveNews(datePublish);
       }
     },
-    saveNews: function () {
+    saveNews: function (datePublish) {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
@@ -556,8 +556,17 @@ export default {
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         spaceId: this.spaceId,
-        publicationState: 'published'
+        publicationState: null,
+        schedulePostDate: null,
       };
+
+      if (datePublish != null){
+        news.publicationState ='staged';
+        news.schedulePostDate = datePublish;
+      } else {
+        news.publicationState ='published';
+        news.schedulePostDate = null;
+      }
 
       if (this.news.illustration.length > 0) {
         news.uploadId = this.news.illustration[0].uploadId;

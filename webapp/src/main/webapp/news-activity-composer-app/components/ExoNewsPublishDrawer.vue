@@ -25,7 +25,9 @@
               class="flex-grow-1 my-auto" />
             <div class="d-flex flex-row flex-grow-0">
               <slot name="datePublishedDateTime"></slot>
-              <time-picker v-model="datePublishedTime" class="me-4" />
+              <time-picker
+                v-model="datePublishedTime"
+                class="me-4" />
             </div>
           </div>
         </div>
@@ -36,7 +38,7 @@
             :disabled="disabled"
             class="btn btn-primary ms-2"
             @click="selectPostMode">
-            {{ $t('news.composer.post') }}
+            {{ saveButtonLabel }}
           </v-btn>
         </div>
       </template>
@@ -50,11 +52,42 @@ export default {
     disabled: true,
     postArticleMode: 'immediate',
     datePublished: null,
-    datePublishedTime: null,
+    datePublishedTime: '8:00',
     showDatePublishing: false,
     allowPostingLater: false,
   }),
+  watch: {
+    datePublished(newVal, oldVal) {
+      if (!this.datePublished || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
+        return;
+      }
+      if ( this.datePublished < new Date().getTime()) {
+        this.datePublished = new Date();
+      }
+      const newDate = new Date(this.datePublished);
+      newDate.setHours(this.datePublishedTime.getHours());
+      newDate.setMinutes(this.datePublishedTime.getMinutes());
+      newDate.setSeconds(0);
+      this.datePublished = newDate;
+    },
+    datePublishedTime(newVal, oldVal) {
+      if (!this.datePublishedTime || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
+        return;
+      }
+      const newDate = new Date(this.datePublished);
+      newDate.setHours(this.datePublishedTime.getHours());
+      newDate.setMinutes(this.datePublishedTime.getMinutes());
+      newDate.setSeconds(0);
+      this.datePublished = newDate;
+    },
+  },
+  computed: {
+    saveButtonLabel() {
+      return this.postArticleMode==='later' ? this.$t('news.composer.schedule'): this.$t('news.composer.post');
+    }
+  },
   created() {
+    this.initializeDate();
     this.$featureService.isFeatureEnabled('news.postLater')
       .then(enabled => this.allowPostingLater = enabled);
   },
@@ -65,8 +98,23 @@ export default {
         this.$refs.publishNewsDrawer.open();
       }
     },
+    initializeDate() {
+      const nextDate = new Date();
+      nextDate.setDate(nextDate.getDate()+1);
+      this.datePublished = nextDate;
+      this.datePublishedTime = nextDate;
+      this.datePublishedTime.setHours(8);
+      this.datePublishedTime.setMinutes(0);
+      this.datePublishedTime.setMilliseconds(0);
+    },
     selectPostMode() {
-      this.$emit('post-article', this.postArticleMode);
+      let datePublish = null;
+      if (this.postArticleMode !=='later') {
+        datePublish = null;
+      } else {
+        datePublish = this.$newsUtils.convertDate(this.datePublished);
+      }
+      this.$emit('post-article', datePublish);
     },
   }
 };

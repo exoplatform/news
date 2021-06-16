@@ -244,11 +244,10 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
 
     try {
-      Node liveNode = null;
       Node node = session.getNodeByUUID(id);
-
-      if (!editMode && node != null && node.getProperty(CURRENT_STATE).getString().equals(DRAFT) && node.hasProperty(LIVE_REVISION_PROP)) {
+      if (node != null && !editMode && node.getProperty(CURRENT_STATE).getString().equals(DRAFT) && node.hasProperty(LIVE_REVISION_PROP)) {
         try {
+          Node liveNode = null;
           String nodeVersionUUID = node.getProperty(LIVE_REVISION_PROP).getString();
           Node revNode = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID);
           if (revNode != null)

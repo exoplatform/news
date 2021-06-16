@@ -12,7 +12,23 @@
           <v-radio
             :label="$t('news.composer.postImmediately')"
             value="immediate" />
+          <v-radio
+            v-if="allowPostingLater"
+            :label="$t('news.composer.postLater')"
+            value="later" />
         </v-radio-group>
+        <div v-if="postArticleMode==='later' && allowPostingLater" class="ml-4">
+          <div class="grey--text my-4">{{ $t('news.composer.chooseDatePublish') }}</div>
+          <div class="d-flex flex-row flex-grow-1">
+            <date-picker
+              v-model="datePublished"
+              class="flex-grow-1 my-auto" />
+            <div class="d-flex flex-row flex-grow-0">
+              <slot name="datePublishedDateTime"></slot>
+              <time-picker v-model="datePublishedTime" class="me-4" />
+            </div>
+          </div>
+        </div>
       </template>
       <template slot="footer">
         <div class="d-flex justify-end">
@@ -33,7 +49,15 @@ export default {
   data: () => ({
     disabled: true,
     postArticleMode: 'immediate',
+    datePublished: null,
+    datePublishedTime: null,
+    showDatePublishing: false,
+    allowPostingLater: false,
   }),
+  created() {
+    this.$featureService.isFeatureEnabled('news.postLater')
+      .then(enabled => this.allowPostingLater = enabled);
+  },
   methods: {
     open() {
       if (this.$refs.publishNewsDrawer) {

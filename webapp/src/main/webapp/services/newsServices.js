@@ -1,7 +1,7 @@
 import {newsConstants} from '../js/newsConstants.js';
 
-export function getNewsById(id) {
-  return fetch(`${newsConstants.NEWS_API}/${id}`, {
+export function getNewsById(id, editMode) {
+  return fetch(`${newsConstants.NEWS_API}/${id}?editMode=${editMode || ''}`, {
     credentials: 'include',
     method: 'GET',
   }).then((data) => {

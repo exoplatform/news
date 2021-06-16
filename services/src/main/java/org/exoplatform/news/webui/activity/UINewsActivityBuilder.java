@@ -20,7 +20,7 @@ public class UINewsActivityBuilder extends BaseUIActivityBuilder {
     try {
       String newsId = activity.getTemplateParams().get("newsId");
       if (newsId != null) {
-        News news = newsService.getNewsById(newsId);
+        News news = newsService.getNewsById(newsId, false);
         if(news != null) {
           ((UINewsActivity) uiActivity).setNews(news);
         }

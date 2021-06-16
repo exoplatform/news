@@ -444,7 +444,7 @@ export default {
 
     initNewsComposerData: function(newsId) {
       const self = this;
-      this.$newsServices.getNewsById(newsId)
+      this.$newsServices.getNewsById(newsId, true)
         .then(fetchedNode => {
           if (fetchedNode){
             this.news.id = fetchedNode.id;

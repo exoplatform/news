@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.jcr.ItemNotFoundException;
@@ -61,7 +60,6 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -101,6 +99,12 @@ public class NewsServiceImpl implements NewsService {
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
+
+  public static final String       CURRENT_STATE                   = "publication:currentState";
+
+  public static final String       LIVE_REVISION_PROP                   = "publication:liveRevision";
+
+  public final static String       DRAFT                           = "draft";
 
   private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
@@ -226,10 +230,11 @@ public class NewsServiceImpl implements NewsService {
    * Get a news by id
    * 
    * @param id Id of the news
+   * @param editMode
    * @return The news with the given id
    * @throws Exception when error
    */
-  public News getNewsById(String id) throws Exception {
+  public News getNewsById(String id, boolean editMode) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -239,7 +244,22 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
 
     try {
+      Node liveNode = null;
       Node node = session.getNodeByUUID(id);
+
+      if (!editMode && node != null && node.getProperty(CURRENT_STATE).getString().equals(DRAFT) && node.hasProperty(LIVE_REVISION_PROP)) {
+        try {
+          String nodeVersionUUID = node.getProperty(LIVE_REVISION_PROP).getString();
+          Node revNode = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID);
+          if (revNode != null)
+            liveNode = revNode.getNode("jcr:frozenNode");
+          return convertNodeToNews(liveNode);
+        } catch (Exception e) {
+          if (LOG.isWarnEnabled()) {
+            LOG.warn(e.getMessage());
+          }
+        }
+      }
       return convertNodeToNews(node);
     } catch (ItemNotFoundException e) {
       return null;
@@ -461,7 +481,7 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
-    News news = getNewsById(newsId);
+    News news = getNewsById(newsId, false);
 
     Node newsNode = session.getNodeByUUID(newsId);
 
@@ -490,7 +510,7 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
-    News news = getNewsById(newsId);
+    News news = getNewsById(newsId, false);
     if (news == null) {
       throw new Exception("Unable to find a news with an id equal to: " + newsId);
     }
@@ -586,7 +606,7 @@ public class NewsServiceImpl implements NewsService {
         activity.setUserId(poster.getId());
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("newsId", sharedNews.getNewsId());
-        News news = getNewsById(sharedNews.getNewsId());
+        News news = getNewsById(sharedNews.getNewsId(), false);
         templateParams.put("originalActivityId", news.getActivityId());
         activity.setTemplateParams(templateParams);
         activityManager.saveActivityNoReturn(spaceIdentity, activity);

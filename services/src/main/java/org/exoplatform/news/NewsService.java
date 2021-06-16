@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.jcr.Node;
 
-import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
@@ -15,7 +14,7 @@ import org.exoplatform.social.core.space.model.Space;
 public interface NewsService {
   News createNews(News news) throws Exception;
 
-  News getNewsById(String id) throws Exception;
+  News getNewsById(String id, boolean editMode) throws Exception;
 
   List<News> getNews(NewsFilter filter) throws Exception;
 

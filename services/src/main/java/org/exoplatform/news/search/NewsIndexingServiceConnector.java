@@ -40,7 +40,6 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnector {
-  private static final long     serialVersionUID = 1L;
 
   public static final String    TYPE             = "news";
 
@@ -63,7 +62,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
   }
 
   @Override
-  public String getType() {
+  public String getConnectorName() {
     return TYPE;
   }
 
@@ -82,17 +81,11 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public boolean canReindex() {
-    return false;
-  }
-
   private Document getDocument(String id) {
     if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("id is mandatory");
     }
     LOG.debug("Index document for news id={}", id);
-    Document document = new Document();
     News news = null;
     SessionProvider systemProvider = SessionProvider.createSystemProvider();
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
@@ -181,9 +174,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
       fields.put("lastUpdatedTime", String.valueOf(news.getUpdateDate().getTime()));
     }
 
-    document = new Document(TYPE, id, null, news.getUpdateDate(), Collections.singleton(ownerIdentityId), fields);
-
-    return document;
+    return new Document(id, null, news.getUpdateDate(), Collections.singleton(ownerIdentityId), fields);
   }
 
   private String htmlToText(String source) {
@@ -193,7 +184,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     source = source.replaceAll("<( )*script([^>])*>", "<script>");
     source = source.replaceAll("(<( )*(/)( )*script( )*>)", "</script>");
     source = source.replaceAll("(<script>).*(</script>)", "");
-    source = source.replaceAll("javascript:", "");
+    source = source.replace("javascript:", "");
     source = source.replaceAll("<( )*style([^>])*>", "<style>");
     source = source.replaceAll("(<( )*(/)( )*style( )*>)", "</style>");
     source = source.replaceAll("(<style>).*(</style>)", "");

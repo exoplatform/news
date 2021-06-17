@@ -28,8 +28,6 @@ import org.exoplatform.social.core.storage.api.ActivityStorage;
 @RunWith(MockitoJUnitRunner.class)
 public class NewsESSearchConnectorTest {
 
-  private static final String ES_TYPE         = "news";
-
   private static final String ES_INDEX        = "news_alias";
 
   public static final String  FAKE_ES_QUERY   =
@@ -123,7 +121,7 @@ public class NewsESSearchConnectorTest {
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
-    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn("{}");
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX))).thenReturn("{}");
 
     List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "term", 0, 10);
     assertNotNull(result);
@@ -146,7 +144,7 @@ public class NewsESSearchConnectorTest {
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
-    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX))).thenReturn(searchResult);
 
     Identity rootIdentity = new Identity("organization", "root");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(rootIdentity);
@@ -180,7 +178,7 @@ public class NewsESSearchConnectorTest {
                                           .replaceAll("@limit@", "10");
     searchResult = IOUtil.getStreamContentAsString(getClass().getClassLoader()
                                                              .getResourceAsStream("news-search-result-by-identity.json"));
-    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX))).thenReturn(searchResult);
 
     Identity poster = new Identity(OrganizationIdentityProvider.NAME, "posterId");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(poster);
@@ -202,7 +200,6 @@ public class NewsESSearchConnectorTest {
     PropertiesParam propertiesParam = new PropertiesParam();
     propertiesParam.setName("constructor.params");
     propertiesParam.setProperty("index", ES_INDEX);
-    propertiesParam.setProperty("searchType", ES_TYPE);
 
     ValueParam valueParam = new ValueParam();
     valueParam.setName("query.file.path");

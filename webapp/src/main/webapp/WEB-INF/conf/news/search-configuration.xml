@@ -91,9 +91,7 @@
         <properties-param>
           <name>constructor.params</name>
           <property name="index_alias" value="news_alias" />
-          <property name="index_previous" value="" />
           <property name="index_current" value="news_v1" />
-          <property name="type" value="news" />
         </properties-param>
       </init-params>
     </component-plugin>

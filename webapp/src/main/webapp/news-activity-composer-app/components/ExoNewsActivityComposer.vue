@@ -183,6 +183,7 @@
 
 <script>
 import autosize from 'autosize';
+const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
 export default {
   props: {
     newsId: {
@@ -591,14 +592,17 @@ export default {
         spaceId: this.spaceId,
         publicationState: null,
         schedulePostDate: null,
+        timeZoneId: null,
       };
 
       if (datePublish != null){
         news.publicationState ='staged';
         news.schedulePostDate = datePublish;
+        news.timeZoneId = USER_TIMEZONE_ID;
       } else {
         news.publicationState ='published';
         news.schedulePostDate = null;
+        news.timeZoneId = null;
       }
 
       if (this.news.illustration.length > 0) {

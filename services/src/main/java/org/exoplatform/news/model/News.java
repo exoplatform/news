@@ -2,6 +2,7 @@ package org.exoplatform.news.model;
 
 import org.exoplatform.social.core.space.model.Space;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +63,7 @@ public class News {
   private Long                 viewsCount;
 
   private String               activities;
-  
+
   private String               activityId;
 
   private List<NewsAttachment> attachments;
@@ -81,7 +82,9 @@ public class News {
 
   private boolean              hiddenSpace;
 
-  private Date                 schedulePostDate;
+  private String               schedulePostDate;
+
+  private String               timeZoneId;
 
   public String getId() {
     return id;
@@ -384,11 +387,19 @@ public class News {
     this.canDelete = canDelete;
   }
 
-  public Date getSchedulePostDate() {
+  public String getSchedulePostDate() {
     return schedulePostDate;
   }
 
-  public void setSchedulePostDate(Date schedulePostDate) {
+  public void setSchedulePostDate(String schedulePostDate) {
     this.schedulePostDate = schedulePostDate;
+  }
+
+  public String getTimeZoneId() {
+    return timeZoneId;
+  }
+
+  public void setTimeZoneId(String timeZoneId) {
+    this.timeZoneId = timeZoneId;
   }
 }

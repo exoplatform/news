@@ -3,6 +3,9 @@ package org.exoplatform.news;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +66,7 @@ import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.jcr.impl.core.value.StringValue;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.rest.impl.method.StringValueOfProducer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
@@ -963,15 +967,10 @@ public class NewsServiceImpl implements NewsService {
     Node spaceNewsRootNode = getSpaceNewsRootNode(news.getSpaceId(), session);
 
     Calendar creationCalendar = Calendar.getInstance();
-    Calendar scheduleCalendar = Calendar.getInstance();
     if (news.getCreationDate() != null) {
       creationCalendar.setTime(news.getCreationDate());
     } else {
       news.setCreationDate(creationCalendar.getTime());
-    }
-
-    if (news.getSchedulePostDate() != null) {
-      scheduleCalendar.setTime(news.getSchedulePostDate());
     }
     String newsNodeName = !news.getTitle().equals("") ? news.getTitle() : "Untitled";
     Node newsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, getNodeRelativePath(creationCalendar));
@@ -985,10 +984,6 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:viewsCount", 0);
     newsDraftNode.setProperty("exo:viewers", "");
     newsDraftNode.setProperty("exo:activities", "");
-    if(news.getSchedulePostDate() != null) {
-      newsDraftNode.setProperty("publication:currentState", "staged");
-      newsDraftNode.setProperty("publication:startPublishedDate", scheduleCalendar);
-    }
     Calendar updateCalendar = Calendar.getInstance();
     if (news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());
@@ -1141,18 +1136,29 @@ public class NewsServiceImpl implements NewsService {
   public News scheduleNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
-            repositoryService.getCurrentRepository()
-                    .getConfiguration()
-                    .getDefaultWorkspaceName(),
-            repositoryService.getCurrentRepository());
-
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     try {
-      if (StringUtils.isEmpty(news.getId())) {
-        news = createNewsDraft(news);
-      } else {
-        postNewsActivity(news);
+      String datePublishFormatted = null;
+      Calendar startDate = Calendar.getInstance();
+      String schedulePostDate = news.getSchedulePostDate();
+      Node newsNode = session.getNodeByUUID(news.getId());
+      if (newsNode == null) {
+        throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
-
+      if (schedulePostDate != null) {
+        String timeZoneId = news.getTimeZoneId();
+        ZoneId userTimeZone = StringUtils.isBlank(timeZoneId) ? ZoneOffset.UTC : ZoneId.of(timeZoneId);
+        String offsetTimeZone = String.valueOf(OffsetTime.now(userTimeZone).getOffset()).replace(":", "");
+        datePublishFormatted = schedulePostDate.concat(" ").concat(offsetTimeZone);
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
+        startDate.setTime(format.parse(datePublishFormatted));
+        newsNode.setProperty("publication:currentState", "staged");
+        newsNode.setProperty("publication:startPublishedDate", startDate);
+        newsNode.save();
+      }
     } finally {
       if (session != null) {
         session.logout();

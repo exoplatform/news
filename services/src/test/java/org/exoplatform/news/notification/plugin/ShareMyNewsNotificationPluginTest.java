@@ -11,6 +11,7 @@ import org.exoplatform.commons.api.notification.service.NotificationCompletionSe
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.jcr.util.IdGenerator;
@@ -49,7 +50,7 @@ public class ShareMyNewsNotificationPluginTest {
   @Rule
   public ExpectedException    exceptionRule = ExpectedException.none();
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class })
+  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForShareMyNewsContext() throws Exception {
     // Given
@@ -80,6 +81,7 @@ public class ShareMyNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
 
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
 

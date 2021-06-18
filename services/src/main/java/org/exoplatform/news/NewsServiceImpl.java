@@ -52,6 +52,8 @@ import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -68,7 +70,6 @@ import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.rest.impl.method.StringValueOfProducer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
@@ -109,7 +110,7 @@ public class NewsServiceImpl implements NewsService {
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
-
+  
   private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
   private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
@@ -117,6 +118,10 @@ public class NewsServiceImpl implements NewsService {
   private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
 
   private static final String      START_TIME_PROPERTY             = "publication:startPublishedDate";
+
+  private static final String      LAST_PUBLISHER                  = "publication:lastUser";
+
+  private static final String      STAGED                          = "staged";
 
   private RepositoryService        repositoryService;
 
@@ -726,6 +731,7 @@ public class NewsServiceImpl implements NewsService {
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
+    StringBuilder newsUrl = new StringBuilder("");
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();
       if(StringUtils.isNotEmpty(strActivities)) {
@@ -736,7 +742,6 @@ public class NewsServiceImpl implements NewsService {
         String newsActivityId = activities[0].split(":")[1];
         news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-        StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
@@ -760,7 +765,10 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
-
+    if (StringUtils.equals(node.getProperty("publication:currentState").getString(), STAGED)) {
+      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+      news.setUrl(newsUrl.toString());
+    }
     if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
@@ -1090,14 +1098,16 @@ public class NewsServiceImpl implements NewsService {
             getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
-  public News scheduleNews(News news) throws Exception {
+  public News scheduleNews(News news, String currentUser) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
+    News sheduledNews = null;
     try {
+      String siteName = CommonsUtils.getService(UserPortalConfigService.class).getDefaultPortal();
       String datePublishFormatted = null;
       Calendar startDate = Calendar.getInstance();
       String schedulePostDate = news.getSchedulePostDate();
@@ -1112,16 +1122,19 @@ public class NewsServiceImpl implements NewsService {
         datePublishFormatted = schedulePostDate.concat(" ").concat(offsetTimeZone);
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
         startDate.setTime(format.parse(datePublishFormatted));
-        newsNode.setProperty("publication:currentState", "staged");
-        newsNode.setProperty("publication:startPublishedDate", startDate);
+        newsNode.setProperty(START_TIME_PROPERTY, startDate);
+        newsNode.setProperty(LAST_PUBLISHER, currentUser);
         newsNode.save();
+        publicationService.changeState(newsNode, "staged", new HashMap<>());
+        wCMPublicationService.updateLifecyleOnChangeContent(newsNode, siteName, currentUser, "staged");
+        sheduledNews = convertNodeToNews(newsNode);
       }
     } finally {
       if (session != null) {
         session.logout();
       }
     }
-    return news;
+    return sheduledNews;
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {

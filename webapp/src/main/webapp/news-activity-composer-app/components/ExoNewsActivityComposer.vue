@@ -586,6 +586,8 @@ export default {
         }
         if (createdNewsActivity) {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+        } else if (createdNews.publicationState === 'staged') {
+          window.location.href = createdNews.url;
         } else {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
         }

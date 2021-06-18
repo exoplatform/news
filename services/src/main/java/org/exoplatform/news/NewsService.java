@@ -53,5 +53,5 @@ public interface NewsService {
 
   public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit);
 
-  News scheduleNews(News news) throws Exception;
+  News scheduleNews(News news, String currentUser) throws Exception;
 }

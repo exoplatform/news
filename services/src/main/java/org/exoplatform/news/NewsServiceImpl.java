@@ -642,6 +642,7 @@ public class NewsServiceImpl implements NewsService {
                   .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
         }
       }
+      Utils.removeDeadSymlinks(node, false);
       node.remove();
       session.save();
     } finally {

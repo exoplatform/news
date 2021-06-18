@@ -614,6 +614,7 @@ public class NewsServiceImpl implements NewsService {
       if (session != null) {
         session.logout();
       }
+      NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, sharedNews.getNewsId(), sharedNews.getPoster());
     }
   }
 

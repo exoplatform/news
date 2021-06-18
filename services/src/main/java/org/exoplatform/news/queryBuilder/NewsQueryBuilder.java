@@ -3,10 +3,14 @@ package org.exoplatform.news.queryBuilder;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 
 public class NewsQueryBuilder {
   private static final Log    LOG                             = ExoLogger.getLogger(NewsQueryBuilder.class);
@@ -59,13 +63,18 @@ public class NewsQueryBuilder {
           }
           sqlQuery.append("exo:spaceId = '").append(spaces.get(spaces.size() - 1)).append("') AND ");
         }
-        if (StringUtils.isNotEmpty(filter.getAuthor())) {
-          sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");
-        }
         if (filter.isDraftNews()) {
-          sqlQuery.append("publication:currentState = 'draft'");
+          IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+          Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+          String currentUserId = identity.getId();
+          sqlQuery.append("publication:currentState = 'draft' AND (('");
+          sqlQuery.append(currentUserId).append("' IN exo:newsModifiersIds AND exo:activities <> '') OR (");
+          sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
         } else {
-          sqlQuery.append("publication:currentState = 'published'");
+          if (StringUtils.isNotEmpty(filter.getAuthor())) {
+            sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");
+          }
+          sqlQuery.append("(publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' ))");
         }
         sqlQuery.append(" AND jcr:path LIKE '/Groups/spaces/%' ORDER BY ").append(filter.getOrder()).append(" DESC");
       } else {

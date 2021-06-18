@@ -81,10 +81,10 @@
             <exo-news-details-action-menu
               v-if="news.canEdit "
               :news="news"
-              :show-edit-button="news.canEdit && !news.draft"
+              :show-edit-button="news.canEdit && !isFilterDrafts"
               :show-delete-button="news.canDelete"
-              :show-share-button="showShareButton && !news.draft"
-              :show-resume-button="news.draft"
+              :show-share-button="showShareButton && !isFilterDrafts"
+              :show-resume-button="news.draft && isFilterDrafts"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -198,6 +198,9 @@ export default {
         return this.$t('news.app.noNews');
       }
     },
+    isFilterDrafts() {
+      return this.newsFilter === 'drafts';
+    }
   },
   watch: {
     searchText() {
@@ -292,10 +295,10 @@ export default {
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          updatedDate: !isDraft ? newsPublicationDate : newsUpdateDate,
+          updatedDate: this.isFilterDrafts ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: isDraft ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
+          url: this.isFilterDrafts ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
@@ -311,7 +314,7 @@ export default {
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
-          target: item.publicationState === 'draft' ? '_blank' : '_self',
+          target: this.newsFilter === 'drafts' ? '_blank' : '_self',
         });
       });
       if (append) {

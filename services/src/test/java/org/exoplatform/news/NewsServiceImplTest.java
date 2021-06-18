@@ -1424,6 +1424,7 @@ public class NewsServiceImplTest {
     when(node2.getProperty(anyString())).thenReturn(property);
     when(node3.getProperty(anyString())).thenReturn(property);
     when(property.toString()).thenReturn("news ");
+    when(property.getString()).thenReturn("");
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getBoolean()).thenReturn(true);
     when(property.getLong()).thenReturn((long) 10);
@@ -2202,15 +2203,20 @@ public class NewsServiceImplTest {
     Property property1 = mock(Property.class);
     Property property2 = mock(Property.class);
     Property property3 = mock(Property.class);
+    Property property4 = mock(Property.class);
     when(node1.getProperty("exo:title")).thenReturn(property1);
     when(node1.hasProperty("exo:title")).thenReturn(true);
     when(node2.getProperty("exo:title")).thenReturn(property2);
     when(node2.hasProperty("exo:title")).thenReturn(true);
     when(node3.getProperty("exo:title")).thenReturn(property3);
     when(node3.hasProperty("exo:title")).thenReturn(true);
+    when(node1.getProperty("publication:currentState")).thenReturn(property4);
+    when(node2.getProperty("publication:currentState")).thenReturn(property4);
+    when(node3.getProperty("publication:currentState")).thenReturn(property4);
     when(property1.getString()).thenReturn("title1");
     when(property2.getString()).thenReturn("title2");
     when(property3.getString()).thenReturn("title3");
+    when(property4.getString()).thenReturn("");
     when(property1.getDate()).thenReturn(Calendar.getInstance());
     when(property2.getDate()).thenReturn(Calendar.getInstance());
     when(property3.getDate()).thenReturn(Calendar.getInstance());
@@ -2741,6 +2747,7 @@ public class NewsServiceImplTest {
     when(node2.getProperty(anyString())).thenReturn(property);
     when(node3.getProperty(anyString())).thenReturn(property);
     when(property.toString()).thenReturn("news ");
+    when(property.getString()).thenReturn("");
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getBoolean()).thenReturn(true);
     when(property.getLong()).thenReturn((long) 10);
@@ -3375,7 +3382,7 @@ public class NewsServiceImplTest {
     when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
     
     
-    assertFalse(newsService.convertNodeToNews(newsNode).getBody().contains("<img"));
+    assertFalse(newsService.convertNodeToNews(newsNode, false).getBody().contains("<img"));
     
   }
 }

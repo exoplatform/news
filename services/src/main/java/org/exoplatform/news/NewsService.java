@@ -30,7 +30,7 @@ public interface NewsService {
 
   void unpinNews(String newsId) throws Exception;
 
-  News convertNodeToNews(Node node) throws Exception;
+  News convertNodeToNews(Node node, boolean editMode) throws Exception;
 
   News createNewsDraft(News news) throws Exception;
 

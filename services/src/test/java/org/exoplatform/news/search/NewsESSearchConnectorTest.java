@@ -1,9 +1,8 @@
 package org.exoplatform.news.search;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -58,7 +57,7 @@ public class NewsESSearchConnectorTest {
 
     try {
       Mockito.reset(configurationManager);
-      when(configurationManager.getInputStream("FILE_PATH")).thenReturn(new ByteArrayInputStream(FAKE_ES_QUERY.getBytes()));
+      lenient().when(configurationManager.getInputStream("FILE_PATH")).thenReturn(new ByteArrayInputStream(FAKE_ES_QUERY.getBytes()));
     } catch (Exception e) {
       throw new IllegalStateException("Error retrieving ES Query content", e);
     }
@@ -87,7 +86,7 @@ public class NewsESSearchConnectorTest {
       // Expected
     }
     Identity identity = mock(Identity.class);
-    when(identity.getId()).thenReturn("1");
+    lenient().when(identity.getId()).thenReturn("1");
     try {
       newsESSearchConnector.search(identity, null, 0, 10);
       fail("Should throw IllegalArgumentException: filter is mandatory");
@@ -118,13 +117,13 @@ public class NewsESSearchConnectorTest {
 
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
-    when(identity.getId()).thenReturn("1");
-    when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
+    lenient().when(identity.getId()).thenReturn("1");
+    lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
     String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "term")
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
-    when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn("{}");
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn("{}");
 
     List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "term", 0, 10);
     assertNotNull(result);
@@ -141,16 +140,16 @@ public class NewsESSearchConnectorTest {
 
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
-    when(identity.getId()).thenReturn("1");
-    when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
+    lenient().when(identity.getId()).thenReturn("1");
+    lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
     String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "term")
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
-    when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
 
     Identity rootIdentity = new Identity("organization", "root");
-    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(rootIdentity);
+    lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(rootIdentity);
 
     List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "term", 0, 10);
     assertNotNull(result);
@@ -173,18 +172,18 @@ public class NewsESSearchConnectorTest {
 
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
-    when(identity.getId()).thenReturn("1");
-    when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
+    lenient().when(identity.getId()).thenReturn("1");
+    lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
     String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "john")
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
     searchResult = IOUtil.getStreamContentAsString(getClass().getClassLoader()
                                                              .getResourceAsStream("news-search-result-by-identity.json"));
-    when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
+    lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX), eq(ES_TYPE))).thenReturn(searchResult);
 
     Identity poster = new Identity(OrganizationIdentityProvider.NAME, "posterId");
-    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(poster);
+    lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(poster);
 
     List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "john", 0, 10);
     assertNotNull(result);

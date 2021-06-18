@@ -26,10 +26,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsSearchConnectorTest {
@@ -103,7 +101,7 @@ public class NewsSearchConnectorTest {
     when(queryResult.getNodes()).thenReturn(nodeIterator);
     when(queryResult.getRows()).thenReturn(rowIterator);
     when(nodeIterator.hasNext()).thenReturn(false);
-    when(rowIterator.hasNext()).thenReturn(false);
+    lenient().when(rowIterator.hasNext()).thenReturn(false);
 
     // When
     List<SearchResult> listResult = newsSearchConnector.search(filter, offset, limit, sort, order );
@@ -158,7 +156,7 @@ public class NewsSearchConnectorTest {
     when(nodeIterator.hasNext()).thenReturn(true).thenReturn(false);
     when(nodeIterator.nextNode()).thenReturn(node);
     when(queryResult.getRows()).thenReturn(rowIterator);
-    when(rowIterator.hasNext()).thenReturn(true).thenReturn(false);
+    lenient().when(rowIterator.hasNext()).thenReturn(true).thenReturn(false);
     when(rowIterator.nextRow()).thenReturn(row);
 
     NewsSearchConnector newsSearchConnector = new NewsSearchConnector(initParams, sessionProviderService, repositoryService);

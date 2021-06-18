@@ -12,6 +12,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.jcr.util.IdGenerator;
@@ -50,7 +51,7 @@ public class PostNewsNotificationPluginTest {
   @Rule
   public ExpectedException    exceptionRule = ExpectedException.none();
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class })
+  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForPostNewsContext() throws Exception {
     // Given
@@ -89,6 +90,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -114,7 +116,7 @@ public class PostNewsNotificationPluginTest {
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
   }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class })
+  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForPostNewsContextAndDoNotSendNotificationToCreator() throws Exception {
     // Given
@@ -153,6 +155,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -180,7 +183,7 @@ public class PostNewsNotificationPluginTest {
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
   }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class })
+  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForPostNewsContextAndAuthorUserIsNull() throws Exception {
     // Given
@@ -215,6 +218,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");

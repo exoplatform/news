@@ -207,11 +207,11 @@ export function canUserCreateNews(spaceId) {
   });
 }
 
-export function deleteNews(newsId, delay) {
+export function deleteNews(newsId, isDraft, delay) {
   if (delay > 0) {
     localStorage.setItem('deletedNews', newsId);
   }
-  return fetch(`${newsConstants.NEWS_API}/${newsId}?delay=${delay || 0}`, {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}?isDraft=${isDraft || ''}&delay=${delay || 0}`, {
     credentials: 'include',
     method: 'DELETE'
   }).then((resp) => {

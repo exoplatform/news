@@ -656,9 +656,10 @@ public class NewsServiceImpl implements NewsService {
    * Delete news
    * 
    * @param newsId the news id to delete
+   * @param isDraft
    * @throws Exception when error
    */
-  public void deleteNews(String newsId) throws Exception {
+  public void deleteNews(String newsId, boolean isDraft) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -672,7 +673,7 @@ public class NewsServiceImpl implements NewsService {
       if (node.hasProperty("exo:activities")) {
         String newActivities = node.getProperty("exo:activities").getString();
         if (StringUtils.isNotEmpty(newActivities)) {
-          if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+          if (isDraft && node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
                   && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
             String nodeVersionUUID = (node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) ?
                     node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;

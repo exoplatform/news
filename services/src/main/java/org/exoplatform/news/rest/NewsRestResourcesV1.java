@@ -698,9 +698,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response deleteNews(@Context HttpServletRequest request,
                              @ApiParam(value = "News id", required = true)
                              @PathParam("id") String id,
+                             @ApiParam(value = "Is draft to delete", defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
                              @ApiParam(value = "Time to effectively delete news", required = false)
                              @QueryParam(
-                               "delay"
+                                     "delay"
                              ) long delay) {
     try {
       if (StringUtils.isBlank(id)) {
@@ -725,7 +726,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             RequestLifeCycle.begin(container);
             try {
               newsToDeleteQueue.remove(id);
-              newsService.deleteNews(id);
+              newsService.deleteNews(id, isDraft);
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", authenticatedUser, e);
             } catch (Exception e) {
@@ -737,7 +738,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }, delay, TimeUnit.SECONDS);
       } else {
         newsToDeleteQueue.remove(id);
-        newsService.deleteNews(id);
+        newsService.deleteNews(id, isDraft);
       }
       return Response.ok().build();
     } catch (Exception e) {

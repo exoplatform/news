@@ -16,6 +16,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
@@ -64,7 +65,7 @@ public class LikeSharedNewsNotificationPluginTest {
   private NewsService            newsService;
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForLikeSharedNewsContext() throws Exception {
     // Given
@@ -112,6 +113,7 @@ public class LikeSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
@@ -155,7 +157,7 @@ public class LikeSharedNewsNotificationPluginTest {
   }
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForLikeSharedNewsContextWhenPosterActivityIsNotMemberInSharedSpace() throws Exception {
     // Given
@@ -203,6 +205,7 @@ public class LikeSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
@@ -248,7 +251,7 @@ public class LikeSharedNewsNotificationPluginTest {
   }
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForLikeSharedNewsContextWhenNewsHasNoIllustrationAndAuthorIsNotMemberInSharedSpace() throws Exception {
     // Given
@@ -296,6 +299,7 @@ public class LikeSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 

@@ -5,6 +5,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
+
 import javax.jcr.Node;
 import javax.jcr.Session;
 
@@ -16,10 +18,12 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationServ
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.services.idgenerator.IDGeneratorService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -64,7 +68,7 @@ public class CommentSharedNewsNotificationPluginTest {
   private NewsService            newsService;
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForCommentSharedNewsContext() throws Exception {
     // Given
@@ -112,6 +116,7 @@ public class CommentSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
@@ -155,7 +160,7 @@ public class CommentSharedNewsNotificationPluginTest {
   }
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForCommentSharedNewsContextWhenPosterActivityIsNotMemberInSharedSpace() throws Exception {
     // Given
@@ -203,6 +208,7 @@ public class CommentSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
@@ -248,7 +254,7 @@ public class CommentSharedNewsNotificationPluginTest {
   }
 
   @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, SessionProvider.class,
-      LinkProvider.class, PropertyManager.class })
+      LinkProvider.class, PropertyManager.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForLikeSharedNewsContextWhenNewsHasNoIllustrationAndAuthorIsNotMemberInSharedSpace() throws Exception {
     // Given
@@ -296,6 +302,7 @@ public class CommentSharedNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    mockIdGeneratorService();
     PowerMockito.mockStatic(PropertyManager.class);
     when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
@@ -336,6 +343,31 @@ public class CommentSharedNewsNotificationPluginTest {
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));
     assertEquals("http://localhost:8080/portal/g/:spaces:space1/space1",
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
+  }
+
+  public static void mockIdGeneratorService() {
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IDGeneratorService.class)).thenReturn(new IDGeneratorService() {
+      @Override
+      public String generateStringID(Object o) {
+        return "123456";
+      }
+      
+      @Override
+      public long generateLongID(Object o) {
+        return 123456;
+      }
+      
+      @Override
+      public Serializable generateID(Object o) {
+        return 123456;
+      }
+      
+      @Override
+      public int generatIntegerID(Object o) {
+        return 123456;
+      }
+    });
   }
 
 }

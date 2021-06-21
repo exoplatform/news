@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -63,8 +65,11 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
+import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationConstant;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
+import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -667,6 +672,20 @@ public class NewsServiceImpl implements NewsService {
       if (node.hasProperty("exo:activities")) {
         String newActivities = node.getProperty("exo:activities").getString();
         if (StringUtils.isNotEmpty(newActivities)) {
+          if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+                  && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
+            String nodeVersionUUID = (node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) ?
+                    node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;
+            String versionName = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID).getName();
+            if (!versionName.isEmpty()) {
+              node.restore(versionName, true);
+              if (!node.isCheckedOut()) {
+                node.checkout();
+              }
+              publicationService.changeState(node, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+              return;
+            }
+          }
           Stream.of(newActivities.split(";"))
                   .map(activity -> activity.split(":")[1])
                   .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));

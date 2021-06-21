@@ -88,7 +88,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
 @PrepareForTest(CommonsUtils.class)
 public class NewsServiceImplTest {
 
@@ -194,15 +194,15 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(node.getSession()).thenReturn(session);
-    when(node.getProperty(anyString())).thenReturn(property);
+    when(node.getProperty(nullable(String.class))).thenReturn(property);
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getLong()).thenReturn((long) 10);
     Space space = mock(Space.class);
-    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
     MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
@@ -212,9 +212,9 @@ public class NewsServiceImplTest {
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
     when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
     when(space.getVisibility()).thenReturn("private");
-    when(spaceService.isSuperManager(anyString())).thenReturn(false);
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
 
     // When
     News news = newsService.getNewsById("1", false);
@@ -250,7 +250,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(null);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
 
     // When
     News news = newsService.getNewsById("1", false);
@@ -290,7 +290,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(node.getSession()).thenReturn(session);
@@ -348,7 +348,7 @@ public class NewsServiceImplTest {
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(property.getLong()).thenReturn((long) 10);
     Space space = mock(Space.class);
-    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
     PowerMockito.mockStatic(CommonsUtils.class);
     PowerMockito.mockStatic(PortalContainer.class);
@@ -365,8 +365,8 @@ public class NewsServiceImplTest {
     when(actProperty.getString()).thenReturn("1:2;1:3");
     when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
     when(space.getVisibility()).thenReturn("private");
-    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
-    when(spaceService.isSuperManager(anyString())).thenReturn(false);
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
 
     // When
     News news = newsService.getNewsById("1", false);
@@ -411,12 +411,12 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
-    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
     when(newsNode.getName()).thenReturn("Updated title");
 
     News news = new News();
@@ -470,12 +470,12 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
-    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
     when(newsNode.getName()).thenReturn("Updated title");
 
     News news = new News();
@@ -526,12 +526,12 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     when(newsNode.getSession()).thenReturn(session);
-    when(newsNode.getProperty(anyString())).thenReturn(property);
-    when(activityManager.getActivity(anyString())).thenReturn(null);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
+    when(activityManager.getActivity(nullable(String.class))).thenReturn(null);
     Identity spaceIdentity = new Identity(SpaceIdentityProvider.NAME, "space1");
     when(identityManager.getOrCreateIdentity(eq(SpaceIdentityProvider.NAME),
                                              eq("space1"),
@@ -621,11 +621,11 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
@@ -695,7 +695,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(node);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
     when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
     when(space.getGroupId()).thenReturn("spaceTest");
@@ -703,9 +703,9 @@ public class NewsServiceImplTest {
     when(spaceRootNode.hasNode("News")).thenReturn(true);
     when(spaceRootNode.getNode("News")).thenReturn(spaceNewsRootNode);
     when(dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, "2019/8/22")).thenReturn(newsFolderNode);
-    when(newsFolderNode.addNode(anyString(), anyString())).thenReturn(newsNode);
+    when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getUUID()).thenReturn("id123");
-    when(node.getProperty(anyString())).thenReturn(property);
+    when(node.getProperty(nullable(String.class))).thenReturn(property);
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
     when(space.getPrettyName()).thenReturn("spaceTest");
@@ -778,13 +778,13 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(property.getString()).thenReturn("");
     when(newsNode.getProperty(anyString())).thenReturn(property);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
@@ -843,7 +843,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(null);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
     exceptionRule.expect(Exception.class);
     exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
 
@@ -935,11 +935,11 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
@@ -997,11 +997,11 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(null);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(null);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
@@ -1060,11 +1060,11 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
@@ -1138,17 +1138,17 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), anyString())).thenReturn(newsFolderNode);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
-    when(nodeHierarchyCreator.getJcrPath(anyString())).thenReturn("/Groups/");
-    when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    when(newsFolderNode.addNode(anyString(), anyString())).thenReturn(draftNode);
-    when(publicationManagerImpl.getLifecycle(anyString())).thenReturn(newsLifecycle);
+    when(nodeHierarchyCreator.getJcrPath(nullable(String.class))).thenReturn("/Groups/");
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space1);
+    when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(draftNode);
+    when(publicationManagerImpl.getLifecycle(nullable(String.class))).thenReturn(newsLifecycle);
     when(wcmPublicationServiceImpl.getWebpagePublicationPlugins()).thenReturn(publicationPlugins);
     when(imageProcessor.processImages(news.getBody(), draftNode, "images")).thenReturn("");
-    when(draftNode.canAddMixin(anyString())).thenReturn(true);
+    when(draftNode.canAddMixin(nullable(String.class))).thenReturn(true);
 
     // When
     newsService.createNewsDraft(news);
@@ -1220,8 +1220,8 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.hasProperty("exo:activities")).thenReturn(true);
     when(newsNode.getProperty("exo:activities")).thenReturn(exoActivitiesProperty);
     when(exoActivitiesProperty.getString()).thenReturn("1:1;2:2;2:3");
@@ -1230,10 +1230,10 @@ public class NewsServiceImplTest {
     newsService.deleteNews("1");
 
     // Then
-    verify(session, times(1)).getNodeByUUID(anyString());
+    verify(session, times(1)).getNodeByUUID(nullable(String.class));
     verify(session, times(1)).save();
     verify(newsNode, times(1)).remove();
-    verify(activityManager, times(3)).deleteActivity(anyString());
+    verify(activityManager, times(3)).deleteActivity(nullable(String.class));
   }
 
   @Test
@@ -1288,8 +1288,8 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
@@ -1357,8 +1357,8 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getItem(anyString())).thenReturn(applicationDataNode);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
@@ -1404,7 +1404,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     QueryImpl query = mock(QueryImpl.class);
-    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
+    when(qm.createQuery(nullable(String.class), nullable(String.class))).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -1420,9 +1420,9 @@ public class NewsServiceImplTest {
     when(node3.getSession()).thenReturn(session);
     when(it.nextNode()).thenReturn(node1).thenReturn(node2).thenReturn(node3);
     Property property = mock(Property.class);
-    when(node1.getProperty(anyString())).thenReturn(property);
-    when(node2.getProperty(anyString())).thenReturn(property);
-    when(node3.getProperty(anyString())).thenReturn(property);
+    when(node1.getProperty(nullable(String.class))).thenReturn(property);
+    when(node2.getProperty(nullable(String.class))).thenReturn(property);
+    when(node3.getProperty(nullable(String.class))).thenReturn(property);
     when(property.toString()).thenReturn("news ");
     when(property.getString()).thenReturn("");
     when(property.getDate()).thenReturn(Calendar.getInstance());
@@ -1432,11 +1432,11 @@ public class NewsServiceImplTest {
     when(node2.hasNode("illustration")).thenReturn(false);
     when(node3.hasNode("illustration")).thenReturn(false);
     Space space = mock(Space.class);
-    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
     when(space.getDisplayName()).thenReturn("Test news space");
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
-    when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity(nullable(String.class), nullable(String.class), anyBoolean())).thenReturn(poster);
     setCurrentIdentity();
     when(spaceService.isSuperManager("user")).thenReturn(false);
     when(space.getVisibility()).thenReturn("private");
@@ -1487,7 +1487,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     QueryImpl query = mock(QueryImpl.class);
-    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
+    when(qm.createQuery(nullable(String.class), nullable(String.class))).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -2185,7 +2185,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     QueryImpl query = mock(QueryImpl.class);
-    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
+    when(qm.createQuery(nullable(String.class), nullable(String.class))).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -2242,14 +2242,14 @@ public class NewsServiceImplTest {
     when(node2.hasNode("illustration")).thenReturn(false);
     when(node3.hasNode("illustration")).thenReturn(false);
     Space space = mock(Space.class);
-    when(spaceService.getSpaceById(anyString())).thenReturn(space);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
     when(space.getDisplayName()).thenReturn("Test news space");
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
-    when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity(nullable(String.class), nullable(String.class), anyBoolean())).thenReturn(poster);
     when(space.getVisibility()).thenReturn("private");
-    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
-    when(spaceService.isSuperManager(anyString())).thenReturn(false);
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName", "root root");
 
@@ -2727,7 +2727,7 @@ public class NewsServiceImplTest {
     when(session.getWorkspace()).thenReturn(workSpace);
     when(workSpace.getQueryManager()).thenReturn(qm);
     QueryImpl query = mock(QueryImpl.class);
-    when(qm.createQuery(anyString(), anyString())).thenReturn(query);
+    when(qm.createQuery(nullable(String.class), nullable(String.class))).thenReturn(query);
     QueryResult queryResult = mock(QueryResult.class);
     when(query.execute()).thenReturn(queryResult);
     NodeIterator it = mock(NodeIterator.class);
@@ -2743,9 +2743,9 @@ public class NewsServiceImplTest {
     when(node3.getSession()).thenReturn(session);
     when(it.nextNode()).thenReturn(node1).thenReturn(node2).thenReturn(node3);
     Property property = mock(Property.class);
-    when(node1.getProperty(anyString())).thenReturn(property);
-    when(node2.getProperty(anyString())).thenReturn(property);
-    when(node3.getProperty(anyString())).thenReturn(property);
+    when(node1.getProperty(nullable(String.class))).thenReturn(property);
+    when(node2.getProperty(nullable(String.class))).thenReturn(property);
+    when(node3.getProperty(nullable(String.class))).thenReturn(property);
     when(property.toString()).thenReturn("news ");
     when(property.getString()).thenReturn("");
     when(property.getDate()).thenReturn(Calendar.getInstance());
@@ -2755,14 +2755,14 @@ public class NewsServiceImplTest {
     when(node2.hasNode("illustration")).thenReturn(false);
     when(node3.hasNode("illustration")).thenReturn(false);
     Space space = mock(Space.class);
-    when(spaceService.getSpaceById(anyString())).thenReturn(space);
-    when(spaceService.isMember(anyString(), anyString())).thenReturn(false);
-    when(spaceService.isSuperManager(anyString())).thenReturn(false);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
     when(space.getVisibility()).thenReturn("private");
     when(space.getDisplayName()).thenReturn("Test news space");
     when(space.getGroupId()).thenReturn("/spaces/test_news_space");
     Identity poster = mock(Identity.class);
-    when(identityManager.getOrCreateIdentity(anyString(), anyString(), anyBoolean())).thenReturn(poster);
+    when(identityManager.getOrCreateIdentity(nullable(String.class), nullable(String.class))).thenReturn(poster);
 
     Profile p1 = new Profile(poster);
     p1.setProperty("fullName", "Sara Boutej");
@@ -2868,7 +2868,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
 
     Property property = mock(Property.class);
     when(newsNode.getProperty("exo:pinned")).thenReturn(property);
@@ -2929,7 +2929,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(null);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
 
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
@@ -2982,7 +2982,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(null);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
 
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Unable to find a node with an UUID equal to: id123");
@@ -3035,7 +3035,7 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getName()).thenReturn("archived title");
 
     // When
@@ -3079,8 +3079,8 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getName()).thenReturn("Untitled");
     when(newsNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22/Untitled");
     when(newsNode.getParent()).thenReturn(parentNode);
@@ -3088,7 +3088,7 @@ public class NewsServiceImplTest {
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
-    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
@@ -3147,8 +3147,8 @@ public class NewsServiceImplTest {
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(anyString())).thenReturn(newsNode);
-    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getName()).thenReturn("Untitled");
     when(newsNode.getPath()).thenReturn("/Groups/spaces/space_test/News/2020/1/22/Untitled");
     when(newsNode.getParent()).thenReturn(parentNode);
@@ -3156,7 +3156,7 @@ public class NewsServiceImplTest {
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
     when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
     when(property.getDate()).thenReturn(Calendar.getInstance());
-    when(imageProcessor.processImages(anyString(), any(), anyString())).thenAnswer(i -> i.getArguments()[0]);
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
 
@@ -3367,7 +3367,7 @@ public class NewsServiceImplTest {
                                                       userACL);
   
     Node newsNode = mock(Node.class);
-    when(newsNode.hasProperty(anyString())).thenReturn(true);
+    when(newsNode.hasProperty(nullable(String.class))).thenReturn(true);
     when(newsNode.hasProperty(eq("jcr:frozenUuid"))).thenReturn(false);
     when(newsNode.hasProperty(eq("exo:dateCreated"))).thenReturn(false);
     when(newsNode.hasProperty(eq("exo:dateModified"))).thenReturn(false);
@@ -3378,7 +3378,7 @@ public class NewsServiceImplTest {
   
     Property propertyBody = mock(Property.class);
     when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
-    when(newsNode.getProperty(anyString())).thenReturn(property);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
     
     

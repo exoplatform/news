@@ -1,5 +1,7 @@
 package org.exoplatform.news;
 
+import static org.mockito.Mockito.*;
+
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.services.cms.documents.DocumentService;
@@ -85,25 +87,25 @@ public class NewsAttachmentsServiceImplTest {
                                                                                    spaceService,
                                                                                    uploadService,
                                                                                    documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node resourceNode = mock(Node.class);
     Property mimetypeProperty = mock(Property.class);
-    when(mimetypeProperty.getString()).thenReturn("image/png");
-    when(resourceNode.hasProperty(eq("jcr:mimeType"))).thenReturn(true);
-    when(resourceNode.getProperty(eq("jcr:mimeType"))).thenReturn(mimetypeProperty);
+    lenient().when(mimetypeProperty.getString()).thenReturn("image/png");
+    lenient().when(resourceNode.hasProperty(eq("jcr:mimeType"))).thenReturn(true);
+    lenient().when(resourceNode.getProperty(eq("jcr:mimeType"))).thenReturn(mimetypeProperty);
     Property dataProperty = mock(Property.class);
-    when(dataProperty.getStream()).thenReturn(new ByteArrayInputStream("image".getBytes()));
-    when(resourceNode.getProperty(eq("jcr:data"))).thenReturn(dataProperty);
-    when(node.getNode(eq("jcr:content"))).thenReturn(resourceNode);
+    lenient().when(dataProperty.getStream()).thenReturn(new ByteArrayInputStream("image".getBytes()));
+    lenient().when(resourceNode.getProperty(eq("jcr:data"))).thenReturn(dataProperty);
+    lenient().when(node.getNode(eq("jcr:content"))).thenReturn(resourceNode);
 
 
     // When
@@ -127,13 +129,13 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(null);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(null);
 
 
     // When
@@ -153,17 +155,17 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getNode(eq("jcr:content"))).thenReturn(null);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getNode(eq("jcr:content"))).thenReturn(null);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
 
 
     // When
@@ -187,25 +189,25 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getSession()).thenReturn(session);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getSession()).thenReturn(session);
     Property attachmentIdsProperty = mock(Property.class);
-    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node attachmentNode = mock(Node.class);
-    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
-    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
-    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
 
 
     // When
@@ -226,21 +228,21 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getSession()).thenReturn(session);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getSession()).thenReturn(session);
     Property attachmentIdsProperty = mock(Property.class);
-    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] {});
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(attachmentIdsProperty.getValues()).thenReturn(new Value[] {});
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
 
 
     // When
@@ -261,21 +263,21 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node resourceNode = mock(Node.class);
     Property dataProperty = mock(Property.class);
-    when(dataProperty.getStream()).thenReturn(new ByteArrayInputStream("image".getBytes()));
-    when(resourceNode.getProperty(eq("jcr:data"))).thenReturn(dataProperty);
-    when(node.getNode(eq("jcr:content"))).thenReturn(resourceNode);
+    lenient().when(dataProperty.getStream()).thenReturn(new ByteArrayInputStream("image".getBytes()));
+    lenient().when(resourceNode.getProperty(eq("jcr:data"))).thenReturn(dataProperty);
+    lenient().when(node.getNode(eq("jcr:content"))).thenReturn(resourceNode);
 
 
     // When
@@ -296,13 +298,13 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(null);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(null);
 
 
     // When
@@ -316,7 +318,7 @@ public class NewsAttachmentsServiceImplTest {
   public void shouldAddAttachmentFromUploadResource() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
+    lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
     NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
@@ -324,36 +326,36 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
     Property spacesIdProperty = mock(Property.class);
-    when(spacesIdProperty.getString()).thenReturn("1");
-    when(node.hasProperty(eq("exo:spaceId"))).thenReturn(true);
-    when(node.getProperty(eq("exo:spaceId"))).thenReturn(spacesIdProperty);
-    when(node.getSession()).thenReturn(session);
+    lenient().when(spacesIdProperty.getString()).thenReturn("1");
+    lenient().when(node.hasProperty(eq("exo:spaceId"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:spaceId"))).thenReturn(spacesIdProperty);
+    lenient().when(node.getSession()).thenReturn(session);
     Node spaceDocumentsFolderNode = mock(Node.class);
-    when(session.getItem(anyString())).thenReturn(spaceDocumentsFolderNode);
-    when(spaceDocumentsFolderNode.hasNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(true);
+    lenient().when(session.getItem(anyString())).thenReturn(spaceDocumentsFolderNode);
+    lenient().when(spaceDocumentsFolderNode.hasNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(true);
     Node spaceNewsRootNode = mock(Node.class);
-    when(spaceDocumentsFolderNode.getNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(spaceNewsRootNode);
+    lenient().when(spaceDocumentsFolderNode.getNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(spaceNewsRootNode);
     Node newsAttachmentsFolderNode = mock(Node.class);
-    when(dataDistributionType.getOrCreateDataNode(any(), anyString())).thenReturn(newsAttachmentsFolderNode);
+    lenient().when(dataDistributionType.getOrCreateDataNode(any(), anyString())).thenReturn(newsAttachmentsFolderNode);
     Node newsAttachmentsNode = mock(Node.class);
-    when(newsAttachmentsNode.getUUID()).thenReturn("attachId1");
-    when(newsAttachmentsFolderNode.addNode(anyString(), anyString())).thenReturn(newsAttachmentsNode);
+    lenient().when(newsAttachmentsNode.getUUID()).thenReturn("attachId1");
+    lenient().when(newsAttachmentsFolderNode.addNode(anyString(), anyString())).thenReturn(newsAttachmentsNode);
     Node newsAttachmentsResourceNode = mock(Node.class);
-    when(newsAttachmentsNode.addNode(anyString(), anyString())).thenReturn(newsAttachmentsResourceNode);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
-    when(spaceService.getSpaceById(eq("1"))).thenReturn(new Space());
+    lenient().when(newsAttachmentsNode.addNode(anyString(), anyString())).thenReturn(newsAttachmentsResourceNode);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(spaceService.getSpaceById(eq("1"))).thenReturn(new Space());
     String uploadId = "uploadId1";
-    when(uploadService.getUploadResource(eq(uploadId))).thenReturn(new UploadResource(uploadId, "uploaded-file.png"));
+    lenient().when(uploadService.getUploadResource(eq(uploadId))).thenReturn(new UploadResource(uploadId, "uploaded-file.png"));
 
 
     // When
@@ -367,7 +369,7 @@ public class NewsAttachmentsServiceImplTest {
   public void shouldAddAttachmentFromExistingResourceToNewsHavingAttachments() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
+    lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
     NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
@@ -375,20 +377,20 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
     Value[] oldValues = new Value[]{new StringValue("1"),new StringValue("2"),new StringValue("3")};
     Value[] newValues = new Value[]{new StringValue("1"),new StringValue("2"),new StringValue("3"),new StringValue("4")};
     Property attachmentsIdsProperty = mock(Property.class);
-    when(attachmentsIdsProperty.getValues()).thenReturn(oldValues);
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentsIdsProperty);
-    when(node.getSession()).thenReturn(session);
+    lenient().when(attachmentsIdsProperty.getValues()).thenReturn(oldValues);
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentsIdsProperty);
+    lenient().when(node.getSession()).thenReturn(session);
     String uploadId = "4";
 
     // When
@@ -402,7 +404,7 @@ public class NewsAttachmentsServiceImplTest {
   public void shouldAddAttachmentFromExistingResourceToNewsNotHavingAttachments() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
+    lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
     NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
@@ -410,16 +412,16 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(false);
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(false);
     Value[] newValues = new Value[]{new StringValue("1")};
-    when(node.getSession()).thenReturn(session);
+    lenient().when(node.getSession()).thenReturn(session);
     String uploadId = "1";
 
     // When
@@ -439,31 +441,31 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getSession()).thenReturn(session);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getSession()).thenReturn(session);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Property attachmentIdsProperty = mock(Property.class);
-    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
-    when(attachmentNode1.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode1.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
     ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
-    when(attachmentNode2.canAddMixin(eq("exo:privilegeable"))).thenReturn(false);
+    lenient().when(attachmentNode2.canAddMixin(eq("exo:privilegeable"))).thenReturn(false);
     ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
-    when(attachmentNode3.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
-    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
-    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
+    lenient().when(attachmentNode3.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
+    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
+    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
 
 
     // When
@@ -488,31 +490,31 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getSession()).thenReturn(session);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getSession()).thenReturn(session);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Property attachmentIdsProperty = mock(Property.class);
-    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
-    when(attachmentNode1.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode1.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
     ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
-    when(attachmentNode2.isNodeType(eq("exo:privilegeable"))).thenReturn(false);
+    lenient().when(attachmentNode2.isNodeType(eq("exo:privilegeable"))).thenReturn(false);
     ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
-    when(attachmentNode3.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
-    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
-    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
-    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
+    lenient().when(attachmentNode3.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
+    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
+    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
 
 
     // When
@@ -534,29 +536,29 @@ public class NewsAttachmentsServiceImplTest {
             spaceService,
             uploadService,
             documentService);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    lenient().when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    lenient().when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    lenient().when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    lenient().when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    lenient().when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
-    when(node.getUUID()).thenReturn("id123");
-    when(node.getName()).thenReturn("name123");
-    when(node.getSession()).thenReturn(session);
+    lenient().when(node.getUUID()).thenReturn("id123");
+    lenient().when(node.getName()).thenReturn("name123");
+    lenient().when(node.getSession()).thenReturn(session);
     Property attachmentIdsProperty = mock(Property.class);
-    when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
-    when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
-    when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
-    when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
+    lenient().when(attachmentIdsProperty.getValues()).thenReturn(new Value[] { new StringValue("idAttach1"), new StringValue("idAttach2"), new StringValue("idAttach3") });
+    lenient().when(node.hasProperty(eq("exo:attachmentsIds"))).thenReturn(true);
+    lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
+    lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node attachmentNode = mock(Node.class);
-    when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
-    when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
-    when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
     News news = mock(News.class);
     List<NewsAttachment> newsAttachments = newsAttachmentsService.getNewsAttachments(node);
 
-    when(news.getAttachments()).thenReturn(newsAttachments);
+    lenient().when(news.getAttachments()).thenReturn(newsAttachments);
 
     NewsAttachment newsAttachmentFromUpload = mock(NewsAttachment.class);
     newsAttachmentFromUpload.setUploadId("uploadID123");

@@ -304,7 +304,7 @@ export default {
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,
-          canDelete: item.canDelete && !(isDraft && activityId),
+          canDelete: item.canDelete,
           archived: item.archived,
           draft: item.publicationState === 'draft',
           canArchive: item.canArchive,

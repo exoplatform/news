@@ -131,4 +131,25 @@
       </portlet-application>
     </container>
   </page>
+
+  <page>
+    <name>stagedNewsDetails</name>
+    <title>Staged News Details</title>
+    <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
+    <edit-permission>*:/platform/administrators</edit-permission>
+    <container id="StagedNewsDetail" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+      <access-permissions>*:/platform/users;*:/platform/externals</access-permissions>
+      <portlet-application>
+        <portlet>
+          <application-ref>news</application-ref>
+          <portlet-ref>NewsDetail</portlet-ref>
+        </portlet>
+        <title>Staged News Details</title>
+        <access-permissions>Everyone</access-permissions>
+        <show-info-bar>false</show-info-bar>
+        <show-application-state>false</show-application-state>
+        <show-application-mode>false</show-application-mode>
+      </portlet-application>
+    </container>
+  </page>
 </page-set>

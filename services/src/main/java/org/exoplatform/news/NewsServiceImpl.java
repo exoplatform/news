@@ -766,7 +766,7 @@ public class NewsServiceImpl implements NewsService {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
     if (StringUtils.equals(node.getProperty("publication:currentState").getString(), STAGED)) {
-      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
       news.setUrl(newsUrl.toString());
     }
     if (node.hasNode("illustration")) {
@@ -1125,7 +1125,7 @@ public class NewsServiceImpl implements NewsService {
         newsNode.setProperty(START_TIME_PROPERTY, startDate);
         newsNode.setProperty(LAST_PUBLISHER, currentUser);
         newsNode.save();
-        publicationService.changeState(newsNode, "staged", new HashMap<>());
+        publicationService.changeState(newsNode, STAGED, new HashMap<>());
         wCMPublicationService.updateLifecyleOnChangeContent(newsNode, siteName, currentUser, "staged");
         sheduledNews = convertNodeToNews(newsNode);
       }

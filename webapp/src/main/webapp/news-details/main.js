@@ -37,10 +37,10 @@ export function init(params) {
       data: function() {
         return {
           news: params.news,
-          newsId: params.news.newsId,
+          newsId: getURLQueryParam('newsId') || params.news.newsId,
           activityId: params.activityId,
-          showEditButton: params.showEditButton,
-          showPinButton: params.showPinInput,
+          showEditButton: params.news.canEdit,
+          showPinButton: params.news.canEdit,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -62,5 +62,12 @@ export function init(params) {
 export function destroy() {
   if (newsDetails) {
     newsDetails.$destroy();
+  }
+}
+
+function getURLQueryParam(paramName) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has(paramName)) {
+    return urlParams.get(paramName);
   }
 }

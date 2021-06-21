@@ -624,7 +624,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
@@ -783,7 +783,7 @@ public class NewsServiceImplTest {
     when(newsNode.getProperty(anyString())).thenReturn(property);
     when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
@@ -938,7 +938,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
@@ -1000,7 +1000,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(null);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
@@ -1063,7 +1063,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123");
+    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);

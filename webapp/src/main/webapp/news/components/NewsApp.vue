@@ -289,7 +289,6 @@ export default {
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
-        const isDraft = item.publicationState === 'draft';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),

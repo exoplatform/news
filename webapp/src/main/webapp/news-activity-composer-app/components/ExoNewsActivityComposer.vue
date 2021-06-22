@@ -302,7 +302,7 @@ export default {
       return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
     },
     draftWarningText() {
-      return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.updateDate.time));
+      return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
     }
   },
   watch: {
@@ -487,7 +487,7 @@ export default {
             this.news.activityId = fetchedNode.activityId;
             this.news.updater = fetchedNode.updater;
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
-            this.news.updateDate = fetchedNode.updateDate;
+            this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 

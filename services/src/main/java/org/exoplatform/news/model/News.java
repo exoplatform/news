@@ -39,6 +39,8 @@ public class News {
 
   private Date                 updateDate;
 
+  private Date                 draftUpdateDate;
+
   private boolean              pinned;
 
   private boolean              archived;
@@ -194,6 +196,14 @@ public class News {
 
   public void setUpdateDate(Date updateDate) {
     this.updateDate = updateDate;
+  }
+
+  public Date getDraftUpdateDate() {
+    return draftUpdateDate;
+  }
+
+  public void setDraftUpdateDate(Date draftUpdateDate) {
+    this.draftUpdateDate = draftUpdateDate;
   }
 
   public boolean isPinned() {

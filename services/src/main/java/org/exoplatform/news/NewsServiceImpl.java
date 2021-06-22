@@ -707,6 +707,7 @@ public class NewsServiceImpl implements NewsService {
     news.setUpdater(getLastUpdater(node));
     news.setUpdateDate(getLastUpdatedDate(node));
     news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
+    news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());

@@ -404,7 +404,6 @@ public class NewsServiceImpl implements NewsService {
             newsNode.addMixin(MIX_NEWS_MODIFIERS);
           }
           Value[] newsModifiers = new Value[0];
-          List<String> modifiersIds = new ArrayList<>();
           boolean alreadyExist = false;
           if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
             newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
@@ -414,7 +413,7 @@ public class NewsServiceImpl implements NewsService {
               } catch (RepositoryException e) {
                 return null;
               }
-            }).anyMatch(modifiersId -> modifiersId.equals(currentIdentityId));;
+            }).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
           }
           if (!alreadyExist) {
             newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));

@@ -31,6 +31,7 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
@@ -41,6 +42,8 @@ import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.services.cms.documents.TrashService;
+import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -61,6 +64,7 @@ import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManag
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
 import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -1166,6 +1170,7 @@ public class NewsServiceImplTest {
     verify(draftNode, times(1)).setProperty(eq("id"), eq("1"));
   }
 
+  @PrepareForTest(WCMCoreUtils.class)
   @Test
   public void shouldDeleteNewsWithId() throws Exception {
     // Given
@@ -1215,6 +1220,10 @@ public class NewsServiceImplTest {
     news.setId("id123");
     news.setSpaceId("1");
 
+    PowerMockito.mockStatic(WCMCoreUtils.class);
+    TrashService trashService = mock(TrashService.class);
+    when(trashService.isInTrash(newsNode)).thenReturn(false);
+    when(WCMCoreUtils.getService(TrashService.class)).thenReturn(trashService);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);

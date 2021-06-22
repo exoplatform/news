@@ -119,7 +119,7 @@ public class UINewsActivity extends BaseUIActivity {
               SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
               sessionProviderService.setSessionProvider(null, systemProvider);
               NewsService newsService = CommonsUtils.getService(NewsService.class);
-              News news = newsService.getNewsById(newsId);
+              News news = newsService.getNewsById(newsId, false);
               String posterActivityUserName = news.getAuthor();
               IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
               Identity posterActivity = identityManager.getIdentity(posterId);
@@ -192,7 +192,7 @@ public class UINewsActivity extends BaseUIActivity {
             SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
             sessionProviderService.setSessionProvider(null, systemProvider);
             NewsService newsService = CommonsUtils.getService(NewsService.class);
-            News news = newsService.getNewsById(newsId);
+            News news = newsService.getNewsById(newsId, false);
             String posterActivityUserName = news.getAuthor();
             IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
             Identity posterActivity = identityManager.getIdentity(posterId);

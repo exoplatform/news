@@ -98,7 +98,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
     sessionProviderService.setSessionProvider(null, systemProvider);
     try {
-      news = newsService.getNewsById(id);
+      news = newsService.getNewsById(id, false);
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
     }

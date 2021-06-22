@@ -1,7 +1,7 @@
 import {newsConstants} from '../js/newsConstants.js';
 
-export function getNewsById(id) {
-  return fetch(`${newsConstants.NEWS_API}/${id}`, {
+export function getNewsById(id, editMode) {
+  return fetch(`${newsConstants.NEWS_API}/${id}?editMode=${editMode || ''}`, {
     credentials: 'include',
     method: 'GET',
   }).then((data) => {
@@ -207,11 +207,11 @@ export function canUserCreateNews(spaceId) {
   });
 }
 
-export function deleteNews(newsId, delay) {
+export function deleteNews(newsId, isDraft, delay) {
   if (delay > 0) {
     localStorage.setItem('deletedNews', newsId);
   }
-  return fetch(`${newsConstants.NEWS_API}/${newsId}?delay=${delay || 0}`, {
+  return fetch(`${newsConstants.NEWS_API}/${newsId}?isDraft=${isDraft || ''}&delay=${delay || 0}`, {
     credentials: 'include',
     method: 'DELETE'
   }).then((resp) => {

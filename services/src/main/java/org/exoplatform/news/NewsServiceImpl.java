@@ -5,14 +5,9 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.version.Version;
@@ -20,6 +15,7 @@ import javax.jcr.version.VersionIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -63,7 +59,7 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.listener.ListenerService;
+import org.exoplatform.services.jcr.impl.core.value.StringValue;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -106,6 +102,12 @@ public class NewsServiceImpl implements NewsService {
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
+
+  public static final String       CURRENT_STATE                   = "publication:currentState";
+
+  public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
+
+  public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
 
   private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
@@ -231,10 +233,11 @@ public class NewsServiceImpl implements NewsService {
    * Get a news by id
    * 
    * @param id Id of the news
+   * @param editMode
    * @return The news with the given id
    * @throws Exception when error
    */
-  public News getNewsById(String id) throws Exception {
+  public News getNewsById(String id, boolean editMode) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -245,7 +248,7 @@ public class NewsServiceImpl implements NewsService {
 
     try {
       Node node = session.getNodeByUUID(id);
-      return convertNodeToNews(node);
+      return convertNodeToNews(node, editMode);
     } catch (ItemNotFoundException e) {
       return null;
     } finally {
@@ -281,7 +284,7 @@ public class NewsServiceImpl implements NewsService {
       NodeIterator it = query.execute().getNodes();
       while (it.hasNext()) {
         Node iterNode = it.nextNode();
-        News news = convertNodeToNews(iterNode);
+        News news = convertNodeToNews(iterNode, filter.isDraftNews());
         listNews.add(news);
       }
       return listNews;
@@ -377,6 +380,10 @@ public class NewsServiceImpl implements NewsService {
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
+          if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+            newsNode.removeMixin(MIX_NEWS_MODIFIERS);
+            newsNode.save();
+          }
           //if it's an "update news" case
           if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
             News newMentionedNews = news;
@@ -389,8 +396,29 @@ public class NewsServiceImpl implements NewsService {
             sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
           }
           indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
-        } else if ("draft".equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, "draft", new HashMap<>());
+        } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
+          Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
+          String currentIdentityId = currentIdentity.getId();
+          if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+            newsNode.addMixin(MIX_NEWS_MODIFIERS);
+          }
+          Value[] newsModifiers = new Value[0];
+          boolean alreadyExist = false;
+          if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
+            newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
+            alreadyExist = Arrays.stream(newsModifiers).map(value -> {
+              try {
+                return value.getString();
+              } catch (RepositoryException e) {
+                return null;
+              }
+            }).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
+          }
+          if (!alreadyExist) {
+            newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
+            newsNode.save();
+          }
         }
       }
       return news;
@@ -466,7 +494,7 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
-    News news = getNewsById(newsId);
+    News news = getNewsById(newsId, false);
 
     Node newsNode = session.getNodeByUUID(newsId);
 
@@ -495,7 +523,7 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
-    News news = getNewsById(newsId);
+    News news = getNewsById(newsId, false);
     if (news == null) {
       throw new Exception("Unable to find a news with an id equal to: " + newsId);
     }
@@ -591,7 +619,7 @@ public class NewsServiceImpl implements NewsService {
         activity.setUserId(poster.getId());
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("newsId", sharedNews.getNewsId());
-        News news = getNewsById(sharedNews.getNewsId());
+        News news = getNewsById(sharedNews.getNewsId(), false);
         templateParams.put("originalActivityId", news.getActivityId());
         activity.setTemplateParams(templateParams);
         activityManager.saveActivityNoReturn(spaceIdentity, activity);
@@ -626,9 +654,10 @@ public class NewsServiceImpl implements NewsService {
    * Delete news
    * 
    * @param newsId the news id to delete
+   * @param isDraft
    * @throws Exception when error
    */
-  public void deleteNews(String newsId) throws Exception {
+  public void deleteNews(String newsId, boolean isDraft) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -642,11 +671,11 @@ public class NewsServiceImpl implements NewsService {
       if (node.hasProperty("exo:activities")) {
         String newActivities = node.getProperty("exo:activities").getString();
         if (StringUtils.isNotEmpty(newActivities)) {
-          if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+          if (isDraft && node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
                   && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
-            String nodeVersionUUID = (node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) ?
+            String versionNodeUUID = node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP) ?
                     node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;
-            String versionName = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID).getName();
+            String versionName = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID).getName();
             if (!versionName.isEmpty()) {
               node.restore(versionName, true);
               if (!node.isCheckedOut()) {
@@ -672,11 +701,15 @@ public class NewsServiceImpl implements NewsService {
   }
 
   @Override
-  public News convertNodeToNews(Node node) throws Exception {
+  public News convertNodeToNews(Node node, boolean editMode) throws Exception {
     if (node == null) {
       return null;
     }
-
+    if (!editMode && node.getProperty(CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
+      String versionNodeUUID = node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString();
+      Node versionNode = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID);
+      node = versionNode.getNode("jcr:frozenNode");
+    }
     News news = new News();
 
     Node originalNode;
@@ -1207,7 +1240,7 @@ public class NewsServiceImpl implements NewsService {
     searchResults.forEach(res -> {
       try {
         Node newsNode = ((NewsSearchResult) res).getNode();
-        News news = convertNodeToNews(newsNode);
+        News news = convertNodeToNews(newsNode, false);
         newsList.add(news);
 
       } catch (Exception e) {

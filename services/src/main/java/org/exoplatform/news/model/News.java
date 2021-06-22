@@ -21,6 +21,10 @@ public class News {
 
   private String               updater;
 
+  private String               draftUpdater;
+
+  private String               draftUpdaterDisplayName;
+
   private String               uploadId;
 
   private byte[]               illustration;
@@ -119,6 +123,21 @@ public class News {
 
   public void setUpdater(String updater) {
     this.updater = updater;
+  }
+
+  public String getDraftUpdater() {
+    return draftUpdater;
+  }
+
+  public void setDraftUpdater(String draftUpdater) {
+    this.draftUpdater = draftUpdater;
+  }
+  public String getDraftUpdaterDisplayName() {
+    return draftUpdaterDisplayName;
+  }
+
+  public void setDraftUpdaterDisplayName(String draftUpdaterDisplayName) {
+    this.draftUpdaterDisplayName = draftUpdaterDisplayName;
   }
 
   public String getUploadId() {

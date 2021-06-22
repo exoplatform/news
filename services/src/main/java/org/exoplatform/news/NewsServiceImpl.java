@@ -739,6 +739,8 @@ public class NewsServiceImpl implements NewsService {
     news.setPublicationDate(getPublicationDate(node));
     news.setUpdater(getLastUpdater(node));
     news.setUpdateDate(getLastUpdatedDate(node));
+    news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
+    news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
@@ -821,7 +823,10 @@ public class NewsServiceImpl implements NewsService {
       news.setAuthorAvatarUrl(identity.getProfile().getAvatarUrl());
     }
 
-
+    Identity draftUpdaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getDraftUpdater(), true);
+    if (draftUpdaterIdentity != null && draftUpdaterIdentity.getProfile() != null) {
+      news.setDraftUpdaterDisplayName(draftUpdaterIdentity.getProfile().getFullName());
+    }
 
     return news;
   }

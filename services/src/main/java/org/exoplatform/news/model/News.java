@@ -21,6 +21,10 @@ public class News {
 
   private String               updater;
 
+  private String               draftUpdater;
+
+  private String               draftUpdaterDisplayName;
+
   private String               uploadId;
 
   private byte[]               illustration;
@@ -34,6 +38,8 @@ public class News {
   private Date                 publicationDate;
 
   private Date                 updateDate;
+
+  private Date                 draftUpdateDate;
 
   private boolean              pinned;
 
@@ -121,6 +127,21 @@ public class News {
     this.updater = updater;
   }
 
+  public String getDraftUpdater() {
+    return draftUpdater;
+  }
+
+  public void setDraftUpdater(String draftUpdater) {
+    this.draftUpdater = draftUpdater;
+  }
+  public String getDraftUpdaterDisplayName() {
+    return draftUpdaterDisplayName;
+  }
+
+  public void setDraftUpdaterDisplayName(String draftUpdaterDisplayName) {
+    this.draftUpdaterDisplayName = draftUpdaterDisplayName;
+  }
+
   public String getUploadId() {
     return uploadId;
   }
@@ -175,6 +196,14 @@ public class News {
 
   public void setUpdateDate(Date updateDate) {
     this.updateDate = updateDate;
+  }
+
+  public Date getDraftUpdateDate() {
+    return draftUpdateDate;
+  }
+
+  public void setDraftUpdateDate(Date draftUpdateDate) {
+    this.draftUpdateDate = draftUpdateDate;
   }
 
   public boolean isPinned() {

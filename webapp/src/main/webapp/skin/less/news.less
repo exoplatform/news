@@ -821,6 +821,23 @@
           margin-bottom: 0;
         }
       }
+
+      .warningAlert {
+        border: 0;
+        color: @warningColor;
+
+        .exclamationIcon {
+          color: @warningColor;
+          font-size: 20px;
+          margin-right: 8px;
+        }
+        .warningText {
+          color: @warningText;
+        }
+        .v-alert__dismissible {
+          color: @warningColor !important;
+        }
+      }
     }
   }
 

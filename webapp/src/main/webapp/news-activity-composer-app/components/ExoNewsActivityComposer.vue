@@ -117,7 +117,7 @@
             colored-border
             class="warningAlert">
             <i class="fas fa-exclamation-circle exclamationIcon"></i>
-            <span class="warningText">{{ $t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', formatDate(this.news.updateDate.time)) }}</span>
+            <span class="warningText">{{ draftWarningText }}</span>
           </v-alert>
         </div>
       </form>
@@ -301,6 +301,9 @@ export default {
     originalTitle() {
       return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
     },
+    draftWarningText() {
+      return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.updateDate.time));
+    }
   },
   watch: {
     'news.title': function() {

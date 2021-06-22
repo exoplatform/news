@@ -58,6 +58,15 @@ export default {
         });
       }
     });
+    this.$root.$on('news-posted', (newsId) => {
+      if (newsId) {
+        const message = this.$t('news.composer.scheduleSuccess');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+        });
+      }
+    });
   },
   methods: {
     addAlert(alert) {

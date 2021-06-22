@@ -14,8 +14,6 @@ import java.util.stream.Stream;
 import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -803,10 +801,6 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
-    if (StringUtils.equals(node.getProperty("publication:currentState").getString(), STAGED)) {
-      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
-      news.setUrl(newsUrl.toString());
-    }
     if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
@@ -1148,7 +1142,7 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
-    News sheduledNews = null;
+    News scheduledNews = null;
     try {
       String siteName = CommonsUtils.getService(UserPortalConfigService.class).getDefaultPortal();
       String datePublishFormatted = null;
@@ -1170,14 +1164,14 @@ public class NewsServiceImpl implements NewsService {
         newsNode.save();
         publicationService.changeState(newsNode, "staged", new HashMap<>());
         wCMPublicationService.updateLifecyleOnChangeContent(newsNode, siteName, currentUser, "staged");
-        sheduledNews = convertNodeToNews(newsNode);
+        scheduledNews = convertNodeToNews(newsNode);
       }
     } finally {
       if (session != null) {
         session.logout();
       }
     }
-    return sheduledNews;
+    return scheduledNews;
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {

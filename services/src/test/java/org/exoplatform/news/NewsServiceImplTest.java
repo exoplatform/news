@@ -2229,6 +2229,11 @@ public class NewsServiceImplTest {
     when(property1.getDate()).thenReturn(Calendar.getInstance());
     when(property2.getDate()).thenReturn(Calendar.getInstance());
     when(property3.getDate()).thenReturn(Calendar.getInstance());
+    when(property4.getString()).thenReturn("");
+    when(node1.getProperty("publication:currentState")).thenReturn(property4);
+    when(node2.getProperty("publication:currentState")).thenReturn(property4);
+    when(node3.getProperty("publication:currentState")).thenReturn(property4);
+
     when(node1.getProperty("exo:pinned")).thenReturn(property1);
     when(node2.getProperty("exo:pinned")).thenReturn(property2);
     when(node3.getProperty("exo:pinned")).thenReturn(property3);

@@ -107,7 +107,7 @@ public class NewsIndexingServiceConnectorTest {
     posterProfile.setProperty("fullName", "Root Root");
     posterIdentity.setProfile(posterProfile);
     try {
-      when(newsService.getNewsById("1")).thenReturn(news);
+      when(newsService.getNewsById("1", false)).thenReturn(news);
     } catch (Exception e) {
       e.printStackTrace();
     }

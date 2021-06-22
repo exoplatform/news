@@ -59,7 +59,7 @@
 
   def newsNode = uicomponent.getNode();
 
-  def news = newsService.convertNodeToNews(newsNode);
+  def news = newsService.convertNodeToNews(newsNode, false);
 
   if(news.archived && !news.canArchive) {
 

@@ -32,7 +32,7 @@
     if(Utils.isViewable(node) && (sliderSpaceId == null || !node.hasProperty("exo:spaceId") || !node.getProperty("exo:spaceId").getString().equals(sliderSpaceId))) {
       nodes.add(node);
 
-      def news = newsService.convertNodeToNews(node);
+      def news = newsService.convertNodeToNews(node, false);
       def body = new HtmlCleaner().clean(news.getBody()).getText();
       if( body != null ){
         news.setBody(body.toString());

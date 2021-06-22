@@ -45,11 +45,9 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.SpaceUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
@@ -61,7 +59,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.jaxrs.PATCH;
 
 import org.exoplatform.social.rest.api.EntityBuilder;
-import org.exoplatform.social.webui.Utils;
 
 import org.picocontainer.Startable;
 
@@ -264,15 +261,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       @ApiResponse(code = 401, message = "User not authorized to get the news"),
       @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
   public Response getNewsById(@Context HttpServletRequest request,
-                          @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                          @ApiParam(value = "fields", required = true) @QueryParam("fields") String fields) {
+                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
+                              @ApiParam(value = "fields", required = true) @QueryParam("fields") String fields,
+                              @ApiParam(value = "Is edit mode", defaultValue = "false") @QueryParam("editMode") boolean editMode) {
     try {
 
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, editMode);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -400,7 +398,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
 
     try {
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -455,7 +453,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                             @ApiParam(value = "Shared News", required = true) SharedNews sharedNews) {
 
     try {
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -504,7 +502,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response getNewsIllustration(@Context Request request,
                                       @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
     try {
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null || news.getIllustration() == null || news.getIllustration().length == 0) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -546,7 +544,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
     News news;
     try {
-      news = newsService.getNewsById(id);
+      news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -584,7 +582,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
 
     try {
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -668,7 +666,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                            @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
 
     try {
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -700,16 +698,17 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response deleteNews(@Context HttpServletRequest request,
                              @ApiParam(value = "News id", required = true)
                              @PathParam("id") String id,
+                             @ApiParam(value = "Is draft to delete", defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
                              @ApiParam(value = "Time to effectively delete news", required = false)
                              @QueryParam(
-                               "delay"
+                                     "delay"
                              ) long delay) {
     try {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
-      News news = newsService.getNewsById(id);
+      News news = newsService.getNewsById(id, false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -727,7 +726,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             RequestLifeCycle.begin(container);
             try {
               newsToDeleteQueue.remove(id);
-              newsService.deleteNews(id);
+              newsService.deleteNews(id, isDraft);
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", authenticatedUser, e);
             } catch (Exception e) {
@@ -739,7 +738,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }, delay, TimeUnit.SECONDS);
       } else {
         newsToDeleteQueue.remove(id);
-        newsService.deleteNews(id);
+        newsService.deleteNews(id, isDraft);
       }
       return Response.ok().build();
     } catch (Exception e) {

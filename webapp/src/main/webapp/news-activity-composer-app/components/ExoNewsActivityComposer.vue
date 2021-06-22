@@ -109,6 +109,16 @@
               name="newsContent">
             </textarea>
           </div>
+          <v-alert
+            v-if="this.news.publicationState === 'draft' && this.activityId"
+            dismissible
+            border="left"
+            elevation="2"
+            colored-border
+            class="warningAlert">
+            <i class="fas fa-exclamation-circle exclamationIcon"></i>
+            <span class="warningText">{{ draftWarningText }}</span>
+          </v-alert>
         </div>
       </form>
       <v-btn
@@ -247,7 +257,14 @@ export default {
       canCreatNews: false,
       loading: true,
       currentSpace: {},
-      spaceURL: null
+      spaceURL: null,
+      fullDateFormat: {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }
     };
   },
   computed: {
@@ -284,16 +301,28 @@ export default {
     originalTitle() {
       return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
     },
+    draftWarningText() {
+      return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
+    }
   },
   watch: {
-    'news.title': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
-    'news.summary': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
-    'news.body': function(newValue, oldValue) { if (newValue !== oldValue) { this.autoSave(); } },
+    'news.title': function() {
+      if (this.news.title !== this.originalNews.title) {
+        this.autoSave();
+      } },
+    'news.summary': function() {
+      if (this.news.summary !== this.originalNews.summary) {
+        this.autoSave();
+      } },
+    'news.body': function() {
+      if (this.getContent(this.news.body) !== this.getContent(this.originalNews.body)) {
+        this.autoSave();
+      } },
     'news.attachments': function() {
-      if (this.initDone) {
+      if (this.initDone && this.news.attachments !== this.originalNews.attachments) {
         this.attachmentsChanged = true;
+        this.autoSave();
       }
-      this.autoSave();
     },
     'news.illustration': function() {
       if (this.initIllustrationDone) {
@@ -444,7 +473,7 @@ export default {
 
     initNewsComposerData: function(newsId) {
       const self = this;
-      this.$newsServices.getNewsById(newsId)
+      this.$newsServices.getNewsById(newsId, true)
         .then(fetchedNode => {
           if (fetchedNode){
             this.news.id = fetchedNode.id;
@@ -455,6 +484,10 @@ export default {
             this.news.archived = fetchedNode.archived;
             this.news.spaceId = fetchedNode.spaceId;
             this.news.publicationState = fetchedNode.publicationState;
+            this.news.activityId = fetchedNode.activityId;
+            this.news.updater = fetchedNode.updater;
+            this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
+            this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -767,6 +800,12 @@ export default {
     getBody: function() {
       const newData = CKEDITOR.instances['newsContent'].getData();
       return newData ? newData : null;
+    },
+    formatDate(time) {
+      return this.$dateUtil.formatDateObjectToDisplay(new Date(time),this.fullDateFormat, eXo.env.portal.language);
+    },
+    getContent(body) {
+      return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     }
   }
 };

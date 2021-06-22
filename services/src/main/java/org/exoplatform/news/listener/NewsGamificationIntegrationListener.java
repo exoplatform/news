@@ -44,7 +44,7 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
       String eventName = event.getEventName();
       String newsId = event.getSource();
       String earnerId = event.getData();
-      News news = newsService.getNewsById(newsId);
+      News news = newsService.getNewsById(newsId, false);
       String ruleTitle = "";
       if (StringUtils.equals(eventName, NewsUtils.POST_NEWS)) {
         ruleTitle = GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE;

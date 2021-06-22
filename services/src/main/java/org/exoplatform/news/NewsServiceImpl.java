@@ -105,9 +105,9 @@ public class NewsServiceImpl implements NewsService {
 
   public static final String       CURRENT_STATE                   = "publication:currentState";
 
-  public static final String       LIVE_REVISION_PROP              = "publication:liveRevision";
+  public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
 
-  public final static String       DRAFT                           = "draft";
+  public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
 
   private static final Pattern     MENTION_PATTERN                 = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
@@ -380,8 +380,8 @@ public class NewsServiceImpl implements NewsService {
 
         if ("published".equals(news.getPublicationState())) {
           publicationService.changeState(newsNode, "published", new HashMap<>());
-          if (newsNode.isNodeType("mix:newsModifiers")) {
-            newsNode.removeMixin("mix:newsModifiers");
+          if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+            newsNode.removeMixin(MIX_NEWS_MODIFIERS);
             newsNode.save();
           }
           //if it's an "update news" case
@@ -396,29 +396,27 @@ public class NewsServiceImpl implements NewsService {
             sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
           }
           indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
-        } else if ("draft".equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, "draft", new HashMap<>());
-          Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
-          String currentUserId = identity.getId();
-          if (!newsNode.isNodeType("mix:newsModifiers")) {
-            newsNode.addMixin("mix:newsModifiers");
+        } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
+          Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
+          String currentIdentityId = currentIdentity.getId();
+          if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+            newsNode.addMixin(MIX_NEWS_MODIFIERS);
           }
-          Value[] modifiersIdsProperty;
+          Value[] newsModifiers = new Value[0];
           List<String> modifiersIds = new ArrayList<>();
           boolean alreadyExist = false;
-          if (newsNode.hasProperty("exo:newsModifiersIds")) {
-            modifiersIdsProperty = newsNode.getProperty("exo:newsModifiersIds").getValues();
-            for (Value value : modifiersIdsProperty) {
+          if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
+            newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
+            for (Value value : newsModifiers) {
               modifiersIds.add(value.getString());
             }
             alreadyExist = modifiersIds
                     .stream()
-                    .anyMatch(modifiersId -> modifiersId.equals(currentUserId));
-          } else {
-            modifiersIdsProperty = new Value[0];
+                    .anyMatch(modifiersId -> modifiersId.equals(currentIdentityId));
           }
           if (!alreadyExist) {
-            newsNode.setProperty("exo:newsModifiersIds", ArrayUtils.add(modifiersIdsProperty, new StringValue(currentUserId)));
+            newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
             newsNode.save();
           }
         }
@@ -675,9 +673,9 @@ public class NewsServiceImpl implements NewsService {
         if (StringUtils.isNotEmpty(newActivities)) {
           if (isDraft && node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
                   && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
-            String nodeVersionUUID = (node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) ?
+            String versionNodeUUID = node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP) ?
                     node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;
-            String versionName = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID).getName();
+            String versionName = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID).getName();
             if (!versionName.isEmpty()) {
               node.restore(versionName, true);
               if (!node.isCheckedOut()) {
@@ -706,10 +704,10 @@ public class NewsServiceImpl implements NewsService {
     if (node == null) {
       return null;
     }
-    if (!editMode && node.getProperty(CURRENT_STATE).getString().equals(DRAFT) && node.hasProperty(LIVE_REVISION_PROP)) {
-      String nodeVersionUUID = node.getProperty(LIVE_REVISION_PROP).getString();
-      Node revNode = node.getVersionHistory().getSession().getNodeByUUID(nodeVersionUUID);
-      node = revNode.getNode("jcr:frozenNode");
+    if (!editMode && node.getProperty(CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
+      String versionNodeUUID = node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString();
+      Node versionNode = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID);
+      node = versionNode.getNode("jcr:frozenNode");
     }
     News news = new News();
 

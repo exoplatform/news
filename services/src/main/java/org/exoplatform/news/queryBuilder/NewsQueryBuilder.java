@@ -66,10 +66,12 @@ public class NewsQueryBuilder {
         if (filter.isDraftNews()) {
           IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
           Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
-          String currentUserId = identity.getId();
-          sqlQuery.append("publication:currentState = 'draft' AND (('");
-          sqlQuery.append(currentUserId).append("' IN exo:newsModifiersIds AND exo:activities <> '') OR (");
-          sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
+          String currentIdentityId = identity.getId();
+          sqlQuery.append("publication:currentState = 'draft'");
+          sqlQuery.append(" AND (('");
+          sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
+          sqlQuery.append(" OR ");
+          sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
         } else {
           if (StringUtils.isNotEmpty(filter.getAuthor())) {
             sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");

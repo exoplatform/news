@@ -81,10 +81,10 @@
             <exo-news-details-action-menu
               v-if="news.canEdit "
               :news="news"
-              :show-edit-button="news.canEdit && !isFilterDrafts"
+              :show-edit-button="news.canEdit && !isDraftsFilter"
               :show-delete-button="news.canDelete"
-              :show-share-button="showShareButton && !isFilterDrafts"
-              :show-resume-button="news.draft && isFilterDrafts"
+              :show-share-button="showShareButton && !isDraftsFilter"
+              :show-resume-button="news.draft && isDraftsFilter"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -198,7 +198,7 @@ export default {
         return this.$t('news.app.noNews');
       }
     },
-    isFilterDrafts() {
+    isDraftsFilter() {
       return this.newsFilter === 'drafts';
     }
   },
@@ -294,10 +294,10 @@ export default {
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          updatedDate: this.isFilterDrafts ? newsPublicationDate : newsUpdateDate,
+          updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: this.isFilterDrafts ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
+          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,

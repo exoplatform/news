@@ -1164,7 +1164,7 @@ public class NewsServiceImpl implements NewsService {
         newsNode.save();
         publicationService.changeState(newsNode, "staged", new HashMap<>());
         wCMPublicationService.updateLifecyleOnChangeContent(newsNode, siteName, currentUser, "staged");
-        scheduledNews = convertNodeToNews(newsNode);
+        scheduledNews = convertNodeToNews(newsNode, false);
       }
     } finally {
       if (session != null) {

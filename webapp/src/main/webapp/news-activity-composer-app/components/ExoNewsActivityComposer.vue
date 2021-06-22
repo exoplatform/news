@@ -625,8 +625,7 @@ export default {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
         } else {
           this.closeDrawer();
-          window.location.href = '#';
-          this.$root.$emit('news-posted', this.news.id);
+          window.location.href = createdNews.spaceUrl;
         }
       });
     },

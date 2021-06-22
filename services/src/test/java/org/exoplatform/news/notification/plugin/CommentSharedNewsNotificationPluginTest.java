@@ -133,7 +133,7 @@ public class CommentSharedNewsNotificationPluginTest {
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
 
-    when(newsService.getNewsById("id123")).thenReturn(news);
+    when(newsService.getNewsById("id123", false)).thenReturn(news);
     Identity posterActivity = mock(Identity.class);
     when(identityManager.getIdentity("2")).thenReturn(posterActivity);
     Profile profile = mock(Profile.class);
@@ -225,7 +225,7 @@ public class CommentSharedNewsNotificationPluginTest {
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
 
-    when(newsService.getNewsById("id123")).thenReturn(news);
+    when(newsService.getNewsById("id123", false)).thenReturn(news);
     Identity posterActivity = mock(Identity.class);
     when(identityManager.getIdentity("2")).thenReturn(posterActivity);
     Profile profile = mock(Profile.class);
@@ -319,7 +319,7 @@ public class CommentSharedNewsNotificationPluginTest {
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
 
-    when(newsService.getNewsById("id123")).thenReturn(news);
+    when(newsService.getNewsById("id123", false)).thenReturn(news);
     Identity posterActivity = mock(Identity.class);
     when(identityManager.getIdentity("2")).thenReturn(posterActivity);
     Profile profile = mock(Profile.class);

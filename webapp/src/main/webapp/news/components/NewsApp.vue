@@ -81,10 +81,10 @@
             <exo-news-details-action-menu
               v-if="news.canEdit "
               :news="news"
-              :show-edit-button="news.canEdit && !news.draft"
+              :show-edit-button="news.canEdit && !isDraftsFilter"
               :show-delete-button="news.canDelete"
-              :show-share-button="showShareButton && !news.draft"
-              :show-resume-button="news.draft"
+              :show-share-button="showShareButton && !isDraftsFilter"
+              :show-resume-button="news.draft && isDraftsFilter"
               @delete="deleteConfirmDialog(index)"
               @edit="editLink(news)" />
             <exo-confirm-dialog
@@ -198,6 +198,9 @@ export default {
         return this.$t('news.app.noNews');
       }
     },
+    isDraftsFilter() {
+      return this.newsFilter === 'drafts';
+    }
   },
   watch: {
     searchText() {
@@ -286,16 +289,15 @@ export default {
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
-        const isDraft = item.publicationState === 'draft';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
           illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
           title: item.title,
-          updatedDate: !isDraft ? newsPublicationDate : newsUpdateDate,
+          updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: isDraft ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
+          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
@@ -311,7 +313,7 @@ export default {
           spaceAvatarUrl: item.spaceAvatarUrl,
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
-          target: item.publicationState === 'draft' ? '_blank' : '_self',
+          target: this.newsFilter === 'drafts' ? '_blank' : '_self',
         });
       });
       if (append) {
@@ -393,7 +395,7 @@ export default {
     deleteNews(news) {
       const deleteDelay = 6;
       const redirectionTime = 6100;
-      this.$newsServices.deleteNews(news.newsId, deleteDelay)
+      this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', news);
         });

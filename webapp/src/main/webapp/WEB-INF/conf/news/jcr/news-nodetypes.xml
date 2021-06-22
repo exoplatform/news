@@ -49,4 +49,11 @@
       </childNodeDefinition>
     </childNodeDefinitions>
   </nodeType>
+  <nodeType name="mix:newsModifiers" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+    <propertyDefinition name="exo:newsModifiersIds" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
+      <valueConstraints/>
+    </propertyDefinition>
+    </propertyDefinitions>
+  </nodeType>
 </nodeTypes>

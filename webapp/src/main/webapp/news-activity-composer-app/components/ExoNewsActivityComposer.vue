@@ -12,6 +12,7 @@
       id="newsActivityComposer"
       class="newsComposer">
       <exo-news-publish-drawer ref="publishNewsDrawer" @post-article="postNews" />
+      <exo-news-notification-alerts />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -553,6 +554,9 @@ export default {
         this.$refs.publishNewsDrawer.open();
       }
     },
+    closeDrawer() {
+      this.$refs.publishNewsDrawer.close();
+    },
     postNews: function (datePublish) {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');
@@ -619,10 +623,10 @@ export default {
         }
         if (createdNewsActivity) {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
-        } else if (createdNews.publicationState === 'staged') {
-          window.location.href = createdNews.url;
         } else {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+          this.closeDrawer();
+          window.location.href = '#';
+          this.$root.$emit('news-posted', this.news.id);
         }
       });
     },

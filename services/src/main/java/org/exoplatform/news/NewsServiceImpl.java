@@ -408,12 +408,13 @@ public class NewsServiceImpl implements NewsService {
           boolean alreadyExist = false;
           if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
             newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
-            for (Value value : newsModifiers) {
-              modifiersIds.add(value.getString());
-            }
-            alreadyExist = modifiersIds
-                    .stream()
-                    .anyMatch(modifiersId -> modifiersId.equals(currentIdentityId));
+            alreadyExist = Arrays.stream(newsModifiers).map(value -> {
+              try {
+                return value.getString();
+              } catch (RepositoryException e) {
+                return null;
+              }
+            }).anyMatch(modifiersId -> modifiersId.equals(currentIdentityId));;
           }
           if (!alreadyExist) {
             newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));

@@ -752,6 +752,7 @@ public class NewsServiceImpl implements NewsService {
     news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
+    news.setCanEdit(canEditNews(news.getAuthor(), news.getSpaceId()));
     if (node.hasProperty("publication:currentState")) {
       news.setPublicationState(node.getProperty("publication:currentState").getString());
     }
@@ -765,6 +766,7 @@ public class NewsServiceImpl implements NewsService {
       news.setSpaceId(node.getProperty("exo:spaceId").getString());
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
+    news.setCanPin(canPinNews());
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     StringBuilder newsUrl = new StringBuilder("");
     if (originalNode.hasProperty("exo:activities")) {
@@ -794,6 +796,11 @@ public class NewsServiceImpl implements NewsService {
         }
         news.setActivities(memberSpaceActivities.toString());
       }
+    }
+
+    if (StringUtils.equals(node.getProperty("publication:currentState").getString(), STAGED)) {
+      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/stagedNewsDetail?newsId=").append(news.getId());
+      news.setUrl(newsUrl.toString());
     }
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);

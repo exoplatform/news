@@ -146,6 +146,8 @@
       archived: ${news.archived},
       canArchive: ${news.canArchive},
       canDelete: ${news.canDelete},
+      canPin: ${news.canPin},
+      canEdit: ${news.canEdit},
       profileAvatarURL: '${ownerAvatar}',
       spaceDisplayName: "${news.spaceDisplayName}",
       spaceUrl:'${news.spaceUrl}',

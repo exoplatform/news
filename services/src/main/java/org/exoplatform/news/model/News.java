@@ -74,6 +74,8 @@ public class News {
 
   private Boolean              canDelete;
 
+  private Boolean              canPin;
+
   private Set<Space>           sharedInSpacesList;
 
   private String               url;
@@ -391,5 +393,13 @@ public class News {
 
   public void setTimeZoneId(String timeZoneId) {
     this.timeZoneId = timeZoneId;
+  }
+
+  public Boolean isCanPin() {
+    return canPin;
+  }
+
+  public void setCanPin(Boolean canPin) {
+    this.canPin = canPin;
   }
 }

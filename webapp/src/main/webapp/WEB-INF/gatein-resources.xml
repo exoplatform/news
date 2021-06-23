@@ -144,6 +144,16 @@
     </module>
   </portlet>
 
+  <portlet>
+    <name>NewsDetail</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/newsDetails.bundle.js</path>
+      </script>
+    </module>
+  </portlet>
+
   <module>
     <name>newsDetails</name>
     <script>

@@ -26,7 +26,12 @@ export function init(params) {
   ];
 
   const appId = 'newsDetailsApp';
-  const cacheId = `${appId}_${params.activityId}`;
+  let cacheId = '';
+  if (params && params.activityId) {
+    cacheId = `${appId}_${params.activityId}`;
+  } else {
+    cacheId = `${appId}`;
+  }
 
   const appElement = document.createElement('div');
   appElement.id = appId;
@@ -36,12 +41,12 @@ export function init(params) {
     newsDetails = new Vue({
       data: function() {
         return {
-          news: params.news,
-          newsId: params.news.newsId,
-          activityId: params.activityId,
-          showEditButton: params.showEditButton,
-          showPinButton: params.showPinInput,
-          showDeleteButton: params.news.canDelete,
+          news: params.news || null,
+          newsId: getURLQueryParam('newsId') || params.news.newsId,
+          activityId: params.activityId || null,
+          showEditButton: params.showEditButton || null,
+          showPinButton: params.showPinInput || null,
+          showDeleteButton: params.news.canDelete || null,
         };
       },
       template: `<v-app id="${appId}" v-cacheable="{cacheId: '${cacheId}'}">
@@ -62,5 +67,12 @@ export function init(params) {
 export function destroy() {
   if (newsDetails) {
     newsDetails.$destroy();
+  }
+}
+
+function getURLQueryParam(paramName) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has(paramName)) {
+    return urlParams.get(paramName);
   }
 }

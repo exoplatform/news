@@ -62,4 +62,22 @@
         </portlet-info>
     </portlet>
 
+    <portlet>
+        <portlet-name>NewsDetail</portlet-name>
+        <display-name xml:lang="EN">News Details</display-name>
+        <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+        <init-param>
+            <name>portlet-view-dispatched-file-path</name>
+            <value>/news-details/index.html</value>
+        </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+        </supports>
+        <supported-locale>en</supported-locale>
+        <portlet-info>
+            <title>News Details</title>
+            <keywords>News Details</keywords>
+        </portlet-info>
+    </portlet>
+
 </portlet-app>

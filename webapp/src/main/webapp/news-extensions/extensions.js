@@ -50,11 +50,13 @@ const newsActivityTypeExtensionOptions = {
   },
   canEdit: () => false,
   supportsThumbnail: true,
-  getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL,
-  defaultIcon: {
-    icon: 'far fa-newspaper',
-    size: '150',
-  },
+  getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL || '/news/images/news.png',
+  getThumbnailProperties: (activity) => !(activity && activity.news && activity.news.illustrationURL) && {
+    height: '90px',
+    width: '90px',
+    noBorder: true,
+  } || null,
+  isUseSameViewForMobile: (activity) => !activity || !activity.news || !activity.news.illustrationURL,
   getTitle: (activity) => {
     const news = activity && activity.news;
     if (news && news.title) {

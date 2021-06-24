@@ -152,6 +152,7 @@
       spaceAvatarUrl: '${news.spaceAvatarUrl}',
       url: '${news.url}',
       hiddenSpace: ${news.hiddenSpace},
+      isSpaceMember: ${news.isSpaceMember},
     },
     showEditButton: $showEditButton,
     showPinInput: $showPinInput,

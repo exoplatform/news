@@ -53,6 +53,8 @@ public class News {
 
   private String               spaceUrl;
 
+  private boolean              isSpaceMember;
+
   private String               path;
 
   private String               publicationState;
@@ -236,6 +238,14 @@ public class News {
 
   public void setSpaceUrl(String spaceUrl) {
     this.spaceUrl = spaceUrl;
+  }
+
+  public boolean isSpaceMember() {
+    return isSpaceMember;
+  }
+
+  public void setSpaceMember(boolean spaceMember) {
+    isSpaceMember = spaceMember;
   }
 
   public String getPath() {

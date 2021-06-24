@@ -12,7 +12,6 @@
       id="newsActivityComposer"
       class="newsComposer">
       <exo-news-publish-drawer ref="publishNewsDrawer" @post-article="postNews" />
-      <exo-news-notification-alerts />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">

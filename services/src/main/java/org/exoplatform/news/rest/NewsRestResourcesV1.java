@@ -45,6 +45,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -139,9 +140,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       News createdNews;
-      if ("published".equals(news.getPublicationState())) {
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
-      } else if ("staged".equals(news.getPublicationState())) {
+      } else if (PublicationDefaultStates.STAGED.equals(news.getPublicationState())) {
         createdNews = newsService.scheduleNews(news, authenticatedUser);
       } else {
         createdNews = newsService.createNewsDraft(news);

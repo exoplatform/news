@@ -6,12 +6,25 @@ import java.text.SimpleDateFormat;
 import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.jcr.*;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
@@ -48,7 +61,6 @@ import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -107,8 +119,6 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
 
-  public static final String       CURRENT_STATE                   = "publication:currentState";
-
   public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
 
   public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
@@ -119,11 +129,7 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
 
-  private static final String      START_TIME_PROPERTY             = "publication:startPublishedDate";
-
   private static final String      LAST_PUBLISHER                  = "publication:lastUser";
-
-  private static final String      STAGED                          = "staged";
 
   private RepositoryService        repositoryService;
 
@@ -388,8 +394,8 @@ public class NewsServiceImpl implements NewsService {
           session.getWorkspace().move(srcPath, destPath);
         }
 
-        if ("published".equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, "published", new HashMap<>());
+        if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
           if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
             newsNode.removeMixin(MIX_NEWS_MODIFIERS);
             newsNode.save();
@@ -716,7 +722,7 @@ public class NewsServiceImpl implements NewsService {
     if (node == null) {
       return null;
     }
-    if (!editMode && node.getProperty(CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
+    if (!editMode && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
       String versionNodeUUID = node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString();
       Node versionNode = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID);
       node = versionNode.getNode("jcr:frozenNode");
@@ -753,8 +759,8 @@ public class NewsServiceImpl implements NewsService {
     news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
-    if (node.hasProperty("publication:currentState")) {
-      news.setPublicationState(node.getProperty("publication:currentState").getString());
+    if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)) {
+      news.setPublicationState(node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString());
     }
     if (originalNode.hasProperty("exo:pinned")) {
       news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
@@ -1007,7 +1013,7 @@ public class NewsServiceImpl implements NewsService {
       newsDraftNode.setProperty("publication:lifecycle", lifecycle.getName());
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
-    publicationService.changeState(newsDraftNode, "draft", new HashMap<>());
+    publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
     newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
     spaceNewsRootNode.save();
 
@@ -1144,7 +1150,6 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
     News scheduledNews = null;
     try {
-      String siteName = CommonsUtils.getService(UserPortalConfigService.class).getDefaultPortal();
       String datePublishFormatted = null;
       Calendar startDate = Calendar.getInstance();
       String schedulePostDate = news.getSchedulePostDate();
@@ -1159,11 +1164,10 @@ public class NewsServiceImpl implements NewsService {
         datePublishFormatted = schedulePostDate.concat(" ").concat(offsetTimeZone);
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
         startDate.setTime(format.parse(datePublishFormatted));
-        newsNode.setProperty(START_TIME_PROPERTY, startDate);
+        newsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startDate);
         newsNode.setProperty(LAST_PUBLISHER, currentUser);
         newsNode.save();
-        publicationService.changeState(newsNode, "staged", new HashMap<>());
-        wCMPublicationService.updateLifecyleOnChangeContent(newsNode, siteName, currentUser, "staged");
+        publicationService.changeState(newsNode, PublicationDefaultStates.STAGED, new HashMap<>());
         scheduledNews = convertNodeToNews(newsNode, false);
       }
     } finally {

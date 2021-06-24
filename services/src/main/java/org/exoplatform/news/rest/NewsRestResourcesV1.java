@@ -142,9 +142,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       News createdNews;
       if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
-      } else if (PublicationDefaultStates.STAGED.equals(news.getPublicationState())) {
-        createdNews = newsService.scheduleNews(news, authenticatedUser);
-      } else {
+      } 
+      else if (PublicationDefaultStates.STAGED.equals(news.getPublicationState())) {
+        createdNews = newsService.scheduleNews(news);
+      }
+      else {
         createdNews = newsService.createNewsDraft(news);
       }
 
@@ -656,7 +658,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.serverError().build();
     }
   }
-
+  
   @POST
   @Path("{id}/view")
   @RolesAllowed("users")

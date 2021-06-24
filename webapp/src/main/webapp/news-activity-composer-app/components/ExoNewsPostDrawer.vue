@@ -1,11 +1,11 @@
 <template>
   <v-app>
     <exo-drawer
-      ref="publishNewsDrawer"
+      ref="postNewsDrawer"
       body-classes="hide-scroll decrease-z-index-more"
       right>
       <template slot="title">
-        {{ $t('news.composer.postArticle') }}
+        {{ $t('news.composer.postArticle') }} 
       </template>
       <template slot="content">
         <v-radio-group v-model="postArticleMode" class="ml-2">
@@ -18,15 +18,15 @@
             value="later" />
         </v-radio-group>
         <div v-if="postArticleMode==='later' && allowPostingLater" class="ml-4">
-          <div class="grey--text my-4">{{ $t('news.composer.chooseDatePublish') }}</div>
+          <div class="grey--text my-4">{{ $t('news.composer.choosePostDate') }}</div>
           <div class="d-flex flex-row flex-grow-1">
             <date-picker
-              v-model="datePublished"
+              v-model="postDate"
               class="flex-grow-1 my-auto" />
             <div class="d-flex flex-row flex-grow-0">
-              <slot name="datePublishedDateTime"></slot>
+              <slot name="postDateDateTime"></slot>
               <time-picker
-                v-model="datePublishedTime"
+                v-model="postDateTime"
                 class="me-4" />
             </div>
           </div>
@@ -51,34 +51,33 @@ export default {
   data: () => ({
     disabled: true,
     postArticleMode: 'immediate',
-    datePublished: null,
-    datePublishedTime: '8:00',
-    showDatePublishing: false,
+    postDate: null,
+    postDateTime: '8:00',
     allowPostingLater: false,
   }),
   watch: {
-    datePublished(newVal, oldVal) {
-      if (!this.datePublished || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
+    postDate(newVal, oldVal) {
+      if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
-      if ( this.datePublished < new Date().getTime()) {
-        this.datePublished = new Date();
+      if ( this.postDate < new Date().getTime()) {
+        this.postDate = new Date();
       }
-      const newDate = new Date(this.datePublished);
-      newDate.setHours(this.datePublishedTime.getHours());
-      newDate.setMinutes(this.datePublishedTime.getMinutes());
+      const newDate = new Date(this.postDate);
+      newDate.setHours(this.postDateTime.getHours());
+      newDate.setMinutes(this.postDateTime.getMinutes());
       newDate.setSeconds(0);
-      this.datePublished = newDate;
+      this.postDate = newDate;
     },
-    datePublishedTime(newVal, oldVal) {
-      if (!this.datePublishedTime || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
+    postDateTime(newVal, oldVal) {
+      if (!this.postDateTime || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
-      const newDate = new Date(this.datePublished);
-      newDate.setHours(this.datePublishedTime.getHours());
-      newDate.setMinutes(this.datePublishedTime.getMinutes());
+      const newDate = new Date(this.postDate);
+      newDate.setHours(this.postDateTime.getHours());
+      newDate.setMinutes(this.postDateTime.getMinutes());
       newDate.setSeconds(0);
-      this.datePublished = newDate;
+      this.postDate = newDate;
     },
   },
   computed: {
@@ -93,32 +92,26 @@ export default {
   },
   methods: {
     open() {
-      if (this.$refs.publishNewsDrawer) {
+      if (this.$refs.postNewsDrawer) {
         this.disabled = false;
-        this.$refs.publishNewsDrawer.open();
+        this.$refs.postNewsDrawer.open();
       }
     },
     close() {
       this.disabled = false;
-      this.$refs.publishNewsDrawer.close();
+      this.$refs.postNewsDrawer.close();
     },
     initializeDate() {
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate()+1);
-      this.datePublished = nextDate;
-      this.datePublishedTime = nextDate;
-      this.datePublishedTime.setHours(8);
-      this.datePublishedTime.setMinutes(0);
-      this.datePublishedTime.setMilliseconds(0);
+      this.postDate = nextDate;
+      this.postDateTime = nextDate;
+      this.postDateTime.setHours(8);
+      this.postDateTime.setMinutes(0);
+      this.postDateTime.setMilliseconds(0);
     },
     selectPostMode() {
-      let datePublish = null;
-      if (this.postArticleMode !=='later') {
-        datePublish = null;
-      } else {
-        datePublish = this.$newsUtils.convertDate(this.datePublished);
-      }
-      this.$emit('post-article', datePublish);
+      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate));
     },
   }
 };

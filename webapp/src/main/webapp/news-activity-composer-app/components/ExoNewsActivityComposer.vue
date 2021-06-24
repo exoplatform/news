@@ -11,7 +11,7 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
-      <exo-news-publish-drawer ref="publishNewsDrawer" @post-article="postNews" />
+      <exo-news-post-drawer ref="postNewsDrawer" @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -549,14 +549,14 @@ export default {
       }, this.autoSaveDelay);
     },
     openDrawer() {
-      if (this.$refs.publishNewsDrawer) {
-        this.$refs.publishNewsDrawer.open();
+      if (this.$refs.postNewsDrawer) {
+        this.$refs.postNewsDrawer.open();
       }
     },
     closeDrawer() {
-      this.$refs.publishNewsDrawer.close();
+      this.$refs.postNewsDrawer.close();
     },
-    postNews: function (datePublish) {
+    postNews: function (schedulePostDate) {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');
         const captionText = this.$t('news.broadcast.action');
@@ -564,20 +564,20 @@ export default {
         const cancelButton = this.$t('news.edit.cancel');
         eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
-        this.doPostNews(datePublish);
+        this.doPostNews(schedulePostDate);
       }
     },
-    doPostNews: function (datePublish) {
+    doPostNews: function (schedulePostDate) {
       this.postingNews = true;
       // if the News draft is being saved, we have to wait until it is done before posting the News
       if (this.savingDraft) {
         this.$on('draftCreated', this.saveNews);
         this.$on('draftUpdated', this.saveNews);
       } else {
-        this.saveNews(datePublish);
+        this.saveNews(schedulePostDate);
       }
     },
-    saveNews: function (datePublish) {
+    saveNews: function (schedulePostDate) {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
@@ -593,19 +593,16 @@ export default {
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         spaceId: this.spaceId,
-        publicationState: null,
+        publicationState: 'published',
         schedulePostDate: null,
         timeZoneId: null,
       };
 
-      if (datePublish != null){
+      if (schedulePostDate != null){
+        alert(schedulePostDate);
         news.publicationState ='staged';
-        news.schedulePostDate = datePublish;
+        news.schedulePostDate = schedulePostDate;
         news.timeZoneId = USER_TIMEZONE_ID;
-      } else {
-        news.publicationState ='published';
-        news.schedulePostDate = null;
-        news.timeZoneId = null;
       }
 
       if (this.news.illustration.length > 0) {

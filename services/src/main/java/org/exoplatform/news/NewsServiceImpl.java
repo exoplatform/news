@@ -60,7 +60,6 @@ import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -1141,34 +1140,36 @@ public class NewsServiceImpl implements NewsService {
             getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
-  public News scheduleNews(News news, String currentUser) throws Exception {
+  public News scheduleNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
                                                                   .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
+     
+                                                                  repositoryService.getCurrentRepository());
     News scheduledNews = null;
     try {
-      String datePublishFormatted = null;
-      Calendar startDate = Calendar.getInstance();
-      String schedulePostDate = news.getSchedulePostDate();
-      Node newsNode = session.getNodeByUUID(news.getId());
-      if (newsNode == null) {
+      Node scheduledNewsNode = session.getNodeByUUID(news.getId());
+      if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
+      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
+      if (!scheduledNews.isCanEdit()) {
+        throw new IllegalStateException("User not allowed to schedule the news: " + news.getId());
+      }
+      String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
-        String timeZoneId = news.getTimeZoneId();
-        ZoneId userTimeZone = StringUtils.isBlank(timeZoneId) ? ZoneOffset.UTC : ZoneId.of(timeZoneId);
+        ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
         String offsetTimeZone = String.valueOf(OffsetTime.now(userTimeZone).getOffset()).replace(":", "");
-        datePublishFormatted = schedulePostDate.concat(" ").concat(offsetTimeZone);
+        schedulePostDate = schedulePostDate.concat(" ").concat(offsetTimeZone);
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
-        startDate.setTime(format.parse(datePublishFormatted));
-        newsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startDate);
-        newsNode.setProperty(LAST_PUBLISHER, currentUser);
-        newsNode.save();
-        publicationService.changeState(newsNode, PublicationDefaultStates.STAGED, new HashMap<>());
-        scheduledNews = convertNodeToNews(newsNode, false);
+        Calendar startPublishedDate = Calendar.getInstance();
+        startPublishedDate.setTime(format.parse(schedulePostDate));
+        scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
+        scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
+        scheduledNewsNode.save();
+        publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }
     } finally {
       if (session != null) {

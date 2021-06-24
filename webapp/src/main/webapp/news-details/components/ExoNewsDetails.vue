@@ -133,6 +133,7 @@
         </div>
       </div>
     </div>
+    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -309,7 +310,7 @@ export default {
     deleteNews() {
       const deleteDelay = 6;
       const redirectionTime = 6100;
-      this.$newsServices.deleteNews(this.newsId, deleteDelay)
+      this.$newsServices.deleteNews(this.newsId, false, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
         });

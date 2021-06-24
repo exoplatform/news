@@ -1,6 +1,9 @@
 <template>
   <div id="newsDetails">
     <a class="backBtn" :href="spaceUrl"><i class="uiIconBack"></i></a>
+    <v-btn v-if="publicationState === 'staged'" class="btn newsDetailsActionMenu mt-6 pull-right">
+      {{ $t("news.composer.btn.scheduleArticle") }}
+    </v-btn>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -81,13 +84,22 @@
                   <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
                 <div v-if="showUpdateInfo" class="newsUpdater">
-                  <div>
+                  <div v-if="publicationState !== 'staged'">
                     <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
                   </div>
+                  <div v-else>
+                    <span class="newsInformationLabel">{{ $t('news.activity.scheduled') }} </span>
+                  </div>
                   <div>
-                    <template v-if="updatedDate">
+                    <template v-if="publicationState !== 'staged' && updatedDate">
                       <date-format
                         :value="updatedDate"
+                        :format="dateFormat"
+                        class="newsInformationValue newsUpdatedDate" />
+                    </template>
+                    <template v-else-if="publicationState === 'staged'">
+                      <date-format
+                        :value="scheduleDate"
                         :format="dateFormat"
                         class="newsInformationValue newsUpdatedDate" />
                     </template>
@@ -242,7 +254,13 @@ export default {
     },
     attachments() {
       return this.news && this.news.attachments;
-    }
+    },
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+    scheduleDate() {
+      return this.news && this.news.schedulePostDate;
+    },
   },
   created() {
     if (!this.news || !this.news.spaceId) {

@@ -800,6 +800,10 @@ public class NewsServiceImpl implements NewsService {
       newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/stagedNewsDetail?newsId=").append(news.getId());
       news.setUrl(newsUrl.toString());
     }
+    
+    if (node.hasProperty("publication:startPublishedDate")) {
+      news.setSchedulePostDate(node.getProperty("publication:startPublishedDate").getString());
+    }
 
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);

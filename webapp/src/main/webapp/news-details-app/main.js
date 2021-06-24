@@ -37,7 +37,9 @@ export function init() {
           newsId: getURLQueryParam('newsId'),
         };
       },
-      template: '<exo-news-detail-app :news-id="newsId"></exo-news-detail-app>',
+      template: `<v-app id="${appId}">
+                  <exo-news-detail-app :news-id="newsId"></exo-news-detail-app>
+                 </v-app>`,
       i18n,
       vuetify
     }).$mount(appElement);

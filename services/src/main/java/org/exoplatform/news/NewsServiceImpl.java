@@ -514,7 +514,7 @@ public class NewsServiceImpl implements NewsService {
 
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
-    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
   }
 
   public void unpinNews(String newsId) throws Exception {

@@ -623,9 +623,11 @@ export default {
         }
         if (createdNewsActivity) {
           window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
-        } else {
+        } else if (createdNews.publicationState === 'staged') {
           this.closeDrawer();
-          window.location.href = createdNews.spaceUrl;
+          window.location.href = createdNews.url;
+        } else {
+          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
         }
       });
     },

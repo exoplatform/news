@@ -162,7 +162,7 @@ export default {
     showPinButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     showDeleteButton: {
       type: Boolean,

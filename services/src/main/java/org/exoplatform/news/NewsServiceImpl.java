@@ -795,6 +795,12 @@ public class NewsServiceImpl implements NewsService {
         news.setActivities(memberSpaceActivities.toString());
       }
     }
+
+    if (StringUtils.equals(node.getProperty("publication:currentState").getString(), STAGED)) {
+      newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/stagedNewsDetail?newsId=").append(news.getId());
+      news.setUrl(newsUrl.toString());
+    }
+
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {

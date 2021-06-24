@@ -165,6 +165,7 @@ if (activity && news) {
        spaceDisplayName: "${news.spaceDisplayName}",
        spaceUrl:'${news.spaceUrl}',
        hiddenSpace: ${news.hiddenSpace},
+       isSpaceMember: ${news.isSpaceMember},
      },
     showShareButton: false,
     showEditButton: false,

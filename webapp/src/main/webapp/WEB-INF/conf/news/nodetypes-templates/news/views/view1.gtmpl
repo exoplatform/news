@@ -147,6 +147,7 @@
         url: '${news.url}',
         activityId: '${activityId}',
         hiddenSpace: ${news.hiddenSpace},
+        isSpaceMember: ${news.isSpaceMember},
       },
       showEditButton: $showEditButton,
       showPinInput: $showPinInput,

@@ -199,7 +199,7 @@ export default {
       return this.news && (this.news.profileAvatarURL || this.news.authorAvatarUrl);
     },
     backURL() {
-      return this.news && this.news.url.includes('/news/detail?content-id=') ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}` : this.news.spaceUrl;
+      return this.news && this.news.isSpaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
     },
     updaterFullName() {
       return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);

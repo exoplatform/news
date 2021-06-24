@@ -17,12 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NewsGamificationIntegrationListener extends Listener<String, String> {
-  private static final Log   LOG                                       =
+  private static final Log   LOG                                         =
                                  ExoLogger.getLogger(NewsGamificationIntegrationListener.class);
 
-  public static final String GAMIFICATION_GENERIC_EVENT                = "exo.gamification.generic.action";
+  public static final String GAMIFICATION_GENERIC_EVENT                   = "exo.gamification.generic.action";
 
-  public static final String GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE = "PostArticle";
+  public static final String GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE    = "PostArticle";
+
+  public static final String GAMIFICATION_PUBLISH_NEWS_ARTICLE_RULE_TITLE = "PublishArticle";
 
   private PortalContainer    container;
 
@@ -48,6 +50,8 @@ public class NewsGamificationIntegrationListener extends Listener<String, String
       String ruleTitle = "";
       if (StringUtils.equals(eventName, NewsUtils.POST_NEWS)) {
         ruleTitle = GAMIFICATION_POST_NEWS_ARTICLE_RULE_TITLE;
+      } else if (StringUtils.equals(eventName, NewsUtils.PUBLISH_NEWS)) {
+        ruleTitle = GAMIFICATION_PUBLISH_NEWS_ARTICLE_RULE_TITLE;
       }
       try {
         Map<String, String> gamificationMap = new HashMap<>();

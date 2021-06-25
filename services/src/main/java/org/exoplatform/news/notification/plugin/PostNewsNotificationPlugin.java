@@ -40,6 +40,8 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
 
+  public static final ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
+
   public static final ArgumentLiteral<String> ACTIVITY_LINK    = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
   public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT          = new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
@@ -88,6 +90,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     String contentSpaceId = ctx.value(CONTENT_SPACE_ID);
     String contentSpaceName = ctx.value(CONTENT_SPACE);
     String illustrationUrl = ctx.value(ILLUSTRATION_URL);
+    String authorAvatarUrl = ctx.value(AUTHOR_AVATAR_URL);
     String activityLink = ctx.value(ACTIVITY_LINK);
 
     List<String> receivers = new ArrayList<String>();
@@ -105,6 +108,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
                            .with(NotificationConstants.CURRENT_USER, currentUserFullName)
                            .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
                            .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
+                           .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
                            .with(NotificationConstants.CONTEXT, context.getContext())
                            .key(getKey())

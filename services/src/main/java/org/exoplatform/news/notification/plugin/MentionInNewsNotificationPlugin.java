@@ -25,6 +25,8 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
 
+  public static final ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
+
   public static final ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
   public static final ArgumentLiteral<Set> MENTIONED_IDS = new ArgumentLiteral<Set>(Set.class, "MENTIONED_IDS");
@@ -69,6 +71,7 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
     List<String> mentionedIds = new ArrayList<>(ctx.value(MENTIONED_IDS));
     String newsTitle = ctx.value(CONTENT_TITLE);
     String illustrationUrl = ctx.value(ILLUSTRATION_URL);
+    String authorAvatarUrl = ctx.value(AUTHOR_AVATAR_URL);
     String activityLink = ctx.value(ACTIVITY_LINK);
 
     return NotificationInfo.instance()
@@ -80,6 +83,7 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
             .with(NotificationConstants.CURRENT_USER, currentUserFullName)
             .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
             .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
+            .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
             .with(NotificationConstants.ACTIVITY_LINK, activityLink)
             .with(NotificationConstants.CONTEXT, context.getContext())
             .end();

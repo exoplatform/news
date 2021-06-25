@@ -73,7 +73,7 @@ public class MentionInNewsNotificationPluginTest {
                                                      .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
                                                      .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds)
-                                                     .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL,
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
                                                      .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
@@ -96,7 +96,6 @@ public class MentionInNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");

@@ -73,8 +73,10 @@ public class MentionInNewsNotificationPluginTest {
                                                      .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
                                                      .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds)
+                                                     .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                             "http://localhost:8080/rest/v1/news/id123/illustration")
                                                      .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL,
-                                                             "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);

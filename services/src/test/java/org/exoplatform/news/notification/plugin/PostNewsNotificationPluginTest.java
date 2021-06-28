@@ -67,8 +67,6 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CURRENT_USER, "root")
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
-                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
-                                                             "http://localhost:8080//rest/v1/news/id123/illustration")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -132,7 +130,7 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
-                                                             "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -198,7 +196,7 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
-                                                             "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);

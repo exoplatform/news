@@ -48,6 +48,18 @@
     </init-params>
   </component>
 
+  <component>
+    <key>ScheduleNewsFeatureProperties</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>ScheduleNewsFeatureProperties</name>
+        <description>News schedule Feature enablement flag</description>
+        <property name="exo.feature.news.postLater.enabled" value="${exo.feature.news.postLater.enabled:false}" />
+      </properties-param>
+    </init-params>
+  </component>
+
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
     <component-plugin>

@@ -610,7 +610,6 @@ export default {
       if (news.publicationState ==='staged') {
         this.$newsServices.scheduleNews(news).then((scheduleNews) => {
           if (scheduleNews) {
-            this.closeDrawer();
             window.location.href = scheduleNews.spaceUrl;
           }
         });

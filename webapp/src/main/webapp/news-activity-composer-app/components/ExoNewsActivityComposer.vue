@@ -110,7 +110,7 @@
             </textarea>
           </div>
           <v-alert
-            v-if="this.news.publicationState === 'draft' && this.activityId"
+            v-if="news.publicationState === 'draft' && activityId"
             dismissible
             border="left"
             elevation="2"
@@ -599,7 +599,6 @@ export default {
       };
 
       if (schedulePostDate != null){
-        alert(schedulePostDate);
         news.publicationState ='staged';
         news.schedulePostDate = schedulePostDate;
         news.timeZoneId = USER_TIMEZONE_ID;
@@ -608,22 +607,29 @@ export default {
       if (this.news.illustration.length > 0) {
         news.uploadId = this.news.illustration[0].uploadId;
       }
-
-      this.$newsServices.saveNews(news).then((createdNews) => {
-        let createdNewsActivity = null;
-        if (createdNews.activities) {
-          const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
-          if (createdNewsActivities.length > 1) {
-            createdNewsActivity = createdNewsActivities[1];
+      if (news.publicationState ==='staged') {
+        this.$newsServices.scheduleNews(news).then((scheduleNews) => {
+          if (scheduleNews) {
+            this.closeDrawer();
+            window.location.href = scheduleNews.spaceUrl;
           }
-        }
-        if (createdNewsActivity) {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
-        } else {
-          this.closeDrawer();
-          window.location.href = createdNews.spaceUrl;
-        }
-      });
+        });
+      } else {
+        this.$newsServices.saveNews(news).then((createdNews) => {
+          let createdNewsActivity = null;
+          if (createdNews.activities) {
+            const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
+            if (createdNewsActivities.length > 1) {
+              createdNewsActivity = createdNewsActivities[1];
+            }
+          }
+          if (createdNewsActivity) {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+          } else {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+          }
+        });
+      }
     },
     saveNewsDraft: function () {
       const news = {

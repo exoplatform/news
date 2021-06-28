@@ -142,17 +142,42 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       News createdNews;
       if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
-      } 
-      else if (PublicationDefaultStates.STAGED.equals(news.getPublicationState())) {
-        createdNews = newsService.scheduleNews(news);
-      }
-      else {
+      } else {
         createdNews = newsService.createNewsDraft(news);
       }
 
       return Response.ok(createdNews).build();
     } catch (Exception e) {
       LOG.error("Error when creating the news " + news.getTitle(), e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("scheduleNews")
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Schedule a news", httpMethod = "POST", response = Response.class, notes = "This schedules the news if the authenticated user is a member of the space or a spaces super manager. The news is created in staged status, after reaching a date of publication startPublishedDate, the publicationState property is set to 'published'.")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News scheduled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 401, message = "User not authorized to schedule the news"),
+          @ApiResponse(code = 500, message = "Internal server error") })
+  public Response scheduleNews(@Context HttpServletRequest request, @ApiParam(value = "News", required = true) News news) {
+    if (news == null || StringUtils.isEmpty(news.getSpaceId())) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    String authenticatedUser = request.getRemoteUser();
+    Space space = spaceService.getSpaceById(news.getSpaceId());
+    try {
+      if (!canCreateNews(authenticatedUser, space)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      News scheduledNews = newsService.scheduleNews(news);
+      return Response.ok(scheduledNews).build();
+    } catch (Exception e) {
+      LOG.error("Error when scheduling the news " + news.getTitle(), e);
       return Response.serverError().build();
     }
   }

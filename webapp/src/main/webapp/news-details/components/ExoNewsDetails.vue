@@ -1,6 +1,9 @@
 <template>
   <div id="newsDetails">
     <a class="backBtn" :href="backURL"><i class="uiIconBack"></i></a>
+    <v-btn v-if="publicationState === 'staged'" class="btn newsDetailsActionMenu mt-6 pull-right">
+      {{ $t("news.composer.btn.scheduleArticle") }}
+    </v-btn>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -15,7 +18,7 @@
       :ok-label="$t('news.button.ok')"
       :cancel-label="$t('news.button.cancel')"
       @ok="deleteNews" />
-    <div v-if="news.archived && !news.canArchive">
+    <div v-if="archivedNews && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">
           <img src="/news/images/notauthorized.png" class="iconNotAuthorized">
@@ -24,10 +27,10 @@
       </div>
     </div>
     <div v-else class="newsDetails-description">
-      <div :class="[news.illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
-        <div v-if="news.illustrationURL" class="illustration">
+      <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
+        <div v-if="illustrationURL" class="illustration">
           <img
-            :src="news.illustrationURL"
+            :src="illustrationURL"
             class="newsDetailsImage illustrationPicture"
             alt="News">
         </div>
@@ -37,19 +40,19 @@
               v-if="showPinButton"
               :news-id="newsId"
               :news-pinned="news.pinned"
-              :news-archived="news.archived"
-              :news-title="news.title" />
+              :news-archived="archivedNews"
+              :news-title="newsTitle" />
           </div>
           <div class="news-top-information d-flex">
             <div id="titleNews" class="newsTitle newsTitleMobile">
-              <a class="activityLinkColor newsTitleLink">{{ news.title }}</a>
+              <a class="activityLinkColor newsTitleLink">{{ newsTitle }}</a>
             </div>
-            <div v-if="news.archived" class="newsArchived">
+            <div v-if="archivedNews" class="newsArchived">
               <exo-news-archive
-                v-if="news.archived"
+                v-if="archivedNews"
                 :news-id="newsId"
-                :news-archived="news.archived"
-                :news-title="news.title"
+                :news-archived="archivedNews"
+                :news-title="newsTitle"
                 :pinned="news.pinned"
                 @update-archived-field="updateArchivedField" />
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
@@ -67,9 +70,9 @@
               <div id="informationNews" class="newsInformation">
                 <div class="newsAuthor">
                   <a :href="authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ authorFullName }} </a>
-                  <span v-if="!news.hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
-                  <div v-if="!news.hiddenSpace" class="newsSpace">
-                    <a :href="news.spaceUrl" class="newsInformationLabel news-details-information">{{ news.spaceDisplayName }}</a>
+                  <span v-if="!hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
+                  <div v-if="!hiddenSpace" class="newsSpace">
+                    <a :href="spaceUrl" class="newsInformationLabel news-details-information">{{ spaceDisplayName }}</a>
                   </div>
                   <template v-if="publicationDate">
                     -
@@ -78,21 +81,29 @@
                       :format="dateFormat"
                       class="newsInformationValue newsPostedDate news-details-information" />
                   </template>
-                  <span v-else-if="news.postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ news.postedDate }}</span>
+                  <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
                 <div v-if="showUpdateInfo" class="newsUpdater">
-                  <div>
+                  <div v-if="publicationState !== 'staged'">
                     <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
                   </div>
+                  <div v-else>
+                    <span class="newsInformationLabel">{{ $t('news.activity.scheduled') }} </span>
+                  </div>
                   <div>
-                    <template v-if="updatedDate">
+                    <template v-if="publicationState !== 'staged' && updatedDate">
                       <date-format
                         :value="updatedDate"
                         :format="dateFormat"
                         class="newsInformationValue newsUpdatedDate" />
                     </template>
+                    <template v-else-if="publicationState === 'staged'">
+                      <date-format
+                        :value="scheduleDate"
+                        :format="dateFormat"
+                        class="newsInformationValue newsUpdatedDate" />
+                    </template>
                     <div v-else-if="news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
-
                     <div v-if="notSameUpdater">
                       <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
                       <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
@@ -112,18 +123,18 @@
 
           <div
             id="newsBody"
-            :class="[!news.summary ? 'fullDetailsBodyNoSummary' : '']"
+            :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
             <span v-html="newsBody"></span>
           </div>
 
-          <div v-show="news.attachments && news.attachments.length" class="newsAttachmentsTitle">
-            {{ $t('news.details.attachments.title') }} ({{ news.attachments ? news.attachments.length : 0 }})
+          <div v-show="attachments && attachments.length" class="newsAttachmentsTitle">
+            {{ $t('news.details.attachments.title') }} ({{ attachments ? attachments.length : 0 }})
           </div>
 
-          <div v-show="news.attachments && news.attachments.length" class="newsAttachments">
+          <div v-show="attachments && attachments.length" class="newsAttachments">
             <div
-              v-for="attachedFile in news.attachments"
+              v-for="attachedFile in attachments"
               :key="attachedFile.id"
               class="newsAttachment"
               @click="openPreview(attachedFile)">
@@ -162,7 +173,7 @@ export default {
     showPinButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: false
     },
     showDeleteButton: {
       type: Boolean,
@@ -175,7 +186,6 @@ export default {
       spaceId: null,
       updaterIdentity: null,
       BYTES_IN_MB: 1048576,
-      spaceDisplayName: this.news.spaceDisplayName,
       dateFormat: {
         year: 'numeric',
         month: 'long',
@@ -185,7 +195,7 @@ export default {
   },
   computed: {
     newsBody() {
-      return this.targetBlank(this.news.body);
+      return this.news && this.targetBlank(this.news.body);
     },
     showUpdateInfo() {
       return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
@@ -218,8 +228,41 @@ export default {
       return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
     },
     newsSummary() {
-      return this.targetBlank(this.news.summary);
-    }
+      return this.news && this.targetBlank(this.news.summary);
+    },
+    spaceDisplayName() {
+      return this.news && this.news.spaceDisplayName;
+    },
+    spaceUrl() {
+      return this.news && this.news.spaceUrl;
+    },
+    archivedNews() {
+      return this.news && this.news.archived;
+    },
+    illustrationURL() {
+      return this.news && this.news.illustrationURL;
+    },
+    newsTitle() {
+      return this.news && this.news.title;
+    },
+    hiddenSpace() {
+      return this.news && this.news.hiddenSpace;
+    },
+    postedDate() {
+      return this.news && this.news.postedDate;
+    },
+    summary() {
+      return this.news && this.news.summary;
+    },
+    attachments() {
+      return this.news && this.news.attachments;
+    },
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+    scheduleDate() {
+      return this.news && this.news.schedulePostDate;
+    },
   },
   created() {
     if (!this.news || !this.news.spaceId) {

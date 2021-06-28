@@ -97,10 +97,6 @@ export default {
         this.$refs.postNewsDrawer.open();
       }
     },
-    close() {
-      this.disabled = false;
-      this.$refs.postNewsDrawer.close();
-    },
     initializeDate() {
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate()+1);

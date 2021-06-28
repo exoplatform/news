@@ -553,9 +553,6 @@ export default {
         this.$refs.postNewsDrawer.open();
       }
     },
-    closeDrawer() {
-      this.$refs.postNewsDrawer.close();
-    },
     postNews: function (schedulePostDate) {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');

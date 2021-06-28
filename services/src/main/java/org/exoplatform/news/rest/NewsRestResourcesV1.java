@@ -153,8 +153,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
   }
 
-  @Path("scheduleNews")
-  @POST
+  @Path("schedule")
+  @PATCH
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
@@ -163,21 +163,28 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           @ApiResponse(code = 400, message = "Invalid query input"),
           @ApiResponse(code = 401, message = "User not authorized to schedule the news"),
           @ApiResponse(code = 500, message = "Internal server error") })
-  public Response scheduleNews(@Context HttpServletRequest request, @ApiParam(value = "News", required = true) News news) {
-    if (news == null || StringUtils.isEmpty(news.getSpaceId())) {
+  public Response scheduleNews(@Context HttpServletRequest request,
+                               @ApiParam(value = "News", required = true) News scheduledNews) {
+    if (scheduledNews == null || StringUtils.isEmpty(scheduledNews.getId())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-
-    String authenticatedUser = request.getRemoteUser();
-    Space space = spaceService.getSpaceById(news.getSpaceId());
     try {
-      if (!canCreateNews(authenticatedUser, space)) {
+      News news = newsService.getNewsById(scheduledNews.getId(), false);
+      if (news == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      if (!news.isCanEdit()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      News scheduledNews = newsService.scheduleNews(news);
-      return Response.ok(scheduledNews).build();
+      if (news.getSchedulePostDate() == null) {
+        news.setSchedulePostDate(scheduledNews.getSchedulePostDate());
+        news.setPublicationState(scheduledNews.getPublicationState());
+        news.setTimeZoneId(scheduledNews.getTimeZoneId());
+      }
+      News StoredScheduledNews = newsService.scheduleNews(news);
+      return Response.ok(StoredScheduledNews).build();
     } catch (Exception e) {
-      LOG.error("Error when scheduling the news " + news.getTitle(), e);
+      LOG.error("Error when scheduling the news " + scheduledNews.getTitle(), e);
       return Response.serverError().build();
     }
   }

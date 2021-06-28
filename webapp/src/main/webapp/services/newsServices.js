@@ -63,12 +63,12 @@ export function saveNews(news) {
 }
 
 export function scheduleNews(news) {
-  return fetch(`${newsConstants.NEWS_API}/scheduleNews`, {
+  return fetch(`${newsConstants.NEWS_API}/schedule`, {
     headers: {
       'Content-Type': 'application/json'
     },
     credentials: 'include',
-    method: 'POST',
+    method: 'PATCH',
     body: JSON.stringify(news)
   }).then((data) => {
     return data.json();

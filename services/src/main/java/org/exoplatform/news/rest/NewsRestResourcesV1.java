@@ -173,16 +173,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      if (!news.isCanEdit()) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
-      if (news.getSchedulePostDate() == null) {
-        news.setSchedulePostDate(scheduledNews.getSchedulePostDate());
-        news.setPublicationState(scheduledNews.getPublicationState());
-        news.setTimeZoneId(scheduledNews.getTimeZoneId());
-      }
-      News StoredScheduledNews = newsService.scheduleNews(news);
-      return Response.ok(StoredScheduledNews).build();
+      news = newsService.scheduleNews(scheduledNews);
+      return Response.ok(news).build();
     } catch (Exception e) {
       LOG.error("Error when scheduling the news " + scheduledNews.getTitle(), e);
       return Response.serverError().build();

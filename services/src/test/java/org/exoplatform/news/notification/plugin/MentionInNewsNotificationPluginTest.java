@@ -98,6 +98,7 @@ public class MentionInNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
+    PostNewsNotificationPluginTest.mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -116,8 +117,10 @@ public class MentionInNewsNotificationPluginTest {
     assertEquals("", notificationInfo.getTitle());
     assertEquals("title", notificationInfo.getValueOwnerParameter("CONTENT_TITLE"));
     assertEquals("root", notificationInfo.getValueOwnerParameter("CONTENT_AUTHOR"));
-    assertEquals("http://localhost:8080//rest/v1/news/id123/illustration",
+    assertEquals("http://localhost:8080/rest/v1/news/id123/illustration",
                  notificationInfo.getValueOwnerParameter("ILLUSTRATION_URL"));
+    assertEquals("http://localhost:8080/portal/rest/v1/social/users/default-image/avatar",
+                 notificationInfo.getValueOwnerParameter("AUTHOR_AVATAR_URL"));
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));
     assertEquals("http://localhost:8080/portal/intranet/activity?id=38",
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));

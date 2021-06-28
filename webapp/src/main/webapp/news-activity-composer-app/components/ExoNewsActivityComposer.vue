@@ -559,7 +559,7 @@ export default {
         const captionText = this.$t('news.broadcast.action');
         const confirmButton = this.$t('news.broadcast.btn.confirm');
         const cancelButton = this.$t('news.edit.cancel');
-        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
+        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews(schedulePostDate), label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
         this.doPostNews(schedulePostDate);
       }
@@ -607,7 +607,7 @@ export default {
       if (news.publicationState ==='staged') {
         this.$newsServices.scheduleNews(news).then((scheduleNews) => {
           if (scheduleNews) {
-            window.location.href = scheduleNews.spaceUrl;
+            window.location.href = scheduleNews.url;
           }
         });
       } else {

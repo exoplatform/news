@@ -173,6 +173,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
+      if (!news.isCanEdit()) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       news = newsService.scheduleNews(scheduledNews);
       return Response.ok(news).build();
     } catch (Exception e) {

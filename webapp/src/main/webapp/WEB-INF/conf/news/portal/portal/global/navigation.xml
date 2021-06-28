@@ -46,6 +46,13 @@
                 <visibility>SYSTEM</visibility>
                 <page-reference>portal::global::newsDetail</page-reference>
             </node>
+
+            <node>
+                <name>stagedNewsDetail</name>
+                <label>#{portal.global.newsDetail}</label>
+                <visibility>SYSTEM</visibility>
+                <page-reference>portal::global::stagedNewsDetails</page-reference>
+            </node>
         </node>
     </page-nodes>
 </node-navigation>

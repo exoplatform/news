@@ -799,8 +799,15 @@ public class NewsServiceImpl implements NewsService {
           }
         }
         news.setActivities(memberSpaceActivities.toString());
+      } else {
+        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/stagedNewsDetail?newsId=").append(news.getId());
+        news.setUrl(newsUrl.toString());
       }
     }
+    if (node.hasProperty("publication:startPublishedDate")) {
+      news.setSchedulePostDate(node.getProperty("publication:startPublishedDate").getString());
+    }
+    
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
@@ -1154,10 +1161,6 @@ public class NewsServiceImpl implements NewsService {
       if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
-      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
-      if (!scheduledNews.isCanEdit()) {
-        throw new IllegalStateException("User not allowed to schedule the news: " + news.getId());
-      }
       String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
         ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
@@ -1171,6 +1174,7 @@ public class NewsServiceImpl implements NewsService {
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }
+      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
     } finally {
       if (session != null) {
         session.logout();

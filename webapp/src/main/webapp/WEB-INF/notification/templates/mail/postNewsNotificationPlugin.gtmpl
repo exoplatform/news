@@ -77,24 +77,6 @@ switch(CONTEXT) {
  case "MENTION IN NEWS":
    notificationDescription =  _ctx.appRes("news.notification.description.mention.in.news",CONTENT_TITLE);
    break;
- case "SHARE NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
-   break;
- case "SHARE MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
-   break;
- case "LIKE MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
-   break;
- case "LIKE MY SHARED NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
-   break;
- case "COMMENT MY NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
-   break;
- case "COMMENT MY SHARED NEWS":
-   notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
-   break;
  default:
    break;
 }

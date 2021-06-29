@@ -63,7 +63,9 @@ import org.exoplatform.services.wcm.extensions.publication.WCMPublicationService
 import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManagerImpl;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
+import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -720,7 +722,7 @@ public class NewsServiceImplTest {
     Mockito.doNothing().when(newsServiceSpy).pinNews("id123");
     Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft);
-    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
+    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
     Mockito.doNothing()
            .when(newsServiceSpy)
            .sendNotification(createdNewsDraft, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -1301,7 +1303,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
-    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
+    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
     Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     // When
@@ -1371,7 +1373,7 @@ public class NewsServiceImplTest {
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
     Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
-    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, "published", new HashMap<>());
+    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
     Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     // When
@@ -2219,9 +2221,9 @@ public class NewsServiceImplTest {
     when(node2.hasProperty("exo:title")).thenReturn(true);
     when(node3.getProperty("exo:title")).thenReturn(property3);
     when(node3.hasProperty("exo:title")).thenReturn(true);
-    when(node1.getProperty("publication:currentState")).thenReturn(property4);
-    when(node2.getProperty("publication:currentState")).thenReturn(property4);
-    when(node3.getProperty("publication:currentState")).thenReturn(property4);
+    when(node1.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
+    when(node2.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
+    when(node3.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
     when(property1.getString()).thenReturn("title1");
     when(property2.getString()).thenReturn("title2");
     when(property3.getString()).thenReturn("title3");
@@ -2229,6 +2231,11 @@ public class NewsServiceImplTest {
     when(property1.getDate()).thenReturn(Calendar.getInstance());
     when(property2.getDate()).thenReturn(Calendar.getInstance());
     when(property3.getDate()).thenReturn(Calendar.getInstance());
+    when(property4.getString()).thenReturn("");
+    when(node1.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
+    when(node2.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
+    when(node3.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)).thenReturn(property4);
+
     when(node1.getProperty("exo:pinned")).thenReturn(property1);
     when(node2.getProperty("exo:pinned")).thenReturn(property2);
     when(node3.getProperty("exo:pinned")).thenReturn(property3);
@@ -3258,7 +3265,7 @@ public class NewsServiceImplTest {
     news.setCreationDate(new Date());
     news.setUploadId(null);
     news.setViewsCount((long) 10);
-    news.setPublicationState("published");
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
     news.setPublicationDate(Calendar.getInstance().getTime());
 
     // when

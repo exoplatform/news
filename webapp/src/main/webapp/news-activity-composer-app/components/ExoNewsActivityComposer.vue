@@ -11,7 +11,7 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
-      <exo-news-publish-drawer ref="publishNewsDrawer" @post-article="postNews" />
+      <exo-news-post-drawer ref="postNewsDrawer" @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -110,7 +110,7 @@
             </textarea>
           </div>
           <v-alert
-            v-if="this.news.publicationState === 'draft' && this.activityId"
+            v-if="news.publicationState === 'draft' && activityId"
             dismissible
             border="left"
             elevation="2"
@@ -183,6 +183,7 @@
 
 <script>
 import autosize from 'autosize';
+const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
 export default {
   props: {
     newsId: {
@@ -548,11 +549,11 @@ export default {
       }, this.autoSaveDelay);
     },
     openDrawer() {
-      if (this.$refs.publishNewsDrawer) {
-        this.$refs.publishNewsDrawer.open();
+      if (this.$refs.postNewsDrawer) {
+        this.$refs.postNewsDrawer.open();
       }
     },
-    postNews: function () {
+    postNews: function (schedulePostDate) {
       if (this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');
         const captionText = this.$t('news.broadcast.action');
@@ -560,20 +561,20 @@ export default {
         const cancelButton = this.$t('news.edit.cancel');
         eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews, label: confirmButton}], captionText, confirmText, cancelButton);
       } else {
-        this.doPostNews();
+        this.doPostNews(schedulePostDate);
       }
     },
-    doPostNews: function () {
+    doPostNews: function (schedulePostDate) {
       this.postingNews = true;
       // if the News draft is being saved, we have to wait until it is done before posting the News
       if (this.savingDraft) {
         this.$on('draftCreated', this.saveNews);
         this.$on('draftUpdated', this.saveNews);
       } else {
-        this.saveNews();
+        this.saveNews(schedulePostDate);
       }
     },
-    saveNews: function () {
+    saveNews: function (schedulePostDate) {
       clearTimeout(this.saveDraft);
       this.$off('draftCreated', this.saveNews);
       this.$off('draftUpdated', this.saveNews);
@@ -589,27 +590,42 @@ export default {
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         spaceId: this.spaceId,
-        publicationState: 'published'
+        publicationState: 'published',
+        schedulePostDate: null,
+        timeZoneId: null,
       };
+
+      if (schedulePostDate != null){
+        news.publicationState ='staged';
+        news.schedulePostDate = schedulePostDate;
+        news.timeZoneId = USER_TIMEZONE_ID;
+      }
 
       if (this.news.illustration.length > 0) {
         news.uploadId = this.news.illustration[0].uploadId;
       }
-
-      this.$newsServices.saveNews(news).then((createdNews) => {
-        let createdNewsActivity = null;
-        if (createdNews.activities) {
-          const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
-          if (createdNewsActivities.length > 1) {
-            createdNewsActivity = createdNewsActivities[1];
+      if (news.publicationState ==='staged') {
+        this.$newsServices.scheduleNews(news).then((scheduleNews) => {
+          if (scheduleNews) {
+            window.location.href = scheduleNews.spaceUrl;
           }
-        }
-        if (createdNewsActivity) {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
-        } else {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
-        }
-      });
+        });
+      } else {
+        this.$newsServices.saveNews(news).then((createdNews) => {
+          let createdNewsActivity = null;
+          if (createdNews.activities) {
+            const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
+            if (createdNewsActivities.length > 1) {
+              createdNewsActivity = createdNewsActivities[1];
+            }
+          }
+          if (createdNewsActivity) {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+          } else {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+          }
+        });
+      }
     },
     saveNewsDraft: function () {
       const news = {

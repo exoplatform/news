@@ -2,16 +2,31 @@ package org.exoplatform.news;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.jcr.*;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -103,8 +118,6 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
 
-  public static final String       CURRENT_STATE                   = "publication:currentState";
-
   public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
 
   public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
@@ -114,6 +127,8 @@ public class NewsServiceImpl implements NewsService {
   private static final String      HTML_AT_SYMBOL_PATTERN          = "@";
 
   private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN  = "&#64;";
+
+  private static final String      LAST_PUBLISHER                  = "publication:lastUser";
 
   private RepositoryService        repositoryService;
 
@@ -378,8 +393,8 @@ public class NewsServiceImpl implements NewsService {
           session.getWorkspace().move(srcPath, destPath);
         }
 
-        if ("published".equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, "published", new HashMap<>());
+        if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+          publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
           if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
             newsNode.removeMixin(MIX_NEWS_MODIFIERS);
             newsNode.save();
@@ -706,7 +721,7 @@ public class NewsServiceImpl implements NewsService {
     if (node == null) {
       return null;
     }
-    if (!editMode && node.getProperty(CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
+    if (!editMode && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT) && node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP)) {
       String versionNodeUUID = node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString();
       Node versionNode = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID);
       node = versionNode.getNode("jcr:frozenNode");
@@ -743,8 +758,8 @@ public class NewsServiceImpl implements NewsService {
     news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
-    if (node.hasProperty("publication:currentState")) {
-      news.setPublicationState(node.getProperty("publication:currentState").getString());
+    if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)) {
+      news.setPublicationState(node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString());
     }
     if (originalNode.hasProperty("exo:pinned")) {
       news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
@@ -757,6 +772,7 @@ public class NewsServiceImpl implements NewsService {
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
+    StringBuilder newsUrl = new StringBuilder("");
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();
       if(StringUtils.isNotEmpty(strActivities)) {
@@ -767,7 +783,6 @@ public class NewsServiceImpl implements NewsService {
         String newsActivityId = activities[0].split(":")[1];
         news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
-        StringBuilder newsUrl = new StringBuilder("");
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
@@ -791,7 +806,6 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
-
     if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
@@ -998,7 +1012,7 @@ public class NewsServiceImpl implements NewsService {
       newsDraftNode.setProperty("publication:lifecycle", lifecycle.getName());
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
-    publicationService.changeState(newsDraftNode, "draft", new HashMap<>());
+    publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
     newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
     spaceNewsRootNode.save();
 
@@ -1124,6 +1138,45 @@ public class NewsServiceImpl implements NewsService {
   public boolean canPinNews() {
     return  getCurrentIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
             getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  public News scheduleNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+     
+                                                                  repositoryService.getCurrentRepository());
+    News scheduledNews = null;
+    try {
+      Node scheduledNewsNode = session.getNodeByUUID(news.getId());
+      if (scheduledNewsNode == null) {
+        throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
+      }
+      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
+      if (!scheduledNews.isCanEdit()) {
+        throw new IllegalStateException("User not allowed to schedule the news: " + news.getId());
+      }
+      String schedulePostDate = news.getSchedulePostDate();
+      if (schedulePostDate != null) {
+        ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
+        String offsetTimeZone = String.valueOf(OffsetTime.now(userTimeZone).getOffset()).replace(":", "");
+        schedulePostDate = schedulePostDate.concat(" ").concat(offsetTimeZone);
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
+        Calendar startPublishedDate = Calendar.getInstance();
+        startPublishedDate.setTime(format.parse(schedulePostDate));
+        scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
+        scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
+        scheduledNewsNode.save();
+        publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
+      }
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+    return scheduledNews;
   }
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {

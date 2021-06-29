@@ -45,6 +45,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -139,7 +140,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       News createdNews;
-      if ("published".equals(news.getPublicationState())) {
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
       } else {
         createdNews = newsService.createNewsDraft(news);
@@ -148,6 +149,34 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.ok(createdNews).build();
     } catch (Exception e) {
       LOG.error("Error when creating the news " + news.getTitle(), e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("schedule")
+  @PATCH
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Schedule a news", httpMethod = "POST", response = Response.class, notes = "This schedules the news if the authenticated user is a member of the space or a spaces super manager. The news is created in staged status, after reaching a date of publication startPublishedDate, the publicationState property is set to 'published'.")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News scheduled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 401, message = "User not authorized to schedule the news"),
+          @ApiResponse(code = 500, message = "Internal server error") })
+  public Response scheduleNews(@Context HttpServletRequest request,
+                               @ApiParam(value = "News", required = true) News scheduledNews) {
+    if (scheduledNews == null || StringUtils.isEmpty(scheduledNews.getId())) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    try {
+      News news = newsService.getNewsById(scheduledNews.getId(), false);
+      if (news == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      news = newsService.scheduleNews(scheduledNews);
+      return Response.ok(news).build();
+    } catch (Exception e) {
+      LOG.error("Error when scheduling the news " + scheduledNews.getTitle(), e);
       return Response.serverError().build();
     }
   }
@@ -653,7 +682,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.serverError().build();
     }
   }
-
+  
   @POST
   @Path("{id}/view")
   @RolesAllowed("users")

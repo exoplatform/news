@@ -62,6 +62,19 @@ export function saveNews(news) {
   });
 }
 
+export function scheduleNews(news) {
+  return fetch(`${newsConstants.NEWS_API}/schedule`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    method: 'PATCH',
+    body: JSON.stringify(news)
+  }).then((data) => {
+    return data.json();
+  });
+}
+
 export function importFileFromUrl(url) {
   return fetch(url, {
     headers: {

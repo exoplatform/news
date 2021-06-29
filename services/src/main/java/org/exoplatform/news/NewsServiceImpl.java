@@ -784,7 +784,7 @@ public class NewsServiceImpl implements NewsService {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
         } else {
-          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
@@ -797,14 +797,14 @@ public class NewsServiceImpl implements NewsService {
         }
         news.setActivities(memberSpaceActivities.toString());
       } else {
-        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/stagedNewsDetail?newsId=").append(news.getId());
+        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
         news.setUrl(newsUrl.toString());
       }
     }
-    if (node.hasProperty("publication:startPublishedDate")) {
-      news.setSchedulePostDate(node.getProperty("publication:startPublishedDate").getString());
+    if (node.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
+      news.setSchedulePostDate(node.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).getString());
     }
-    
+
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
@@ -1166,6 +1166,7 @@ public class NewsServiceImpl implements NewsService {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
         Calendar startPublishedDate = Calendar.getInstance();
         startPublishedDate.setTime(format.parse(schedulePostDate));
+        scheduledNewsNode.setProperty("exo:pinned", news.isPinned());
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.save();
@@ -1176,6 +1177,9 @@ public class NewsServiceImpl implements NewsService {
       if (session != null) {
         session.logout();
       }
+    }
+    if (news.isPinned()) {
+      pinNews(news.getId());
     }
     return scheduledNews;
   }

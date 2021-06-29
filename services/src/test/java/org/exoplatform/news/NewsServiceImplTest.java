@@ -31,7 +31,6 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
@@ -43,7 +42,6 @@ import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.documents.TrashService;
-import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -2331,6 +2329,8 @@ public class NewsServiceImplTest {
   public void shouldNotSendNotificationAsNewsNodeDoesNotExist() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
                                                       sessionProviderService,
@@ -2378,6 +2378,7 @@ public class NewsServiceImplTest {
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
 
@@ -2426,6 +2427,9 @@ public class NewsServiceImplTest {
     space1.setGroupId("space1");
     space1.setVisibility("private");
 
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
+
     Node newsNode = mock(Node.class);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2438,9 +2442,8 @@ public class NewsServiceImplTest {
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
     when(newsNode.hasNode("illustration")).thenReturn(true);
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
 
     PowerMockito.mockStatic(LinkProvider.class);
     when(LinkProvider.getSingleActivityUrl("38")).thenReturn("portal/intranet/activity?id=38");
@@ -2470,8 +2473,8 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
-    when(ctx.append(AUTHOR_AVATAR_URL, "")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/id123/illustration")).thenReturn(ctx);
+    when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
@@ -2978,6 +2981,7 @@ public class NewsServiceImplTest {
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
     when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
 
     when(newsNode.hasNode("illustration")).thenReturn(true);
     PowerMockito.mockStatic(PropertyManager.class);
@@ -3014,8 +3018,8 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/1234/illustration")).thenReturn(ctx);
-    when(ctx.append(AUTHOR_AVATAR_URL, "")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/1234/illustration")).thenReturn(ctx);
+    when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=1")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)).thenReturn(ctx);
 
@@ -3034,6 +3038,9 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("root"))).thenReturn(rootIdentity);
+
     Profile profile = johnIdentity.getProfile();
     profile.setUrl("/profile/john");
     profile.setProperty("fullName", "john john");

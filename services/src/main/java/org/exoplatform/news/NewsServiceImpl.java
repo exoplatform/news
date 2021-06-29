@@ -94,6 +94,7 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
@@ -1220,11 +1221,8 @@ public class NewsServiceImpl implements NewsService {
     if (contentSpace == null) {
       throw new NullPointerException("Cannot find a space with id " + contentSpaceId + ", it may not exist");
     }
-    String authorAvatarUrl = "";
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), true);
-    if (identity != null && identity.getProfile() != null) {
-      authorAvatarUrl = identity.getProfile().getAvatarUrl();
-    }
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor());
+    String authorAvatarUrl = LinkProviderUtils.getUserAvatarUrl(identity.getProfile());
     String illustrationURL = NotificationUtils.getNewsIllustration(news);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();

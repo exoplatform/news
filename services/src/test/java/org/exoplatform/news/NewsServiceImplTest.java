@@ -31,7 +31,6 @@ import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
@@ -43,7 +42,6 @@ import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.documents.TrashService;
-import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -554,10 +552,6 @@ public class NewsServiceImplTest {
     sharedNews.setSpacesNames(Arrays.asList("space1"));
     sharedNews.setNewsId("1");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS));
-    Mockito.doNothing()
-           .when(newsServiceSpy)
-           .sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS));
     Mockito.doReturn(true).when(newsServiceSpy).canEditNews(any(),any());
 
     // When
@@ -2331,6 +2325,8 @@ public class NewsServiceImplTest {
   public void shouldNotSendNotificationAsNewsNodeDoesNotExist() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
                                                       sessionProviderService,
@@ -2378,6 +2374,7 @@ public class NewsServiceImplTest {
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
 
@@ -2426,6 +2423,9 @@ public class NewsServiceImplTest {
     space1.setGroupId("space1");
     space1.setVisibility("private");
 
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
+
     Node newsNode = mock(Node.class);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -2438,9 +2438,8 @@ public class NewsServiceImplTest {
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
     when(newsNode.hasNode("illustration")).thenReturn(true);
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
 
     PowerMockito.mockStatic(LinkProvider.class);
     when(LinkProvider.getSingleActivityUrl("38")).thenReturn("portal/intranet/activity?id=38");
@@ -2457,6 +2456,8 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
 
+    ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
+
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
     ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
@@ -2468,7 +2469,8 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/id123/illustration")).thenReturn(ctx);
+    when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
@@ -2491,225 +2493,6 @@ public class NewsServiceImplTest {
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);
 
-  }
-
-  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class,
-      CommonsUtils.class })
-  @Test
-  public void shouldSendNotificationForShareNewsContext() throws Exception {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    News news = new News();
-    news.setTitle("title");
-    news.setAuthor("root");
-    news.setId("id123");
-    news.setSpaceId("1");
-    news.setActivities("1:38");
-
-    Space space1 = new Space();
-    space1.setId("1");
-    space1.setDisplayName("space1");
-    space1.setGroupId("space1");
-    space1.setVisibility("private");
-
-    Node newsNode = mock(Node.class);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(spaceService.getSpaceById("1")).thenReturn(space1);
-    when(spaceService.isMember(space1, "root")).thenReturn(true);
-    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
-    when(newsNode.hasNode("illustration")).thenReturn(true);
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
-    when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
-    PowerMockito.mockStatic(LinkProvider.class);
-    when(LinkProvider.getSingleActivityUrl("38")).thenReturn("portal/intranet/activity?id=38");
-    PowerMockito.mockStatic(NotificationContextImpl.class);
-    NotificationContext ctx = mock(NotificationContext.class);
-    NotificationExecutor executor = mock(NotificationExecutor.class);
-    ArgumentLiteral<String> CONTENT_TITLE = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
-
-    ArgumentLiteral<String> CONTENT_AUTHOR = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
-
-    ArgumentLiteral<String> CURRENT_USER = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
-
-    ArgumentLiteral<String> CONTENT_SPACE = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
-
-    ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
-
-    ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
-
-    ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
-
-    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
-                                                                        new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
-                                                                                                                                        "CONTEXT");
-
-    when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
-    when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
-    when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
-    when(ctx.append(CURRENT_USER, "root")).thenReturn(ctx);
-    when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
-    when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
-    when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
-    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)).thenReturn(ctx);
-
-    when(ctx.getNotificationExecutor()).thenReturn(executor);
-    PowerMockito.mockStatic(PluginKey.class);
-    PluginKey plugin = mock(PluginKey.class);
-    when(PluginKey.key("ShareNewsNotificationPlugin")).thenReturn(plugin);
-    NotificationCommand notificationCommand = mock(NotificationCommand.class);
-    when(ctx.makeCommand(plugin)).thenReturn(notificationCommand);
-    NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
-    when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
-    when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-
-    // When
-    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
-
-    // Then
-    verify(notificationExecutor, times(1)).execute(ctx);
-
-  }
-
-  @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class,
-      CommonsUtils.class })
-  @Test
-  public void shouldSendNotificationForShareMyNewsContext() throws Exception {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    News news = new News();
-    news.setTitle("title");
-    news.setAuthor("root");
-    news.setId("id123");
-    news.setSpaceId("1");
-    news.setActivities("2:39;1:38");
-
-    Space space1 = new Space();
-    space1.setId("1");
-    space1.setDisplayName("space1");
-    space1.setPrettyName("space1");
-    space1.setGroupId("space1");
-    space1.setVisibility("private");
-
-    Node newsNode = mock(Node.class);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(spaceService.getSpaceById("1")).thenReturn(space1);
-    when(spaceService.isMember(space1, "root")).thenReturn(true);
-    when(session.getNodeByUUID("id123")).thenReturn(newsNode);
-    when(newsNode.hasNode("illustration")).thenReturn(true);
-    when(spaceService.isMember(space1, news.getAuthor())).thenReturn(true);
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080/");
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
-    when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
-    PowerMockito.mockStatic(LinkProvider.class);
-    when(LinkProvider.getSingleActivityUrl("38")).thenReturn("portal/intranet/activity?id=38");
-    PowerMockito.mockStatic(NotificationContextImpl.class);
-    NotificationContext ctx = mock(NotificationContext.class);
-    NotificationExecutor executor = mock(NotificationExecutor.class);
-    ArgumentLiteral<String> CONTENT_TITLE = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
-
-    ArgumentLiteral<String> CONTENT_AUTHOR = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
-
-    ArgumentLiteral<String> CURRENT_USER = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
-
-    ArgumentLiteral<String> CONTENT_SPACE = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
-
-    ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
-
-    ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
-
-    ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
-
-    ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
-                                                                        new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
-                                                                                                                                        "CONTEXT");
-
-    when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
-    when(ctx.append(CONTENT_TITLE, "title")).thenReturn(ctx);
-    when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
-    when(ctx.append(CURRENT_USER, "jean")).thenReturn(ctx);
-    when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
-    when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/id123/illustration")).thenReturn(ctx);
-    when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
-    when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)).thenReturn(ctx);
-
-    when(ctx.getNotificationExecutor()).thenReturn(executor);
-    PowerMockito.mockStatic(PluginKey.class);
-    PluginKey plugin = mock(PluginKey.class);
-    when(PluginKey.key("ShareMyNewsNotificationPlugin")).thenReturn(plugin);
-    NotificationCommand notificationCommand = mock(NotificationCommand.class);
-    when(ctx.makeCommand(plugin)).thenReturn(notificationCommand);
-    NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
-    when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
-    when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("jean");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-
-    // When
-    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
-
-    // Then
-    verify(notificationExecutor, times(1)).execute(ctx);
   }
 
   @Test
@@ -3194,6 +2977,7 @@ public class NewsServiceImplTest {
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
     when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityManager);
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
 
     when(newsNode.hasNode("illustration")).thenReturn(true);
     PowerMockito.mockStatic(PropertyManager.class);
@@ -3215,6 +2999,8 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
 
+    ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
+
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
     ArgumentLiteral<Set> MENTIONED_IDS = new ArgumentLiteral<Set>(Set.class, "MENTIONED_IDS");
@@ -3228,7 +3014,8 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_AUTHOR, "root")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE_ID, "1")).thenReturn(ctx);
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080//rest/v1/news/1234/illustration")).thenReturn(ctx);
+    when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/1234/illustration")).thenReturn(ctx);
+    when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=1")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)).thenReturn(ctx);
 
@@ -3247,6 +3034,9 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
+    Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
+    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME), eq("root"))).thenReturn(rootIdentity);
+
     Profile profile = johnIdentity.getProfile();
     profile.setUrl("/profile/john");
     profile.setProperty("fullName", "john john");

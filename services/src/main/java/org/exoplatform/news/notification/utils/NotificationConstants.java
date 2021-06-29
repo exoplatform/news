@@ -9,6 +9,8 @@ public class NotificationConstants {
 
   public static final String ILLUSTRATION_URL = "ILLUSTRATION_URL";
 
+  public static final String AUTHOR_AVATAR_URL = "AUTHOR_AVATAR_URL";
+
   public static final String CONTENT_SPACE    = "CONTENT_SPACE";
 
   public static final String CONTENT_SPACE_ID = "CONTENT_SPACE_ID";
@@ -21,12 +23,6 @@ public class NotificationConstants {
 
   public static enum NOTIFICATION_CONTEXT {
     POST_NEWS ("POST NEWS"),
-    SHARE_NEWS ("SHARE NEWS"),
-    SHARE_MY_NEWS ("SHARE MY NEWS"),
-    LIKE_MY_NEWS ("LIKE MY NEWS"),
-    LIKE_MY_SHARED_NEWS ("LIKE MY SHARED NEWS"),
-    COMMENT_MY_NEWS ("COMMENT MY NEWS"),
-    COMMENT_MY_SHARED_NEWS ("COMMENT MY SHARED NEWS"),
     MENTION_IN_NEWS ("MENTION IN NEWS");
 
     private String context;

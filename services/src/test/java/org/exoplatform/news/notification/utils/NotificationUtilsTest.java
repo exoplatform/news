@@ -80,7 +80,7 @@ public class NotificationUtilsTest {
     assertEquals("http://localhost:8080/portal/g/:spaces:space1/space_one", activityUrl);
   }
 
-  @PrepareForTest({PropertyManager.class, CommonsUtils.class})
+  @PrepareForTest(CommonsUtils.class)
   @Test
   public void shouldGetTheDefaultIllustrationWhenTheNodeHasNotIllustration() throws Exception {
     // Given
@@ -101,8 +101,7 @@ public class NotificationUtilsTest {
     Node node = mock(Node.class);
     when(session.getNodeByUUID("id123")).thenReturn(node);
     when(node.hasNode("illustration")).thenReturn(false);
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
+    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
 
     News news = new News();
     news.setId("id123");

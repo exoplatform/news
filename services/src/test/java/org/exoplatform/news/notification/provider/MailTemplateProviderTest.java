@@ -25,13 +25,7 @@ import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.ValueParam;
-import org.exoplatform.news.notification.plugin.CommentNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.CommentSharedNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.LikeSharedNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.provider.MailTemplateProvider.TemplateBuilder;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
@@ -70,12 +64,6 @@ public class MailTemplateProviderTest {
     PowerMockito.mockStatic(PluginKey.class);
     PluginKey plugin = mock(PluginKey.class);
     when(PluginKey.key(PostNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(ShareNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(ShareMyNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(LikeNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(LikeSharedNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(CommentNewsNotificationPlugin.ID)).thenReturn(plugin);
-    when(PluginKey.key(CommentSharedNewsNotificationPlugin.ID)).thenReturn(plugin);
     ValueParam channelParam = new ValueParam();
     channelParam.setName(CHANNEL_ID_KEY);
     channelParam.setValue("MAIL_CHANNEL");
@@ -85,15 +73,6 @@ public class MailTemplateProviderTest {
     PowerMockito.mockStatic(NotificationContextImpl.class);
     NotificationContext ctx = mock(NotificationContext.class);
     when(NotificationContextImpl.cloneInstance()).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.CONTENT_TITLE, "title")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.CONTENT_AUTHOR, "jean")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.CURRENT_USER, "root")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.CONTENT_SPACE, "space1")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.ILLUSTRATION_URL,
-                    "http://localhost:8080/rest/v1/news/id123/illustration")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.ACTIVITY_LINK,
-                    "http://localhost:8080/portal/intranet/activity?id=39")).thenReturn(ctx);
-    when(ctx.append(CommentNewsNotificationPlugin.CONTEXT, "COMMENT MY NEWS")).thenReturn(ctx);
     NotificationInfo notification = mock(NotificationInfo.class);
     when(ctx.getNotificationInfo()).thenReturn(notification);
     when(notification.getKey()).thenReturn(plugin);

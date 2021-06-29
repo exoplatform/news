@@ -23,8 +23,6 @@ public class NotificationConstants {
 
   public static enum NOTIFICATION_CONTEXT {
     POST_NEWS ("POST NEWS"),
-    SHARE_NEWS ("SHARE NEWS"),
-    SHARE_MY_NEWS ("SHARE MY NEWS"),
     MENTION_IN_NEWS ("MENTION IN NEWS");
 
     private String context;

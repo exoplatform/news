@@ -654,8 +654,6 @@ public class NewsServiceImpl implements NewsService {
             }
           }
           newsNode.save();
-          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
-          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
         }
       }
     } finally {
@@ -1207,9 +1205,6 @@ public class NewsServiceImpl implements NewsService {
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String contentAuthor = news.getAuthor();
     String currentUser = getCurrentUserId();
-    if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS) && contentAuthor.equals(currentUser)) {
-      return;
-    }
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
     String contentBody = news.getBody();
@@ -1221,7 +1216,7 @@ public class NewsServiceImpl implements NewsService {
     if (contentSpace == null) {
       throw new NullPointerException("Cannot find a space with id " + contentSpaceId + ", it may not exist");
     }
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor());
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, contentAuthor);
     String authorAvatarUrl = LinkProviderUtils.getUserAvatarUrl(identity.getProfile());
     String illustrationURL = NotificationUtils.getNewsIllustration(news);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);

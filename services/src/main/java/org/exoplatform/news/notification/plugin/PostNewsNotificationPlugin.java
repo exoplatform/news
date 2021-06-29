@@ -95,7 +95,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
     List<String> receivers = new ArrayList<String>();
     try {
-      receivers = getReceivers(contentSpaceId, currentUserName, context, contentAuthorUserName);
+      receivers = getReceivers(contentSpaceId, currentUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
@@ -117,28 +117,15 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   }
 
   private List<String> getReceivers(String contentSpaceId,
-                                    String currentUserName,
-                                    NotificationConstants.NOTIFICATION_CONTEXT context,
-                                    String newsAuthor) throws Exception {
-    List<String> receivers = null;
-    if (!context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
-      Space space = spaceService.getSpaceById(contentSpaceId);
-      ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
-      User[] userArray = members.load(0, members.getSize());
-      List<User> receiverUsers = Arrays.stream(userArray)
-                                       .filter(u -> !u.getUserName().equals(currentUserName))
-                                       .collect(Collectors.toList());
-      List<String> receiversIds = new ArrayList<String>();
-      receiverUsers.forEach(u -> receiversIds.add(u.getUserName()));
-      // remove redondance
-      Set<String> receiversSet = new HashSet<String>(receiversIds);
-      // convert the set to List to be used after in to method
-      receivers = new ArrayList(receiversSet);
-    } else {
-      receivers = new ArrayList<String>();
-      receivers.add(newsAuthor);
-    }
-
-    return receivers;
+                                    String currentUserName) throws Exception {
+    Space space = spaceService.getSpaceById(contentSpaceId);
+    ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
+    User[] userArray = members.load(0, members.getSize());
+    List<String> receiverUsers = Arrays.stream(userArray)
+            .filter(u -> !u.getUserName().equals(currentUserName))
+            .distinct()
+            .map(User::getUserName)
+            .collect(Collectors.toList());
+    return receiverUsers;
   }
 }

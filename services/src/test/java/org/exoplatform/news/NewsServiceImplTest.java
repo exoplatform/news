@@ -552,10 +552,6 @@ public class NewsServiceImplTest {
     sharedNews.setSpacesNames(Arrays.asList("space1"));
     sharedNews.setNewsId("1");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS));
-    Mockito.doNothing()
-           .when(newsServiceSpy)
-           .sendNotification(any(), eq(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS));
     Mockito.doReturn(true).when(newsServiceSpy).canEditNews(any(),any());
 
     // When

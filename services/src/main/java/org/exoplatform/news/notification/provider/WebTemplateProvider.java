@@ -49,6 +49,7 @@ public class WebTemplateProvider extends TemplateProvider {
       String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
+      String illustrationUrl = notification.getValueOwnerParameter(NotificationConstants.ILLUSTRATION_URL);
       String authorAvatarUrl = notification.getValueOwnerParameter(NotificationConstants.AUTHOR_AVATAR_URL);
       String activityLink = notification.getValueOwnerParameter(NotificationConstants.ACTIVITY_LINK);
       String context = notification.getValueOwnerParameter(NotificationConstants.CONTEXT);
@@ -58,6 +59,7 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put(NotificationConstants.CONTENT_SPACE, encoder.encode(contentSpaceName));
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
       templateContext.put("CURRENT_USER", currentUser);
+      templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
       templateContext.put("CONTEXT", encoder.encode(context));

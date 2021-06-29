@@ -51,8 +51,6 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareMyNewsNotificationPlugin;
-import org.exoplatform.news.notification.plugin.ShareNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
@@ -96,6 +94,7 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
@@ -655,8 +654,6 @@ public class NewsServiceImpl implements NewsService {
             }
           }
           newsNode.save();
-          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS);
-          sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS);
         }
       }
     } finally {
@@ -1208,9 +1205,6 @@ public class NewsServiceImpl implements NewsService {
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String contentAuthor = news.getAuthor();
     String currentUser = getCurrentUserId();
-    if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS) && contentAuthor.equals(currentUser)) {
-      return;
-    }
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
     String contentBody = news.getBody();
@@ -1222,6 +1216,8 @@ public class NewsServiceImpl implements NewsService {
     if (contentSpace == null) {
       throw new NullPointerException("Cannot find a space with id " + contentSpaceId + ", it may not exist");
     }
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, contentAuthor);
+    String authorAvatarUrl = LinkProviderUtils.getUserAvatarUrl(identity.getProfile());
     String illustrationURL = NotificationUtils.getNewsIllustration(news);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();
@@ -1235,23 +1231,20 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
       if(matcher.find()) {
-        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
+        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
-      sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, activityLink, contentSpaceName);
-    }  else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_NEWS)) {
-      ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareNewsNotificationPlugin.ID))).execute(ctx);
-    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.SHARE_MY_NEWS)) {
-      ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(ShareMyNewsNotificationPlugin.ID))).execute(ctx);
+      sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
     }
   }
 
-  private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String activityLink, String contentSpaceName) {
+  private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
     Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
@@ -1261,6 +1254,7 @@ public class NewsServiceImpl implements NewsService {
             .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
             .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
             .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+            .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
             .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);

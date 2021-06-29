@@ -14,6 +14,9 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 
@@ -39,23 +42,26 @@ public class NotificationUtils {
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
     StringBuffer illustrationURL = new StringBuffer();
+    String currentDomain = CommonsUtils.getCurrentDomain();
+    if (!currentDomain.endsWith("/")) {
+      currentDomain += "/";
+    }
     try {
       Node newsNode = session.getNodeByUUID(news.getId());
       if (newsNode == null) {
         throw new ItemNotFoundException("Cannot find a node with UUID equals to " + news.getId() + ", it may not exist");
       }
       if (newsNode.hasNode("illustration")) {
-        illustrationURL.append("/rest/v1/news/").append(news.getId()).append("/illustration");
+        illustrationURL.append(currentDomain).append("portal/rest/v1/news/").append(news.getId()).append("/illustration");
       } else {
-        illustrationURL.append("/news/images/newsImageDefault.png");
+        illustrationURL.append(currentDomain).append("news/images/newsImageDefault.png");
       }
     } finally {
       if (session != null) {
         session.logout();
       }
     }
-    String baseUrl = PropertyManager.getProperty("gatein.email.domain.url");
-    return baseUrl.concat(illustrationURL.toString());
+    return illustrationURL.toString();
   }
 
   public static String getNotificationActivityLink(Space space, String activityId, boolean isMember) {

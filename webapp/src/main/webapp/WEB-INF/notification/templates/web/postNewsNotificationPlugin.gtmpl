@@ -1,8 +1,7 @@
 <li class="$READ clearfix" data-id="$NOTIFICATION_ID">
   <div class="media">
-    <a href="$ACTIVITY_LINK">
-      <div class="avatarXSmall pull-left" style="width: 36px;">
-        <img src="$ILLUSTRATION_URL" />
+      <div class="avatarXSmall pull-left">
+        <img src="$AUTHOR_AVATAR_URL" />
       </div>
       <%
 		String spaceName = "<span class=\"notification_space\">" + CONTENT_SPACE + "</span>";
@@ -16,35 +15,15 @@
           case "MENTION IN NEWS":
             notificationDescription =  _ctx.appRes("news.notification.description.mention.in.news",CONTENT_TITLE);
             break;
-          case "SHARE NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.share",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          case "SHARE MY NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.share.myNews",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          case "LIKE MY NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.like.myNews",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          case "LIKE MY SHARED NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.like.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          case "COMMENT MY NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.comment.myNews",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          case "COMMENT MY SHARED NEWS":
-            notificationDescription =  _ctx.appRes("news.notification.description.comment.mySharedNews",currentUser,CONTENT_TITLE,spaceName);
-            break;
-          default:
-            break;
         }
 
       %>
-      <div class="media-body ps-2">
-        <div class="contentSmall">
-        <div class="status ms-2" style="color: #333333;">$notificationDescription</div>
+      <div class="media-body">
+        <div class="contentSmall" data-link="$ACTIVITY_LINK">
+        <div class="status" style="color: #333333;">$notificationDescription</div>
+        <div class="lastUpdatedTime">$LAST_UPDATED_TIME</div>
         </div>
       </div>
-    </a>
   </div>
   <span class="remove-item" data-rest=""><i class="uiIconClose uiIconLightGray"></i></span>
 </li>

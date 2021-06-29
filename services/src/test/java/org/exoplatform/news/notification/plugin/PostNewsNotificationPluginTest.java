@@ -15,6 +15,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.services.idgenerator.IDGeneratorService;
 import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
@@ -31,6 +32,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.Serializable;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
@@ -69,6 +72,8 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -90,7 +95,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
+    mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -134,6 +139,8 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -155,7 +162,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
+    mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -201,6 +208,8 @@ public class PostNewsNotificationPluginTest {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080//rest/v1/news/id123/illustration")
+                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
+                                                             "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -218,7 +227,7 @@ public class PostNewsNotificationPluginTest {
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");
-    CommentSharedNewsNotificationPluginTest.mockIdGeneratorService();
+    mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
@@ -242,6 +251,31 @@ public class PostNewsNotificationPluginTest {
     assertEquals("space1", notificationInfo.getValueOwnerParameter("CONTENT_SPACE"));
     assertEquals("http://localhost:8080/portal/intranet/activity?id=38",
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
+  }
+
+  public static void mockIdGeneratorService() {
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IDGeneratorService.class)).thenReturn(new IDGeneratorService() {
+      @Override
+      public String generateStringID(Object o) {
+        return "123456";
+      }
+
+      @Override
+      public long generateLongID(Object o) {
+        return 123456;
+      }
+
+      @Override
+      public Serializable generateID(Object o) {
+        return 123456;
+      }
+
+      @Override
+      public int generatIntegerID(Object o) {
+        return 123456;
+      }
+    });
   }
 
 }

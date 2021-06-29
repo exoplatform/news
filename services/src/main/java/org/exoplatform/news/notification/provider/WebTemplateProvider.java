@@ -26,13 +26,6 @@ import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = ShareNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = ShareMyNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = LikeNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = LikeSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = CommentNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = CommentSharedNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
     @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl") })
 public class WebTemplateProvider extends TemplateProvider {
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
@@ -40,12 +33,6 @@ public class WebTemplateProvider extends TemplateProvider {
   public WebTemplateProvider(InitParams initParams) {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(ShareNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(ShareMyNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(LikeNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(LikeSharedNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(CommentNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.templateBuilders.put(PluginKey.key(CommentSharedNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
   }
 
@@ -63,6 +50,7 @@ public class WebTemplateProvider extends TemplateProvider {
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
       String illustrationUrl = notification.getValueOwnerParameter(NotificationConstants.ILLUSTRATION_URL);
+      String authorAvatarUrl = notification.getValueOwnerParameter(NotificationConstants.AUTHOR_AVATAR_URL);
       String activityLink = notification.getValueOwnerParameter(NotificationConstants.ACTIVITY_LINK);
       String context = notification.getValueOwnerParameter(NotificationConstants.CONTEXT);
 
@@ -72,6 +60,7 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put("CONTENT_AUTHOR", encoder.encode(contentAuthor));
       templateContext.put("CURRENT_USER", currentUser);
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
+      templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
       templateContext.put("CONTEXT", encoder.encode(context));
       templateContext.put("READ",

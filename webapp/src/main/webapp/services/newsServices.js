@@ -4,8 +4,14 @@ export function getNewsById(id, editMode) {
   return fetch(`${newsConstants.NEWS_API}/${id}?editMode=${editMode || ''}`, {
     credentials: 'include',
     method: 'GET',
-  }).then((data) => {
-    if (data.ok) {return data.json();}
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      return 'error';
+    }
+  }).then(resp => {
+    return resp;
   });
 }
 

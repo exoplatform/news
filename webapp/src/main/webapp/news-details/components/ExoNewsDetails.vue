@@ -219,7 +219,7 @@ export default {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
     },
     notSameUpdater() {
-      return this.news && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
+      return this.news.updater !=='__system' && this.news && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
     },
     publicationDate() {
       return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);

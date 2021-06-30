@@ -18,23 +18,6 @@
             <img src="/news/images/newsImageDefault.png">
             <span class="newsFormTitle">{{ newsFormTitle }}</span>
           </div>
-          <div
-            v-show="showPinInput"
-            class="pinArticleContent "
-            @click="news.pinned">
-            <a
-              id="newsPinButton"
-              :data-original-title="originalTitle"
-              :class="[news.archived ? 'unauthorizedPin' : '']"
-              class="pinArticle"
-              rel="tooltip"
-              data-placement="bottom"
-              @click="!news.archived ? news.pinned = !news.pinned : null">
-              <v-icon
-                :class="broadcastArticleClass"
-                class="fas fa-bullhorn" />
-            </a>
-          </div>
           <div class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
             <v-btn

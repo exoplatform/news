@@ -38,6 +38,7 @@
               <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
               <li><a @click="newsFilter = 'archived'">{{ $t('news.app.filter.archived') }}</a></li>
               <li><a @click="newsFilter = 'drafts'">{{ $t('news.app.filter.drafts') }}</a></li>
+              <li><a @click="newsFilter = 'scheduled'">{{ $t('news.app.filter.scheduled') }}</a></li>
             </ul>
           </div>
         </div>
@@ -306,6 +307,7 @@ export default {
           canDelete: item.canDelete,
           archived: item.archived,
           draft: item.publicationState === 'draft',
+          scheduled: item.publicationState === 'staged',
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,

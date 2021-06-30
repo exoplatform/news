@@ -63,15 +63,18 @@ public class NewsQueryBuilder {
           }
           sqlQuery.append("exo:spaceId = '").append(spaces.get(spaces.size() - 1)).append("') AND ");
         }
+        IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
+        Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+        String currentIdentityId = identity.getId();
         if (filter.isDraftNews()) {
-          IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-          Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
-          String currentIdentityId = identity.getId();
           sqlQuery.append("publication:currentState = 'draft'");
           sqlQuery.append(" AND (('");
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
+        } else if(filter.isScheduleNews()) {
+          sqlQuery.append("publication:currentState = 'staged'");
+          sqlQuery.append("AND exo:author = '").append(filter.getAuthor()).append("'");
         } else {
           if (StringUtils.isNotEmpty(filter.getAuthor())) {
             sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");

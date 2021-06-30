@@ -90,7 +90,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private Map<String, String>    newsToDeleteQueue = new HashMap<>();
 
   private enum FilterType {
-    PINNED, MYPOSTED, ARCHIVED, DRAFTS, ALL
+    PINNED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
   }
 
   public NewsRestResourcesV1(NewsService newsService,
@@ -857,29 +857,36 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     if (StringUtils.isNotEmpty(filter)) {
       FilterType filterType = FilterType.valueOf(filter.toUpperCase());
       switch (filterType) {
-      case PINNED: {
-        newsFilter.setPinnedNews(true);
-        break;
-      }
-
-      case MYPOSTED: {
-        if (StringUtils.isNotEmpty(author)) {
-          newsFilter.setAuthor(author);
+        case PINNED: {
+          newsFilter.setPinnedNews(true);
+          break;
         }
-        break;
-      }
 
-      case ARCHIVED: {
-        newsFilter.setArchivedNews(true);
-        break;
-      }
-      case DRAFTS: {
-        if (StringUtils.isNotEmpty(author)) {
-          newsFilter.setAuthor(author);
+        case MYPOSTED: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          break;
         }
-        newsFilter.setDraftNews(true);
-        break;
-      }
+
+        case ARCHIVED: {
+          newsFilter.setArchivedNews(true);
+          break;
+        }
+        case DRAFTS: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          newsFilter.setDraftNews(true);
+          break;
+        }
+        case SCHEDULED: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          newsFilter.setScheduleNews(true);
+          break;
+        }
       }
     }
     // Set text to search news with

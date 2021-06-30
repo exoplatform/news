@@ -72,6 +72,9 @@ public class NewsQueryBuilder {
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
+        } else if(filter.isScheduleNews()) {
+          sqlQuery.append("publication:currentState = 'staged'");
+          sqlQuery.append("AND exo:author = '").append(filter.getAuthor()).append("'");
         } else {
           if (StringUtils.isNotEmpty(filter.getAuthor())) {
             sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");

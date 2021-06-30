@@ -38,6 +38,7 @@
               <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
               <li><a @click="newsFilter = 'archived'">{{ $t('news.app.filter.archived') }}</a></li>
               <li><a @click="newsFilter = 'drafts'">{{ $t('news.app.filter.drafts') }}</a></li>
+              <li><a @click="newsFilter = 'scheduled'">{{ $t('news.app.filter.scheduled') }}</a></li>
             </ul>
           </div>
         </div>
@@ -111,9 +112,10 @@
             </div>
             <div class="newsDate">
               <i class="uiIconClock"></i>
-              <span>{{ news.updatedDate }}</span>
+              <span v-if="news && news.schedulePostDate">{{ news.schedulePostDate }}</span>
+              <span v-else>{{ news.updatedDate }}</span>
             </div>
-            <div class="newsViews" v-if="!news.draft">
+            <div class="newsViews" v-if="!news.draft && !news.scheduled">
               <i class="uiIconWatch"></i>
               <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
             </div>
@@ -200,7 +202,7 @@ export default {
     },
     isDraftsFilter() {
       return this.newsFilter === 'drafts';
-    }
+    },
   },
   watch: {
     searchText() {
@@ -285,6 +287,7 @@ export default {
 
       data.forEach((item) => {
         const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time).toLocaleDateString(local, options) : null;
+        const schedulePostDate = item.schedulePostDate != null ? new Date(item.schedulePostDate).toLocaleDateString(local, options) : null;
         const newsUpdateDate = new Date(item.updateDate.time).toLocaleDateString(local, options);
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
@@ -306,6 +309,8 @@ export default {
           canDelete: item.canDelete,
           archived: item.archived,
           draft: item.publicationState === 'draft',
+          scheduled: item.publicationState === 'staged',
+          schedulePostDate: schedulePostDate,
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,

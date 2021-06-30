@@ -29,7 +29,7 @@
               <boolean>${exo.news.portalConfig.metadata.override:true}</boolean>
             </field>
             <field name="importMode">
-              <string>${exo.news.portalConfig.metadata.importmode:insert}</string>
+              <string>${exo.news.portalConfig.metadata.importmode:merge}</string>
             </field>
           </object>
         </object-param>

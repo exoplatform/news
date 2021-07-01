@@ -118,7 +118,12 @@ public class MailTemplateProvider extends TemplateProvider {
         }
         String pluginId = notificationInfo.getKey().getId();
         if (pluginId.equals(MentionInNewsNotificationPlugin.ID)) {
-          return false;
+          String mentionedIds = notificationInfo.getValueOwnerParameter(NotificationConstants.MENTIONED_IDS);
+          String ids = mentionedIds.substring(1, mentionedIds.length() - 1);
+          List<String> mentionedList = Stream.of(ids.split(",")).map(String::trim).collect(Collectors.toList());
+          if (!mentionedList.contains(notificationInfo.getTo())) {
+            return false;
+          }
         }
         String language = getLanguage(notificationInfo);
         TemplateContext templateContext = new TemplateContext(pluginId, language);

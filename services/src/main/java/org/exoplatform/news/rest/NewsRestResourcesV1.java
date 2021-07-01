@@ -227,9 +227,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       } else {
         news = newsService.getNews(newsFilter);
       }
-      if (news == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
+
       if (news != null && news.size() != 0) {
         for (News newsItem : news) {
           newsItem.setIllustration(null);

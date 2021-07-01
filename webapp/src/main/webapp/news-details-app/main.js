@@ -46,8 +46,8 @@ export function init() {
   });
 }
 export function destroy() {
-  if (newsDetailApp) {
-    newsDetailApp.$destroy();
+  if (newsDetailsApp) {
+    newsDetailsApp.$destroy();
   }
 }
 function getURLQueryParam(paramName) {

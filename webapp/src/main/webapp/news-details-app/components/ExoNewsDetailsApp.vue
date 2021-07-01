@@ -6,6 +6,8 @@
     </div>
     <exo-news-details
       v-else
+      id="newsFullDetails"
+      style="display: none"
       :news="news"
       :news-id="newsId" />
   </div>
@@ -26,7 +28,8 @@ export default {
   created() {
     this.$newsServices.getNewsById(this.newsId, false)
       .then(news => {
-        if (news !== 'error') {
+        if (news !== null) {
+          document.getElementById('newsFullDetails').style.display = 'initial';
           this.news = news;
           if (!this.news.spaceMember) {
             this.$root.$emit('restricted-space', this.news.spaceDisplayName);

@@ -1,7 +1,7 @@
 <template>
   <div id="newsDetails">
     <a class="backBtn" :href="backURL"><i class="uiIconBack"></i></a>
-    <v-btn v-if="publicationState === 'staged'" class="btn newsDetailsActionMenu mt-6 pull-right">
+    <v-btn v-if="publicationState === 'staged'" class="btn newsDetailsActionMenu mt-6 mr-2 pull-right">
       {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
     <exo-news-details-action-menu

@@ -3,7 +3,6 @@
     <div v-if="notFound" class="articleNotFound">
       <i class="iconNotFound"></i>
       <h3>{{ $t('news.app.noNews') }}</h3>
-      <v-btn class="btn btn-primary" @click="redirectUrl">{{ $t("news.composer.btn.backToHome") }}</v-btn>
     </div>
     <exo-news-details
       v-else
@@ -37,10 +36,5 @@ export default {
         }
       });
   },
-  methods: {
-    redirectUrl() {
-      window.location.href='/';
-    }
-  }
 };
 </script>

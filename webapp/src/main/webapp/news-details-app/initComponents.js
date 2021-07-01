@@ -1,7 +1,7 @@
 import * as  newsServices from '../services/newsServices';
 import ExoNewsDetailsApp from './components/ExoNewsDetailsApp.vue';
 const components = {
-  'exo-news-detail-app': ExoNewsDetailsApp,
+  'exo-news-details-app': ExoNewsDetailsApp,
 };
 
 for (const key in components) {

@@ -1166,7 +1166,6 @@ public class NewsServiceImpl implements NewsService {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss" + "Z");
         Calendar startPublishedDate = Calendar.getInstance();
         startPublishedDate.setTime(format.parse(schedulePostDate));
-        scheduledNewsNode.setProperty("exo:pinned", news.isPinned());
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.save();
@@ -1177,9 +1176,6 @@ public class NewsServiceImpl implements NewsService {
       if (session != null) {
         session.logout();
       }
-    }
-    if (news.isPinned()) {
-      pinNews(news.getId());
     }
     return scheduledNews;
   }

@@ -14,7 +14,7 @@ if (extensionRegistry) {
   }
 }
 
-let newsDetailApp;
+let newsDetailsApp;
 export function init() {
   // getting language of the PLF
   const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
@@ -30,7 +30,7 @@ export function init() {
   // getting locale resources
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale resources are ready
-    newsDetailApp = new Vue({
+    newsDetailsApp = new Vue({
       el: '#NewsDetailApp',
       data: function() {
         return {
@@ -38,7 +38,7 @@ export function init() {
         };
       },
       template: `<v-app id="${appId}">
-                   <exo-news-detail-app :news-id="newsId"></exo-news-detail-app>
+                   <exo-news-details-app :news-id="newsId"></exo-news-details-app>
                  </v-app>`,
       i18n,
       vuetify

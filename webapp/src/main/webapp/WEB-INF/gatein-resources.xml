@@ -149,7 +149,7 @@
     <module>
       <script>
         <minify>false</minify>
-        <path>/js/newsDetailApp.bundle.js</path>
+        <path>/js/newsDetailsApp.bundle.js</path>
       </script>
       <depends>
         <module>vue</module>

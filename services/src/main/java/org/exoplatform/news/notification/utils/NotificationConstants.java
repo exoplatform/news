@@ -21,6 +21,8 @@ public class NotificationConstants {
 
   public static final String CURRENT_USER     = "CURRENT_USER";
 
+  public static final String MENTIONED_IDS    = "MENTIONED_IDS";
+
   public static enum NOTIFICATION_CONTEXT {
     POST_NEWS ("POST NEWS"),
     MENTION_IN_NEWS ("MENTION IN NEWS");

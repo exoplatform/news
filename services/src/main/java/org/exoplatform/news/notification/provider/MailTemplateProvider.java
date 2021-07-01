@@ -112,19 +112,13 @@ public class MailTemplateProvider extends TemplateProvider {
       try {
         String spaceId = notificationInfo.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
         Space space = Utils.getSpaceService().getSpaceByDisplayName(spaceId);
-        if (!Utils.getSpaceService().isMember(space, notificationInfo.getTo()) || notificationInfo.getTo().equals(notificationInfo.getFrom())) {
+        if (!Utils.getSpaceService().isMember(space, notificationInfo.getTo())
+            || notificationInfo.getTo().equals(notificationInfo.getFrom())) {
           return false;
         }
         String pluginId = notificationInfo.getKey().getId();
         if (pluginId.equals(MentionInNewsNotificationPlugin.ID)) {
-          String mentionedIds = notificationInfo.getValueOwnerParameter(NotificationConstants.MENTIONED_IDS);
-          String ids = mentionedIds.substring(1, mentionedIds.length() - 1);
-          List<String> mentionedList = Stream.of(ids.split(","))
-                  .map(String::trim)
-                  .collect(Collectors.toList());
-          if (!mentionedList.contains(notificationInfo.getTo())) {
-            return false;
-          }
+          return false;
         }
         String language = getLanguage(notificationInfo);
         TemplateContext templateContext = new TemplateContext(pluginId, language);

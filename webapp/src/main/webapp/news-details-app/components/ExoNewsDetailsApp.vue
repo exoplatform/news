@@ -2,7 +2,7 @@
   <div id="newsDetail">
     <div v-if="notFound" class="articleNotFound">
       <i class="iconNotFound"></i>
-      <h3>{{ $t('news.app.noNews') }}</h3>
+      <h3>{{ $t('news.details.restricted') }}</h3>
     </div>
     <exo-news-details
       v-else

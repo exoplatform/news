@@ -144,17 +144,11 @@ public class MailTemplateProvider extends TemplateProvider {
       Map<String, List<NotificationInfo>> map = new HashMap<>();
       for (NotificationInfo notificationInfo : notifications) {
         String notificationId = notificationInfo.getValueOwnerParameter(NotificationConstants.CONTEXT);
-        List<NotificationInfo> tmp = map.get(notificationId);
-        if (tmp == null) {
-          tmp = new LinkedList<>();
-          map.put(notificationId, tmp);
-        }
-        tmp.add(notificationInfo);
+        map.computeIfAbsent(notificationId, key -> new LinkedList<>()).add(notificationInfo);
       }
-
       StringBuilder sb = new StringBuilder();
-      for (String notification : map.keySet()) {
-        List<NotificationInfo> notificationInfos = map.get(notification);
+      for (Map.Entry<String, List<NotificationInfo>> notification : map.entrySet()) {
+        List<NotificationInfo> notificationInfos = notification.getValue();
         NotificationInfo first = notificationInfos.get(0);
         templateContext.put("CONTENT_TITLE", first.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE));
         templateContext.put("USER", first.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR));
@@ -168,7 +162,5 @@ public class MailTemplateProvider extends TemplateProvider {
       }
       return sb.toString();
     }
-
   }
-
 }

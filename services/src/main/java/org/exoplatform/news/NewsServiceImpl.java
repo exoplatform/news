@@ -1257,14 +1257,14 @@ public class NewsServiceImpl implements NewsService {
     Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
-            .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)
-            .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
-            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
-            .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
-            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-            .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
-            .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
-            .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+            .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
+            .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
+            .append(PostNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
+            .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+            .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
+            .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }

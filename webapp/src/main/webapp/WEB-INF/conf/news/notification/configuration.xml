@@ -124,6 +124,45 @@
         </object-param>
       </init-params>
     </component-plugin>
+    <component-plugin>
+      <name>notification.plugins</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.news.notification.plugin.PublishNewsNotificationPlugin</type>
+      <description>Initial information for plugin PublishNewsNotificationPlugin</description>
+      <init-params>
+        <object-param>
+          <name>template.PublishNewsNotificationPlugin</name>
+          <description>The template for the plugin of the state updates of contents</description>
+          <object type="org.exoplatform.commons.api.notification.plugin.config.PluginConfig">
+            <field name="pluginId">
+              <string>PublishNewsNotificationPlugin</string>
+            </field>
+            <field name="resourceBundleKey">
+              <string>UINotification.label.PublishArticle</string>
+            </field>
+            <field name="order">
+              <string>3</string>
+            </field>
+            <field name="defaultConfig">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <string>daily</string>
+                </value>
+                <value>
+                  <string>Instantly</string>
+                </value>
+              </collection>
+            </field>
+            <field name="groupId">
+              <string>news</string>
+            </field>
+            <field name="bundlePath">
+              <string>locale.portlet.news.News</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>

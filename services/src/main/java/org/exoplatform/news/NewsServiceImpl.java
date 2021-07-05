@@ -51,6 +51,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.PublishNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
@@ -529,6 +530,7 @@ public class NewsServiceImpl implements NewsService {
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
+    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -1237,6 +1239,7 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
+
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
@@ -1245,6 +1248,8 @@ public class NewsServiceImpl implements NewsService {
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+      ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }
 

@@ -21,19 +21,27 @@ import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = PublishNewsNotificationPlugin.ID, template = "war:/notification/templates/web/postNewsNotificationPlugin.gtmpl")})
 public class WebTemplateProvider extends TemplateProvider {
-  protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
 
-  public WebTemplateProvider(InitParams initParams) {
+  protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
+  private IdentityManager identityManager;
+
+  public WebTemplateProvider(InitParams initParams, IdentityManager identityManager) {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(PublishNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.identityManager = identityManager;
   }
 
   private class TemplateBuilder extends AbstractTemplateBuilder {
@@ -53,7 +61,6 @@ public class WebTemplateProvider extends TemplateProvider {
       String authorAvatarUrl = notification.getValueOwnerParameter(NotificationConstants.AUTHOR_AVATAR_URL);
       String activityLink = notification.getValueOwnerParameter(NotificationConstants.ACTIVITY_LINK);
       String context = notification.getValueOwnerParameter(NotificationConstants.CONTEXT);
-
       EntityEncoder encoder = HTMLEntityEncoder.getInstance();
       templateContext.put("CONTENT_TITLE", encoder.encode(contentTitle));
       templateContext.put(NotificationConstants.CONTENT_SPACE, encoder.encode(contentSpaceName));
@@ -74,7 +81,6 @@ public class WebTemplateProvider extends TemplateProvider {
                                                                        "EE, dd yyyy",
                                                                        new Locale(language),
                                                                        TimeConvertUtils.YEAR));
-
       //
       String body = TemplateUtils.processGroovy(templateContext);
       // binding the exception throws by processing template

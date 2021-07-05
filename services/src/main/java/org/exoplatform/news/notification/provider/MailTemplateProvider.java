@@ -38,7 +38,8 @@ import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = PublishNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
 public class MailTemplateProvider extends TemplateProvider {
   protected static Log    log = ExoLogger.getLogger(MailTemplateProvider.class);
 
@@ -48,6 +49,7 @@ public class MailTemplateProvider extends TemplateProvider {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(PublishNewsNotificationPlugin.ID), new TemplateBuilder());
     this.identityManager = identityManager;
   }
 
@@ -92,7 +94,10 @@ public class MailTemplateProvider extends TemplateProvider {
                                                                        new Locale(language),
                                                                        TimeConvertUtils.YEAR));
       // Receiver
-      Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notification.getTo(), true);
+      Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notification.getTo());
+      if (receiver == null || receiver.getRemoteId().equals(notification.getFrom())) {
+        return null;
+      }
       templateContext.put("FIRST_NAME", encoder.encode(receiver.getProfile().getProperty(Profile.FIRST_NAME).toString()));
       // Footer
       templateContext.put("FOOTER_LINK", LinkProviderUtils.getRedirectUrl("notification_settings", receiver.getRemoteId()));
@@ -110,13 +115,16 @@ public class MailTemplateProvider extends TemplateProvider {
       List<NotificationInfo> notifications = ctx.getNotificationInfos();
       NotificationInfo notificationInfo = notifications.get(0);
       try {
+        String pluginId = notificationInfo.getKey().getId();
         String spaceId = notificationInfo.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
         Space space = Utils.getSpaceService().getSpaceByDisplayName(spaceId);
-        if (!Utils.getSpaceService().isMember(space, notificationInfo.getTo())
-            || notificationInfo.getTo().equals(notificationInfo.getFrom())) {
+        if (!pluginId.equals(PublishNewsNotificationPlugin.ID)
+            && !Utils.getSpaceService().isMember(space, notificationInfo.getTo())) {
           return false;
         }
-        String pluginId = notificationInfo.getKey().getId();
+        if (notificationInfo.getTo().equals(notificationInfo.getFrom())) {
+          return false;
+        }
         if (pluginId.equals(MentionInNewsNotificationPlugin.ID)) {
           String mentionedIds = notificationInfo.getValueOwnerParameter(NotificationConstants.MENTIONED_IDS);
           String ids = mentionedIds.substring(1, mentionedIds.length() - 1);

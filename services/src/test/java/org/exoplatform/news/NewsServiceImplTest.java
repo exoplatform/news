@@ -630,6 +630,9 @@ public class NewsServiceImplTest {
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
     when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    Mockito.doNothing()
+            .when(newsServiceSpy)
+            .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
 
     // When
     newsServiceSpy.pinNews("id123");

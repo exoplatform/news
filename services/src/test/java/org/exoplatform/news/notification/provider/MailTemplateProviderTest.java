@@ -57,7 +57,7 @@ public class MailTemplateProviderTest {
       HTMLEntityEncoder.class, NotificationMessageUtils.class, TimeConvertUtils.class, LinkProviderUtils.class,
       TemplateUtils.class, NotificationContextImpl.class })
   @Test
-  public void shoudIntantiateMailTemplate() {
+  public void shouldInstantiateMailTemplate() {
     // Given
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(any())).thenReturn(null);
@@ -76,7 +76,7 @@ public class MailTemplateProviderTest {
     NotificationInfo notification = mock(NotificationInfo.class);
     when(ctx.getNotificationInfo()).thenReturn(notification);
     when(notification.getKey()).thenReturn(plugin);
-    when(plugin.getId()).thenReturn("CommentNewsNotificationPlugin");
+    when(plugin.getId()).thenReturn("PostNewsNotificationPlugin");
     PowerMockito.mockStatic(NotificationPluginUtils.class);
     when(NotificationPluginUtils.getLanguage(anyString())).thenReturn("en");
     TemplateContext templateContext = mock(TemplateContext.class);
@@ -85,7 +85,7 @@ public class MailTemplateProviderTest {
     when(mailTemplateSpy.getChannelKey()).thenReturn(key);
     PowerMockito.mockStatic(TemplateContext.class);
     when(TemplateContext.newChannelInstance(Matchers.any(),
-                                            eq("CommentNewsNotificationPlugin"),
+                                            eq("PostNewsNotificationPlugin"),
                                             eq("en"))).thenReturn(templateContext);
     when(notification.getValueOwnerParameter("CONTENT_AUTHOR")).thenReturn("jean");
     when(notification.getValueOwnerParameter("CURRENT_USER")).thenReturn("root");
@@ -122,16 +122,14 @@ public class MailTemplateProviderTest {
     Profile profile = new Profile(receiverIdentity);
     receiverIdentity.setProfile(profile);
     profile.setProperty(Profile.FIRST_NAME, "jean");
-    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME),
-                                             eq("jean"),
-                                             anyBoolean())).thenReturn(receiverIdentity);
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "jean")).thenReturn(receiverIdentity);
     when(encoder.encode("jean")).thenReturn("jean");
     PowerMockito.mockStatic(LinkProviderUtils.class);
     when(LinkProviderUtils.getRedirectUrl("notification_settings",
                                           "jean")).thenReturn("http://localhost:8080//portal/intranet/allNotifications");
     PowerMockito.mockStatic(TemplateUtils.class);
-    when(TemplateUtils.processSubject(templateContext)).thenReturn("root commented your article on space1 space");
-    when(TemplateUtils.processGroovy(templateContext)).thenReturn("root commented your article \"title\" in the space1 space");
+    when(TemplateUtils.processSubject(templateContext)).thenReturn("Root Root has posted an article on space1 space");
+    when(TemplateUtils.processGroovy(templateContext)).thenReturn("Root Root has posted an article \"title\" in the space1 space");
     when(templateContext.getException()).thenReturn(null);
 
     // When
@@ -139,7 +137,7 @@ public class MailTemplateProviderTest {
 
     // Then
     assertNotNull(messageInfo);
-    assertEquals("root commented your article \"title\" in the space1 space", messageInfo.getBody());
-    assertEquals("root commented your article on space1 space", messageInfo.getSubject());
+    assertEquals("Root Root has posted an article \"title\" in the space1 space", messageInfo.getBody());
+    assertEquals("Root Root has posted an article on space1 space", messageInfo.getSubject());
   }
 }

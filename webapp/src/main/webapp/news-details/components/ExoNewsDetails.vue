@@ -102,6 +102,11 @@
                         :value="scheduleDate"
                         :format="dateFormat"
                         class="newsInformationValue newsUpdatedDate" />
+                      <span class="newsInformationValue">-</span>
+                      <date-format
+                        :value="scheduleDate"
+                        :format="dateTimeFormat"
+                        class="newsInformationValue newsUpdatedDate ml-1 me-1" />
                     </template>
                     <div v-else-if="news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
                     <div v-if="notSameUpdater">
@@ -179,7 +184,7 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
   },
   data() {
     return {
@@ -190,6 +195,10 @@ export default {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+      },
+      dateTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
       },
     };
   },

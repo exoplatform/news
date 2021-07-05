@@ -1,61 +1,66 @@
 <template>
-  <div class="newsApp">
-    <div class="newsAppToolBar">
-      <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'" class="newsAppToolbarLeft">
-        <h3 class="newsAppToolBarTitle">
-          {{ $t('news.app.title') }}
-        </h3>
-        <div class="inputNewsSearchWrapper">
-          <i class="uiIconSearchSpaces" @click="searchInputDisplayed = !searchInputDisplayed"></i>
-          <input
-            id="searchInput"
-            v-model="searchText"
-            :placeholder="$t('news.app.searchPlaceholder')"
-            type="text"
-            class="searchNewsInput mr-3">
-        </div>
-        <v-app
-          class="VuetifyApp">
-          <v-progress-circular
-            v-if="loadingNews && newsList.length !== 0"
-            :size="30"
-            :width="3"
-            indeterminate
-            class="loadingRing"
-            color="#578dc9" />
-        </v-app>
-      </div>
-      <div class="newsAppToolbarRight">
-        <div class="newsTypes">
-          <div class="btn-group newsTypesSelectBox">
-            <button class="btn dropdown-toggle" data-toggle="dropdown">
-              {{ newsStatusLabel }}
-              <i class="uiIconMiniArrowDown uiIconLightGray"></i>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a @click="newsFilter = 'all'">{{ $t('news.app.filter.all') }}</a></li>
-              <li><a @click="newsFilter = 'pinned'">{{ $t('news.app.filter.pinned') }}</a></li>
-              <li><a @click="newsFilter = 'myPosted'">{{ $t('news.app.filter.myPosted') }}</a></li>
-              <li><a @click="newsFilter = 'archived'">{{ $t('news.app.filter.archived') }}</a></li>
-              <li><a @click="newsFilter = 'drafts'">{{ $t('news.app.filter.drafts') }}</a></li>
-            </ul>
+  <v-app class="newsApp">
+    <v-toolbar
+      color="white"
+      flat
+      dense>
+      <v-row>
+        <v-spacer />
+
+        <v-col
+          cols="2"
+          sm="4"
+          class="d-flex flex-row justify-end my-auto flex-nowrap">
+          <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'">
+            <div class="inputNewsSearchWrapper">
+              <v-scale-transition>
+                <v-text-field
+                  v-model="searchText"
+                  :placeholder="$t('news.app.searchPlaceholder')"
+                  prepend-inner-icon="fa-filter"
+                  class="pa-0 my-auto" />
+              </v-scale-transition>
+            </div>
+            <v-progress-circular
+              v-if="loadingNews && newsList.length !== 0"
+              :size="30"
+              :width="3"
+              indeterminate
+              class="loadingRing"
+              color="primary" />
           </div>
-        </div>
-        <div class="newsAppFilterOptions">
-          <news-spaces-selector v-model="spacesFilter" />
-        </div>
-      </div>
+        </v-col>
+        <v-col
+          cols="2"
+          class="d-flex flex-row justify-end my-auto flex-nowrap">
+          <select
+            v-model="newsFilter"
+            class="width-auto my-auto ms-4 subtitle-1 ignore-vuetify-classes d-none d-sm-inline">
+            <option value="all">{{ $t('news.app.filter.all') }}</option>
+            <option value="pinned">{{ $t('news.app.filter.pinned') }}</option>
+            <option value="myPosted">{{ $t('news.app.filter.myPosted') }}</option>
+            <option value="archived">{{ $t('news.app.filter.archived') }}</option>
+            <option value="drafts">{{ $t('news.app.filter.drafts') }}</option>
+          </select>
+          <v-btn
+            icon
+            class="d-none d-sm-inline text-header-title"
+            @click="$root.$emit('news-space-selector-drawer-open')">
+            <i class="uiIcon uiIcon24x24 settingsIcon text-color"></i>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-toolbar>
+    <div class="newsAppFilterOptions">
+      <news-spaces-selector v-model="spacesFilter" />
     </div>
-    <v-app
-      class="VuetifyApp">
-      <v-progress-circular
-        v-if="loadingNews && newsList.length === 0"
-        :size="40"
-        :width="4"
-        indeterminate
-        class="loadingRing"
-        color="#578dc9" />
-    </v-app>
+    <v-progress-circular
+      v-if="loadingNews && newsList.length === 0"
+      :size="40"
+      :width="4"
+      indeterminate
+      class="loadingRing"
+      color="primary" />
     <div
       v-if="newsList.length"
       id="newsListItems"
@@ -163,7 +168,7 @@
     </div>
     <share-news-activity ref="shareNewsActivity" class="shareNewsDrawer" />
     <news-activity-sharing-spaces-drawer />
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -181,7 +186,7 @@ export default {
       searchNews: '',
       searchDelay: 300,
       searchInputDisplayed: false,
-      newsFilter: '',
+      newsFilter: 'all',
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,

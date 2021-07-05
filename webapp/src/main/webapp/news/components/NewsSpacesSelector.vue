@@ -1,82 +1,79 @@
 <template>
-  <div @keydown.esc="closeFilterNewsDrawer()">
-    <div class="btn newsSpacesFilterButton" @click="openFilterNewsDrawer()">
-      <i :class="{filterApplied}" class="uiIconFilter"></i>
-      <span v-if="selectedSpaces.length === 0 || !filterApplied">{{ $t('news.app.filter.label') }}</span>
-      <span v-if="filterApplied && selectedSpaces.length !== 0">{{ $t('news.app.filter.filterApplied') }}</span>
-    </div>
-    <div :class="{open}" class="drawer filterSpacesDrawer">
-      <div class="header">
-        <span>{{ $t('news.app.filter.bySpaces') }}</span>
-        <a
-          class="closebtn"
-          href="javascript:void(0)"
-          @click="closeFilterNewsDrawer()">×</a>
-      </div>
+  <exo-drawer
+    ref="newsFiltersDrawer"
+    right
+    @opened="drawer = true"
+    @closed="drawer = false">
+    <template slot="title">
+      {{ $t('news.app.filter.bySpaces') }}
+    </template>
+    <template slot="content">
       <div class="content">
-        <div class="searchSpacesInput ">
-          <i class="uiIconSearchSpaces"></i>
-          <input
-            v-model="searchSpaceText"
-            :placeholder="$t('news.app.filter.drawer.searchPlaceholder')"
-            type="text">
-        </div>
-        <div v-if="!noSpacesFound" class="spacesList">
-          <div v-for="(space) in userSpaces" :key="space">
-            <span :for="space.displayName" class="uiCheckbox">
-              <input
-                v-model="selectedSpaces"
-                :id="space.displayName"
-                :value="space.id"
-                type="checkbox"
-                class="checkbox">
-              <span class="spaceCheckbox">
-                <img
-                  :src="space.avatarUrl"
-                  :alt="space.avatarUrl"
-                  class="avatarMini">
-                {{ space.displayName }}</span>
-            </span>
-            <br>
-          </div>
-          <div v-if="showLoadMore" class="moreSpace">
-            <div class="loadMoreSpaces" @click="loadMoreSpaces()">
-              <a>{{ $t('news.app.filter.drawer.showMoreSpaces') }}</a>
+        <v-list>
+          <v-list-item class="px-0">
+            <v-scale-transition>
+              <v-text-field
+                v-model="searchSpaceText"
+                :placeholder="$t('news.app.filterBySpacePlaceholder')"
+                prepend-inner-icon="fa-filter"
+                class="pa-0 my-auto" />
+            </v-scale-transition>
+          </v-list-item>
+          <v-list-item class="px-0">
+            <div v-if="!noSpacesFound" class="spacesList">
+              <div v-for="(space) in userSpaces" :key="space">
+                <span :for="space.displayName" class="uiCheckbox">
+                  <input
+                    v-model="selectedSpaces"
+                    :id="space.displayName"
+                    :value="space.id"
+                    type="checkbox"
+                    class="checkbox">
+                  <span class="spaceCheckbox">
+                    <img
+                      :src="space.avatarUrl"
+                      :alt="space.avatarUrl"
+                      class="avatarMini">
+                    {{ space.displayName }}</span>
+                </span>
+                <br>
+              </div>
+              <div v-if="showLoadMore" class="moreSpace">
+                <div class="loadMoreSpaces" @click="loadMoreSpaces()">
+                  <a>{{ $t('news.app.filter.drawer.showMoreSpaces') }}</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div v-if="noSpacesFound" class="noSpacesFound">
-          <span> {{ $t('news.app.filter.drawer.noSpacesFound') }} </span>
-        </div>
+            <div v-if="noSpacesFound" class="noSpacesFound">
+              <span> {{ $t('news.app.filter.drawer.noSpacesFound') }} </span>
+            </div>
+          </v-list-item>
+        </v-list>
       </div>
-      <div class="footer">
-        <button
+    </template>
+    <template slot="footer">
+      <div class="d-flex">
+        <v-btn
           :disabled="selectedSpaces.length === 0"
-          type="button"
-          class="btn reset"
-          @click="resetSelectedSpaces()">
+          class="btn ms-2"
+          @click="resetSelectedSpaces">
           {{ $t('news.app.filter.drawer.reset') }}
-        </button>
-        <button
-          :disabled="disableApplyButton"
-          type="button"
-          class="btn btn-primary"
-          @click="applySpaceFilter()">
-          {{ $t('news.app.filter.drawer.apply') }}
-        </button>
-        <button
-          type="button"
-          class="btn"
-          @click="closeFilterNewsDrawer()">
+        </v-btn>
+        <v-spacer />
+        <v-btn
+          class="btn ms-2"
+          @click="close">
           {{ $t('news.app.filter.drawer.cancel') }}
-        </button>
+        </v-btn>
+        <v-btn
+          :disabled="disableApplyButton"
+          class="btn btn-primary ms-2"
+          @click="applySpaceFilter">
+          {{ $t('news.app.filter.drawer.apply') }}
+        </v-btn>
       </div>
-    </div>
-    <div
-      v-show="showFilterNews"
-      class="drawer-backdrop"
-      @click="closeFilterNewsDrawer()"></div>
-  </div>
+    </template>
+  </exo-drawer>
 </template>
 
 <script>
@@ -90,7 +87,8 @@ export default {
   data() {
     return {
       showFilterNews: false,
-      open: false,
+      drawer: false,
+      selectionType: 'all',
       selectedSpaces: [],
       searchSpaceText: '',
       userSpaces: [],
@@ -148,6 +146,7 @@ export default {
     }
   },
   created() {
+    this.$root.$on('news-space-selector-drawer-open', this.open);
     if (this.value.length > 0) {
       this.filterApplied = true;
       this.selectedSpaces = this.value;
@@ -155,17 +154,11 @@ export default {
     this.loadUserSpaces();
   },
   methods: {
-    openFilterNewsDrawer() {
-      this.open = true;
-      this.showFilterNews = true;
-      document.body.style.overflow = 'hidden';
+    close() {
+      this.$refs.newsFiltersDrawer.close();
     },
-    closeFilterNewsDrawer() {
-      this.open = false;
-      this.selectedSpaces = this.value;
-      this.showFilterNews = false;
-      this.searchSpaceText = '';
-      document.body.style.overflow = 'auto';
+    open() {
+      this.$refs.newsFiltersDrawer.open();
     },
     resetSelectedSpaces() {
       this.selectedSpaces = [];
@@ -198,9 +191,7 @@ export default {
       // eslint-disable-next-line vue/no-mutating-props
       this.value = this.selectedSpaces;
       this.$emit('input', this.value);
-
-      this.closeFilterNewsDrawer();
-
+      this.close();
       this.filterApplied = this.selectedSpaces.length !== 0;
       this.filterChanged = false;
     }

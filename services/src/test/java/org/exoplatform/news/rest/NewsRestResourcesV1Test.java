@@ -122,6 +122,7 @@ public class NewsRestResourcesV1Test {
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
@@ -1004,7 +1005,7 @@ public class NewsRestResourcesV1Test {
     News news = new News();
     news.setId("1");
     news.setSpaceId("1");
-
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);

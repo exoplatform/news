@@ -173,6 +173,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
+      if (!Boolean.TRUE.equals(news.isCanEdit())) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       news = newsService.scheduleNews(scheduledNews);
       return Response.ok(news).build();
     } catch (Exception e) {
@@ -224,6 +227,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       } else {
         news = newsService.getNews(newsFilter);
       }
+
       if (news != null && news.size() != 0) {
         for (News newsItem : news) {
           newsItem.setIllustration(null);
@@ -298,17 +302,19 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-
+      String authenticatedUser = request.getRemoteUser();
       News news = newsService.getNewsById(id, editMode);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-
+      if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
+          && !StringUtils.equals(news.getAuthor(), authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       if (!news.isPinned()) {
-        String authenticatedUser = request.getRemoteUser();
-
         Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (!canViewNews(authenticatedUser, space)) {
+        if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
+            && !canViewNews(authenticatedUser, space)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
       }

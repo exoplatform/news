@@ -58,6 +58,15 @@ export default {
         });
       }
     });
+    this.$root.$on('restricted-space', (spaceDisplayName) => {
+      if (spaceDisplayName) {
+        const message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'warning',
+        });
+      }
+    });
   },
   methods: {
     addAlert(alert) {

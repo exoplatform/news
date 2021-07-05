@@ -86,6 +86,7 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
             .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
             .with(NotificationConstants.ACTIVITY_LINK, activityLink)
             .with(NotificationConstants.CONTEXT, context.getContext())
+            .with(NotificationConstants.MENTIONED_IDS, String.valueOf(mentionedIds))
             .end();
   }
 }

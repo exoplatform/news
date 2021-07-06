@@ -307,17 +307,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
+      Space space = spaceService.getSpaceById(news.getSpaceId());
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
-          && !StringUtils.equals(news.getAuthor(), authenticatedUser)) {
+          && !canViewScheduleNews(authenticatedUser, space, news)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      if (!news.isPinned()) {
-        Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
-            && !canViewNews(authenticatedUser, space)) {
-          return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+      if (!news.isPinned() && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
+          && !canViewNews(authenticatedUser, space)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
       }
+      
       news.setIllustration(null);
 
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
@@ -326,8 +325,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         String newsActivities = news.getActivities();
         for (String act : newsActivities.split(";")) {
           String spaceId = act.split(":")[0];
-          Space space = spaceService.getSpaceById(spaceId);
-          spacesList.add(space);
+          Space space1 = spaceService.getSpaceById(spaceId);
+          spacesList.add(space1);
         }
         filteredNews.setSharedInSpacesList(spacesList);
         return Response.ok(filteredNews).build();
@@ -915,5 +914,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   
   private boolean canViewNews(String authenticatedUser, Space space) throws Exception {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
+  }
+
+  private boolean canViewScheduleNews(String authenticatedUser, Space space, News news) throws Exception {
+    return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
+        && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }
 }

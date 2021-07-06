@@ -77,7 +77,7 @@ public class NewsQueryBuilder {
           List<Space> spacesFiltered = NewsUtils.getSpacesWhichIsManagerOrRedactor(currentIdentity.getUserId());
           sqlQuery.append("publication:currentState = 'staged'");
           sqlQuery.append(" AND exo:author = '").append(filter.getAuthor()).append("'");
-          if (spacesFiltered != null && spacesFiltered.size() != 0) {
+          if (spacesFiltered != null && !spacesFiltered.isEmpty()) {
             sqlQuery.append("OR publication:currentState = 'staged'");
             for (Space space : spacesFiltered) {
               sqlQuery.append(" AND exo:spaceId = '").append(space.getId()).append("'");

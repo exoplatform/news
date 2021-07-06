@@ -196,7 +196,11 @@ export default {
       showArchiveButton: true,
       showShareButton: true,
       loadingNews: true,
-      initialized: false
+      initialized: false,
+      dateTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+      },
     };
   },
   computed: {

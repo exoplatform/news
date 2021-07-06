@@ -8,11 +8,16 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.SpaceException;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 public class NewsUtils {
 
@@ -74,6 +79,17 @@ public class NewsUtils {
       return null;
     }
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+  }
+
+  public static List<Space> getSpacesWhichIsManagerOrRedactor(String userId) throws SpaceException {
+    SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+    List<Space> spaces = spaceService.getSpaces(userId);
+    return spaces.stream().filter(space -> {
+      if (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)) {
+        return true;
+      }
+      return false;
+    }).collect(Collectors.toList());
   }
 
 }

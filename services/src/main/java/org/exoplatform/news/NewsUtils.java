@@ -81,7 +81,7 @@ public class NewsUtils {
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
   }
 
-  public static List<Space> getSpacesWhichIsManagerOrRedactor(String userId) throws SpaceException {
+  public static List<Space> getRedactorOrManagerSpaces(String userId) throws SpaceException {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     List<Space> spaces = spaceService.getSpaces(userId);
     return spaces.stream()

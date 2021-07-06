@@ -73,16 +73,14 @@ public class NewsQueryBuilder {
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
-        } else if (filter.isScheduleNews()) {
-          List<Space> spacesFiltered = NewsUtils.getSpacesWhichIsManagerOrRedactor(currentIdentity.getUserId());
+        } else if (filter.isScheduledNews()) {
+          List<Space> allowedScheduledNewsSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
           sqlQuery.append("publication:currentState = 'staged'");
-          sqlQuery.append(" AND exo:author = '").append(filter.getAuthor()).append("'");
-          if (spacesFiltered != null && !spacesFiltered.isEmpty()) {
-            sqlQuery.append("OR publication:currentState = 'staged'");
-            for (Space space : spacesFiltered) {
-              sqlQuery.append(" AND exo:spaceId = '").append(space.getId()).append("'");
-            }
+          sqlQuery.append(" AND (exo:author = '").append(filter.getAuthor()).append("'");
+          for (Space space : allowedScheduledNewsSpaces ) {
+            sqlQuery.append(" OR exo:spaceId = '").append(space.getId()).append("'");
           }
+          sqlQuery.append(" )");
         } else {
           if (StringUtils.isNotEmpty(filter.getAuthor())) {
             sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");

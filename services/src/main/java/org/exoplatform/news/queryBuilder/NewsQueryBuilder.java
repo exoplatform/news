@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -11,6 +12,7 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
 
 public class NewsQueryBuilder {
   private static final Log    LOG                             = ExoLogger.getLogger(NewsQueryBuilder.class);
@@ -27,7 +29,6 @@ public class NewsQueryBuilder {
    * @throws Exception for error when creating query
    */
   public StringBuilder buildQuery(NewsFilter filter) throws Exception {
-
     StringBuilder sqlQuery = new StringBuilder("SELECT * FROM exo:news WHERE ");
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     boolean isPublisher = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
@@ -72,9 +73,16 @@ public class NewsQueryBuilder {
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = ''))");
-        } else if(filter.isScheduleNews()) {
+        } else if (filter.isScheduleNews()) {
+          List<Space> spacesFiltered = NewsUtils.getSpacesWhichIsManagerOrRedactor(currentIdentity.getUserId());
           sqlQuery.append("publication:currentState = 'staged'");
-          sqlQuery.append("AND exo:author = '").append(filter.getAuthor()).append("'");
+          sqlQuery.append(" AND exo:author = '").append(filter.getAuthor()).append("'");
+          if (spacesFiltered != null && spacesFiltered.size() != 0) {
+            sqlQuery.append("OR publication:currentState = 'staged'");
+            for (Space space : spacesFiltered) {
+              sqlQuery.append(" AND exo:spaceId = '").append(space.getId()).append("'");
+            }
+          }
         } else {
           if (StringUtils.isNotEmpty(filter.getAuthor())) {
             sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("' AND ");

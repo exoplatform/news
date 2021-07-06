@@ -44,7 +44,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="noSpacesFound" class="noSpacesFound">
+            <div v-else class="noSpacesFound">
               <span> {{ $t('news.app.filter.drawer.noSpacesFound') }} </span>
             </div>
           </v-list-item>

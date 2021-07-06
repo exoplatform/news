@@ -27,7 +27,7 @@
               :disabled="postDisabled || postingNews"
               elevation="0"
               class="btn btn-primary"
-              @click="openDrawer">
+              @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
           </div>
@@ -248,7 +248,8 @@ export default {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-      }
+      },
+      canScheduleNews: false,
     };
   },
   computed: {
@@ -342,6 +343,9 @@ export default {
           }
           this.loading = false;
         });
+      });
+      this.$newsServices.canScheduleNews(this.currentSpace.id).then(canScheduleNews => {
+        this.canScheduleNews = canScheduleNews;
       });
     });
     
@@ -530,6 +534,13 @@ export default {
           }
         });
       }, this.autoSaveDelay);
+    },
+    newsActions() {
+      if (this.canScheduleNews) {
+        this.openDrawer();
+      } else {
+        this.postNews();
+      }
     },
     openDrawer() {
       if (this.$refs.postNewsDrawer) {

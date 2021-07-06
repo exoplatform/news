@@ -307,13 +307,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      Space space = spaceService.getSpaceById(news.getSpaceId());
+      Space newsSpace = spaceService.getSpaceById(news.getSpaceId());
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
-          && !canViewScheduleNews(authenticatedUser, space, news)) {
+          && !canViewScheduledNews(authenticatedUser, newsSpace, news)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       if (!news.isPinned() && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
-          && !canViewNews(authenticatedUser, space)) {
+          && !canViewNews(authenticatedUser, newsSpace)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
       
@@ -325,8 +325,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         String newsActivities = news.getActivities();
         for (String act : newsActivities.split(";")) {
           String spaceId = act.split(":")[0];
-          Space space1 = spaceService.getSpaceById(spaceId);
-          spacesList.add(space1);
+          Space space = spaceService.getSpaceById(spaceId);
+          spacesList.add(space);
         }
         filteredNews.setSharedInSpacesList(spacesList);
         return Response.ok(filteredNews).build();
@@ -889,7 +889,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           if (StringUtils.isNotEmpty(author)) {
             newsFilter.setAuthor(author);
           }
-          newsFilter.setScheduleNews(true);
+          newsFilter.setScheduledNews(true);
           break;
         }
       }
@@ -916,7 +916,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
   }
 
-  private boolean canViewScheduleNews(String authenticatedUser, Space space, News news) throws Exception {
+  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) throws Exception {
     return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
         && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }

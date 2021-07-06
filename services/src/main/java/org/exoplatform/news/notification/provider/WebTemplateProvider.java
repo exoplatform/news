@@ -24,7 +24,7 @@ import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.space.model.Space;
-import org.exoplatform.social.notification.Utils;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
 
@@ -36,8 +36,11 @@ public class WebTemplateProvider extends TemplateProvider {
 
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
 
-  public WebTemplateProvider(InitParams initParams) {
+  private final SpaceService spaceService;
+
+  public WebTemplateProvider(InitParams initParams, SpaceService spaceService) {
     super(initParams);
+    this.spaceService = spaceService;
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(PublishNewsNotificationPlugin.ID), new TemplateBuilder());
@@ -68,11 +71,11 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put("CURRENT_USER", currentUser);
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
-      Space space = Utils.getSpaceService().getSpaceByDisplayName(contentSpaceName);
+      Space space = spaceService.getSpaceByDisplayName(contentSpaceName);
       StringBuilder activityUrl = new StringBuilder();
       String portalName = PortalContainer.getCurrentPortalContainerName();
       String portalOwner = CommonsUtils.getCurrentPortalOwner();
-      if (pluginId.equals(PublishNewsNotificationPlugin.ID) && !Utils.getSpaceService().isMember(space, notification.getTo())) {
+      if (pluginId.equals(PublishNewsNotificationPlugin.ID) && !spaceService.isMember(space, notification.getTo())) {
         activityUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(newsId);
       } else {
         activityUrl.append(activityLink);

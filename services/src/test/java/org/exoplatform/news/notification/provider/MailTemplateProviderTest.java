@@ -31,6 +31,7 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.junit.Test;
@@ -53,6 +54,9 @@ public class MailTemplateProviderTest {
   @Mock
   private IdentityManager identityManager;
 
+  @Mock
+  private SpaceService spaceService;
+
   @PrepareForTest({ CommonsUtils.class, PluginKey.class, NotificationPluginUtils.class, TemplateContext.class, PropertyManager.class,
       HTMLEntityEncoder.class, NotificationMessageUtils.class, TimeConvertUtils.class, LinkProviderUtils.class,
       TemplateUtils.class, NotificationContextImpl.class })
@@ -68,7 +72,7 @@ public class MailTemplateProviderTest {
     channelParam.setName(CHANNEL_ID_KEY);
     channelParam.setValue("MAIL_CHANNEL");
     when(initParams.getValueParam(eq(CHANNEL_ID_KEY))).thenReturn(channelParam);
-    MailTemplateProvider mailTemplate = new MailTemplateProvider(initParams, identityManager);
+    MailTemplateProvider mailTemplate = new MailTemplateProvider(initParams, identityManager, spaceService);
     TemplateBuilder templateBuilder = (TemplateBuilder) mailTemplate.getTemplateBuilder().get(plugin);
     PowerMockito.mockStatic(NotificationContextImpl.class);
     NotificationContext ctx = mock(NotificationContext.class);

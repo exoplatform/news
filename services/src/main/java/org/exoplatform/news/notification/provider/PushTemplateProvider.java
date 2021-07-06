@@ -6,16 +6,14 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.social.core.manager.IdentityManager;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = PublishNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl") })
 public class PushTemplateProvider extends WebTemplateProvider {
   protected static Log log = ExoLogger.getLogger(PushTemplateProvider.class);
 
-  public PushTemplateProvider(InitParams initParams, IdentityManager identityManager) {
-    super(initParams, identityManager);
+  public PushTemplateProvider(InitParams initParams) {
+    super(initParams);
   }
 }

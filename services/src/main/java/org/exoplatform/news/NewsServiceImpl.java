@@ -1209,6 +1209,7 @@ public class NewsServiceImpl implements NewsService {
   }
 
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+    String newsId = news.getId();
     String contentAuthor = news.getAuthor();
     String currentUser = getCurrentUserId();
     String activities = news.getActivities();
@@ -1238,7 +1239,8 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
-                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
+                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
 
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);

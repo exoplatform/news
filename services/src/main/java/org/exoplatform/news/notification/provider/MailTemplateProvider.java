@@ -21,6 +21,7 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
@@ -62,6 +63,7 @@ public class MailTemplateProvider extends TemplateProvider {
       String language = getLanguage(notification);
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
+      String newsId = notification.getValueOwnerParameter(NotificationConstants.NEWS_ID);
       String contentAuthor = notification.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR);
       String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
@@ -80,7 +82,28 @@ public class MailTemplateProvider extends TemplateProvider {
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
       templateContext.put("CONTEXT", encoder.encode(context));
-      templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
+      StringBuilder activityUrl = new StringBuilder();
+      if (pluginId.equals(PublishNewsNotificationPlugin.ID)) {
+        Space space = Utils.getSpaceService().getSpaceByDisplayName(contentSpaceName);
+        String portalName = PortalContainer.getCurrentPortalContainerName();
+        String portalOwner = CommonsUtils.getCurrentPortalOwner();
+        String currentDomain = CommonsUtils.getCurrentDomain();
+        if (!currentDomain.endsWith("/")) {
+          currentDomain += "/";
+        }
+        if (!Utils.getSpaceService().isMember(space, notification.getTo())) {
+          activityUrl.append(currentDomain)
+                     .append(portalName)
+                     .append("/")
+                     .append(portalOwner)
+                     .append("/news/detail?newsId=")
+                     .append(newsId);
+        }
+      } else {
+        activityUrl.append(activityLink);
+      }
+
+      templateContext.put("ACTIVITY_LINK", encoder.encode(activityUrl.toString()));
 
       templateContext.put("READ",
                           Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"

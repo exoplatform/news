@@ -1,6 +1,9 @@
 package org.exoplatform.news.notification.utils;
 
 public class NotificationConstants {
+
+  public static final String NEWS_ID          = "NEWS_ID";
+
   public static final String CONTENT_TITLE    = "CONTENT_TITLE";
 
   public static final String CONTENT_AUTHOR   = "CONTENT_AUTHOR";

@@ -15,15 +15,16 @@ import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.notification.service.template.TemplateContext;
 import org.exoplatform.commons.notification.template.TemplateUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.notification.Utils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
 
@@ -34,14 +35,12 @@ import org.gatein.common.text.EntityEncoder;
 public class WebTemplateProvider extends TemplateProvider {
 
   protected static Log log = ExoLogger.getLogger(WebTemplateProvider.class);
-  private IdentityManager identityManager;
 
-  public WebTemplateProvider(InitParams initParams, IdentityManager identityManager) {
+  public WebTemplateProvider(InitParams initParams) {
     super(initParams);
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(PublishNewsNotificationPlugin.ID), new TemplateBuilder());
-    this.identityManager = identityManager;
   }
 
   private class TemplateBuilder extends AbstractTemplateBuilder {
@@ -53,7 +52,8 @@ public class WebTemplateProvider extends TemplateProvider {
       String language = getLanguage(notification);
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
-      String contentAuthor = notification.getValueOwnerParameter("CONTENT_AUTHOR");
+      String newsId = notification.getValueOwnerParameter(NotificationConstants.NEWS_ID);
+      String contentAuthor = notification.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR);
       String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
       String contentSpaceName = notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
@@ -68,7 +68,16 @@ public class WebTemplateProvider extends TemplateProvider {
       templateContext.put("CURRENT_USER", currentUser);
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
-      templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
+      Space space = Utils.getSpaceService().getSpaceByDisplayName(contentSpaceName);
+      StringBuilder activityUrl = new StringBuilder();
+      String portalName = PortalContainer.getCurrentPortalContainerName();
+      String portalOwner = CommonsUtils.getCurrentPortalOwner();
+      if (pluginId.equals(PublishNewsNotificationPlugin.ID) && !Utils.getSpaceService().isMember(space, notification.getTo())) {
+        activityUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(newsId);
+      } else {
+        activityUrl.append(activityLink);
+      }
+      templateContext.put("ACTIVITY_LINK", encoder.encode(activityUrl.toString()));
       templateContext.put("CONTEXT", encoder.encode(context));
       templateContext.put("READ",
                           Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"

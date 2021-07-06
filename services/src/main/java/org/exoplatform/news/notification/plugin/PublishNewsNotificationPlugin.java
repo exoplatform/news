@@ -52,6 +52,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String illustrationUrl = ctx.value(PostNewsNotificationPlugin.ILLUSTRATION_URL);
     String authorAvatarUrl = ctx.value(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL);
     String activityLink = ctx.value(PostNewsNotificationPlugin.ACTIVITY_LINK);
+    String newsId = ctx.value(PostNewsNotificationPlugin.NEWS_ID);
 
     return NotificationInfo.instance()
                            .setFrom(currentUserName)
@@ -64,6 +65,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
                            .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
                            .with(NotificationConstants.CONTEXT, context.getContext())
+                           .with(NotificationConstants.NEWS_ID, newsId)
                            .key(getKey())
                            .end();
 

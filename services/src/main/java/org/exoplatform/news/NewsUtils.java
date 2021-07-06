@@ -84,12 +84,9 @@ public class NewsUtils {
   public static List<Space> getSpacesWhichIsManagerOrRedactor(String userId) throws SpaceException {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     List<Space> spaces = spaceService.getSpaces(userId);
-    return spaces.stream().filter(space -> {
-      if (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)) {
-        return true;
-      }
-      return false;
-    }).collect(Collectors.toList());
+    return spaces.stream()
+                 .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
+                 .collect(Collectors.toList());
   }
 
 }

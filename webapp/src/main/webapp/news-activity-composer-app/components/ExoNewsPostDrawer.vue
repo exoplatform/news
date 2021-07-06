@@ -22,11 +22,13 @@
           <div class="d-flex flex-row flex-grow-1">
             <date-picker
               v-model="postDate"
+              :min-value="minimumPostDate"
               class="flex-grow-1 my-auto" />
             <div class="d-flex flex-row flex-grow-0">
               <slot name="postDateDateTime"></slot>
               <time-picker
                 v-model="postDateTime"
+                :min="minimumDateTime"
                 class="me-4" />
             </div>
           </div>
@@ -60,9 +62,6 @@ export default {
       if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
-      if ( this.postDate < new Date().getTime()) {
-        this.postDate = new Date();
-      }
       const newDate = new Date(this.postDate);
       newDate.setHours(this.postDateTime.getHours());
       newDate.setMinutes(this.postDateTime.getMinutes());
@@ -83,6 +82,19 @@ export default {
   computed: {
     saveButtonLabel() {
       return this.postArticleMode==='later' ? this.$t('news.composer.schedule'): this.$t('news.composer.post');
+    },
+    minimumPostDate() {
+      return new Date();
+    },
+    minimumDateTime() {
+      if ( new Date(this.postDate).getDate() === new Date().getDate()) {
+        const currentTime = new Date();
+        currentTime.setHours(currentTime.getHours());
+        currentTime.setSeconds(0);
+        currentTime.setMinutes ( currentTime.getMinutes() + 30 );
+        return currentTime;
+      }
+      return null;
     }
   },
   created() {

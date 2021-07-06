@@ -225,6 +225,17 @@ export function canUserCreateNews(spaceId) {
   });
 }
 
+export function canScheduleNews(spaceId) {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canScheduleNews/${eXo.env.portal.spaceId || spaceId}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}
+
 export function deleteNews(newsId, isDraft, delay) {
   if (delay > 0) {
     localStorage.setItem('deletedNews', newsId);

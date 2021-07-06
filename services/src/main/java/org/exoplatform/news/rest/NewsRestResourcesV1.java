@@ -827,7 +827,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
   @ApiOperation(value = "check if the current user can create a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News deleted"),
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News created"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 401, message = "User not authorized to create a news"),
       @ApiResponse(code = 404, message = "Space not found"),
@@ -851,6 +851,39 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.ok(String.valueOf(canCreateNews(authenticatedUser, space))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can create a news", e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("canScheduleNews/{spaceId}")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RolesAllowed("users")
+  @ApiOperation(value = "check if the current user can schedule a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can schedule a news in the given space", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News scheduled"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 401, message = "User not authorized to schedule a news"),
+          @ApiResponse(code = 404, message = "Space not found"),
+          @ApiResponse(code = 500, message = "Internal server error") })
+  public Response canScheduleNews(@Context HttpServletRequest request,
+                                @ApiParam(value = "space id", required = true) @PathParam("spaceId") String spaceId) {
+    try {
+      if (StringUtils.isBlank(spaceId)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      Space space = spaceService.getSpaceById(spaceId);
+      if (space == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      String authenticatedUser = request.getRemoteUser();
+
+      if (StringUtils.isBlank(authenticatedUser) || !canViewNews(authenticatedUser, space)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      return Response.ok(String.valueOf(canScheduleNews(authenticatedUser, space))).build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the authenticated user can schedule a news", e);
       return Response.serverError().build();
     }
   }
@@ -918,7 +951,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
   }
 
-  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) {
+  private boolean canScheduleNews(String authenticatedUser, Space space) throws Exception {
+    boolean isManager = space != null && spaceService.isManager(space, authenticatedUser);
+    boolean isRedactor = space != null && spaceService.isRedactor(space, authenticatedUser);
+    boolean spaceHasARedactor = space != null && space.getRedactors() != null && space.getRedactors().length > 0;
+    return ((spaceHasARedactor && (isRedactor || isManager)) || (!spaceHasARedactor && isManager));
+  }
+
+  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) throws Exception {
     return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
         && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }

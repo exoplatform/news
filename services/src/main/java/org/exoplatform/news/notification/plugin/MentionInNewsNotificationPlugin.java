@@ -19,25 +19,10 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public final static String ID = "MentionInNewsNotificationPlugin";
 
-  public final static ArgumentLiteral<String> CONTENT_TITLE = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
-
   public static final Pattern MENTION_PATTERN = Pattern.compile("@([^\\s]+)|@([^\\s]+)$");
-
-  public static final ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
-
-  public static final ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
-
-  public static final ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
   public static final ArgumentLiteral<Set> MENTIONED_IDS = new ArgumentLiteral<Set>(Set.class, "MENTIONED_IDS");
 
-  public static final ArgumentLiteral<String> CURRENT_USER = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
-
-  public static final ArgumentLiteral<String> CONTENT_SPACE = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
-
-  public static final ArgumentLiteral<String> CONTENT_AUTHOR = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
-
-  public static final ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
 
   public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT = new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
 
@@ -59,20 +44,20 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
   protected NotificationInfo makeNotification(NotificationContext ctx) {
     NotificationConstants.NOTIFICATION_CONTEXT context = ctx.value(CONTEXT);
 
-    String currentUserName = ctx.value(CURRENT_USER);
+    String currentUserName = ctx.value(PostNewsNotificationPlugin.CURRENT_USER);
     String currentUserFullName = currentUserName;
     try {
       currentUserFullName = NotificationUtils.getUserFullName(currentUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to retreive a user with username " + currentUserName + " " + e.getMessage(), e);
     }
-    String contentAuthor = ctx.value(CONTENT_AUTHOR);
-    String contentSpaceName = ctx.value(CONTENT_SPACE);
+    String contentAuthor = ctx.value(PostNewsNotificationPlugin.CONTENT_AUTHOR);
+    String contentSpaceName = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE);
     List<String> mentionedIds = new ArrayList<>(ctx.value(MENTIONED_IDS));
-    String newsTitle = ctx.value(CONTENT_TITLE);
-    String illustrationUrl = ctx.value(ILLUSTRATION_URL);
-    String authorAvatarUrl = ctx.value(AUTHOR_AVATAR_URL);
-    String activityLink = ctx.value(ACTIVITY_LINK);
+    String newsTitle = ctx.value(PostNewsNotificationPlugin.CONTENT_TITLE);
+    String illustrationUrl = ctx.value(PostNewsNotificationPlugin.ILLUSTRATION_URL);
+    String authorAvatarUrl = ctx.value(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL);
+    String activityLink = ctx.value(PostNewsNotificationPlugin.ACTIVITY_LINK);
 
     return NotificationInfo.instance()
             .setFrom(currentUserName)

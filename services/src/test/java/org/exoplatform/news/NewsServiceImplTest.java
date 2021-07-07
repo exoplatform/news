@@ -637,6 +637,9 @@ public class NewsServiceImplTest {
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
     when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    Mockito.doNothing()
+            .when(newsServiceSpy)
+            .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
 
     // When
     newsServiceSpy.pinNews("id123");
@@ -2459,6 +2462,8 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
+    ArgumentLiteral<String> NEWS_ID = new ArgumentLiteral<String>(String.class, "NEWS_ID");
+
     ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
                                                                         new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
                                                                                                                                         "CONTEXT");
@@ -2471,6 +2476,7 @@ public class NewsServiceImplTest {
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
+    when(ctx.append(NEWS_ID, "id123")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);

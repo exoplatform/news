@@ -1,6 +1,7 @@
 package org.exoplatform.news;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
@@ -8,14 +9,10 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.SpaceException;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -81,9 +78,18 @@ public class NewsUtils {
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
   }
 
-  public static List<Space> getRedactorOrManagerSpaces(String userId) throws SpaceException {
+  public static List<Space> getRedactorOrManagerSpaces(String userId) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
-    List<Space> spaces = spaceService.getSpaces(userId);
+    ListAccess<Space> spacesAccess = spaceService.getMemberSpaces(userId);
+    List<Space> spaces = new ArrayList<>();
+    int spacesSize = spacesAccess.getSize();
+    int limitToFetch = Math.min(spacesSize, 20);
+    int offsetToFetch = 0;
+    while (limitToFetch > 0) {
+      spaces = Arrays.asList(spacesAccess.load(offsetToFetch, limitToFetch));
+      offsetToFetch += limitToFetch;
+      limitToFetch = Math.min((spacesSize - offsetToFetch), 20);
+    }
     return spaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
                  .collect(Collectors.toList());

@@ -24,11 +24,9 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log                    LOG              = ExoLogger.getLogger(PostNewsNotificationPlugin.class);
 
-  public final static String                  ID               = "PostNewsNotificationPlugin";
+  public static final  String                  ID               = "PostNewsNotificationPlugin";
 
-  public final static ArgumentLiteral<String> CONTENT_TITLE    = new ArgumentLiteral<>(String.class, "CONTENT_TITLE");
-
-  public final static ArgumentLiteral<String> CONTENT_UPDATER  = new ArgumentLiteral<>(String.class, "CONTENT_UPDATER");
+  public static final ArgumentLiteral<String> CONTENT_TITLE    = new ArgumentLiteral<>(String.class, "CONTENT_TITLE");
 
   public static final ArgumentLiteral<String> CONTENT_AUTHOR   = new ArgumentLiteral<>(String.class, "CONTENT_AUTHOR");
 

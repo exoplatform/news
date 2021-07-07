@@ -9,14 +9,10 @@ import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 
@@ -33,8 +29,7 @@ public class NotificationUtils {
   }
 
   public static String getNewsIllustration(News news) throws Exception {
-    SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()

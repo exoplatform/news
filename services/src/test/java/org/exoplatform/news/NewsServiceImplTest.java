@@ -737,6 +737,64 @@ public class NewsServiceImplTest {
   }
 
   @Test
+  public void shouldScheduleNews() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
+                                                      userACL);
+    News news = new News();
+    news.setTitle("new scheduled news title");
+    news.setSummary("new scheduled news summary");
+    news.setBody("new scheduled news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+
+    News scheduledNews = new News();
+    String datePostScheduled = "06/18/2021 15:01:16 +0100";
+    scheduledNews.setId("id123");
+    scheduledNews.setSchedulePostDate(datePostScheduled);
+    scheduledNews.setPublicationState("staged");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doReturn(scheduledNews).when(newsServiceSpy).scheduleNews(news);
+
+
+    // When
+    News scheduleNews = newsServiceSpy.scheduleNews(news);
+
+    // Then
+    assertNotNull(scheduleNews);
+    assertEquals("staged", scheduleNews.getPublicationState());
+    assertEquals("06/18/2021 15:01:16 +0100", scheduleNews.getSchedulePostDate());
+  }
+
+  @Test
   public void shouldUnPinNews() throws Exception {
     // Given
 

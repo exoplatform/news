@@ -913,6 +913,36 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldGetOkWhenScheduleNews() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setCanEdit(true);
+    news.setSpaceId("1");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.scheduleNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void shouldGetNotAuthorizedWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,

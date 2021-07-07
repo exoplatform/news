@@ -21,6 +21,7 @@ import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLEntityEncoder;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.news.notification.utils.NotificationConstants;
@@ -31,23 +32,28 @@ import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
-import org.exoplatform.social.notification.Utils;
 import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.gatein.common.text.EntityEncoder;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = PublishNewsNotificationPlugin.ID, template = "war:/notification/templates/mail/postNewsNotificationPlugin.gtmpl") })
 public class MailTemplateProvider extends TemplateProvider {
   protected static Log    log = ExoLogger.getLogger(MailTemplateProvider.class);
 
-  private IdentityManager identityManager;
+  private final IdentityManager identityManager;
 
-  public MailTemplateProvider(InitParams initParams, IdentityManager identityManager) {
+  private final SpaceService spaceService;
+
+  public MailTemplateProvider(InitParams initParams, IdentityManager identityManager, SpaceService spaceService) {
     super(initParams);
+    this.spaceService = spaceService;
     this.templateBuilders.put(PluginKey.key(PostNewsNotificationPlugin.ID), new TemplateBuilder());
     this.templateBuilders.put(PluginKey.key(MentionInNewsNotificationPlugin.ID), new TemplateBuilder());
+    this.templateBuilders.put(PluginKey.key(PublishNewsNotificationPlugin.ID), new TemplateBuilder());
     this.identityManager = identityManager;
   }
 
@@ -60,6 +66,7 @@ public class MailTemplateProvider extends TemplateProvider {
       String language = getLanguage(notification);
       TemplateContext templateContext = TemplateContext.newChannelInstance(getChannelKey(), pluginId, language);
 
+      String newsId = notification.getValueOwnerParameter(NotificationConstants.NEWS_ID);
       String contentAuthor = notification.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR);
       String currentUser = notification.getValueOwnerParameter(NotificationConstants.CURRENT_USER);
       String contentTitle = notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE);
@@ -78,7 +85,26 @@ public class MailTemplateProvider extends TemplateProvider {
       templateContext.put("ILLUSTRATION_URL", encoder.encode(illustrationUrl));
       templateContext.put("AUTHOR_AVATAR_URL", encoder.encode(authorAvatarUrl));
       templateContext.put("CONTEXT", encoder.encode(context));
-      templateContext.put("ACTIVITY_LINK", encoder.encode(activityLink));
+      StringBuilder activityUrl = new StringBuilder();
+      Space space = spaceService.getSpaceByDisplayName(contentSpaceName);
+      if (pluginId.equals(PublishNewsNotificationPlugin.ID) && !spaceService.isMember(space, notification.getTo())) {
+        String portalName = PortalContainer.getCurrentPortalContainerName();
+        String portalOwner = CommonsUtils.getCurrentPortalOwner();
+        String currentDomain = CommonsUtils.getCurrentDomain();
+        if (!currentDomain.endsWith("/")) {
+          currentDomain += "/";
+        }
+        activityUrl.append(currentDomain)
+                   .append(portalName)
+                   .append("/")
+                   .append(portalOwner)
+                   .append("/news/detail?newsId=")
+                   .append(newsId);
+      } else {
+        activityUrl.append(activityLink);
+      }
+
+      templateContext.put("ACTIVITY_LINK", encoder.encode(activityUrl.toString()));
 
       templateContext.put("READ",
                           Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"
@@ -92,7 +118,10 @@ public class MailTemplateProvider extends TemplateProvider {
                                                                        new Locale(language),
                                                                        TimeConvertUtils.YEAR));
       // Receiver
-      Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notification.getTo(), true);
+      Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notification.getTo());
+      if (receiver == null || receiver.getRemoteId().equals(notification.getFrom())) {
+        return null;
+      }
       templateContext.put("FIRST_NAME", encoder.encode(receiver.getProfile().getProperty(Profile.FIRST_NAME).toString()));
       // Footer
       templateContext.put("FOOTER_LINK", LinkProviderUtils.getRedirectUrl("notification_settings", receiver.getRemoteId()));
@@ -110,13 +139,14 @@ public class MailTemplateProvider extends TemplateProvider {
       List<NotificationInfo> notifications = ctx.getNotificationInfos();
       NotificationInfo notificationInfo = notifications.get(0);
       try {
+        String pluginId = notificationInfo.getKey().getId();
         String spaceId = notificationInfo.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE);
-        Space space = Utils.getSpaceService().getSpaceByDisplayName(spaceId);
-        if (!Utils.getSpaceService().isMember(space, notificationInfo.getTo())
+        Space space = spaceService.getSpaceByDisplayName(spaceId);
+        if ((!pluginId.equals(PublishNewsNotificationPlugin.ID)
+            && !spaceService.isMember(space, notificationInfo.getTo()))
             || notificationInfo.getTo().equals(notificationInfo.getFrom())) {
           return false;
         }
-        String pluginId = notificationInfo.getKey().getId();
         if (pluginId.equals(MentionInNewsNotificationPlugin.ID)) {
           String mentionedIds = notificationInfo.getValueOwnerParameter(NotificationConstants.MENTIONED_IDS);
           String ids = mentionedIds.substring(1, mentionedIds.length() - 1);
@@ -128,7 +158,7 @@ public class MailTemplateProvider extends TemplateProvider {
         String language = getLanguage(notificationInfo);
         TemplateContext templateContext = new TemplateContext(pluginId, language);
         //
-        Identity receiver = CommonsUtils.getService(IdentityManager.class).getOrCreateIdentity(OrganizationIdentityProvider.NAME, notificationInfo.getTo());
+        Identity receiver = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, notificationInfo.getTo());
         templateContext.put("FIRST_NAME", encoder.encode(receiver.getProfile().getProperty(Profile.FIRST_NAME).toString()));
         templateContext.put("FOOTER_LINK", LinkProviderUtils.getRedirectUrl("notification_settings", receiver.getRemoteId()));
 

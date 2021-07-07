@@ -2,9 +2,7 @@ package org.exoplatform.news.notification.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -26,27 +24,27 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log                    LOG              = ExoLogger.getLogger(PostNewsNotificationPlugin.class);
 
-  public final static String                  ID               = "PostNewsNotificationPlugin";
+  public static final  String                  ID               = "PostNewsNotificationPlugin";
 
-  public final static ArgumentLiteral<String> CONTENT_TITLE    = new ArgumentLiteral<String>(String.class, "CONTENT_TITLE");
+  public static final ArgumentLiteral<String> CONTENT_TITLE    = new ArgumentLiteral<>(String.class, "CONTENT_TITLE");
 
-  public final static ArgumentLiteral<String> CONTENT_UPDATER  = new ArgumentLiteral<String>(String.class, "CONTENT_UPDATER");
+  public static final ArgumentLiteral<String> CONTENT_AUTHOR   = new ArgumentLiteral<>(String.class, "CONTENT_AUTHOR");
 
-  public static final ArgumentLiteral<String> CONTENT_AUTHOR   = new ArgumentLiteral<String>(String.class, "CONTENT_AUTHOR");
+  public static final ArgumentLiteral<String> CONTENT_SPACE    = new ArgumentLiteral<>(String.class, "CONTENT_SPACE");
 
-  public static final ArgumentLiteral<String> CONTENT_SPACE    = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE");
+  public static final ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<>(String.class, "CONTENT_SPACE_ID");
 
-  public static final ArgumentLiteral<String> CONTENT_SPACE_ID = new ArgumentLiteral<String>(String.class, "CONTENT_SPACE_ID");
+  public static final ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<>(String.class, "ILLUSTRATION_URL");
 
-  public static final ArgumentLiteral<String> ILLUSTRATION_URL = new ArgumentLiteral<String>(String.class, "ILLUSTRATION_URL");
+  public static final ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<>(String.class, "AUTHOR_AVATAR_URL");
 
-  public static final ArgumentLiteral<String> AUTHOR_AVATAR_URL = new ArgumentLiteral<String>(String.class, "AUTHOR_AVATAR_URL");
+  public static final ArgumentLiteral<String> ACTIVITY_LINK    = new ArgumentLiteral<>(String.class, "ACTIVITY_LINK");
 
-  public static final ArgumentLiteral<String> ACTIVITY_LINK    = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
+  public static final ArgumentLiteral<String> NEWS_ID          = new ArgumentLiteral<>(String.class, "NEWS_ID");
 
-  public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT          = new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
+  public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT          = new ArgumentLiteral<>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
 
-  public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<String>(String.class, "CURRENT_USER");
+  public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<>(String.class, "CURRENT_USER");
 
   private SpaceService                        spaceService;
 

@@ -1,6 +1,9 @@
 package org.exoplatform.news.notification.utils;
 
 public class NotificationConstants {
+
+  public static final String NEWS_ID          = "NEWS_ID";
+
   public static final String CONTENT_TITLE    = "CONTENT_TITLE";
 
   public static final String CONTENT_AUTHOR   = "CONTENT_AUTHOR";
@@ -25,7 +28,8 @@ public class NotificationConstants {
 
   public static enum NOTIFICATION_CONTEXT {
     POST_NEWS ("POST NEWS"),
-    MENTION_IN_NEWS ("MENTION IN NEWS");
+    MENTION_IN_NEWS ("MENTION IN NEWS"),
+    PUBLISH_IN_NEWS("PUBLISH NEWS");
 
     private String context;
 

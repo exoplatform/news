@@ -21,13 +21,6 @@
                   class="pa-0 my-auto" />
               </v-scale-transition>
             </div>
-            <v-progress-circular
-              v-if="loadingNews && newsList.length !== 0"
-              :size="30"
-              :width="3"
-              indeterminate
-              class="loadingRing"
-              color="primary" />
           </div>
         </v-col>
         <v-col

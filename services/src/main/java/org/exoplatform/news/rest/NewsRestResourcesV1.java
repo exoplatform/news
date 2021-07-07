@@ -916,7 +916,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
   }
 
-  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) throws Exception {
+  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) {
     return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
         && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }

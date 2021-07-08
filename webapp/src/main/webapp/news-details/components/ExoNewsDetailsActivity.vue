@@ -5,7 +5,6 @@
     :news-id="newsId"
     :activity-id="activityId"
     :show-edit-button="showEditButton"
-    :show-pin-button="showPinButton"
     :show-delete-button="showDeleteButton" />
 </template>
 

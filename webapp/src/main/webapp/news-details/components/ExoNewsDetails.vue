@@ -356,7 +356,7 @@ export default {
       }
     },
     editLink() {
-      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.news.newsId}&activityId=${this.activityId}`;
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_target');
     },
     deleteConfirmDialog() {

@@ -123,12 +123,9 @@ def streamOwner = activity.getStreamOwner();
 
   displayReadMore = displayReadMore && (!isArchived || canArchive);
 
-  def illustration = Utils.getActivityManager().getActivityFilesIds(activity).stream().findAny().orElse(null);
-  StringBuffer illustrationURL = new StringBuffer();
-  if(news.illustration == null){
-    illustrationURL.append("/news/images/newsImageDefault.png");
-  } else {
-    illustrationURL.append("/rest/v1/news/").append(news.id).append("/illustration");
+  String illustrationURL = news.illustrationURL;
+  if(illustrationURL == null){
+    illustrationURL = "/news/images/newsImageDefault.png";
   }
   def captionConfirmation=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.label.Confirmation"));
   def labelToDeleteThisActivity=StringEscapeUtils.escapeHtml(_ctx.appRes("UIActivity.msg.Are_You_Sure_To_Delete_This_Activity"));

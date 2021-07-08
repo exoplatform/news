@@ -21,8 +21,7 @@
             :size="30"
             :width="3"
             indeterminate
-            class="loadingRing"
-            color="#578dc9" />
+            class="loadingRing" />
         </v-app>
       </div>
       <div class="newsAppToolbarRight">
@@ -54,8 +53,7 @@
         :size="40"
         :width="4"
         indeterminate
-        class="loadingRing"
-        color="#578dc9" />
+        class="loadingRing" />
     </v-app>
     <div
       v-if="newsList.length"
@@ -80,7 +78,7 @@
               :news-id="news.newsId"
               :activities="news.activities" />
             <exo-news-details-action-menu
-              v-if="news.canEdit "
+              v-if="news.canEdit && !news.schedulePostDate"
               :news="news"
               :show-edit-button="news.canEdit && !isDraftsFilter"
               :show-delete-button="news.canDelete"
@@ -113,7 +111,10 @@
             <div class="newsDate">
               <i class="uiIconClock"></i>
               <span v-if="news && news.schedulePostDate">
-                {{ news.schedulePostDate }}
+                <date-format
+                  :value="news.schedulePostDate"
+                  :format="dateFormat"
+                  class="newsTime" />
                 -
                 <date-format
                   :value="news.schedulePostDate"
@@ -200,6 +201,11 @@ export default {
       dateTimeFormat: {
         hour: '2-digit',
         minute: '2-digit',
+      },
+      dateFormat: {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       },
     };
   },
@@ -298,7 +304,6 @@ export default {
 
       data.forEach((item) => {
         const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time).toLocaleDateString(local, options) : null;
-        const schedulePostDate = item.schedulePostDate != null ? new Date(item.schedulePostDate).toLocaleDateString(local, options) : null;
         const newsUpdateDate = new Date(item.updateDate.time).toLocaleDateString(local, options);
         const newsIllustration = item.illustrationURL == null ? '/news/images/newsImageDefault.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
@@ -321,7 +326,7 @@ export default {
           archived: item.archived,
           draft: item.publicationState === 'draft',
           scheduled: item.publicationState === 'staged',
-          schedulePostDate: schedulePostDate,
+          schedulePostDate: item.schedulePostDate,
           canArchive: item.canArchive,
           pinned: item.pinned,
           activities: item.activities,

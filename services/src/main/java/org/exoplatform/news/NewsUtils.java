@@ -80,9 +80,8 @@ public class NewsUtils {
 
   public static List<Space> getRedactorOrManagerSpaces(String userId) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
-    ListAccess<Space> spacesAccess = spaceService.getMemberSpaces(userId);
-    int spacesSize = spacesAccess.getSize();
-    List<Space> spaces = Arrays.asList(spacesAccess.load(0, spacesSize));
+    ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userId);
+    List<Space> spaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return spaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
                  .collect(Collectors.toList());

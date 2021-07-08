@@ -90,7 +90,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private Map<String, String>    newsToDeleteQueue = new HashMap<>();
 
   private enum FilterType {
-    PINNED, MYPOSTED, ARCHIVED, DRAFTS, ALL
+    PINNED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
   }
 
   public NewsRestResourcesV1(NewsService newsService,
@@ -307,17 +307,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
+      Space newsSpace = spaceService.getSpaceById(news.getSpaceId());
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
-          && !StringUtils.equals(news.getAuthor(), authenticatedUser)) {
+          && !canViewScheduledNews(authenticatedUser, newsSpace, news)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      if (!news.isPinned()) {
-        Space space = spaceService.getSpaceById(news.getSpaceId());
-        if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
-            && !canViewNews(authenticatedUser, space)) {
-          return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+      if (!news.isPinned() && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
+          && !canViewNews(authenticatedUser, newsSpace)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
       }
+      
       news.setIllustration(null);
 
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
@@ -863,29 +862,36 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     if (StringUtils.isNotEmpty(filter)) {
       FilterType filterType = FilterType.valueOf(filter.toUpperCase());
       switch (filterType) {
-      case PINNED: {
-        newsFilter.setPinnedNews(true);
-        break;
-      }
-
-      case MYPOSTED: {
-        if (StringUtils.isNotEmpty(author)) {
-          newsFilter.setAuthor(author);
+        case PINNED: {
+          newsFilter.setPinnedNews(true);
+          break;
         }
-        break;
-      }
 
-      case ARCHIVED: {
-        newsFilter.setArchivedNews(true);
-        break;
-      }
-      case DRAFTS: {
-        if (StringUtils.isNotEmpty(author)) {
-          newsFilter.setAuthor(author);
+        case MYPOSTED: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          break;
         }
-        newsFilter.setDraftNews(true);
-        break;
-      }
+
+        case ARCHIVED: {
+          newsFilter.setArchivedNews(true);
+          break;
+        }
+        case DRAFTS: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          newsFilter.setDraftNews(true);
+          break;
+        }
+        case SCHEDULED: {
+          if (StringUtils.isNotEmpty(author)) {
+            newsFilter.setAuthor(author);
+          }
+          newsFilter.setScheduledNews(true);
+          break;
+        }
       }
     }
     // Set text to search news with
@@ -908,5 +914,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   
   private boolean canViewNews(String authenticatedUser, Space space) throws Exception {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
+  }
+
+  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) {
+    return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
+        && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }
 }

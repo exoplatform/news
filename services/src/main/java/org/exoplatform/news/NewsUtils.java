@@ -1,6 +1,7 @@
 package org.exoplatform.news;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
@@ -8,11 +9,12 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 public class NewsUtils {
 
@@ -74,6 +76,15 @@ public class NewsUtils {
       return null;
     }
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
+  }
+
+  public static List<Space> getRedactorOrManagerSpaces(String userId) throws Exception {
+    SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+    ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userId);
+    List<Space> spaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
+    return spaces.stream()
+                 .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
+                 .collect(Collectors.toList());
   }
 
 }

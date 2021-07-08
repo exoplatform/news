@@ -9,6 +9,8 @@ public class NewsFilter {
   private boolean      archivedNews;
 
   private boolean      draftNews;
+  
+  private boolean      scheduledNews;
 
   private String       searchText;
 
@@ -47,6 +49,14 @@ public class NewsFilter {
 
   public void setDraftNews(boolean draftNews) {
     this.draftNews = draftNews;
+  }
+
+  public boolean isScheduledNews() {
+    return scheduledNews;
+  }
+
+  public void setScheduledNews(boolean scheduledNews) {
+    this.scheduledNews = scheduledNews;
   }
 
   public String getSearchText() {

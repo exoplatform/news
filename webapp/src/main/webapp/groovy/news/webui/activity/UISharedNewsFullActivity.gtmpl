@@ -119,9 +119,9 @@ if (activity && news) {
 
   def activityLink = uicomponent.getActivityPermalink(activity.id);
 
-  String illustrationURL = "";
-  if(news.illustrationURL != null) {
-    illustrationURL = new StringBuilder("/portal/rest/v1/news/").append(news.id).append("/illustration").toString();
+  String illustrationURL = news.illustrationURL;
+  if(illustrationURL == null){
+    illustrationURL = "/news/images/newsImageDefault.png";
   }
 
   def newsTitle = news.title;

@@ -28,7 +28,6 @@
               <slot name="postDateDateTime"></slot>
               <time-picker
                 v-model="postDateTime"
-                :min="minimumDateTime"
                 class="me-4" />
             </div>
           </div>
@@ -86,16 +85,6 @@ export default {
     minimumPostDate() {
       return new Date();
     },
-    minimumDateTime() {
-      if ( new Date(this.postDate).getDate() === new Date().getDate()) {
-        const currentTime = new Date();
-        currentTime.setHours(currentTime.getHours());
-        currentTime.setSeconds(0);
-        currentTime.setMinutes ( currentTime.getMinutes() + 30 );
-        return currentTime;
-      }
-      return null;
-    }
   },
   created() {
     this.initializeDate();
@@ -116,6 +105,7 @@ export default {
       this.postDateTime = nextDate;
       this.postDateTime.setHours(8);
       this.postDateTime.setMinutes(0);
+      this.postDateTime.setSeconds(0);
       this.postDateTime.setMilliseconds(0);
     },
     selectPostMode() {

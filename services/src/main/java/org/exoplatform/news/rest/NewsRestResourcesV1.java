@@ -889,13 +889,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
     }
     // Set text to search news with
-    if (text != null && StringUtils.isNotEmpty(text)) {
+    if (StringUtils.isNotEmpty(text)) {
       newsFilter.setSearchText(text);
-      newsFilter.setOrder("jcr:score");
-    } else {
-      newsFilter.setOrder("exo:dateModified");
     }
 
+    newsFilter.setOrder("exo:dateModified");
     newsFilter.setLimit(limit);
     newsFilter.setOffset(offset);
 

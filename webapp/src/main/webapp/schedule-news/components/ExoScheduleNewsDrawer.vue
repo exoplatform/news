@@ -9,8 +9,11 @@
       v-model="drawer"
       show-overlay
       right>
-      <template slot="title">
-        {{ $t('news.composer.postArticle') }} 
+      <template v-if="!editScheduledNews" slot="title">
+        {{ $t('news.composer.postArticle') }}
+      </template>
+      <template else slot="title">
+        {{ $t('news.composer.editArticle') }}
       </template>
       <template slot="content">
         <v-radio-group v-model="postArticleMode" class="ml-2">
@@ -20,23 +23,30 @@
           <v-radio
             v-if="allowPostingLater"
             :label="$t('news.composer.postLater')"
-            value="later" />
-        </v-radio-group>
-        <div v-if="postArticleMode==='later' && allowPostingLater" class="ml-4">
-          <div class="grey--text my-4">{{ $t('news.composer.choosePostDate') }}</div>
-          <div class="d-flex flex-row flex-grow-1">
-            <date-picker
-              v-model="postDate"
-              :min-value="minimumPostDate"
-              class="flex-grow-1 my-auto" />
-            <div class="d-flex flex-row flex-grow-0">
-              <slot name="postDateDateTime"></slot>
-              <time-picker
-                v-model="postDateTime"
-                class="me-4" />
+            value="later"
+            class="mt-4" />
+          <div v-if="(postArticleMode==='later' && allowPostingLater) || allowNotPost" class="mt-4 ml-4">
+            <div class="grey--text my-4">{{ $t('news.composer.choosePostDate') }}</div>
+            <div class="d-flex flex-row flex-grow-1">
+              <slot name="postDate"></slot>
+              <date-picker
+                v-model="postDate"
+                :min-value="minimumPostDate"
+                class="scheduleDatePicker flex-grow-1 my-auto" />
+              <div class="d-flex flex-row flex-grow-0">
+                <slot name="postDateDateTime"></slot>
+                <time-picker
+                  v-model="postDateTime"
+                  class="me-4" />
+              </div>
             </div>
           </div>
-        </div>
+          <v-radio
+            v-if="allowNotPost"
+            :label="$t('news.composer.notPost')"
+            value="notPost"
+            class="mt-4" />
+        </v-radio-group>
       </template>
       <template slot="footer">
         <div class="d-flex justify-end">
@@ -61,6 +71,8 @@ export default {
     postDate: null,
     postDateTime: '8:00',
     allowPostingLater: false,
+    editScheduledNews: false,
+    allowNotPost: false,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -96,6 +108,14 @@ export default {
     this.initializeDate();
     this.$featureService.isFeatureEnabled('news.postLater')
       .then(enabled => this.allowPostingLater = enabled);
+    this.$root.$on('open-schedule-drawer', (scheduleMode) => {
+      this.editScheduledNews = scheduleMode;
+      if (scheduleMode === 'editScheduledNews') {
+        this.allowNotPost = true;
+        this.postArticleMode = 'notPost';
+      }
+      this.open();
+    });
   },
   methods: {
     open() {
@@ -115,7 +135,7 @@ export default {
       this.postDateTime.setMilliseconds(0);
     },
     selectPostMode() {
-      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate));
+      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode);
     },
   }
 };

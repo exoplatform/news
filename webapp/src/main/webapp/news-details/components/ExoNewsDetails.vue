@@ -1,9 +1,13 @@
 <template>
   <div id="newsDetails">
     <a class="backBtn" :href="backURL"><i class="uiIconBack"></i></a>
-    <v-btn v-if="publicationState === 'staged'" class="btn newsDetailsActionMenu mt-6 mr-2 pull-right">
+    <v-btn
+      v-if="publicationState === 'staged'"
+      class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
+      @click="$root.$emit('open-schedule-drawer','editScheduledNews')">
       {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
+    <schedule-news-activity @post-article="postNews" />
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -153,6 +157,7 @@
   </div>
 </template>
 <script>
+const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
 export default {
   props: {
     news: {
@@ -399,6 +404,35 @@ export default {
         }
       }
       return docElement.innerHTML;
+    },
+    postNews(schedulePostDate, postArticleMode) {
+      this.news.timeZoneId = USER_TIMEZONE_ID;
+      if (postArticleMode === 'later') {
+        this.news.schedulePostDate = schedulePostDate;
+        this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {
+          if (scheduleNews) {
+            window.location.href = scheduleNews.url;
+          }
+        });
+      } else if(postArticleMode === 'immediate') {
+        this.news.publicationState = 'published';
+        this.$newsServices.saveNews(this.news).then((createdNews) => {
+          let createdNewsActivity = null;
+          if (createdNews.activities) {
+            const createdNewsActivities = createdNews.activities.split(';')[0].split(':');
+            if (createdNewsActivities.length > 1) {
+              createdNewsActivity = createdNewsActivities[1];
+            }
+          }
+          if (createdNewsActivity) {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+          } else {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+          }
+        });
+      } else {
+        return null;
+      }
     },
   }
 };

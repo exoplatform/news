@@ -278,13 +278,24 @@ export default {
       this.$newsServices.getNewsById(this.newsId)
         .then(news => {
           this.spaceId = news.spaceId;
+          if (!this.news) {
+            this.news = news;
+          }
+          // TODO news.newsId should be converted to use news.id
+          // to correspond to retruned object by REST
+          if (!this.news.newsId) {
+            this.news.newsId = this.newsId;
+          }
           return this.$nextTick();
         })
         .finally(() => {
           this.$root.$emit('application-loaded');
         });
     } else {
-      this.spaceId = this.news && this.news.spaceId;
+      this.spaceId = this.news.spaceId;
+      if (!this.news.newsId) {
+        this.news.newsId = this.newsId;
+      }
       if (this.notSameUpdater && this.news && this.news.updater) {
         this.$identityService.getIdentityByProviderIdAndRemoteId('organization', this.news.updater)
           .then(identity => this.updaterIdentity = identity);

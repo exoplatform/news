@@ -772,6 +772,7 @@ public class NewsServiceImpl implements NewsService {
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
+    news.setCanPublish(canPinNews());
     StringBuilder newsUrl = new StringBuilder("");
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();
@@ -1143,8 +1144,13 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
-    return  getCurrentIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
-            getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    // FIXME shouldn't use ConversationState in Service layer
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    if (currentIdentity == null) {
+      return false;
+    }
+    return  currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
+            currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   public News scheduleNews(News news) throws Exception {

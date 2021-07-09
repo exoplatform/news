@@ -1,13 +1,14 @@
 package org.exoplatform.news.model;
 
+import java.util.*;
+
 import org.exoplatform.social.core.space.model.Space;
 
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 public class News {
+
   private String               id;
 
   private String               title;
@@ -72,9 +73,13 @@ public class News {
 
   private String               authorAvatarUrl;
 
-  private Boolean              canEdit;
+  private boolean              canEdit;
 
-  private Boolean              canDelete;
+  private boolean              canDelete;
+
+  @Getter
+  @Setter
+  private boolean              canPublish;
 
   private Set<Space>           sharedInSpacesList;
 
@@ -113,7 +118,7 @@ public class News {
   public String getBody() {
     return body;
   }
-  
+
   public void setBody(String body) {
     this.body = body;
   }
@@ -124,6 +129,14 @@ public class News {
 
   public void setAuthor(String author) {
     this.author = author;
+  }
+
+  public String getAuthorDisplayName() {
+    return authorDisplayName;
+  }
+
+  public void setAuthorDisplayName(String authorDisplayName) {
+    this.authorDisplayName = authorDisplayName;
   }
 
   public String getUpdater() {
@@ -141,6 +154,7 @@ public class News {
   public void setDraftUpdater(String draftUpdater) {
     this.draftUpdater = draftUpdater;
   }
+
   public String getDraftUpdaterDisplayName() {
     return draftUpdaterDisplayName;
   }
@@ -221,6 +235,22 @@ public class News {
     this.pinned = pinned;
   }
 
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
+  public boolean isCanArchive() {
+    return canArchive;
+  }
+
+  public void setCanArchive(boolean canArchive) {
+    this.canArchive = canArchive;
+  }
+
   public String getSpaceId() {
     return spaceId;
   }
@@ -249,8 +279,8 @@ public class News {
     return isSpaceMember;
   }
 
-  public void setSpaceMember(boolean spaceMember) {
-    isSpaceMember = spaceMember;
+  public void setSpaceMember(boolean isSpaceMember) {
+    this.isSpaceMember = isSpaceMember;
   }
 
   public String getPath() {
@@ -269,14 +299,6 @@ public class News {
     this.publicationState = publicationState;
   }
 
-  public String getAuthorDisplayName() {
-    return authorDisplayName;
-  }
-
-  public void setAuthorDisplayName(String authorDisplayName) {
-    this.authorDisplayName = authorDisplayName;
-  }
-
   public Long getViewsCount() {
     return viewsCount;
   }
@@ -292,17 +314,11 @@ public class News {
   public void setActivities(String activities) {
     this.activities = activities;
   }
-  
-  /**
-   * @return the activityId
-   */
+
   public String getActivityId() {
     return activityId;
   }
 
-  /**
-   * @param activityId the activityId to set
-   */
   public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
@@ -323,28 +339,28 @@ public class News {
     this.spaceAvatarUrl = spaceAvatarUrl;
   }
 
-  public Boolean isCanEdit() {
+  public String getAuthorAvatarUrl() {
+    return authorAvatarUrl;
+  }
+
+  public void setAuthorAvatarUrl(String authorAvatarUrl) {
+    this.authorAvatarUrl = authorAvatarUrl;
+  }
+
+  public boolean isCanEdit() {
     return canEdit;
   }
 
-  public void setCanEdit(Boolean canEdit) {
+  public void setCanEdit(boolean canEdit) {
     this.canEdit = canEdit;
   }
-  
-  public boolean isArchived() {
-    return archived;
+
+  public boolean isCanDelete() {
+    return canDelete;
   }
 
-  public void setArchived(boolean archived) {
-    this.archived = archived;
-  }
-
-  public boolean isCanArchive() {
-    return canArchive;
-  }
-
-  public void setCanArchive(boolean canArchive) {
-    this.canArchive = canArchive;
+  public void setCanDelete(boolean canDelete) {
+    this.canDelete = canDelete;
   }
 
   public Set<Space> getSharedInSpacesList() {
@@ -371,22 +387,6 @@ public class News {
     this.hiddenSpace = hiddenSpace;
   }
 
-  public String getAuthorAvatarUrl() {
-    return authorAvatarUrl;
-  }
-
-  public void setAuthorAvatarUrl(String authorAvatarUrl) {
-    this.authorAvatarUrl = authorAvatarUrl;
-  }
-
-  public Boolean isCanDelete() {
-    return canDelete;
-  }
-
-  public void setCanDelete(Boolean canDelete) {
-    this.canDelete = canDelete;
-  }
-
   public String getSchedulePostDate() {
     return schedulePostDate;
   }
@@ -402,4 +402,5 @@ public class News {
   public void setTimeZoneId(String timeZoneId) {
     this.timeZoneId = timeZoneId;
   }
+
 }

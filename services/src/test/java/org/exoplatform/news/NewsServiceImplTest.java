@@ -732,6 +732,7 @@ public class NewsServiceImplTest {
     News createdNews = newsServiceSpy.createNews(news);
 
     // Then
+    setRootAsCurrentIdentity();
     assertNotNull(createdNews);
     verify(newsServiceSpy, times(1)).pinNews("id123");
   }
@@ -2333,6 +2334,7 @@ public class NewsServiceImplTest {
     newsFilter.setAuthor("root");
     newsFilter.setDraftNews(true);
     newsFilter.setSpaces(spaces);
+    setRootAsCurrentIdentity();
     List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
@@ -2546,9 +2548,7 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setRootAsCurrentIdentity();
 
     // When
     newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -2632,6 +2632,7 @@ public class NewsServiceImplTest {
 
     when(poster.getProfile()).thenReturn(p1);
     // When
+    setRootAsCurrentIdentity();
     List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
@@ -3086,9 +3087,7 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setRootAsCurrentIdentity();
 
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
@@ -3243,9 +3242,19 @@ public class NewsServiceImplTest {
     when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
-    
-    
+
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
+    when(space.getVisibility()).thenReturn("private");
+
+    setRootAsCurrentIdentity();
     assertFalse(newsService.convertNodeToNews(newsNode, false).getBody().contains("<img"));
-    
+  }
+
+  private void setRootAsCurrentIdentity() {
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
   }
 }

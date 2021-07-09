@@ -39,6 +39,9 @@ const newsActivityTypeExtensionOptions = {
       };
     }
   },
+  showSharedInformationFooter: (activity, isActivityDetail) => {
+    return activity && isActivityDetail;
+  },
   init: (activity, isActivityDetail) => {
     if (!isActivityDetail) {
       const newsId = activity && activity.templateParams && activity.templateParams.newsId;

@@ -1,23 +1,17 @@
 <template>
   <div id="pinNewsActivity">
-    <div
-      v-if="showPinMessage"
-      id="messagePin"
-      class="confirmPinMessage">
-      <transition name="fade">
-        <div :class="[successPin ? 'alert-success' : 'alert-error']" class="alert">
-          <i :class="[successPin ? 'uiIconSuccess' : 'uiIconError']"></i>
-          <span>{{ messagePin }}</span>
-        </div>
-      </transition>
-    </div>
+    <exo-confirm-dialog
+      ref="publishConfirmDialog"
+      :title="confirmDialogTitle"
+      :message="confirmDialogMessage"
+      :ok-label="$t('news.broadcast.btn.confirm')"
+      :cancel-label="$t('news.broadcast.btn.cancel')"
+      @ok="updatePinnedField" />
     <a
       id="newsPinButton"
-      :data-original-title="pinLabel"
+      :title="pinLabel"
       :class="[newsArchived ? 'unauthorizedPin' : '']"
       class="btn"
-      rel="tooltip"
-      data-placement="bottom"
       @click="confirmAction">
       <v-icon
         :class="broadcastArticleClass"
@@ -54,31 +48,26 @@ export default {
     return {
       showPinMessage: false,
       messagePin: '',
-      pinLabel: '',
       successPin: true,
     };
   },
   computed: {
     broadcastArticleClass() {
       return this.newsPinned ? 'broadcastArticle' : 'unbroadcastArticle';
-    }
-  },
-  created() {
-    this.pinLabel = !this.newsPinned ? this.$t('news.broadcast.action') : this.$t('news.unbroadcast.action');
+    },
+    pinLabel() {
+      return this.newsPinned && this.$t('news.unbroadcast.action') || this.$t('news.broadcast.action');
+    },
+    confirmDialogTitle() {
+      return this.newsPinned && this.$t('news.unbroadcast.action') || this.$t('news.broadcast.action');
+    },
+    confirmDialogMessage() {
+      return this.newsPinned && this.$t('news.unbroadcast.confirm', {0: this.newsTitle}) || this.$t('news.broadcast.confirm');
+    },
   },
   methods: {
-    confirmAction: function() {
-      if (!this.newsArchived) {
-        let confirmText = this.$t('news.broadcast.confirm');
-        let captionText = this.$t('news.broadcast.action');
-        const confirmButton = this.$t('news.broadcast.btn.confirm');
-        const cancelButton = this.$t('news.broadcast.btn.cancel');
-        if (this.newsPinned === true) {
-          confirmText = this.$t('news.unbroadcast.confirm').replace('{0}', this.newsTitle);
-          captionText = this.$t('news.unbroadcast.action');
-        }
-        eXo.social.PopupConfirmation.confirm('newsPinButtonFromDetailsForm', [{action: this.updatePinnedField, label: confirmButton}], captionText, confirmText, cancelButton);
-      }
+    confirmAction() {
+      this.$refs.publishConfirmDialog.open();
     },
     updatePinnedField: function () {
       const pinMessageTime = 5000;

@@ -24,7 +24,6 @@ import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.deprecation.DeprecatedAPI;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
@@ -145,22 +144,22 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           @ApiResponse(code = 401, message = "User not authorized to schedule the news"),
           @ApiResponse(code = 500, message = "Internal server error") })
   public Response scheduleNews(@Context HttpServletRequest request,
-                               @ApiParam(value = "News", required = true) News updatedScheduledNews) {
-    if (updatedScheduledNews == null || StringUtils.isEmpty(updatedScheduledNews.getId())) {
+                               @ApiParam(value = "News", required = true) News scheduledNews) {
+    if (scheduledNews == null || StringUtils.isEmpty(scheduledNews.getId())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
     try {
-      News news = newsService.getNewsById(updatedScheduledNews.getId(), false);
+      News news = newsService.getNewsById(scheduledNews.getId(), false);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       if (!news.isCanEdit()) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      news = newsService.scheduleNews(updatedScheduledNews);
+      news = newsService.scheduleNews(scheduledNews);
       return Response.ok(news).build();
     } catch (Exception e) {
-      LOG.error("Error when scheduling the news " + updatedScheduledNews.getTitle(), e);
+      LOG.error("Error when scheduling the news " + scheduledNews.getTitle(), e);
       return Response.serverError().build();
     }
   }
@@ -871,14 +870,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     return spaceService.isSuperManager(authenticatedUser) || (space != null && spaceService.isMember(space, authenticatedUser));
   }
 
-  private boolean canScheduleNews(String authenticatedUser, Space space) throws Exception {
+  private boolean canScheduleNews(String authenticatedUser, Space space) {
     boolean isManager = space != null && spaceService.isManager(space, authenticatedUser);
     boolean isRedactor = space != null && spaceService.isRedactor(space, authenticatedUser);
     boolean spaceHasARedactor = space != null && space.getRedactors() != null && space.getRedactors().length > 0;
     return ((spaceHasARedactor && (isRedactor || isManager)) || (!spaceHasARedactor && isManager));
   }
 
-  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) throws Exception {
+  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) {
     return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
         && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
   }

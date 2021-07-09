@@ -31,7 +31,7 @@ export function init(params) {
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale ressources are ready
     shareNewsApp = new Vue({
-      template: `<schedule-news-activity
+      template: `<schedule-news-drawer
                   v-cacheable="{cacheId: '${appId}'}"
                   id="${appId}"/>`,
       i18n,

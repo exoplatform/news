@@ -7,7 +7,9 @@
       @click="$root.$emit('open-schedule-drawer','editScheduledNews')">
       {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
-    <schedule-news-activity @post-article="postNews" />
+    <schedule-news-drawer
+      @post-article="postNews"
+      :news-id="newsId" />
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -414,7 +416,7 @@ export default {
             window.location.href = scheduleNews.url;
           }
         });
-      } else if(postArticleMode === 'immediate') {
+      } else if (postArticleMode === 'immediate') {
         this.news.publicationState = 'published';
         this.$newsServices.saveNews(this.news).then((createdNews) => {
           let createdNewsActivity = null;
@@ -431,7 +433,14 @@ export default {
           }
         });
       } else {
-        return null;
+        this.news.publicationState = 'draft';
+        this.$newsServices.saveNews(this.news).then((createdNews) => {
+          this.news.id = createdNews.id;
+          this.$emit('draftCreated');
+          if (createdNews) {
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=drafts`;
+          }
+        });
       }
     },
   }

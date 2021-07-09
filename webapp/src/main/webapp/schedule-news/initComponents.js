@@ -1,7 +1,7 @@
 import ScheduleNewsDrawer from './components/ExoScheduleNewsDrawer.vue';
 
 const components = {
-  'schedule-news-activity': ScheduleNewsDrawer,
+  'schedule-news-drawer': ScheduleNewsDrawer,
 };
 for (const key in components) {
   Vue.component(key, components[key]);

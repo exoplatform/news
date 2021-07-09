@@ -50,7 +50,6 @@ export default {
         if (Date.now() - this.startTypingKeywordTimeout > this.startSearchAfterInMilliseconds) {
           this.loading = false;
           this.$emit('input', this.query);
-          return;
         } else {
           this.waitForEndTyping();
         }

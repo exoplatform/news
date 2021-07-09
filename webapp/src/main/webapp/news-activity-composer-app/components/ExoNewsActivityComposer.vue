@@ -11,7 +11,7 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
-      <exo-news-post-drawer ref="postNewsDrawer" @post-article="postNews" />
+      <schedule-news-activity @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -250,6 +250,7 @@ export default {
         minute: '2-digit',
       },
       canScheduleNews: false,
+      scheduleMode: '',
     };
   },
   computed: {
@@ -537,14 +538,10 @@ export default {
     },
     newsActions() {
       if (this.canScheduleNews) {
-        this.openDrawer();
+        this.scheduleMode = 'postScheduledNews';
+        this.$root.$emit('open-schedule-drawer', this.scheduleMode);
       } else {
         this.postNews();
-      }
-    },
-    openDrawer() {
-      if (this.$refs.postNewsDrawer) {
-        this.$refs.postNewsDrawer.open();
       }
     },
     postNews: function (schedulePostDate) {

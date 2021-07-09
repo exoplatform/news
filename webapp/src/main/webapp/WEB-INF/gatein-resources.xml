@@ -135,6 +135,9 @@
         <module>newsDetails</module>
       </depends>
       <depends>
+        <module>newsSnackbarComponent</module>
+      </depends>
+      <depends>
         <module>extensionRegistry</module>
       </depends>
       <depends>
@@ -199,7 +202,7 @@
       <module>commonVueComponents</module>
     </depends>
     <depends>
-      <module>snackbarComponent</module>
+      <module>newsSnackbarComponent</module>
     </depends>
     <depends>
       <module>commons-editor</module>
@@ -265,10 +268,10 @@
   </module>
 
   <module>
-    <name>snackbarComponent</name>
+    <name>newsSnackbarComponent</name>
     <script>
       <minify>false</minify>
-      <path>/js/snackbarComponent.bundle.js</path>
+      <path>/js/newsSnackbarComponent.bundle.js</path>
     </script>
     <depends>
       <module>vue</module>
@@ -311,7 +314,7 @@
       <module>ShareActivityDrawer</module>
     </depends>
     <depends>
-      <module>snackbarComponent</module>
+      <module>newsSnackbarComponent</module>
     </depends>
     <depends>
       <module>vue</module>

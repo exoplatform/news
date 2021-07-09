@@ -24,18 +24,15 @@ const urls = [
   `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.social.Webui-${lang}.json`
 ];
 
-
+document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
 const appId = 'NewsApp';
 
 export function init() {
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
-    const appElement = document.createElement('div');
-    appElement.id = appId;
-
     new Vue({
-      template: `<news-app id="${appId}" v-cacheable />`,
+      template: `<news-app id="${appId}"/>`,
       i18n,
       vuetify,
-    }).$mount(appElement);
+    }).$mount(`#${appId}`);
   });
 }

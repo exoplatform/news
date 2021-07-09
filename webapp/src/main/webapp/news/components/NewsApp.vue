@@ -247,6 +247,18 @@ export default {
 
       this.fetchNews(false);
     },
+    loadingNews() {
+      if (this.loadingNews) {
+        document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+      } else {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      }
+    },
+    initialized() {
+      if (this.initialized) {
+        this.$root.$emit('application-loaded');
+      }
+    },
     spacesFilter: {
       handler: function () {
         this.fetchNews(false);
@@ -360,9 +372,9 @@ export default {
       });
     },
     fetchNews(append = true) {
+      this.loadingNews = true;
       const searchTerm = this.searchText.trim().toLowerCase();
       const offset = append ? this.newsList.length : 0;
-      this.loadingNews = true;
       return this.$newsServices.getNews(this.newsFilter, this.spacesFilter, searchTerm, offset, this.newsPerPage + 1, false).then(data => {
         if (data.news && data.news.length) {
           if (data.news.length > this.newsPerPage) {
@@ -377,7 +389,6 @@ export default {
           this.showLoadMoreButton = false;
           this.newsList = [];
         }
-        this.loadingNews = false;
         if (searchTerm){
           window.history.pushState('', 'News', this.setQueryParam('search', this.searchText));
         } else {
@@ -386,10 +397,8 @@ export default {
         return this.$nextTick();
       }).catch(() => this.loadingNews = false)
         .finally(() => {
-          if (!this.initialized) {
-            this.initialized = true;
-            this.$root.$emit('application-loaded');
-          }
+          this.loadingNews = false;
+          this.initialized = true;
         });
     },
     loadMore: function() {

@@ -179,7 +179,6 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
-    <share-news-activity ref="shareNewsActivity" class="shareNewsDrawer" />
     <news-activity-sharing-spaces-drawer />
   </v-app>
 </template>

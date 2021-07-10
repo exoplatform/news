@@ -129,20 +129,6 @@ export function findUserSpaces(spaceName) {
   }).then(resp => resp.json()).then(json => json.options);
 }
 
-export function shareNews(newsId, sharedDescription, sharedSpaces) {
-  const sharedNews = {
-    description: sharedDescription,
-    spacesNames: sharedSpaces
-  };
-  return fetch(`${newsConstants.NEWS_API}/${newsId}/share`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST',
-    body: JSON.stringify(sharedNews)
-  });
-}
-
 export function deleteDraft(newsId) {
   return fetch(`${newsConstants.NEWS_API}/${newsId}`, {
     credentials: 'include',

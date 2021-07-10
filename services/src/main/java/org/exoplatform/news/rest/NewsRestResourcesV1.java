@@ -34,6 +34,7 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.deprecation.DeprecatedAPI;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
@@ -481,7 +482,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @ApiResponses(value = { @ApiResponse(code = 200, message = "News shared"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 401, message = "User not authorized to share the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+      @ApiResponse(code = 404, message = "News not found"),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  @DeprecatedAPI(value = "Not needed endpoint and should be purged after AS migration", insist = true)
   public Response shareNews(@Context HttpServletRequest request,
                             @ApiParam(value = "News id", required = true) @PathParam("id") String id,
                             @ApiParam(value = "Shared News", required = true) SharedNews sharedNews) {

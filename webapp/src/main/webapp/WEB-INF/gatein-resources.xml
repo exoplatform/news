@@ -102,9 +102,6 @@
       <depends>
         <module>latestNews</module>
       </depends>
-	    <depends>
-        <module>ShareNewsActivity</module>
-      </depends>
       <depends>
         <module>socialUtil</module>
       </depends>
@@ -302,31 +299,6 @@
     </depends>
     <depends>
       <module>extensionRegistry</module>
-    </depends>
-  </module>
-  <module>
-    <name>ShareNewsActivity</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/shareNewsActivity.bundle.js</path>
-    </script>
-    <depends>
-      <module>ShareActivityDrawer</module>
-    </depends>
-    <depends>
-      <module>newsSnackbarComponent</module>
-    </depends>
-    <depends>
-      <module>vue</module>
-    </depends>
-    <depends>
-      <module>eXoVueI18n</module>
-    </depends>
-    <depends>
-      <module>extensionRegistry</module>
-    </depends>
-    <depends>
-      <module>vuetify</module>
     </depends>
   </module>
 

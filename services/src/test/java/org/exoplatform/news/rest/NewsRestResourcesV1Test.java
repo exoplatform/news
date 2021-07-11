@@ -2,7 +2,7 @@ package org.exoplatform.news.rest;
 
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
@@ -12,27 +12,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
-import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.services.security.*;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsRestResourcesV1Test {
@@ -54,7 +52,7 @@ public class NewsRestResourcesV1Test {
 
   @Mock
   PortalContainer        container;
-  
+
   @Before
   public void setup() {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -73,7 +71,7 @@ public class NewsRestResourcesV1Test {
     News news = new News();
     news.setId("1");
     news.setIllustration("illustration".getBytes());
-    lenient().when(newsService.getNewsById(nullable(String.class), nullable(Boolean.class))).thenReturn(news);
+    lenient().when(newsService.getNewsById(nullable(String.class), eq("john"), nullable(Boolean.class))).thenReturn(news);
     lenient().when(spaceService.getSpaceById(nullable(String.class))).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
@@ -89,6 +87,132 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldReturnBadRequestWhenNoActivityId() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(null, null);
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnNotFoundwhenNewsNotFound() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    String username = "mary";
+    String activityId = "activityId";
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(request, activityId);
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenNotAccessible() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    String username = "mary";
+    String activityId = "activityId";
+    
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    when(newsService.getNewsByActivityId(activityId, username)).thenThrow(IllegalAccessException.class);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(request, activityId);
+    
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenNewsWithActivityNotFoundException() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    String username = "mary";
+    String activityId = "activityId";
+    
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    when(newsService.getNewsByActivityId(activityId, username)).thenThrow(ObjectNotFoundException.class);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(request, activityId);
+    
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnServerErrorWhenNewsWithActivitythrowsException() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    String username = "mary";
+    String activityId = "activityId";
+    
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    when(newsService.getNewsByActivityId(activityId, username)).thenThrow(RuntimeException.class);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(request, activityId);
+    
+    // Then
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnNewsWhenNewsIsFound() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    String username = "mary";
+    String activityId = "activityId";
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+
+    News news = mock(News.class);
+    when(newsService.getNewsByActivityId(activityId, username)).thenReturn(news);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByActivityId(request, activityId);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(news, response.getEntity());
+  }
+
+  @Test
   public void shouldGetNewsWhenNewsExistsAndUserIsNotMemberOfTheSpaceButSuperManager() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
@@ -99,7 +223,7 @@ public class NewsRestResourcesV1Test {
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(newsService.getNewsById(anyString(), eq("john"), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
     lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
@@ -132,7 +256,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -174,7 +298,7 @@ public class NewsRestResourcesV1Test {
     Space space2 = new Space();
     space1.setId("2");
     space1.setPrettyName("space2");
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(newsService.getNewsById(anyString(), eq("john"), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById("1")).thenReturn(space1);
     lenient().when(spaceService.getSpaceById("2")).thenReturn(space2);
     lenient().when(spaceService.isMember(space1, "john")).thenReturn(true);
@@ -186,11 +310,6 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    News filteredNews = (News) response.getEntity();
-    assertNotNull(filteredNews);
-    assertEquals(2, filteredNews.getSharedInSpacesList().size());
-    assertEquals(true, filteredNews.getSharedInSpacesList().contains(space1));
-    assertEquals(true, filteredNews.getSharedInSpacesList().contains(space2));
   }
 
 
@@ -229,46 +348,6 @@ public class NewsRestResourcesV1Test {
     assertEquals("Updated Summary", returnedNews.getSummary());
     assertEquals("Updated Body", returnedNews.getBody());
     assertEquals(PublicationDefaultStates.PUBLISHED, returnedNews.getPublicationState());
-  }
-
-  @Test
-  public void shouldGetOKWhenShareNewsAndNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
-    // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
-                                                                      newsAttachmentsService,
-                                                                      spaceService,
-                                                                      identityManager,
-                                                                      container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    News news = new News();
-    news.setId("1");
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
-    Space space1 = new Space();
-    space1.setPrettyName("space1");
-    lenient().when(spaceService.getSpaceByPrettyName(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
-    SharedNews sharedNews = new SharedNews();
-    sharedNews.setDescription("Description of shared news");
-    sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setActivityId("2");
-
-    // When
-    Response response = newsRestResourcesV1.shareNews(request, "1", sharedNews);
-
-    // Then
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    ArgumentCaptor<SharedNews> sharedNewsCaptor = ArgumentCaptor.forClass(SharedNews.class);
-    ArgumentCaptor<List<Space>> spacesCaptor = ArgumentCaptor.forClass((Class) List.class);
-    verify(newsService, times(1)).shareNews(sharedNewsCaptor.capture(), spacesCaptor.capture());
-    SharedNews sharedNewsCaptorValue = sharedNewsCaptor.getValue();
-    assertEquals("john", sharedNewsCaptorValue.getPoster());
-    assertEquals("Description of shared news", sharedNewsCaptorValue.getDescription());
-    assertEquals("2", sharedNewsCaptorValue.getActivityId());
-    assertEquals("1", sharedNewsCaptorValue.getNewsId());
-    List<Space> spacesCaptorValue = spacesCaptor.getValue();
-    assertEquals(1, spacesCaptorValue.size());
   }
 
   @Test
@@ -1002,18 +1081,12 @@ public class NewsRestResourcesV1Test {
                                                                       identityManager,
                                                                       container);
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
     news.setId("1");
     news.setSpaceId("1");
 
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
-    Space space1 = new Space();
-    space1.setId("1");
-    space1.setPrettyName("space1");
-    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    when(newsService.getNewsById(anyString(), eq("john"), anyBoolean())).thenReturn(news);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -1045,7 +1118,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -1330,113 +1403,6 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetNotFoundWhenShareNewsAndNewsIsNull() throws Exception {
-    // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
-                                                                      newsAttachmentsService,
-                                                                      spaceService,
-                                                                      identityManager,
-                                                                      container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    News news = new News();
-    news.setId("1");
-    SharedNews sharedNews = new SharedNews();
-    sharedNews.setDescription("Description of shared news");
-    sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setActivityId("2");
-
-    // When
-    Response response = newsRestResourcesV1.shareNews(request, "2", sharedNews);
-
-    // Then
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-  }
-
-  @Test
-  public void shouldGetBadRequestWhenShareNewsAndSpacesNamesOfSharedNewsIsNull() throws Exception {
-    // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
-                                                                      newsAttachmentsService,
-                                                                      spaceService,
-                                                                      identityManager,
-                                                                      container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    News news = new News();
-    news.setId("1");
-
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    lenient().doReturn(news).when(newsService).getNewsById("1", false);
-
-    // When
-    Response response = newsRestResourcesV1.shareNews(request, "1", new SharedNews());
-
-    // Then
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-  }
-
-  @Test
-  public void shouldGetBadRequestWhenShareNewsAndNSpaceIsNull() throws Exception {
-    // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
-                                                                      newsAttachmentsService,
-                                                                      spaceService,
-                                                                      identityManager,
-                                                                      container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    News news = new News();
-    news.setId("1");
-
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
-    Space space1 = new Space();
-    space1.setPrettyName("space1");
-    lenient().when(spaceService.getSpaceByPrettyName(anyString())).thenReturn(null);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
-    SharedNews sharedNews = new SharedNews();
-    sharedNews.setDescription("Description of shared news");
-    sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setActivityId("2");
-
-    // When
-    Response response = newsRestResourcesV1.shareNews(request, "1", sharedNews);
-
-    // Then
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-  }
-
-  @Test
-  public void shouldGetUnauthorizedWhenShareNewsAndNewsExistsAndUserIsNotMemberOfTheSpaceAndUserIsNOtSuperManager() throws Exception {
-    // Given
-    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
-                                                                      newsAttachmentsService,
-                                                                      spaceService,
-                                                                      identityManager,
-                                                                      container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    News news = new News();
-    news.setId("1");
-
-    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
-    Space space1 = new Space();
-    space1.setPrettyName("space1");
-    lenient().when(spaceService.getSpaceByPrettyName(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
-    SharedNews sharedNews = new SharedNews();
-    sharedNews.setDescription("Description of shared news");
-    sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setActivityId("2");
-
-    // When
-    Response response = newsRestResourcesV1.shareNews(request, "1", sharedNews);
-
-    // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-  }
-
-  @Test
   public void shouldGetAllPublishedNewsWhenExist() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
@@ -1507,7 +1473,7 @@ public class NewsRestResourcesV1Test {
     news.setSpaceId("space1");
     news.setViewsCount((long) 6);
 
-    lenient().when(newsService.getNewsById("1", false)).thenReturn(news);
+    lenient().when(newsService.getNewsById("1", "john", false)).thenReturn(news);
     Space space1 = new Space();
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById("space1")).thenReturn(space1);
@@ -1536,7 +1502,7 @@ public class NewsRestResourcesV1Test {
     news.setId("1");
     news.setViewsCount((long) 6);
 
-    lenient().when(newsService.getNewsById("1", false)).thenReturn(news);
+    lenient().when(newsService.getNewsById("1", "john", false)).thenReturn(news);
     lenient().doNothing().when(newsService).markAsRead(news, "john");
 
     // When

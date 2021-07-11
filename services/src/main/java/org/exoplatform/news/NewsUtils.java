@@ -1,20 +1,23 @@
 package org.exoplatform.news;
 
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 public class NewsUtils {
 
@@ -85,6 +88,25 @@ public class NewsUtils {
     return spaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
                  .collect(Collectors.toList());
+  }
+
+  public static org.exoplatform.services.security.Identity getUserIdentity(String username) {
+    IdentityRegistry identityRegistry = ExoContainerContext.getService(IdentityRegistry.class);
+    org.exoplatform.services.security.Identity identity = identityRegistry.getIdentity(username);
+    if (identity != null) {
+      return identity;
+    }
+    Authenticator authenticator = ExoContainerContext.getService(Authenticator.class);
+    try {
+      identity = authenticator.createIdentity(username);
+      if (identity != null) {
+        // To cache identity for next times
+        identityRegistry.register(identity);
+      }
+    } catch (Exception e) {
+      throw new IllegalStateException("Error occurred while retrieving security identity of user " + username);
+    }
+    return identity;
   }
 
 }

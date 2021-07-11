@@ -67,7 +67,7 @@ public class NotificationUtils {
       activityLink = getNotificationActivityLinkForNotSpaceMembers(space);
     }
     String baseUrl = PropertyManager.getProperty("gatein.email.domain.url");
-    return baseUrl.concat(activityLink);
+    return baseUrl == null ? activityLink : baseUrl.concat(activityLink);
   }
 
   private static String getActivityPermalink(String activityId) {

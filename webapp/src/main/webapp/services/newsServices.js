@@ -14,6 +14,19 @@ export function getNewsById(id, editMode) {
   });
 }
 
+export function getNewsByActivityId(activityId) {
+  return fetch(`${newsConstants.NEWS_API}/byActivity/${activityId}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
+}
+
 export function getNewsSpaces(newsId) {
   return fetch(`${newsConstants.NEWS_API}/${newsId}?fields=spaces`, {
     credentials: 'include',

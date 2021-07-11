@@ -1,51 +1,23 @@
 package org.exoplatform.news;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.Session;
-import javax.jcr.Workspace;
+import javax.jcr.*;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
-import javax.jcr.version.Version;
-import javax.jcr.version.VersionHistory;
-import javax.jcr.version.VersionIterator;
+import javax.jcr.version.*;
 
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.AdditionalMatchers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -57,16 +29,17 @@ import org.exoplatform.commons.api.notification.command.NotificationExecutor;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.api.search.data.SearchResult;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
 import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
-import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.portal.config.UserACL;
@@ -79,13 +52,10 @@ import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
-import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
-import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
+import org.exoplatform.services.jcr.ext.distribution.*;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.services.security.*;
 import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
 import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManagerImpl;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
@@ -187,25 +157,7 @@ public class NewsServiceImplTest {
 
   @Test
   public void shouldGetNodeWhenNewsExists() throws Exception {
-    // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
     Node node = mock(Node.class);
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("");
@@ -247,26 +199,9 @@ public class NewsServiceImplTest {
   @Test
   public void shouldGetNullWhenNewsDoesNotExist() throws Exception {
     // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    NewsService newsService = buildNewsService();
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
@@ -284,24 +219,7 @@ public class NewsServiceImplTest {
   @Test
   public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
     // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
     Node node = mock(Node.class);
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("");
@@ -399,28 +317,703 @@ public class NewsServiceImplTest {
     assertEquals("mary", news.getUpdater());
   }
 
+  @Test
+  public void shouldCantViewNewsWhenSpaceIsNotFound() throws Exception {
+    NewsService newsService = buildNewsService();
+    News news = new News();
+    news.setSpaceId("space1");
+    assertFalse(newsService.canViewNews(news, "root"));
+  }
+
+  @Test
+  public void shouldCantViewPublishedNewsWhenNotSpaceMember() throws Exception {
+    NewsService newsService = buildNewsService();
+    
+    String spaceId = "space1";
+    
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    
+    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
+    assertFalse(newsService.canViewNews(news, "mary"));
+  }
+
+  @Test
+  public void shouldCanViewPinnedNewsWhenNotSpaceMember() throws Exception {
+    NewsService newsService = buildNewsService();
+    
+    String spaceId = "space1";
+    
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    news.setPinned(true);
+
+    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
+    assertTrue(newsService.canViewNews(news, "mary"));
+  }
+
+  @Test
+  public void shouldCanViewPinnedStagedNewsWhenNotSpaceMember() throws Exception {
+    NewsService newsService = buildNewsService();
+
+    String spaceId = "space1";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setPinned(true);
+    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
+    assertFalse(newsService.canViewNews(news, "mary"));
+  }
+
+  @Test
+  public void shouldCanViewNotPinnedAndPublishedNewsWhenSuperManager() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String superUser = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    news.setPinned(true);
+    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
+    when(spaceService.isSuperManager(spaceId)).thenReturn(true);
+    assertTrue(newsService.canViewNews(news, superUser));
+  }
+
+  @Test
+  public void shouldCantViewNotPinnedAndStagedNewsWhenSuperManager() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String superUser = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setPinned(true);
+    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
+    when(spaceService.isSuperManager(spaceId)).thenReturn(true);
+    // FIXME How is this ? the super user can't see a staged news but can edit it !
+    assertFalse(newsService.canViewNews(news, superUser));
+  }
+
+  @Test
+  public void shouldCantViewNotPinnedAndStagedNewsWhenIsMember() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setPinned(true);
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isMember(space, spaceId)).thenReturn(true);
+    assertFalse(newsService.canViewNews(news, username));
+  }
+
+  @Test
+  public void shouldCanViewNotPinnedAndSpaceMember() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    news.setPinned(true);
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isMember(space, spaceId)).thenReturn(true);
+    assertTrue(newsService.canViewNews(news, username));
+  }
+
+  @Test
+  public void shouldCanViewNotPinnedAndStagedNewsAndSpaceManager() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isManager(space, username)).thenReturn(true);
+    assertTrue(newsService.canViewNews(news, username));
+  }
+
+  @Test
+  public void shouldCanViewNotPinnedAndStagedNewsAndSpaceRedactor() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setPinned(true);
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isRedactor(space, username)).thenReturn(true);
+    assertTrue(newsService.canViewNews(news, username));
+  }
+
+  @Test
+  public void shouldCanViewNotPinnedAndStagedNewsAndIsAuthor() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor(username);
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    assertTrue(newsService.canViewNews(news, username));
+  }
+
+  @Test
+  public void shouldCanEditNewsWhenIsAuthor() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor(username);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    assertTrue(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  public void shouldCantEditNewsWhenNoIdentity() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor(username);
+    
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+
+    assertFalse(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  public void shouldCantEditNewsWhenNoSpace() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor(username);
+
+    assertFalse(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  public void shouldCanEditNewsWhenSuperSpacesManager() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor(username);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isSuperManager(username)).thenReturn(true);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    assertTrue(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  public void shouldCanEditNewsWhenIsSpaceManager() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+    
+    News news = new News();
+    news.setSpaceId(spaceId);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isManager(space, username)).thenReturn(true);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+    
+    assertTrue(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCantEditNewsWhenIsSpaceMember() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isMember(space, username)).thenReturn(true);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    when(identity.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(false);
+
+    assertFalse(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCantEditNewsWhenIsSpaceRedactor() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isRedactor(space, username)).thenReturn(true);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    when(identity.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(false);
+
+    assertFalse(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCanEditNewsIsGeneralRedactor() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    when(identity.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
+
+    assertTrue(newsService.canEditNews(news, username));
+  }
+
+  @Test
+  public void shouldCantViewNewsWhenNotHavingAccess() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String newsId = "fakeId";
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, false)).thenReturn(news);
+    when(newsService.canViewNews(news, username)).thenReturn(false);
+
+    try {
+      newsService.getNewsById(newsId, username, false);
+      fail("should throw an exception when user can't access news");
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void shouldCanViewNewsWhenHavingAccess() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+    
+    String username = "mary";
+    String newsId = "fakeId";
+    
+    News news = new News();
+    when(newsService.getNewsById(newsId, false)).thenReturn(news);
+    when(newsService.canViewNews(news, username)).thenReturn(true);
+
+    assertEquals(news, newsService.getNewsById(newsId, username, false));
+  }
+
+  @Test
+  public void shouldCantEditNewsWhenNotHavingEditRignt() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String newsId = "fakeId";
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, true)).thenReturn(news);
+    when(newsService.canViewNews(news, username)).thenReturn(true);
+    when(newsService.canEditNews(news, username)).thenReturn(false);
+
+    try {
+      newsService.getNewsById(newsId, username, true);
+      fail("should throw an exception when user can't edit news");
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void shouldCanEditNewsWhenHavingEditRignt() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String newsId = "fakeId";
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, true)).thenReturn(news);
+    when(newsService.canEditNews(news, username)).thenReturn(true);
+
+    assertEquals(news, newsService.getNewsById(newsId, username, true));
+  }
+
+  @Test
+  public void shouldCantAccessNewsWhenActivityNotFound() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+
+    String username = "mary";
+    try {
+      newsService.getNewsByActivityId("1", username);
+      fail("should throw an exception when activity isn't found");
+    } catch (ObjectNotFoundException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCantAccessNewsWhenInaccessibleActivity() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String activityId = "fakeId";
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+
+    when(activityManager.getActivity(activityId)).thenReturn(activity);
+    when(activityManager.isActivityViewable(activity, identity)).thenReturn(false);
+    try {
+      newsService.getNewsByActivityId(activityId, username);
+      fail("should throw an exception when activity isn't accessible for user");
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCantAccessNewsWhenActivityIsntOfTypeNews() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+    
+    String username = "mary";
+    String activityId = "fakeId";
+    
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+
+    when(activityManager.getActivity(activityId)).thenReturn(activity);
+    when(activityManager.isActivityViewable(activity, identity)).thenReturn(true);
+    try {
+      newsService.getNewsByActivityId(activityId, username);
+      fail("should throw an exception when activity isn't of type news");
+    } catch (ObjectNotFoundException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCanAccessNewsWhenActivityIsOfTypeNews() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String activityId = "fakeActivityId";
+    String newsId = "fakeNewsId";
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+
+    when(activityManager.getActivity(activityId)).thenReturn(activity);
+    when(activityManager.isActivityViewable(activity, identity)).thenReturn(true);
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> templateParams = mock(Map.class);
+    when(activity.getTemplateParams()).thenReturn(templateParams);
+    when(templateParams.get("newsId")).thenReturn(newsId);
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, username, false)).thenReturn(news);
+
+    assertEquals(news, newsService.getNewsByActivityId(activityId, username));
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCanAccessNewsWhenSharedActivityIsOfTypeNews() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    FieldUtils.writeField(newsService, "identityManager", identityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String posterId = "3";
+    String poster = "james";
+    String activityId = "fakeActivityId";
+    String sharedActivityId = "fakeSharedActivityId";
+    String newsId = "fakeNewsId";
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+
+    when(activityManager.getActivity(activityId)).thenReturn(activity);
+    when(activityManager.isActivityViewable(activity, identity)).thenReturn(true);
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> templateParams = mock(Map.class);
+    when(activity.getTemplateParams()).thenReturn(templateParams);
+    when(templateParams.get("originalActivityId")).thenReturn(sharedActivityId);
+
+    ExoSocialActivity sharedActivity = mock(ExoSocialActivity.class);
+    when(activityManager.getActivity(sharedActivityId)).thenReturn(sharedActivity);
+
+    when(activity.getPosterId()).thenReturn(posterId);
+    Identity posterIdentity = mock(Identity.class);
+    when(identityManager.getIdentity(posterId)).thenReturn(posterIdentity);
+    when(posterIdentity.getRemoteId()).thenReturn(poster);
+
+    org.exoplatform.services.security.Identity posterSecurityIdentity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(poster)).thenReturn(posterSecurityIdentity);
+
+    when(activityManager.isActivityViewable(sharedActivity, posterSecurityIdentity)).thenReturn(true);
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> sharedTemplateParams = mock(Map.class);
+    when(sharedActivity.getTemplateParams()).thenReturn(sharedTemplateParams);
+    when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, poster, false)).thenReturn(news);
+
+    assertEquals(news, newsService.getNewsByActivityId(activityId, username));
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void shouldCantAccessNewsWhenSharedActivityIsntAccessibleForPoster() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
+    FieldUtils.writeField(newsService, "identityManager", identityManager, true);
+    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+
+    String username = "mary";
+    String posterId = "3";
+    String poster = "james";
+    String activityId = "fakeActivityId";
+    String sharedActivityId = "fakeSharedActivityId";
+    String newsId = "fakeNewsId";
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+
+    when(activityManager.getActivity(activityId)).thenReturn(activity);
+    when(activityManager.isActivityViewable(activity, identity)).thenReturn(true);
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> templateParams = mock(Map.class);
+    when(activity.getTemplateParams()).thenReturn(templateParams);
+    when(templateParams.get("originalActivityId")).thenReturn(sharedActivityId);
+
+    ExoSocialActivity sharedActivity = mock(ExoSocialActivity.class);
+    when(activityManager.getActivity(sharedActivityId)).thenReturn(sharedActivity);
+
+    when(activity.getPosterId()).thenReturn(posterId);
+    Identity posterIdentity = mock(Identity.class);
+    when(identityManager.getIdentity(posterId)).thenReturn(posterIdentity);
+    when(posterIdentity.getRemoteId()).thenReturn(poster);
+
+    org.exoplatform.services.security.Identity posterSecurityIdentity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(poster)).thenReturn(posterSecurityIdentity);
+
+    // Poster doesn't have access anymore
+    when(activityManager.isActivityViewable(sharedActivity, posterSecurityIdentity)).thenReturn(false);
+
+    @SuppressWarnings("unchecked")
+    Map<String, String> sharedTemplateParams = mock(Map.class);
+    when(sharedActivity.getTemplateParams()).thenReturn(sharedTemplateParams);
+    when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
+
+    News news = new News();
+    when(newsService.getNewsById(newsId, poster, false)).thenReturn(news);
+
+    try {
+      newsService.getNewsByActivityId(activityId, username);
+      fail("User shouldn't be able to access news when shared activity poster can't access the news anymore");
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void shouldCantShareNewsWhenNoAccess() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+
+    String username = "mary";
+
+    News news = new News();
+    Identity identity = mock(Identity.class);
+    Space space = new Space();
+
+    when(identity.getRemoteId()).thenReturn(username);
+    when(newsService.canViewNews(news, username)).thenReturn(false);
+
+    try {
+      newsService.shareNews(news, space, identity);
+      fail("Should throw an exception when user doesn't have access to news");
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  @PrepareForTest({ SessionProvider.class })
+  public void shouldCantShareNewsWhenNotFound() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+    PowerMockito.mockStatic(SessionProvider.class);
+    SessionProvider sessionProvider = mock(SessionProvider.class);
+    when(SessionProvider.createSystemProvider()).thenReturn(sessionProvider);
+
+    String username = "mary";
+    
+    News news = new News();
+    Identity identity = mock(Identity.class);
+    Space space = new Space();
+    
+    when(identity.getRemoteId()).thenReturn(username);
+    when(newsService.canViewNews(news, username)).thenReturn(true);
+
+    try {
+      newsService.shareNews(news, space, identity);
+      fail("Should throw an exception when user doesn't have access to news");
+    } catch (ObjectNotFoundException e) {
+      // Expected
+    }
+  }
+
+  @Test
+  public void shouldSetPermissionForSharedSpaceWhenFound() throws Exception {
+    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
+
+    String newsId = "newsId";
+    when(newsService.getNewsNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
+
+    String username = "mary";
+    String spaceGroup = "spaceGroup";
+
+    News news = mock(News.class);
+    Identity identity = mock(Identity.class);
+    Space space = mock(Space.class);
+
+    when(identity.getRemoteId()).thenReturn(username);
+    when(space.getGroupId()).thenReturn(spaceGroup);
+    when(news.getId()).thenReturn(newsId);
+    when(newsService.canViewNews(news, username)).thenReturn(true);
+
+    newsService.shareNews(news, space, identity);
+    verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, NewsServiceImpl.SHARE_NEWS_PERMISSIONS);
+  }
+
   @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
-    // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
@@ -461,25 +1054,7 @@ public class NewsServiceImplTest {
   @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
-    // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
@@ -515,78 +1090,6 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
     verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
     verify(illustrationNode, times(1)).remove();
-  }
-
-  @Test
-  public void shouldShareNewsWhenNewsExists() throws Exception {
-    // Given
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-    ExtendedNode newsNode = mock(ExtendedNode.class);
-    Property property = mock(Property.class);
-    when(property.getString()).thenReturn("");
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
-    Workspace workSpace = mock(Workspace.class);
-    when(session.getWorkspace()).thenReturn(workSpace);
-    when(newsNode.getSession()).thenReturn(session);
-    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
-    when(activityManager.getActivity(nullable(String.class))).thenReturn(null);
-    Identity spaceIdentity = new Identity(SpaceIdentityProvider.NAME, "space1");
-    when(identityManager.getOrCreateIdentity(eq(SpaceIdentityProvider.NAME),
-                                             eq("space1"),
-                                             anyBoolean())).thenReturn(spaceIdentity);
-    Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
-    when(identityManager.getOrCreateIdentity(eq(OrganizationIdentityProvider.NAME),
-                                             eq("john"),
-                                             anyBoolean())).thenReturn(posterIdentity);
-    Space space1 = new Space();
-    space1.setPrettyName("space1");
-    SharedNews sharedNews = new SharedNews();
-    sharedNews.setPoster("john");
-    sharedNews.setDescription("Description of shared news");
-    sharedNews.setSpacesNames(Arrays.asList("space1"));
-    sharedNews.setNewsId("1");
-    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-    Mockito.doReturn(true).when(newsServiceSpy).canEditNews(any(),any());
-
-    // When
-    setCurrentIdentity();
-    newsServiceSpy.shareNews(sharedNews, Arrays.asList(space1));
-
-    // Then
-    ArgumentCaptor<Identity> identityCaptor = ArgumentCaptor.forClass(Identity.class);
-    ArgumentCaptor<ExoSocialActivity> activityCaptor = ArgumentCaptor.forClass(ExoSocialActivity.class);
-    verify(activityManager, times(1)).saveActivityNoReturn(identityCaptor.capture(), activityCaptor.capture());
-    Identity identityCaptorValue = identityCaptor.getValue();
-    assertEquals(SpaceIdentityProvider.NAME, identityCaptorValue.getProviderId());
-    assertEquals("space1", identityCaptorValue.getRemoteId());
-    ExoSocialActivity activityCaptorValue = activityCaptor.getValue();
-    assertEquals("shared_news", activityCaptorValue.getType());
-    assertEquals("Description of shared news", activityCaptorValue.getTitle());
-    assertEquals(2, activityCaptorValue.getTemplateParams().size());
-    assertEquals("1", activityCaptorValue.getTemplateParams().get("newsId"));
   }
 
   @Test
@@ -2553,7 +3056,7 @@ public class NewsServiceImplTest {
     when(ctx.append(CONTENT_SPACE, "space1")).thenReturn(ctx);
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
-    when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
+    when(ctx.append(eq(ACTIVITY_LINK), any(String.class))).thenReturn(ctx);
     when(ctx.append(NEWS_ID, "id123")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
@@ -2930,25 +3433,7 @@ public class NewsServiceImplTest {
 
   @Test
   public void shouldUpdateNewsNodePathWhenNewsNameIsUpdated() throws Exception {
-    // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
 
     Node newsNode = mock(Node.class);
     Node parentNode = mock(Node.class);
@@ -2998,25 +3483,7 @@ public class NewsServiceImplTest {
   @PrepareForTest({ LinkProvider.class, NotificationContextImpl.class, PluginKey.class, PropertyManager.class, CommonsUtils.class })
   @Test
   public void shouldUpdateNewsMentionedIdsWhenNewsBodyIsUpdated() throws Exception {
-    // Given
-    NewsService newsService = new NewsServiceImpl(repositoryService,
-                                                  sessionProviderService,
-                                                  nodeHierarchyCreator,
-                                                  dataDistributionManager,
-                                                  spaceService,
-                                                  activityManager,
-                                                  identityManager,
-                                                  uploadService,
-                                                  imageProcessor,
-                                                  linkManager,
-                                                  publicationServiceImpl,
-                                                  publicationManagerImpl,
-                                                  wcmPublicationServiceImpl,
-                                                  newsSearchConnector,
-                                                  newsAttachmentsService,
-                                                  indexingService,
-                                                  newsESSearchConnector,
-                                                  userACL);
+    NewsService newsService = buildNewsService();
 
     Node newsNode = mock(Node.class);
     Node parentNode = mock(Node.class);
@@ -3280,5 +3747,27 @@ public class NewsServiceImplTest {
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
+  }
+
+  private NewsService buildNewsService() {
+    NewsService newsService = new NewsServiceImpl(repositoryService,
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  spaceService,
+                                                  activityManager,
+                                                  identityManager,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  linkManager,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  wcmPublicationServiceImpl,
+                                                  newsSearchConnector,
+                                                  newsAttachmentsService,
+                                                  indexingService,
+                                                  newsESSearchConnector,
+                                                  userACL);
+    return newsService;
   }
 }

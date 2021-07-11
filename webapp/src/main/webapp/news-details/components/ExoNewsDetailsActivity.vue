@@ -2,7 +2,7 @@
   <exo-news-details
     v-if="news"
     :news="news"
-    :news-id="newsId"
+    :news-id="newsId || sharedNewsId"
     :activity-id="activityId"
     :show-edit-button="showEditButton"
     :show-pin-button="showPinButton"
@@ -21,14 +21,23 @@ export default {
     news: null,
   }),
   computed: {
-    templateParams() {
-      return this.activity && this.activity.templateParams;
-    },
     activityId() {
       return this.activity && this.activity.id;
     },
+    sharedActivity() {
+      return this.activity && this.activity.originalActivity;
+    },
+    sharedTemplateParams() {
+      return this.sharedActivity && this.sharedActivity.templateParams;
+    },
+    templateParams() {
+      return this.activity && this.activity.templateParams;
+    },
     newsId() {
       return this.templateParams && this.templateParams.newsId;
+    },
+    sharedNewsId() {
+      return this.sharedTemplateParams && this.sharedTemplateParams.newsId;
     },
     showDeleteButton() {
       return this.news && this.news.canDelete;
@@ -41,14 +50,23 @@ export default {
     },
   },
   created() {
-    if (this.newsId) {
+    if (this.newsId || this.sharedNewsId) {
       this.retrieveNews();
     }
   },
   methods: {
     retrieveNews() {
-      this.$newsServices.getNewsById(this.newsId)
-        .then(news => this.news = news);
+      this.$newsServices.getNewsByActivityId(this.activityId)
+        .then(news => {
+          this.news = news;
+          if (!this.news) {
+            this.$root.$emit('activity-extension-abort', this.activityId);
+          }
+          this.activity.news = news;
+        })
+        .catch(() => {
+          this.$root.$emit('activity-extension-abort', this.activityId);
+        });
     },
   },
 };

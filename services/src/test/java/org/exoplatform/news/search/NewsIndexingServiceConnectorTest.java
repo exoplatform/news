@@ -50,18 +50,6 @@ public class NewsIndexingServiceConnectorTest {
   }
 
   @Test
-  public void testCanReindex() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
-    assertFalse(newsIndexingServiceConnector.canReindex());
-  }
-
-  @Test
-  public void testGetType() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
-    assertEquals(NewsIndexingServiceConnector.TYPE, newsIndexingServiceConnector.getType());
-  }
-
-  @Test
   public void testCreate() {
     newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
 
@@ -120,7 +108,6 @@ public class NewsIndexingServiceConnectorTest {
     Document document = newsIndexingServiceConnector.create("1");
     assertNotNull(document);
     assertEquals("1", document.getId());
-    assertEquals(NewsIndexingServiceConnector.TYPE, document.getType());
     assertEquals("root", document.getFields().get("posterId"));
     assertEquals("Root Root", document.getFields().get("posterName"));
     assertNotNull(document.getLastUpdatedDate());
@@ -133,6 +120,7 @@ public class NewsIndexingServiceConnectorTest {
     PropertiesParam propertiesParam = new PropertiesParam();
     propertiesParam.setName("constructor.params");
     params.addParameter(propertiesParam);
+    propertiesParam.setProperty("index_current", "index_name");
     return params;
   }
 

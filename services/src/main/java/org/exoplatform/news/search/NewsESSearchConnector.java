@@ -102,7 +102,7 @@ public class NewsESSearchConnector {
     }
     Set<Long> streamFeedOwnerIds = activityStorage.getStreamFeedOwnerIds(viewerIdentity);
     String esQuery = buildQueryStatement(streamFeedOwnerIds, term, offset, limit);
-    String jsonResponse = this.client.sendRequest(esQuery, this.index, this.searchType);
+    String jsonResponse = this.client.sendRequest(esQuery, this.index);
     return buildResult(jsonResponse);
   }
 

@@ -644,8 +644,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @POST
   @Path("{id}/view")
   @RolesAllowed("users")
-  @ApiOperation(value = "Update a news", httpMethod = "PUT", response = Response.class, notes = "This increments the views number of a news")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
+  @ApiOperation(value = "This increments the views number of a news", httpMethod = "PUT", response = Response.class, notes = "No content is restured")
+  @ApiResponses(value = {
+      @ApiResponse(code = 204, message = "No content"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 401, message = "User not authorized to update the news"),
       @ApiResponse(code = 500, message = "Internal server error") })
@@ -653,7 +654,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @DeprecatedAPI(value = "Should use getNews with editMode = false instead of this", insist = true)
   public Response viewNews(@Context HttpServletRequest request,
                            @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
-    return getNewsById(request, id, null, false);
+    getNewsById(request, id, null, false);
+    return Response.noContent().build();
   }
 
   @DELETE

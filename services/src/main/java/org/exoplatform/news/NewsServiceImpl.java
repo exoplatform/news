@@ -215,7 +215,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -253,7 +253,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News getNewsById(String id, boolean editMode) throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
 
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
@@ -281,8 +281,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNews(NewsFilter filter) throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
-
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  (repositoryService.getCurrentRepository()
                                                                    .getConfiguration()
@@ -354,7 +353,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News updateNews(News news) throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -618,7 +617,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception {
-    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -1191,7 +1190,7 @@ public class NewsServiceImpl implements NewsService {
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
     if (activity.getId() != null) {
-      SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
       Session session = sessionProvider.getSession(
                                                    repositoryService.getCurrentRepository()
                                                                     .getConfiguration()

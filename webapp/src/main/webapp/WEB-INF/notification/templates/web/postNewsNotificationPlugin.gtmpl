@@ -15,6 +15,11 @@
           case "MENTION IN NEWS":
             notificationDescription =  _ctx.appRes("news.notification.description.mention.in.news",CONTENT_TITLE);
             break;
+          case "PUBLISH NEWS":
+            notificationDescription =  _ctx.appRes("news.notification.description.publish.news",currentUser, CONTENT_TITLE);
+            break;
+          default:
+            break;
         }
 
       %>

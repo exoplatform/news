@@ -1,26 +1,54 @@
 package org.exoplatform.news;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
-import javax.jcr.Session;
 import javax.jcr.Workspace;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.AdditionalMatchers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.command.NotificationCommand;
@@ -47,6 +75,7 @@ import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ExtendedNode;
+import org.exoplatform.services.jcr.core.ExtendedSession;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
@@ -78,18 +107,6 @@ import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.AdditionalMatchers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
@@ -112,7 +129,7 @@ public class NewsServiceImplTest {
   SessionProvider            sessionProvider;
 
   @Mock
-  Session                    session;
+  ExtendedSession            session;
 
   @Mock
   NodeHierarchyCreator       nodeHierarchyCreator;
@@ -192,12 +209,10 @@ public class NewsServiceImplTest {
     Node node = mock(Node.class);
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("");
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -248,12 +263,11 @@ public class NewsServiceImplTest {
                                                   indexingService,
                                                   newsESSearchConnector,
                                                   userACL);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
 
     // When
@@ -288,12 +302,10 @@ public class NewsServiceImplTest {
     Node node = mock(Node.class);
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("");
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -409,12 +421,10 @@ public class NewsServiceImplTest {
     Property property = mock(Property.class);
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
@@ -468,12 +478,10 @@ public class NewsServiceImplTest {
     Property property = mock(Property.class);
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
@@ -524,12 +532,11 @@ public class NewsServiceImplTest {
     ExtendedNode newsNode = mock(ExtendedNode.class);
     Property property = mock(Property.class);
     when(property.getString()).thenReturn("");
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -630,6 +637,9 @@ public class NewsServiceImplTest {
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
     when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    Mockito.doNothing()
+            .when(newsServiceSpy)
+            .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
 
     // When
     newsServiceSpy.pinNews("id123");
@@ -689,12 +699,10 @@ public class NewsServiceImplTest {
     Identity poster = mock(Identity.class);
     Identity spaceIdentity = mock(Identity.class);
     Property property = mock(Property.class);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
     when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
     when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
@@ -724,8 +732,67 @@ public class NewsServiceImplTest {
     News createdNews = newsServiceSpy.createNews(news);
 
     // Then
+    setRootAsCurrentIdentity();
     assertNotNull(createdNews);
     verify(newsServiceSpy, times(1)).pinNews("id123");
+  }
+
+  @Test
+  public void shouldScheduleNews() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+                                                      sessionProviderService,
+                                                      nodeHierarchyCreator,
+                                                      dataDistributionManager,
+                                                      spaceService,
+                                                      activityManager,
+                                                      identityManager,
+                                                      uploadService,
+                                                      imageProcessor,
+                                                      linkManager,
+                                                      publicationServiceImpl,
+                                                      publicationManagerImpl,
+                                                      wcmPublicationServiceImpl,
+                                                      newsSearchConnector,
+                                                      newsAttachmentsService,
+                                                      indexingService,
+                                                      newsESSearchConnector,
+                                                      userACL);
+    News news = new News();
+    news.setTitle("new scheduled news title");
+    news.setSummary("new scheduled news summary");
+    news.setBody("new scheduled news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+
+    News scheduledNews = new News();
+    String datePostScheduled = "06/18/2021 15:01:16 +0100";
+    scheduledNews.setId("id123");
+    scheduledNews.setSchedulePostDate(datePostScheduled);
+    scheduledNews.setPublicationState("staged");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
+    Mockito.doReturn(scheduledNews).when(newsServiceSpy).scheduleNews(news);
+
+
+    // When
+    News scheduleNews = newsServiceSpy.scheduleNews(news);
+
+    // Then
+    assertNotNull(scheduleNews);
+    assertEquals("staged", scheduleNews.getPublicationState());
+    assertEquals("06/18/2021 15:01:16 +0100", scheduleNews.getSchedulePostDate());
   }
 
   @Test
@@ -1288,11 +1355,10 @@ public class NewsServiceImplTest {
     news.setSpaceId("1");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
 
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
@@ -1313,9 +1379,9 @@ public class NewsServiceImplTest {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
 
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
                                                       sessionProviderService,
@@ -1361,7 +1427,6 @@ public class NewsServiceImplTest {
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
@@ -1399,11 +1464,10 @@ public class NewsServiceImplTest {
                                                       indexingService,
                                                       newsESSearchConnector,
                                                       userACL);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     QueryManager qm = mock(QueryManager.class);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -1482,11 +1546,11 @@ public class NewsServiceImplTest {
                                                       indexingService,
                                                       newsESSearchConnector,
                                                       userACL);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     QueryManager qm = mock(QueryManager.class);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -2143,11 +2207,10 @@ public class NewsServiceImplTest {
     when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
     when(identityManager.getOrCreateIdentity("space", "space1", false)).thenReturn(spaceIdentity);
     when(spaceService.getSpaceById("1")).thenReturn(space);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
     when(newsNode.hasProperty("exo:activities")).thenReturn(true);
     // When
@@ -2180,11 +2243,11 @@ public class NewsServiceImplTest {
                                                       indexingService,
                                                       newsESSearchConnector,
                                                       userACL);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
+    
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     QueryManager qm = mock(QueryManager.class);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -2271,6 +2334,7 @@ public class NewsServiceImplTest {
     newsFilter.setAuthor("root");
     newsFilter.setDraftNews(true);
     newsFilter.setSpaces(spaces);
+    setRootAsCurrentIdentity();
     List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
@@ -2363,11 +2427,10 @@ public class NewsServiceImplTest {
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
 
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     when(spaceService.isMember(space1, "root")).thenReturn(true);
     when(session.getNodeByUUID("id123")).thenReturn(null);
@@ -2427,11 +2490,10 @@ public class NewsServiceImplTest {
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
 
     Node newsNode = mock(Node.class);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     when(spaceService.isMember(space1, "root")).thenReturn(true);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
@@ -2460,6 +2522,8 @@ public class NewsServiceImplTest {
 
     ArgumentLiteral<String> ACTIVITY_LINK = new ArgumentLiteral<String>(String.class, "ACTIVITY_LINK");
 
+    ArgumentLiteral<String> NEWS_ID = new ArgumentLiteral<String>(String.class, "NEWS_ID");
+
     ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT =
                                                                         new ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT>(NotificationConstants.NOTIFICATION_CONTEXT.class,
                                                                                                                                         "CONTEXT");
@@ -2472,6 +2536,7 @@ public class NewsServiceImplTest {
     when(ctx.append(ILLUSTRATION_URL, "http://localhost:8080/portal/rest/v1/news/id123/illustration")).thenReturn(ctx);
     when(ctx.append(AUTHOR_AVATAR_URL, "http://localhost:8080/eXoSkin/skin/images/avatar/DefaultUserAvatar.png")).thenReturn(ctx);
     when(ctx.append(ACTIVITY_LINK, "http://localhost:8080/portal/intranet/activity?id=38")).thenReturn(ctx);
+    when(ctx.append(NEWS_ID, "id123")).thenReturn(ctx);
     when(ctx.append(CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)).thenReturn(ctx);
 
     when(ctx.getNotificationExecutor()).thenReturn(executor);
@@ -2483,9 +2548,7 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setRootAsCurrentIdentity();
 
     // When
     newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
@@ -2516,11 +2579,10 @@ public class NewsServiceImplTest {
                                                       indexingService,
                                                       newsESSearchConnector,
                                                       userACL);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     QueryManager qm = mock(QueryManager.class);
     Workspace workSpace = mock(Workspace.class);
     when(session.getWorkspace()).thenReturn(workSpace);
@@ -2570,6 +2632,7 @@ public class NewsServiceImplTest {
 
     when(poster.getProfile()).thenReturn(p1);
     // When
+    setRootAsCurrentIdentity();
     List<News> newsList = newsService.getNews(newsFilter);
 
     // Then
@@ -2872,12 +2935,10 @@ public class NewsServiceImplTest {
     Node parentNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getName()).thenReturn("Untitled");
@@ -2940,12 +3001,10 @@ public class NewsServiceImplTest {
     Node parentNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
-    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repository.getSystemSession(anyString())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getName()).thenReturn("Untitled");
@@ -2969,7 +3028,6 @@ public class NewsServiceImplTest {
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     when(spaceService.isMember(space1, "root")).thenReturn(true);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
@@ -3029,9 +3087,7 @@ public class NewsServiceImplTest {
     NotificationExecutor notificationExecutor = mock(NotificationExecutor.class);
     when(executor.with(notificationCommand)).thenReturn(notificationExecutor);
     when(notificationExecutor.execute(ctx)).thenReturn(true);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
+    setRootAsCurrentIdentity();
 
     Identity johnIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Identity rootIdentity = new Identity(OrganizationIdentityProvider.NAME, "root");
@@ -3186,9 +3242,19 @@ public class NewsServiceImplTest {
     when(propertyBody.getString()).thenReturn("body <img='#' onerror=alert('test')/>");
     when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
     when(newsNode.getProperty(eq("exo:body"))).thenReturn(propertyBody);
-    
-    
+
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
+    when(space.getVisibility()).thenReturn("private");
+
+    setRootAsCurrentIdentity();
     assertFalse(newsService.convertNodeToNews(newsNode, false).getBody().contains("<img"));
-    
+  }
+
+  private void setRootAsCurrentIdentity() {
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
   }
 }

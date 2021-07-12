@@ -1,16 +1,12 @@
 package org.exoplatform.news.notification.utils;
 
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.news.model.News;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.config.RepositoryEntry;
-import org.exoplatform.services.jcr.core.ManageableRepository;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.social.core.space.model.Space;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import javax.jcr.Node;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -18,13 +14,17 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.jcr.Node;
-import javax.jcr.Session;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.PropertyManager;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.news.model.News;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.config.RepositoryEntry;
+import org.exoplatform.services.jcr.core.ExtendedSession;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.social.core.space.model.Space;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
@@ -85,19 +85,18 @@ public class NotificationUtilsTest {
   public void shouldGetTheDefaultIllustrationWhenTheNodeHasNotIllustration() throws Exception {
     // Given
     SessionProviderService sessionProviderService = mock(SessionProviderService.class);
+    
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
-    SessionProvider sessionProvider = mock(SessionProvider.class);
-    when(sessionProviderService.getSessionProvider(null)).thenReturn(sessionProvider);
     RepositoryService repositoryService = mock(RepositoryService.class);
     when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
     ManageableRepository repository = mock(ManageableRepository.class);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     RepositoryEntry repositoryEntry = mock(RepositoryEntry.class);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    ExtendedSession session = mock(ExtendedSession.class);
+    when(repository.getSystemSession(any())).thenReturn(session);
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-    Session session = mock(Session.class);
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
     when(session.getNodeByUUID("id123")).thenReturn(node);
     when(node.hasNode("illustration")).thenReturn(false);

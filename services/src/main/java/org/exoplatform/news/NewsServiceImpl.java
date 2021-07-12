@@ -51,6 +51,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.SharedNews;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
+import org.exoplatform.news.notification.plugin.PublishNewsNotificationPlugin;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
@@ -214,7 +215,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -252,7 +253,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News getNewsById(String id, boolean editMode) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
 
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
@@ -280,7 +281,8 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNews(NewsFilter filter) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
+
     Session session = sessionProvider.getSession(
                                                  (repositoryService.getCurrentRepository()
                                                                    .getConfiguration()
@@ -352,7 +354,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News updateNews(News news) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -529,6 +531,7 @@ public class NewsServiceImpl implements NewsService {
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
+    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -615,7 +618,7 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public void shareNews(SharedNews sharedNews, List<Space> spaces) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
                                                                   .getConfiguration()
@@ -769,6 +772,7 @@ public class NewsServiceImpl implements NewsService {
     }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
+    news.setCanPublish(canPinNews());
     StringBuilder newsUrl = new StringBuilder("");
     if (originalNode.hasProperty("exo:activities")) {
       String strActivities = originalNode.getProperty("exo:activities").getString();
@@ -784,7 +788,7 @@ public class NewsServiceImpl implements NewsService {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
         } else {
-          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(news.getPath());
+          newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
@@ -796,8 +800,15 @@ public class NewsServiceImpl implements NewsService {
           }
         }
         news.setActivities(memberSpaceActivities.toString());
+      } else {
+        newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
+        news.setUrl(newsUrl.toString());
       }
     }
+    if (node.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
+      news.setSchedulePostDate(node.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).getString());
+    }
+
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
@@ -1133,8 +1144,13 @@ public class NewsServiceImpl implements NewsService {
    * @return if the news can be pinned
    */
   public boolean canPinNews() {
-    return  getCurrentIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
-            getCurrentIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    // FIXME shouldn't use ConversationState in Service layer
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    if (currentIdentity == null) {
+      return false;
+    }
+    return  currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
+            currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   public News scheduleNews(News news) throws Exception {
@@ -1151,10 +1167,6 @@ public class NewsServiceImpl implements NewsService {
       if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
-      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
-      if (!scheduledNews.isCanEdit()) {
-        throw new IllegalStateException("User not allowed to schedule the news: " + news.getId());
-      }
       String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
         ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
@@ -1168,6 +1180,7 @@ public class NewsServiceImpl implements NewsService {
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }
+      scheduledNews = convertNodeToNews(scheduledNewsNode, false);
     } finally {
       if (session != null) {
         session.logout();
@@ -1178,7 +1191,7 @@ public class NewsServiceImpl implements NewsService {
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
     if (activity.getId() != null) {
-      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+      SessionProvider sessionProvider = SessionProvider.createSystemProvider();
       Session session = sessionProvider.getSession(
                                                    repositoryService.getCurrentRepository()
                                                                     .getConfiguration()
@@ -1203,8 +1216,9 @@ public class NewsServiceImpl implements NewsService {
   }
 
   protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+    String newsId = news.getId();
     String contentAuthor = news.getAuthor();
-    String currentUser = getCurrentUserId();
+    String currentUser = getCurrentUserId() != null ? getCurrentUserId() : contentAuthor;
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
     String contentBody = news.getBody();
@@ -1232,7 +1246,9 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
-                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink);
+                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
+
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
@@ -1241,6 +1257,8 @@ public class NewsServiceImpl implements NewsService {
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+      ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }
 
@@ -1248,14 +1266,14 @@ public class NewsServiceImpl implements NewsService {
     Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
-            .append(MentionInNewsNotificationPlugin.CURRENT_USER, currentUser)
-            .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
-            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
-            .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
-            .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-            .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
-            .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
-            .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+            .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
+            .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
+            .append(PostNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
+            .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
+            .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
+            .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }

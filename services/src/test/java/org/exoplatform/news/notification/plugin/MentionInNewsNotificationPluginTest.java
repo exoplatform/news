@@ -67,17 +67,17 @@ public class MentionInNewsNotificationPluginTest {
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
     when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
-                                                     .append(MentionInNewsNotificationPlugin.CONTENT_TITLE, "title")
-                                                     .append(MentionInNewsNotificationPlugin.CONTENT_AUTHOR, "root")
-                                                     .append(MentionInNewsNotificationPlugin.CURRENT_USER, "root")
-                                                     .append(MentionInNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
-                                                     .append(MentionInNewsNotificationPlugin.CONTENT_SPACE, "space1")
+                                                     .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
+                                                     .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "root")
+                                                     .append(PostNewsNotificationPlugin.CURRENT_USER, "root")
+                                                     .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, "1")
+                                                     .append(PostNewsNotificationPlugin.CONTENT_SPACE, "space1")
                                                      .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds)
-                                                     .append(MentionInNewsNotificationPlugin.ILLUSTRATION_URL,
+                                                     .append(PostNewsNotificationPlugin.ILLUSTRATION_URL,
                                                              "http://localhost:8080/rest/v1/news/id123/illustration")
-                                                     .append(MentionInNewsNotificationPlugin.AUTHOR_AVATAR_URL,
+                                                     .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL,
                                                              "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
-                                                     .append(MentionInNewsNotificationPlugin.ACTIVITY_LINK,
+                                                     .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
                                                      .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
 

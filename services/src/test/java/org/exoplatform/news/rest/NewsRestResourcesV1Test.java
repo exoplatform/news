@@ -122,6 +122,7 @@ public class NewsRestResourcesV1Test {
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
@@ -912,6 +913,36 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldGetOkWhenScheduleNews() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    news.setCanEdit(true);
+    news.setSpaceId("1");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.scheduleNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void shouldGetNotAuthorizedWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
@@ -1004,7 +1035,7 @@ public class NewsRestResourcesV1Test {
     News news = new News();
     news.setId("1");
     news.setSpaceId("1");
-
+    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
@@ -1920,6 +1951,41 @@ public class NewsRestResourcesV1Test {
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
+  }
+
+  @Test
+  public void shouldGetStagedNewsWhenCurrentUserIsAuthor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getLocale()).thenReturn(new Locale("en"));
+    News news = new News();
+    news.setSpaceId("1");
+    news.setAuthor("john");
+    news.setPublicationState(PublicationDefaultStates.STAGED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news);
+
+    lenient().when(newsService.getNews(any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+
+    // When
+    Response response = newsRestResourcesV1.getNews(request, "john", null, null, null, 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
+    assertNotNull(newsList);
+    assertEquals(1, newsList.size());
+    assertEquals(PublicationDefaultStates.STAGED, newsList.get(0).getPublicationState());
+    assertEquals("john", newsList.get(0).getAuthor());
   }
 
 }

@@ -12,6 +12,23 @@
 /*============== Activity News ====================*/
 
 .VuetifyApp {
+  #newsDetail {
+    padding: 10px 8%;
+    .articleNotFound {
+      text-align: center;
+      margin: 200px auto auto;
+      .iconNotFound {
+        background: url("@{images-path}/notfound.png") no-repeat top center;
+        padding-top: 90px;
+        padding-left: 200px;
+      }
+
+      h3 {
+        text-align: center;
+        color: @textLightColor;
+      }
+    }
+  }
   #newsDetails .newsDetailsActionMenu {
     margin: 20px 20px 0 0;
   }
@@ -1563,6 +1580,7 @@
 
   .loadingRing {
     margin: 15px auto;
+    color:@primaryColorDefault;
   }
 
   .newsAppToolBar {
@@ -1869,7 +1887,6 @@
 
   .newsListItems {
     background: #fff;
-    margin-top: 20px;
     padding: 0 20px;
     box-shadow: 0 1px 2px #71717129;
     word-break: break-all;
@@ -2020,7 +2037,9 @@
 
       .newsDate {
         color: @color-appNews-information;
-
+        .newsTime {
+          display: inline;
+        }
         .uiIconClock {
           top: 0;
 
@@ -3821,6 +3840,18 @@ p.caption-title:after {
   }
   .noNewsImage {
     display: none;
+  }
+}
+
+#newsSpacesFilters {
+  .newsCheckbox {
+    i {
+      font-size: 24px;
+    }
+
+    label {
+      margin-left: 12px;
+    }
   }
 }
 

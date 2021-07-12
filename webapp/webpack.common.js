@@ -7,13 +7,14 @@ let config = {
   // can use multiple entry
   entry: {
     shareNewsActivity :'./src/main/webapp/share-news-activity/main.js',
-    snackbarComponent :'./src/main/webapp/components/snackbar/main.js',
+    newsSnackbarComponent :'./src/main/webapp/components/snackbar/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',
     latestNews:'./src/main/webapp/latest-news/main.js',
     news :'./src/main/webapp/news/main.js',
     newsSearchCard: './src/main/webapp/news-search/main.js',
     newsExtensions: './src/main/webapp/news-extensions/main.js',
+    newsDetailsApp: './src/main/webapp/news-details-app/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',

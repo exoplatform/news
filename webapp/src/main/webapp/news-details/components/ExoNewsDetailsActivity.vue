@@ -36,6 +36,9 @@ export default {
     showEditButton() {
       return this.news && this.news.canEdit;
     },
+    showPinButton() {
+      return this.news && this.news.canPublish;
+    },
   },
   created() {
     if (this.newsId) {

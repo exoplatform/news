@@ -6,6 +6,7 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.plugin.*;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl"),
@@ -13,7 +14,7 @@ import org.exoplatform.services.log.Log;
 public class PushTemplateProvider extends WebTemplateProvider {
   protected static Log log = ExoLogger.getLogger(PushTemplateProvider.class);
 
-  public PushTemplateProvider(InitParams initParams) {
-    super(initParams);
+  public PushTemplateProvider(InitParams initParams, SpaceService spaceService) {
+    super(initParams, spaceService);
   }
 }

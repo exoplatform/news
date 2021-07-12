@@ -1,18 +1,16 @@
 <template>
-  <v-app>
-    <v-snackbar
-      :value="displayAlerts"
-      color="transparent"
-      elevation="0"
-      app
-      left>
-      <exo-news-notification-alert
-        v-for="alert in alerts"
-        :key="alert.message"
-        :alert="alert"
-        @dismissed="deleteAlert(alert)" />
-    </v-snackbar>
-  </v-app>
+  <v-snackbar
+    :value="displayAlerts"
+    color="transparent"
+    elevation="0"
+    app
+    left>
+    <exo-news-notification-alert
+      v-for="alert in alerts"
+      :key="alert.message"
+      :alert="alert"
+      @dismissed="deleteAlert(alert)" />
+  </v-snackbar>
 </template>
 
 <script>
@@ -55,6 +53,15 @@ export default {
           message,
           type: 'success',
           spaces,
+        });
+      }
+    });
+    this.$root.$on('restricted-space', (spaceDisplayName) => {
+      if (spaceDisplayName) {
+        const message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'warning',
         });
       }
     });

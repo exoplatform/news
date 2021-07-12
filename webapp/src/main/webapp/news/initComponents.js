@@ -1,13 +1,19 @@
 import NewsApp  from './components/NewsApp.vue';
-import NewsSpacesSelector from './components/NewsSpacesSelector.vue';
 import NewsSpacesSharedIn from './components/NewsSpacesSharedIn.vue';
 import NewsActivitySharingSpacesDrawer from './components/NewsActivitySharingSpacesDrawer.vue';
+import NewsFilterSpaceDrawer from './components/NewsFilterSpaceDrawer.vue';
+import NewsFilterSpaceItem from './components/NewsFilterSpaceItem.vue';
+import NewsFilterSpaceList from './components/NewsFilterSpaceList.vue';
+import NewsFilterSpaceSearch from './components/NewsFilterSpaceSearch.vue';
 
 const components = {
   'news-app': NewsApp,
-  'news-spaces-selector': NewsSpacesSelector,
   'news-spaces-shared-in': NewsSpacesSharedIn,
   'news-activity-sharing-spaces-drawer': NewsActivitySharingSpacesDrawer,
+  'news-filter-space-drawer': NewsFilterSpaceDrawer,
+  'news-filter-space-item': NewsFilterSpaceItem,
+  'news-filter-space-list': NewsFilterSpaceList,
+  'news-filter-space-search': NewsFilterSpaceSearch,
 };
 
 for (const key in components) {

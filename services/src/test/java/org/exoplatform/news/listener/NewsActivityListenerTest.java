@@ -161,7 +161,7 @@ public class NewsActivityListenerTest {
     newsActivityListener.shareActivity(event);
 
     verify(newsService, times(1)).getNewsById(newsId, false);
-    verify(newsService, never()).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+    verify(newsService, never()).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
   }
 
   @Test
@@ -203,7 +203,7 @@ public class NewsActivityListenerTest {
     newsActivityListener.shareActivity(event);
 
     verify(newsService, times(1)).getNewsById(newsId, false);
-    verify(newsService, times(1)).shareNews(eq(news), nullable(Space.class), nullable(Identity.class));
+    verify(newsService, times(1)).shareNews(eq(news), nullable(Space.class), nullable(Identity.class), nullable(String.class));
   }
 
 }

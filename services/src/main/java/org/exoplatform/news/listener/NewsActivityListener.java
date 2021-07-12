@@ -55,7 +55,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
           if (news != null) {
             Identity posterIdentity = getIdentity(sharedActivity);
             Space space = getSpace(sharedActivity);
-            newsService.shareNews(news, space, posterIdentity);
+            newsService.shareNews(news, space, posterIdentity, sharedActivity.getId());
           }
         } catch (Exception e) {
           LOG.error("Error while sharing news {} to activity {}", newsId, sharedActivity.getId(), e);

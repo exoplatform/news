@@ -63,10 +63,11 @@ public interface NewsService {
    * @param news {@link News} to share
    * @param space {@link Space} to share with, the news
    * @param userIdentity {@link Identity} of user making the modification
+   * @param sharedActivityId newly generated activity identifier
    * @throws IllegalAccessException when user doesn't have access to {@link News}
    * @throws ObjectNotFoundException when {@link News} is not found
    */
-  void shareNews(News news, Space space, Identity userIdentity) throws IllegalAccessException, ObjectNotFoundException;
+  void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws IllegalAccessException, ObjectNotFoundException;
 
   void pinNews(String newsId) throws Exception;
 

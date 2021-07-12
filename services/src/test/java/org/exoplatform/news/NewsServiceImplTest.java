@@ -938,7 +938,7 @@ public class NewsServiceImplTest {
   @Test
   public void shouldCantShareNewsWhenNoAccess() throws Exception {
     NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
 
     String username = "mary";
 
@@ -950,7 +950,7 @@ public class NewsServiceImplTest {
     when(newsService.canViewNews(news, username)).thenReturn(false);
 
     try {
-      newsService.shareNews(news, space, identity);
+      newsService.shareNews(news, space, identity, "activityId");
       fail("Should throw an exception when user doesn't have access to news");
     } catch (IllegalAccessException e) {
       // Expected
@@ -961,7 +961,7 @@ public class NewsServiceImplTest {
   @PrepareForTest({ SessionProvider.class })
   public void shouldCantShareNewsWhenNotFound() throws Exception {
     NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
     PowerMockito.mockStatic(SessionProvider.class);
     SessionProvider sessionProvider = mock(SessionProvider.class);
     when(SessionProvider.createSystemProvider()).thenReturn(sessionProvider);
@@ -976,7 +976,7 @@ public class NewsServiceImplTest {
     when(newsService.canViewNews(news, username)).thenReturn(true);
 
     try {
-      newsService.shareNews(news, space, identity);
+      newsService.shareNews(news, space, identity, "activityId");
       fail("Should throw an exception when user doesn't have access to news");
     } catch (ObjectNotFoundException e) {
       // Expected
@@ -986,7 +986,7 @@ public class NewsServiceImplTest {
   @Test
   public void shouldSetPermissionForSharedSpaceWhenFound() throws Exception {
     NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class));
+    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
     when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
@@ -1006,7 +1006,7 @@ public class NewsServiceImplTest {
     when(news.getId()).thenReturn(newsId);
     when(newsService.canViewNews(news, username)).thenReturn(true);
 
-    newsService.shareNews(news, space, identity);
+    newsService.shareNews(news, space, identity, "activityId");
     verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, NewsServiceImpl.SHARE_NEWS_PERMISSIONS);
   }
 

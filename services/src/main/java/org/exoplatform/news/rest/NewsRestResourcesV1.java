@@ -287,7 +287,20 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
-      return Response.ok(news).build();
+      if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
+        News filteredNews = new News();
+        Set<Space> spacesList = new HashSet<>();
+        String newsActivities = news.getActivities();
+        for (String act : newsActivities.split(";")) {
+          String spaceId = act.split(":")[0];
+          Space space = spaceService.getSpaceById(spaceId);
+          spacesList.add(space);
+        }
+        filteredNews.setSharedInSpacesList(spacesList);
+        return Response.ok(filteredNews).build();
+      } else {
+        return Response.ok(news).build();
+      }
     } catch (IllegalAccessException e) {
       LOG.warn("User {} attempt to access unauthorized news with id {}", authenticatedUser, id);
       return Response.status(Response.Status.NOT_FOUND).build();

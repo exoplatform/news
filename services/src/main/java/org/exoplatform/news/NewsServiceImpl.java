@@ -196,26 +196,12 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
-
-    try {
-      if (StringUtils.isEmpty(news.getId())) {
-        news = createNewsDraft(news);
-      } else {
-        postNewsActivity(news);
-        updateNews(news);
-        sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
-      }
-
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
+    if (StringUtils.isEmpty(news.getId())) {
+      news = createNewsDraft(news);
+    } else {
+      postNewsActivity(news);
+      updateNews(news);
+      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
     }
 
     if (news.isPinned()) {
@@ -240,8 +226,6 @@ public class NewsServiceImpl implements NewsService {
       return null;
     } catch (Exception e) {
       throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
-    } finally {
-      sessionProvider.close();
     }
   }
 
@@ -332,88 +316,82 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
 
-    try {
-      Node newsNode = session.getNodeByUUID(news.getId());
-      if (newsNode != null) {
-        String oldBody = newsNode.getProperty("exo:body").getString();
-        Set<String> previousMentions = NewsUtils.processMentions(oldBody);
-        newsNode.setProperty("exo:title", news.getTitle());
-        newsNode.setProperty("exo:name", news.getTitle());
-        newsNode.setProperty("exo:summary", news.getSummary());
-        String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
-        news.setBody(processedBody);
-        newsNode.setProperty("exo:body", processedBody);
-        newsNode.setProperty("exo:dateModified", Calendar.getInstance());
+    Node newsNode = session.getNodeByUUID(news.getId());
+    if (newsNode != null) {
+      String oldBody = newsNode.getProperty("exo:body").getString();
+      Set<String> previousMentions = NewsUtils.processMentions(oldBody);
+      newsNode.setProperty("exo:title", news.getTitle());
+      newsNode.setProperty("exo:name", news.getTitle());
+      newsNode.setProperty("exo:summary", news.getSummary());
+      String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
+      news.setBody(processedBody);
+      newsNode.setProperty("exo:body", processedBody);
+      newsNode.setProperty("exo:dateModified", Calendar.getInstance());
 
-        // illustration
-        if (StringUtils.isNotEmpty(news.getUploadId())) {
-          attachIllustration(newsNode, news.getUploadId());
-        } else if ("".equals(news.getUploadId())) {
-          removeIllustration(newsNode);
-        }
-
-        // attachments
-        news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
-
-        newsNode.save();
-
-        // update name of node
-        if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
-          String srcPath = newsNode.getPath();
-          String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY : newsNode.getParent().getPath()) + "/"
-                  + Utils.cleanName(news.getTitle()).trim();
-          session.getWorkspace().move(srcPath, destPath);
-        }
-
-        if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-          if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-            newsNode.removeMixin(MIX_NEWS_MODIFIERS);
-            newsNode.save();
-          }
-          //if it's an "update news" case
-          if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
-            News newMentionedNews = news;
-            if (!previousMentions.isEmpty()) {
-              //clear old mentions from news body before sending a custom object to notification context.
-              previousMentions.forEach(username -> {
-                newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
-              });
-            }
-            sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
-          }
-          indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
-        } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
-          publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-          Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
-          String currentIdentityId = currentIdentity.getId();
-          if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-            newsNode.addMixin(MIX_NEWS_MODIFIERS);
-          }
-          Value[] newsModifiers = new Value[0];
-          boolean alreadyExist = false;
-          if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
-            newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
-            alreadyExist = Arrays.stream(newsModifiers).map(value -> {
-              try {
-                return value.getString();
-              } catch (RepositoryException e) {
-                return null;
-              }
-            }).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
-          }
-          if (!alreadyExist) {
-            newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
-            newsNode.save();
-          }
-        }
+      // illustration
+      if (StringUtils.isNotEmpty(news.getUploadId())) {
+        attachIllustration(newsNode, news.getUploadId());
+      } else if ("".equals(news.getUploadId())) {
+        removeIllustration(newsNode);
       }
-      return news;
-    } finally {
-      if (session != null) {
-        session.logout();
+
+      // attachments
+      news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
+
+      newsNode.save();
+
+      // update name of node
+      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
+        String srcPath = newsNode.getPath();
+        String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY : newsNode.getParent().getPath()) + "/"
+                + Utils.cleanName(news.getTitle()).trim();
+        session.getWorkspace().move(srcPath, destPath);
+      }
+
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+        publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+        if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+          newsNode.removeMixin(MIX_NEWS_MODIFIERS);
+          newsNode.save();
+        }
+        //if it's an "update news" case
+        if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
+          News newMentionedNews = news;
+          if (!previousMentions.isEmpty()) {
+            //clear old mentions from news body before sending a custom object to notification context.
+            previousMentions.forEach(username -> {
+              newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
+            });
+          }
+          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
+        }
+        indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+      } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+        publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
+        Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
+        String currentIdentityId = currentIdentity.getId();
+        if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+          newsNode.addMixin(MIX_NEWS_MODIFIERS);
+        }
+        Value[] newsModifiers = new Value[0];
+        boolean alreadyExist = false;
+        if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
+          newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
+          alreadyExist = Arrays.stream(newsModifiers).map(value -> {
+            try {
+              return value.getString();
+            } catch (RepositoryException e) {
+              return null;
+            }
+          }).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
+        }
+        if (!alreadyExist) {
+          newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
+          newsNode.save();
+        }
       }
     }
+    return news;
   }
 
   /**
@@ -431,40 +409,33 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
 
-    try {
-      Node newsNode = session.getNodeByUUID(news.getId());
-      if (newsNode == null) {
-        throw new Exception("Unable to find a node with an UUID equal to: " + news.getId());
+    Node newsNode = session.getNodeByUUID(news.getId());
+    if (newsNode == null) {
+      throw new Exception("Unable to find a node with an UUID equal to: " + news.getId());
+    }
+    if (!newsNode.hasProperty("exo:viewers")) {
+      newsNode.setProperty("exo:viewers", "");
+    }
+    String newsViewers = newsNode.getProperty("exo:viewers").getString();
+    boolean isCurrentUserInNewsViewers = false;
+    if (!newsViewers.isEmpty()) {
+      String[] newsViewersArray = newsViewers.split(",");
+      isCurrentUserInNewsViewers = Arrays.stream(newsViewersArray).anyMatch(userId::equals);
+    }
+    if (!isCurrentUserInNewsViewers) {
+      if (news.getViewsCount() == null) {
+        news.setViewsCount((long) 1);
+      } else {
+        news.setViewsCount(news.getViewsCount() + 1);
       }
-      if (!newsNode.hasProperty("exo:viewers")) {
-        newsNode.setProperty("exo:viewers", "");
+      if (newsViewers.isEmpty()) {
+        newsViewers = newsViewers.concat(userId);
+      } else {
+        newsViewers = newsViewers.concat(",").concat(userId);
       }
-      String newsViewers = newsNode.getProperty("exo:viewers").getString();
-      boolean isCurrentUserInNewsViewers = false;
-      if (!newsViewers.isEmpty()) {
-        String[] newsViewersArray = newsViewers.split(",");
-        isCurrentUserInNewsViewers = Arrays.stream(newsViewersArray).anyMatch(userId::equals);
-      }
-      if (!isCurrentUserInNewsViewers) {
-        if (news.getViewsCount() == null) {
-          news.setViewsCount((long) 1);
-        } else {
-          news.setViewsCount(news.getViewsCount() + 1);
-        }
-        if (newsViewers.isEmpty()) {
-          newsViewers = newsViewers.concat(userId);
-        } else {
-          newsViewers = newsViewers.concat(",").concat(userId);
-        }
-        newsNode.setProperty("exo:viewsCount", news.getViewsCount());
-        newsNode.setProperty("exo:viewers", newsViewers);
-        newsNode.save();
-      }
-
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
+      newsNode.setProperty("exo:viewsCount", news.getViewsCount());
+      newsNode.setProperty("exo:viewers", newsViewers);
+      newsNode.save();
     }
   }
 
@@ -581,7 +552,7 @@ public class NewsServiceImpl implements NewsService {
   }
 
   @Override
-  public void shareNews(News news, Space space, Identity userIdentity) throws IllegalAccessException, ObjectNotFoundException {
+  public void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws IllegalAccessException, ObjectNotFoundException {
     if (!canViewNews(news, userIdentity.getRemoteId())) {
       throw new IllegalAccessException("User with id " + userIdentity.getRemoteId() + "doesn't have access to news");
     }
@@ -598,11 +569,19 @@ public class NewsServiceImpl implements NewsService {
       }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
       newsNode.save();
+      if (sharedActivityId != null) {
+        if (newsNode.hasProperty("exo:activities")) {
+          String activities = newsNode.getProperty("exo:activities").getString();
+          activities = activities.concat(";").concat(space.getId()).concat(":").concat(sharedActivityId);
+          newsNode.setProperty("exo:activities", activities);
+        } else {
+          newsNode.setProperty("exo:activities", sharedActivityId);
+        }
+        newsNode.save();
+      }
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
           + userIdentity.getId(), e);
-    } finally {
-      sessionProvider.close();
     }
   }
 
@@ -622,38 +601,32 @@ public class NewsServiceImpl implements NewsService {
                                                                   .getDefaultWorkspaceName(),
                                                  repositoryService.getCurrentRepository());
 
-    try {
-      Node node = session.getNodeByUUID(newsId);
-      if (node.hasProperty("exo:activities")) {
-        String newActivities = node.getProperty("exo:activities").getString();
-        if (StringUtils.isNotEmpty(newActivities)) {
-          if (isDraft && node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
-                  && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
-            String versionNodeUUID = node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP) ?
-                    node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;
-            String versionName = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID).getName();
-            if (!versionName.isEmpty()) {
-              node.restore(versionName, true);
-              if (!node.isCheckedOut()) {
-                node.checkout();
-              }
-              publicationService.changeState(node, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-              return;
+    Node node = session.getNodeByUUID(newsId);
+    if (node.hasProperty("exo:activities")) {
+      String newActivities = node.getProperty("exo:activities").getString();
+      if (StringUtils.isNotEmpty(newActivities)) {
+        if (isDraft && node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+                && node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.DRAFT)) {
+          String versionNodeUUID = node.hasProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP) ?
+                  node.getProperty(AuthoringPublicationConstant.LIVE_REVISION_PROP).getString() : null;
+          String versionName = node.getVersionHistory().getSession().getNodeByUUID(versionNodeUUID).getName();
+          if (!versionName.isEmpty()) {
+            node.restore(versionName, true);
+            if (!node.isCheckedOut()) {
+              node.checkout();
             }
+            publicationService.changeState(node, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+            return;
           }
-          Stream.of(newActivities.split(";"))
-                  .map(activity -> activity.split(":")[1])
-                  .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
         }
-      }
-      Utils.removeDeadSymlinks(node, false);
-      node.remove();
-      session.save();
-    } finally {
-      if (session != null) {
-        session.logout();
+        Stream.of(newActivities.split(";"))
+                .map(activity -> activity.split(":")[1])
+                .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
+    Utils.removeDeadSymlinks(node, false);
+    node.remove();
+    session.save();
   }
 
   @Override

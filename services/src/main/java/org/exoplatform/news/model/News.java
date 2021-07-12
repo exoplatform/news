@@ -1,7 +1,8 @@
 package org.exoplatform.news.model;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import org.exoplatform.social.core.space.model.Space;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -79,6 +80,8 @@ public class News {
   @Getter
   @Setter
   private boolean              canPublish;
+
+  private Set<Space>           sharedInSpacesList;
 
   private String               url;
 
@@ -358,6 +361,14 @@ public class News {
 
   public void setCanDelete(boolean canDelete) {
     this.canDelete = canDelete;
+  }
+
+  public Set<Space> getSharedInSpacesList() {
+    return sharedInSpacesList;
+  }
+
+  public void setSharedInSpacesList(Set<Space> sharedInSpacesList) {
+    this.sharedInSpacesList = sharedInSpacesList;
   }
 
   public String getUrl() {

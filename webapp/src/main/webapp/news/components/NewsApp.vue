@@ -86,7 +86,7 @@
               :news-id="news.newsId"
               :activities="news.activities" />
             <exo-news-details-action-menu
-              v-if="news.canEdit && !news.schedulePostDate"
+              v-if="!news.schedulePostDate"
               :news="news"
               :show-edit-button="news.canEdit && !isDraftsFilter"
               :show-delete-button="news.canDelete"

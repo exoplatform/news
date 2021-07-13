@@ -149,13 +149,6 @@ export function deleteDraft(newsId) {
   });
 }
 
-export function incrementViewsNumberOfNews(newsId) {
-  return fetch(`${newsConstants.NEWS_API}/${newsId}/view`, {
-    credentials: 'include',
-    method: 'POST',
-  });
-}
-
 export function getSpaceById(id) {
   return fetch(`${newsConstants.SOCIAL_SPACE_API}/${id}`, {
     credentials: 'include',

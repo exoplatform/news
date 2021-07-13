@@ -1,6 +1,8 @@
 package org.exoplatform.news.webui.activity;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.news.NewsService;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -12,9 +14,12 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.webui.Utils;
 import org.exoplatform.social.webui.activity.BaseUIActivity;
+import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
+
+import org.exoplatform.webui.event.Event;
 
 @ComponentConfig(lifecycle = UIFormLifecycle.class, template = "war:/groovy/news/webui/activity/UINewsActivity.gtmpl", events = {
     @EventConfig(listeners = BaseUIActivity.LoadLikesActionListener.class),
@@ -35,7 +40,7 @@ public class UINewsActivity extends BaseUIActivity {
 
   private final static String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private final static String PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
+  private final static String PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
 
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
@@ -77,7 +82,50 @@ public class UINewsActivity extends BaseUIActivity {
   }
 
   public boolean canPinNews(ExoSocialActivity activity) {
-    return  ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
-            ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*")
+        || ConversationState.getCurrent().getIdentity().isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  public static class LikeActivityActionListener extends BaseUIActivity.LikeActivityActionListener {
+
+    public void execute(Event<BaseUIActivity> event) throws Exception {
+      super.execute(event);
+      WebuiRequestContext requestContext = event.getRequestContext();
+      String isLikedStr = requestContext.getRequestParameter(OBJECTID);
+      boolean isLiked = Boolean.parseBoolean(isLikedStr);
+      if (isLiked) {
+        BaseUIActivity uiActivity = event.getSource();
+        ExoSocialActivity activity = uiActivity.getActivity();
+        if (activity != null) {
+          if (activity.getTemplateParams() != null) {
+            if (activity.getTemplateParams().get("newsId") != null) {
+              String newsId = activity.getTemplateParams().get("newsId");
+              NewsService newsService = CommonsUtils.getService(NewsService.class);
+              News news = newsService.getNewsById(newsId, false);
+              NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, null, news);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public static class PostCommentActionListener extends BaseUIActivity.PostCommentActionListener {
+
+    public void execute(Event<BaseUIActivity> event) throws Exception {
+      super.execute(event);
+      BaseUIActivity uiActivity = event.getSource();
+      ExoSocialActivity activity = uiActivity.getActivity();
+      if (activity != null) {
+        if (activity.getTemplateParams() != null) {
+          if (activity.getTemplateParams().get("newsId") != null) {
+            String newsId = activity.getTemplateParams().get("newsId");
+            NewsService newsService = CommonsUtils.getService(NewsService.class);
+            News news = newsService.getNewsById(newsId, false);
+            NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, null, news);
+          }
+        }
+      }
+    }
   }
 }

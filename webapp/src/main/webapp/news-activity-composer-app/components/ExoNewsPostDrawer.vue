@@ -1,8 +1,13 @@
 <template>
-  <v-app>
+  <div>
+    <v-overlay
+      z-index="1000"
+      :value="drawer"
+      @click.native="drawer = false" />
     <exo-drawer
       ref="postNewsDrawer"
-      body-classes="hide-scroll decrease-z-index-more"
+      v-model="drawer"
+      show-overlay
       right>
       <template slot="title">
         {{ $t('news.composer.postArticle') }} 
@@ -43,13 +48,14 @@
         </div>
       </template>
     </exo-drawer>
-  </v-app>
+  </div>
 </template>
 
 <script>
 export default {
   data: () => ({
     disabled: true,
+    drawer: false,
     postArticleMode: 'immediate',
     postDate: null,
     postDateTime: '8:00',

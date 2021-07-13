@@ -180,6 +180,7 @@
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
     <news-activity-sharing-spaces-drawer />
+    <activity-share-drawer />
   </v-app>
 </template>
 
@@ -290,10 +291,8 @@ export default {
     } else {
       this.fetchNews();
     }
-    this.$root.$on('news-shared', (news) => {
-      if (news && news.spaceId) {
-        this.fetchNews(false);
-      }
+    this.$root.$on('activity-shared', () => {
+      this.fetchNews(false);
     });
   },
   methods: {

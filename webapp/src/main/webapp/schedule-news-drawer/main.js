@@ -21,7 +21,7 @@ if (extensionRegistry) {
     });
   }
 }
-let shareNewsApp;
+let scheduleNewsDrawer;
 export function init(params) {
   const appId = `scheduleNewsDrawer-${params.newsId}`;
 
@@ -30,7 +30,7 @@ export function init(params) {
 
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale ressources are ready
-    shareNewsApp = new Vue({
+    scheduleNewsDrawer = new Vue({
       template: `<schedule-news-drawer
                   v-cacheable="{cacheId: '${appId}'}"
                   id="${appId}"/>`,
@@ -40,14 +40,8 @@ export function init(params) {
   });
 }
 
-export function openShareNewsActivityDrawer(params) {
-  if (shareNewsApp) {
-    shareNewsApp.$root.$emit('news-share-drawer-open', params);
-  }
-}
-
 export function destroy() {
-  if (shareNewsApp) {
-    shareNewsApp.$destroy();
+  if (scheduleNewsDrawer) {
+    scheduleNewsDrawer.$destroy();
   }
 }

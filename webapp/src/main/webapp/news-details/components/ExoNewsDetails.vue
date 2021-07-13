@@ -304,7 +304,6 @@ export default {
     }
   },
   mounted() {
-    this.updateViewsCount();
     window.require(['SHARED/social-ui-profile'], function(socialProfile) {
       const labels = {
         StatusTitle: 'Loading...',
@@ -327,9 +326,6 @@ export default {
     updateArchivedField() {
       // eslint-disable-next-line vue/no-mutating-props
       this.news.archived = false;
-    },
-    updateViewsCount: function () {
-      this.$newsServices.incrementViewsNumberOfNews(this.newsId);
     },
     openPreview(attachedFile) {
       const self = this;

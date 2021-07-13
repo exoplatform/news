@@ -1482,7 +1482,7 @@ public class NewsRestResourcesV1Test {
     lenient().doNothing().when(newsService).markAsRead(news, "john");
 
     // When
-    Response response = newsRestResourcesV1.viewNews(request, "1");
+    Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1506,7 +1506,7 @@ public class NewsRestResourcesV1Test {
     lenient().doNothing().when(newsService).markAsRead(news, "john");
 
     // When
-    Response response = newsRestResourcesV1.viewNews(request, "2");
+    Response response = newsRestResourcesV1.getNewsById(request, "2", null, false);;
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());

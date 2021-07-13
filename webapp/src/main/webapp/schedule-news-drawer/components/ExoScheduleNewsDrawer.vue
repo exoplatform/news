@@ -111,11 +111,6 @@ export default {
       if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
-      if ( (new Date(newVal).getTime() !== new Date(oldVal).getTime()) || (this.postDate === this.schedulePostDate)){
-        this.disabled = false;
-      } else {
-        this.disabled = true;
-      }
       const newDate = new Date(this.postDate);
       newDate.setHours(this.postDateTime.getHours());
       newDate.setMinutes(this.postDateTime.getMinutes());
@@ -135,7 +130,7 @@ export default {
   },
   computed: {
     saveButtonLabel() {
-      return this.postArticleMode==='later' ? this.$t('news.composer.schedule'): this.$t('news.composer.post');
+      return this.postArticleMode === 'later' ? this.$t('news.composer.schedule'): this.$t('news.composer.post');
     },
     minimumPostDate() {
       return new Date();

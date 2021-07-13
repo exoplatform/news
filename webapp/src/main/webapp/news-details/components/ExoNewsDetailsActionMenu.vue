@@ -23,7 +23,7 @@
           {{ $t('news.details.header.menu.edit') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showShareButton" @click="$root.$emit('news-share-drawer-open', news)">
+      <v-list-item v-if="showShareButton && news.activityId" @click="$root.$emit('activity-share-drawer-open', news.activityId)">
         <v-list-item-title>
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>

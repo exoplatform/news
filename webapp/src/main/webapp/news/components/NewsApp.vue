@@ -179,6 +179,7 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
+    <exo-news-notification-alerts />
     <news-activity-sharing-spaces-drawer />
     <activity-share-drawer />
   </v-app>

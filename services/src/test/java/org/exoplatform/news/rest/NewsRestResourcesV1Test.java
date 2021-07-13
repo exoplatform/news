@@ -1954,4 +1954,56 @@ public class NewsRestResourcesV1Test {
     assertEquals("john", newsList.get(0).getAuthor());
   }
 
+  @Test
+  public void shouldScheduleNewsWhenUserIsSpaceManagerOrSpaceRedactor() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    lenient().when(spaceService.isRedactor(any(Space.class), eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isManager(any(Space.class), eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.canScheduleNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    lenient().when(request.getRemoteUser()).thenReturn("Mary");
+    News news1 = new News();
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news1);
+    lenient().when(spaceService.getSpaceById("Mary")).thenReturn(new Space());
+    lenient().when(spaceService.isRedactor(any(Space.class), eq("Mary"))).thenReturn(false);
+    lenient().when(spaceService.isMember(any(Space.class), eq("Mary"))).thenReturn(true);
+    lenient().when(spaceService.isManager(any(Space.class), eq("Mary"))).thenReturn(true);
+
+    // When
+    Response response1 = newsRestResourcesV1.canScheduleNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response1.getStatus());
+
+    lenient().when(request.getRemoteUser()).thenReturn("Eric");
+    News news2 = new News();
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news2);
+    lenient().when(spaceService.getSpaceById("Eric")).thenReturn(new Space());
+    lenient().when(spaceService.isRedactor(any(Space.class), eq("Eric"))).thenReturn(false);
+    lenient().when(spaceService.isMember(any(Space.class), eq("Eric"))).thenReturn(false);
+    lenient().when(spaceService.isManager(any(Space.class), eq("Eric"))).thenReturn(false);
+
+    // When
+    Response response2 = newsRestResourcesV1.canScheduleNews(request, "1");
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response2.getStatus());
+  }
+
 }

@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.news.model.NewsAttachment;
+import org.exoplatform.services.attachments.model.Attachment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -2006,4 +2008,51 @@ public class NewsRestResourcesV1Test {
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response2.getStatus());
   }
 
+  @Test
+  public void shouldDeleteNews() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    News news = new News();
+    news.setId("1");
+    news.setCanDelete(true);
+    lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.deleteNews(request,news.getId(),false,0);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void openNewsAttachmentById() {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    NewsAttachment attachment = new NewsAttachment("111", "111", "attachment", "png", 2);
+    try {
+      lenient().when( newsAttachmentsService.getNewsAttachment(attachment.getId())).thenReturn(attachment);
+      lenient().when( newsAttachmentsService.getNewsAttachmentOpenUrl(attachment.getId())).thenReturn(anyString());
+    } catch (Exception e) {
+
+    }
+
+    // When
+    Response response = newsRestResourcesV1.openNewsAttachmentById(request, "111");
+
+    // Then
+    assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+  }
 }

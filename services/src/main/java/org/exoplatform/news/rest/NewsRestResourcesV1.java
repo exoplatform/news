@@ -873,9 +873,4 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private boolean canScheduleNews(String authenticatedUser, Space space) {
     return spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser);
   }
-
-  private boolean canViewScheduledNews(String authenticatedUser, Space space, News news) {
-    return StringUtils.equals(news.getAuthor(), authenticatedUser) || (space != null
-        && (spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser)));
-  }
 }

@@ -21,12 +21,14 @@
         <v-radio-group v-model="postArticleMode" class="ml-2">
           <v-radio
             :label="$t('news.composer.postImmediately')"
-            value="immediate" />
+            value="immediate"
+            @click="changeDisable" />
           <v-radio
             v-if="allowPostingLater"
             :label="$t('news.composer.postLater')"
             value="later"
-            class="mt-4" />
+            class="mt-4"
+            @click="changeDisable" />
           <div v-if="(postArticleMode==='later' && allowPostingLater) || !allowNotPost && postArticleMode !=='immediate'" class="mt-4 ml-4">
             <div class="grey--text my-4">{{ $t('news.composer.choosePostDate') }}</div>
             <div class="d-flex flex-row flex-grow-1">
@@ -52,7 +54,8 @@
             v-if="allowNotPost"
             :label="$t('news.composer.notPost')"
             value="notPost"
-            class="mt-4" />
+            class="mt-4"
+            @click="changeDisable" />
           <div v-if="allowNotPost && postArticleMode!=='later' && postArticleMode !=='immediate'" class="grey--text my-4 ml-4">{{ $t('news.composer.chooseNotPost') }}</div>
         </v-radio-group>
       </template>
@@ -193,6 +196,11 @@ export default {
     },
     selectPostMode() {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode);
+    },
+    changeDisable() {
+      const today = new Date(this.postDate);
+      const postDate = this.$newsUtils.convertScheduleDate(today);
+      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate === this.schedulePostDate;
     },
     closeDrawer() {
       this.$refs.postNewsDrawer.close();

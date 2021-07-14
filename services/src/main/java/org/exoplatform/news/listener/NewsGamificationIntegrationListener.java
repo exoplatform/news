@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.listener.Event;
@@ -30,12 +29,9 @@ public class NewsGamificationIntegrationListener extends Listener<String, News> 
 
   private ListenerService    listenerService;
 
-  private NewsService        newsService;
-
-  public NewsGamificationIntegrationListener(PortalContainer container, ListenerService listenerService, NewsService newsService) {
+  public NewsGamificationIntegrationListener(PortalContainer container, ListenerService listenerService) {
     this.container = container;
     this.listenerService = listenerService;
-    this.newsService = newsService;
   }
 
   @Override

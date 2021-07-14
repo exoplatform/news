@@ -34,7 +34,7 @@ import org.exoplatform.webui.event.Event;
     @EventConfig(listeners = BaseUIActivity.EditActivityActionListener.class),
     @EventConfig(listeners = BaseUIActivity.EditCommentActionListener.class) })
 public class UINewsActivity extends BaseUIActivity {
-  public static final String  ACTIVITY_TYPE                   = "news";
+  public static final String  NEWS_ID                         = "newsId";
 
   private final static String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
@@ -87,7 +87,7 @@ public class UINewsActivity extends BaseUIActivity {
   }
 
   public static class LikeActivityActionListener extends BaseUIActivity.LikeActivityActionListener {
-
+    @Override
     public void execute(Event<BaseUIActivity> event) throws Exception {
       super.execute(event);
       WebuiRequestContext requestContext = event.getRequestContext();
@@ -96,35 +96,27 @@ public class UINewsActivity extends BaseUIActivity {
       if (isLiked) {
         BaseUIActivity uiActivity = event.getSource();
         ExoSocialActivity activity = uiActivity.getActivity();
-        if (activity != null) {
-          if (activity.getTemplateParams() != null) {
-            if (activity.getTemplateParams().get("newsId") != null) {
-              String newsId = activity.getTemplateParams().get("newsId");
-              NewsService newsService = CommonsUtils.getService(NewsService.class);
-              News news = newsService.getNewsById(newsId, false);
-              NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, null, news);
-            }
-          }
+        if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().get(NEWS_ID) != null) {
+          String newsId = activity.getTemplateParams().get(NEWS_ID);
+          NewsService newsService = CommonsUtils.getService(NewsService.class);
+          News news = newsService.getNewsById(newsId, false);
+          NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, null, news);
         }
       }
     }
   }
 
   public static class PostCommentActionListener extends BaseUIActivity.PostCommentActionListener {
-
+    @Override
     public void execute(Event<BaseUIActivity> event) throws Exception {
       super.execute(event);
       BaseUIActivity uiActivity = event.getSource();
       ExoSocialActivity activity = uiActivity.getActivity();
-      if (activity != null) {
-        if (activity.getTemplateParams() != null) {
-          if (activity.getTemplateParams().get("newsId") != null) {
-            String newsId = activity.getTemplateParams().get("newsId");
-            NewsService newsService = CommonsUtils.getService(NewsService.class);
-            News news = newsService.getNewsById(newsId, false);
-            NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, null, news);
-          }
-        }
+      if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().get(NEWS_ID) != null) {
+        String newsId = activity.getTemplateParams().get(NEWS_ID);
+        NewsService newsService = CommonsUtils.getService(NewsService.class);
+        News news = newsService.getNewsById(newsId, false);
+        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, null, news);
       }
     }
   }

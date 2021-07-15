@@ -10,7 +10,8 @@
       v-model="drawer"
       show-overlay
       body-classes="hide-scroll decrease-z-index-more"
-      right>
+      right
+      @closed="disabled = false">
       <template v-if="editScheduledNews !== 'editScheduledNews'" slot="title">
         {{ $t('news.composer.postArticle') }}
       </template>
@@ -20,17 +21,19 @@
       <template slot="content">
         <v-radio-group v-model="postArticleMode" class="ml-2">
           <v-radio
-            :label="$t('news.composer.postImmediately')"
             value="immediate"
-            @click="changeDisable" />
+            @click="changeDisable">
+            <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
+          </v-radio>
           <v-radio
             v-if="allowPostingLater"
-            :label="$t('news.composer.postLater')"
             value="later"
             class="mt-4"
-            @click="changeDisable" />
+            @click="changeDisable">
+            <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
+          </v-radio>
           <div v-if="(postArticleMode==='later' && allowPostingLater) || !allowNotPost && postArticleMode !=='immediate'" class="mt-4 ml-4">
-            <div class="grey--text my-4">{{ $t('news.composer.choosePostDate') }}</div>
+            <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
             <div class="d-flex flex-row flex-grow-1">
               <slot name="postDate"></slot>
               <date-picker
@@ -45,18 +48,16 @@
                   class="me-4" />
               </div>
             </div>
-            <div v-if="minimumPostDateTime" class="d-flex flex-row mt-4">
-              <v-icon class="warningStyle">warning</v-icon>
-              <span class="ml-2 grey--text">{{ $t('news.composer.warnMessage') }}</span>
-            </div>
           </div>
           <v-radio
             v-if="allowNotPost"
             :label="$t('news.composer.notPost')"
             value="notPost"
-            class="mt-4"
-            @click="changeDisable" />
-          <div v-if="allowNotPost && postArticleMode!=='later' && postArticleMode !=='immediate'" class="grey--text my-4 ml-4">{{ $t('news.composer.chooseNotPost') }}</div>
+            class="postModeText mt-4"
+            @click="changeDisable">
+            <span slot="label" class="postModeText">{{ $t('news.composer.notPost') }}</span>
+          </v-radio>
+          <div v-if="allowNotPost && postArticleMode!=='later' && postArticleMode !=='immediate'" class="grey--text my-4 ml-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
         </v-radio-group>
       </template>
       <template slot="footer">
@@ -98,7 +99,7 @@ export default {
   data: () => ({
     drawer: false,
     disabled: false,
-    postArticleMode: 'immediate',
+    postArticleMode: 'later',
     postDateTime: '8:00',
     allowPostingLater: false,
     editScheduledNews: false,
@@ -154,7 +155,7 @@ export default {
       this.editScheduledNews = scheduleMode;
       if (scheduleMode === 'editScheduledNews') {
         this.allowNotPost = true;
-        this.postArticleMode = 'notPost';
+        this.postArticleMode = 'later';
       } else {
         this.allowNotPost = false;
         this.postArticleMode = 'immediate';
@@ -165,8 +166,8 @@ export default {
   methods: {
     openDrawer() {
       if (this.$refs.postNewsDrawer) {
-        this.disabled = false;
         if (this.editScheduledNews ==='editScheduledNews') {
+          this.disabled = true;
           this.postDateTime = new Date(this.schedulePostDate);
           this.postDate = this.postDateTime;
           this.postDateTime.setHours(new Date(this.schedulePostDate).getHours());

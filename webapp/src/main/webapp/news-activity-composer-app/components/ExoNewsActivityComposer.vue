@@ -15,7 +15,7 @@
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
-            <img src="/news/images/newsImageDefault.png">
+            <img src="/news/images/news.png">
             <span class="newsFormTitle">{{ newsFormTitle }}</span>
           </div>
           <div class="newsFormRightActions">
@@ -379,8 +379,7 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
-      CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
-
+      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular; }');
       // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
@@ -832,14 +831,12 @@ export default {
         });
       });
       $('#newsActivityComposer').parent().click(() => {
-        const element = document.getElementById('newsTop');
-        element.classList.remove('darkComposerEffect');
-        element.classList.add('greyComposerEffect');
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
       });
       $('#newsActivityComposer').parent().keyup(() => {
-        const element = document.getElementById('newsTop');
-        element.classList.remove('darkComposerEffect');
-        element.classList.add('greyComposerEffect');
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
       });
     }
   }

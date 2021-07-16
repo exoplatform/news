@@ -200,7 +200,7 @@ export default {
       searchNews: '',
       searchDelay: 300,
       searchInputDisplayed: false,
-      newsFilter: 'all',
+      newsFilter: '',
       spacesFilter: [],
       newsStatusLabel: this.$t('news.app.filter.all'),
       showArchiveButton: true,
@@ -289,6 +289,8 @@ export default {
         // set search value
         this.searchText = searchQueryParam;
       }
+    } else if (filterQueryParam === null) {
+      this.newsFilter = 'all';
     } else {
       this.fetchNews();
     }

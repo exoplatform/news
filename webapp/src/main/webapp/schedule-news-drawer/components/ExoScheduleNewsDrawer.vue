@@ -112,17 +112,17 @@ export default {
       if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
-      const newDate = new Date(this.postDate);
-      const postDate = this.$newsUtils.convertScheduleDate(newDate);
-      if (postDate !== this.schedulePostDate){
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      if (postDate.getTime() !== scheduleDate.getTime()){
         this.disabled = false;
       } else {
         this.disabled = true;
       }
-      newDate.setHours(this.postDateTime.getHours());
-      newDate.setMinutes(this.postDateTime.getMinutes());
-      newDate.setSeconds(0);
-      this.postDate = newDate;
+      postDate.setHours(this.postDateTime.getHours());
+      postDate.setMinutes(this.postDateTime.getMinutes());
+      postDate.setSeconds(0);
+      this.postDate = postDate;
     },
     postDateTime(newVal, oldVal) {
       if (!this.postDateTime || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
@@ -199,9 +199,9 @@ export default {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode);
     },
     changeDisable() {
-      const today = new Date(this.postDate);
-      const postDate = this.$newsUtils.convertScheduleDate(today);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate === this.schedulePostDate;
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime();
     },
     closeDrawer() {
       this.$refs.postNewsDrawer.close();

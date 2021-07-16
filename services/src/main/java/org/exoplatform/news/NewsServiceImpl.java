@@ -207,7 +207,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, null, news);
     return news;
   }
 
@@ -436,6 +436,7 @@ public class NewsServiceImpl implements NewsService {
       newsNode.setProperty("exo:viewsCount", news.getViewsCount());
       newsNode.setProperty("exo:viewers", newsViewers);
       newsNode.save();
+      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, null, news);
     }
   }
 
@@ -578,6 +579,7 @@ public class NewsServiceImpl implements NewsService {
           newsNode.setProperty("exo:activities", sharedActivityId);
         }
         newsNode.save();
+        NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, null, news);
       }
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"

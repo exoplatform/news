@@ -27,6 +27,15 @@ public class NewsUtils {
 
   public static final String PUBLISH_NEWS = "exo.news.PublishArticle";
 
+  public static final String VIEW_NEWS    = "exo.news.viewArticle";
+
+  public static final String SHARE_NEWS   = "exo.news.shareArticle";
+
+  public static final String COMMENT_NEWS = "exo.news.commentArticle";
+
+  public static final String LIKE_NEWS    = "exo.news.likeArticle";
+
+
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);

@@ -1,9 +1,11 @@
 package org.exoplatform.news.listener;
 
 import org.exoplatform.news.NewsService;
+import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.activity.ActivityLifeCycleEvent;
 import org.exoplatform.social.core.activity.ActivityListenerPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -60,6 +62,36 @@ public class NewsActivityListener extends ActivityListenerPlugin {
         } catch (Exception e) {
           LOG.error("Error while sharing news {} to activity {}", newsId, sharedActivity.getId(), e);
         }
+      }
+    }
+  }
+
+  @Override
+  public void likeActivity(ActivityLifeCycleEvent event) {
+    super.likeActivity(event);
+    ExoSocialActivity activity = event.getActivity();
+    if (activity != null) {
+      String userId = ConversationState.getCurrent().getIdentity().getUserId();
+      try {
+        News news = newsService.getNewsByActivityId(activity.getId(), userId);
+        NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, null, news);
+      } catch (Exception e) {
+        LOG.error("Error broadcast like news event", e);
+      }
+    }
+  }
+
+  @Override
+  public void saveComment(ActivityLifeCycleEvent event) {
+    super.saveComment(event);
+    ExoSocialActivity activity = event.getActivity();
+    if (activity != null) {
+      String userId = ConversationState.getCurrent().getIdentity().getUserId();
+      try {
+        News news = newsService.getNewsByActivityId(activity.getParentId(), userId);
+        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, null, news);
+      } catch (Exception e) {
+        LOG.error("Error broadcast comment news event", e);
       }
     }
   }

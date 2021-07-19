@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
@@ -1954,4 +1955,62 @@ public class NewsRestResourcesV1Test {
     assertEquals("john", newsList.get(0).getAuthor());
   }
 
+  @Test
+  public void getNewsIllustrationTest() {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    Request request = mock(Request.class);
+    News news = new News();
+    news.setSpaceId("1");
+    news.setAuthor("john");
+    news.setPinned(true);
+    news.setIllustrationUpdateDate(new Date());
+    news.setIllustration("illustration".getBytes());
+
+    lenient().when(newsService.getNewsById("1", false)).thenReturn(news);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsIllustration(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    byte[] illustration = (byte[]) response.getEntity();
+    assertNotNull(illustration);
+    assertEquals("illustration", new String(illustration));
+  }
+
+  @Test
+  public void canCreateNewsTest() {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+
+    Space space = new Space();
+    space.setId("1");
+
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(spaceService.getSpaceById("1")).thenReturn(space);
+
+    // When
+    Response response = newsRestResourcesV1.canCreateNews(request, "1");
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+    lenient().when(spaceService.isMember(space, "john")).thenReturn(true);
+    // When
+    response = newsRestResourcesV1.canCreateNews(request, "1");
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    String canCreateNews = (String) response.getEntity();
+    assertNotNull(canCreateNews);
+    assertEquals("true", canCreateNews);
+  }
 }

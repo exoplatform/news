@@ -74,7 +74,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
       String userId = ConversationState.getCurrent().getIdentity().getUserId();
       try {
         News news = newsService.getNewsByActivityId(activity.getId(), userId);
-        NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, null, news);
+        NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, NewsUtils.getCurrentUserId(), news);
       } catch (Exception e) {
         LOG.error("Error broadcast like news event", e);
       }
@@ -89,7 +89,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
       String userId = ConversationState.getCurrent().getIdentity().getUserId();
       try {
         News news = newsService.getNewsByActivityId(activity.getParentId(), userId);
-        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, null, news);
+        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, NewsUtils.getCurrentUserId(), news);
       } catch (Exception e) {
         LOG.error("Error broadcast comment news event", e);
       }

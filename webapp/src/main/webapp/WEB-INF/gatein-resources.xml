@@ -55,6 +55,9 @@
         <as>editor</as>
       </depends>
       <depends>
+        <module>ScheduleNewsDrawer</module>
+      </depends>
+      <depends>
         <module>jquery</module>
         <as>$</as>
       </depends>
@@ -206,6 +209,9 @@
       <as>editor</as>
     </depends>
     <depends>
+      <module>ScheduleNewsDrawer</module>
+    </depends>
+    <depends>
       <module>documentPreview</module>
     </depends>
     <depends>
@@ -299,6 +305,32 @@
     </depends>
     <depends>
       <module>extensionRegistry</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>ScheduleNewsDrawer</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/scheduleNewsDrawer.bundle.js</path>
+    </script>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+    <depends>
+      <module>snackbarComponent</module>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
     </depends>
   </module>
 

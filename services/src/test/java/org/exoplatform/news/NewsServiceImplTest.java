@@ -1809,6 +1809,10 @@ public class NewsServiceImplTest {
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    Property prop = mock(Property.class);
+    when(prop.getString()).thenReturn("");
+    when(newsNode.getProperty("publication:currentState")).thenReturn(prop);
+
     when(newsNode.hasProperty("exo:activities")).thenReturn(true);
     when(newsNode.getProperty("exo:activities")).thenReturn(exoActivitiesProperty);
     when(exoActivitiesProperty.getString()).thenReturn("1:1;2:2;2:3");

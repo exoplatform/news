@@ -12,6 +12,7 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -35,6 +36,9 @@ public class NewsUtils {
 
   public static final String LIKE_NEWS    = "exo.news.likeArticle";
 
+  public static final String DELETE_NEWS  = "exo.news.deleteArticle";
+
+  public static final String UPDATE_NEWS  = "exo.news.updateArticle";
 
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
@@ -116,6 +120,16 @@ public class NewsUtils {
       throw new IllegalStateException("Error occurred while retrieving security identity of user " + username);
     }
     return identity;
+  }
+
+  public static String getCurrentUserId() {
+    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+    return currentIdentity != null ? currentIdentity.getUserId() : null;
+  }
+
+  private static org.exoplatform.services.security.Identity getCurrentIdentity() {
+    ConversationState conversationState = ConversationState.getCurrent();
+    return conversationState != null ? ConversationState.getCurrent().getIdentity() : null;
   }
 
 }

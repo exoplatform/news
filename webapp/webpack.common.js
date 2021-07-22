@@ -14,6 +14,7 @@ let config = {
     newsSearchCard: './src/main/webapp/news-search/main.js',
     newsExtensions: './src/main/webapp/news-extensions/main.js',
     newsDetailsApp: './src/main/webapp/news-details-app/main.js',
+    scheduleNewsDrawer: './src/main/webapp/schedule-news-drawer/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',

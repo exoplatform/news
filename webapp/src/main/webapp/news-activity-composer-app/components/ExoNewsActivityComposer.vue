@@ -376,8 +376,9 @@ export default {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
       CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+      CKEDITOR.plugins.addExternal('insertOptions','/news/js/ckeditor/plugins/insert-options/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video,insertOptions';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -407,7 +408,7 @@ export default {
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
           { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video', 'insertOptions'] },
         ],
         format_tags: 'p;h1;h2;h3',
         autoGrow_minHeight: self.newsFormContentHeight,

@@ -144,6 +144,9 @@ export default {
     },
   },
   created() {
+    window.addEventListener('open-drawer', function(evt) {
+      console.warn('****************** clicked ******************', evt);
+    }, false);
     this.initializeDate();
     this.$featureService.isFeatureEnabled('news.postLater')
       .then(enabled => this.allowPostingLater = enabled);

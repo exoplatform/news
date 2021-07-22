@@ -114,11 +114,7 @@ export default {
       }
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      if (postDate.getTime() !== scheduleDate.getTime()){
-        this.disabled = false;
-      } else {
-        this.disabled = true;
-      }
+      this.disabled = postDate.getTime() === scheduleDate.getTime();
       postDate.setHours(this.postDateTime.getHours());
       postDate.setMinutes(this.postDateTime.getMinutes());
       postDate.setSeconds(0);

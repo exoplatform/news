@@ -748,7 +748,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
   @ApiOperation(value = "check if the current user can create a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News created"),
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to create a news is returned"),
       @ApiResponse(code = 400, message = "Invalid query input"),
       @ApiResponse(code = 401, message = "User not authorized to create a news"),
       @ApiResponse(code = 404, message = "Space not found"),
@@ -781,7 +781,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
   @ApiOperation(value = "check if the current user can schedule a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can schedule a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News scheduled"),
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to schedule a news"),
           @ApiResponse(code = 400, message = "Invalid query input"),
           @ApiResponse(code = 401, message = "User not authorized to schedule a news"),
           @ApiResponse(code = 404, message = "Space not found"),

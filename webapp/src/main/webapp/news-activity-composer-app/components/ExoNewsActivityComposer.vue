@@ -379,7 +379,7 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
-      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular; }');
+      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
       // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';

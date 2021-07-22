@@ -595,6 +595,9 @@
         .newsFormTitle {
           padding: 9px 0 9px 5px ~'; /** orientation=lt */ ';
           padding: 9px 5px 9px 0 ~'; /** orientation=rt */ ';
+          font-family: Helvetica, regular, sans-serif;
+          font-size: 14px;
+          color: @grayDark;
         }
       }
 
@@ -710,7 +713,7 @@
     .newsFormInput {
       display: flex;
       flex-direction: column;
-      margin: 0 20px;
+      margin: 20px 14%;
       background-color: white;
       color: grey;
 
@@ -801,7 +804,7 @@
 
       .formInputGroup {
         display: flex;
-        margin: 0 22%;
+        margin: 0 4%;
         padding: 10px 0;
 
         label {
@@ -812,23 +815,34 @@
 
         input[type="text"] {
           flex: 0 1 100%;
-          margin-bottom: 0;
           border-radius: 0px;
           border-color: transparent;
-          padding: 0 20px;
+          margin: 0;
+          padding: 20px;
           font-size: 24px;
+          text-align: center;
+          box-shadow:none;
+          border-bottom:solid 1px @greyColorDefault !important;
         }
 
         textarea {
           flex: 0 1 100%;
+          height: 40px;
           margin: 0;
           padding: 20px;
           font-size: 18px;
-          border: none;
+          border: none !important;
           resize: none;
+          border-bottom:solid 1px @greyColorDefault !important;
+          border-radius: 0;
+          box-shadow:none;
 
           &#newsSummary {
             font-style: italic;
+            text-align: center;
+            font-family: Helvetica, regular, sans-serif;
+            font-size: 16pt;
+            color: @grayLight;
           }
         }
 
@@ -836,6 +850,11 @@
           border-color: transparent;
           flex: 0 1 100%;
           margin-bottom: 0;
+        }
+        #newsTitle {
+          font-family: Helvetica, regular, sans-serif;
+          font-size: 21pt;
+          color: @grayDark;
         }
       }
 
@@ -3867,5 +3886,13 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
       margin-left: 12px;
     }
   }
+}
+
+.greyComposerEffect{
+  filter: opacity(0.2);
+}
+
+.darkComposerEffect{
+  filter: opacity(0.4);
 }
 

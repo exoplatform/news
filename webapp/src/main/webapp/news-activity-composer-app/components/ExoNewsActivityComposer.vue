@@ -15,7 +15,7 @@
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
-            <img src="/news/images/newsImageDefault.png">
+            <img src="/news/images/news.png">
             <span class="newsFormTitle">{{ newsFormTitle }}</span>
           </div>
           <div class="newsFormRightActions">
@@ -318,6 +318,8 @@ export default {
     }
   },
   mounted() {
+    const elementNewTop = document.getElementById('newsTop');
+    elementNewTop.classList.add('darkComposerEffect');
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
     
@@ -334,6 +336,7 @@ export default {
               this.initNewsComposerData(this.newsId);
             } else {
               this.initCKEditor();
+              this.setToolBarEffect();
               const message = localStorage.getItem('exo-activity-composer-message');
               if (message) {
                 this.initCKEditorData(message);
@@ -381,8 +384,7 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
-      CKEDITOR.addCss('.cke_editable { font-size: 18px; }');
-
+      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
       // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
@@ -425,6 +427,7 @@ export default {
                   $(this).closest('[data-atwho-at-query]').remove();
                 });
               });
+            window.setTimeout(() => self.setFocus(), 50);
           },
           change: function (evt) {
             self.news.body = evt.editor.getData();
@@ -813,6 +816,36 @@ export default {
     },
     getContent(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+    },
+    setFocus() {
+      if (CKEDITOR.instances['newsContent']) {
+        CKEDITOR.instances['newsContent'].status = 'ready';
+        window.setTimeout(() => {
+          this.$nextTick().then(() => CKEDITOR.instances['newsContent'].focus());
+        }, 200);
+      }
+    },
+    setToolBarEffect() {
+      const element = CKEDITOR.instances['newsContent'] ;
+      const elementNewTop = document.getElementById('newsTop');
+      element.on('contentDom', function () {
+        this.document.on('click', function(){
+          elementNewTop.classList.add('darkComposerEffect');
+        });
+      });
+      element.on('contentDom', function () {
+        this.document.on('keyup', function(){
+          elementNewTop.classList.add('darkComposerEffect');
+        });
+      });
+      $('#newsActivityComposer').parent().click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsActivityComposer').parent().keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
     }
   }
 };

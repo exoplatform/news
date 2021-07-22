@@ -26,13 +26,12 @@
             <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
           </v-radio>
           <v-radio
-            v-if="allowPostingLater"
             value="later"
             class="mt-4"
             @click="changeDisable">
             <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
           </v-radio>
-          <div v-if="(postArticleMode==='later' && allowPostingLater) || !allowNotPost && postArticleMode !=='immediate'" class="mt-4 ml-4">
+          <div v-if="postArticleMode==='later' || !allowNotPost && postArticleMode !=='immediate'" class="mt-4 ml-4">
             <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
             <div class="d-flex flex-row flex-grow-1">
               <slot name="postDate"></slot>
@@ -101,7 +100,6 @@ export default {
     disabled: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
-    allowPostingLater: false,
     editScheduledNews: false,
     allowNotPost: false,
     schedulePostDate: null,
@@ -145,8 +143,6 @@ export default {
   },
   created() {
     this.initializeDate();
-    this.$featureService.isFeatureEnabled('news.postLater')
-      .then(enabled => this.allowPostingLater = enabled);
     this.$root.$on('open-schedule-drawer', (scheduleMode) => {
       this.editScheduledNews = scheduleMode;
       if (scheduleMode === 'editScheduledNews') {

@@ -11,7 +11,7 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
-      <exo-news-post-drawer ref="postNewsDrawer" @post-article="postNews" />
+      <schedule-news-drawer @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">
@@ -27,7 +27,7 @@
               :disabled="postDisabled || postingNews"
               elevation="0"
               class="btn btn-primary"
-              @click="openDrawer">
+              @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
           </div>
@@ -248,7 +248,9 @@ export default {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-      }
+      },
+      canScheduleNews: false,
+      scheduleMode: '',
     };
   },
   computed: {
@@ -345,6 +347,9 @@ export default {
           }
           this.loading = false;
         });
+      });
+      this.$newsServices.canScheduleNews(this.currentSpace.id).then(canScheduleNews => {
+        this.canScheduleNews = canScheduleNews;
       });
     });
     
@@ -534,9 +539,12 @@ export default {
         });
       }, this.autoSaveDelay);
     },
-    openDrawer() {
-      if (this.$refs.postNewsDrawer) {
-        this.$refs.postNewsDrawer.open();
+    newsActions() {
+      if (this.canScheduleNews) {
+        this.scheduleMode = 'postScheduledNews';
+        this.$root.$emit('open-schedule-drawer', this.scheduleMode);
+      } else {
+        this.postNews();
       }
     },
     postNews: function (schedulePostDate) {

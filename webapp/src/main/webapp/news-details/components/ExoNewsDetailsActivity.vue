@@ -56,17 +56,21 @@ export default {
   },
   methods: {
     retrieveNews() {
-      this.$newsServices.getNewsByActivityId(this.activityId)
-        .then(news => {
-          this.news = news;
-          if (!this.news) {
+      if (this.activity.news) {
+        this.news = this.activity.news;
+      } else {
+        this.$newsServices.getNewsByActivityId(this.activityId)
+          .then(news => {
+            this.news = news;
+            if (!this.news) {
+              this.$root.$emit('activity-extension-abort', this.activityId);
+            }
+            this.activity.news = news;
+          })
+          .catch(() => {
             this.$root.$emit('activity-extension-abort', this.activityId);
-          }
-          this.activity.news = news;
-        })
-        .catch(() => {
-          this.$root.$emit('activity-extension-abort', this.activityId);
-        });
+          });
+      }
     },
   },
 };

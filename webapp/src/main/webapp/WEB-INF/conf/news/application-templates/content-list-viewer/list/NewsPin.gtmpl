@@ -117,6 +117,7 @@
             StringBuilder newsUrl = new StringBuilder("");
             if (viewNode.hasProperty("exo:activities")) {
               def newsActivityId =  viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
+              def news = newsService.convertNodeToNews(viewNode, false);
               Space newsPostedInSpace = spaceService.getSpaceById( viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
               def portalName = PortalContainer.getCurrentPortalContainerName();
               def portalOwner = CommonsUtils.getCurrentPortalOwner();
@@ -124,7 +125,7 @@
               if (spaceService.isMember(newsPostedInSpace, currentUsername)) {
                 newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
               } else {
-                newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?content-id=").append(newsService.getPath(viewNode));
+                newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
               }
             }
             def itemLink = newsUrl.toString();

@@ -122,6 +122,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       News createdNews;
       if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = newsService.createNews(news);
+      } else if(news.getSchedulePostDate() != null){
+        createdNews = newsService.cancelScheduleNews(news);
       } else {
         createdNews = newsService.createNewsDraft(news);
       }

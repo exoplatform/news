@@ -111,4 +111,6 @@ public interface NewsService {
 
   News scheduleNews(News news) throws Exception;
 
+  News cancelScheduleNews(News news) throws Exception;
+
 }

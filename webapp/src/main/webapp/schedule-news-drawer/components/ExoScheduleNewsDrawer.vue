@@ -55,7 +55,7 @@
             value="notPost"
             class="postModeText mt-4"
             @click="changeDisable">
-            <span slot="label" class="postModeText">{{ $t('news.composer.notPost') }}</span>
+            <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
           </v-radio>
           <div v-if="allowNotPost && postArticleMode!=='later' && postArticleMode !=='immediate'" class="grey--text my-4 ml-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
         </v-radio-group>

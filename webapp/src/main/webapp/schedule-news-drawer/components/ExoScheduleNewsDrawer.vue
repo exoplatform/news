@@ -140,10 +140,10 @@ export default {
       return this.postDate && Number(new Date(this.postDate.getTime())) < currentDate.getTime() ? new Date(currentDate.getTime() + 1800000) : null;
     },
     showDontPostMessage() {
-      return this.allowNotPost && this.postArticleMode!=='later' && this.postArticleMode !=='immediate';
+      return this.allowNotPost && this.postArticleMode !== 'later' && this.postArticleMode !== 'immediate';
     },
     showPostLaterMessage() {
-      return this.postArticleMode==='later' || !this.allowNotPost && this.postArticleMode !=='immediate';
+      return this.postArticleMode === 'later' || !this.allowNotPost && this.postArticleMode !== 'immediate';
     }
   },
   created() {

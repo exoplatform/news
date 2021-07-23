@@ -116,7 +116,7 @@
 
   .newsTitle {
     padding-bottom: 10px;
-    font-weight: bold;
+    font-family: Helvetica, regular, sans-serif;
 
     a {
       color: @textColorDefault;
@@ -291,7 +291,7 @@
         margin: 20px auto 0;
         .newsTitleLink {
           color: @textColorDefault;
-          font-size: 24px;
+          font-size: 21pt;
           line-height: 3.5rem;
         }
       }
@@ -354,8 +354,8 @@
       max-width: 80%;
       margin: auto;
       font-style: italic;
-      font-size: 16px;
-      color: grey;
+      font-size: 16pt;
+      color: @grayLight;
     }
     .fullDetailsBody {
       border-top: 1px #ced2d5 solid;
@@ -363,8 +363,8 @@
       padding-top: 20px;
       padding-bottom: 30px;
       letter-spacing: .1px;
-      line-height: 1.7em;
-      font-size: 14px;
+      line-height: 1.6em;
+      font-size: 14pt;
       max-width: 80%;
       margin: auto;
       word-break: break-word;
@@ -396,7 +396,7 @@
     }
 
     .fullDetailsBody span:first-of-type {
-      line-height: 1.7em;
+      line-height: 1.6em;
     }
   }
 
@@ -705,7 +705,6 @@
 
   #newsForm {
     padding: 2px 0;
-    margin-bottom: 55px;
     overflow: auto;
     z-index: 5;
     background-color: #eeeeee;
@@ -3894,5 +3893,10 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
 
 .darkComposerEffect{
   filter: opacity(0.4);
+}
+
+.VuetifyApp .v-application p {
+  font-size: 14pt;
+  font-family: Helvetica, regular, sans-serif;
 }
 

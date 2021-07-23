@@ -1230,7 +1230,7 @@ public class NewsServiceImpl implements NewsService {
 
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
     if (activity.getId() != null) {
-      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+      SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
       Session session = sessionProvider.getSession(
                                                    repositoryService.getCurrentRepository()
                                                                     .getConfiguration()

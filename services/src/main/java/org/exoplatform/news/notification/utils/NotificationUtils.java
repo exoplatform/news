@@ -31,7 +31,7 @@ public class NotificationUtils {
 
   public static String getNewsIllustration(News news) throws Exception {
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()

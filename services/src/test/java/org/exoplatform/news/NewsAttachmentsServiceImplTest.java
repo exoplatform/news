@@ -205,6 +205,7 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
     lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node attachmentNode = mock(Node.class);
+    lenient().when(attachmentNode.getPath()).thenReturn("/folder/subFolder/attachNode");
     lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
     lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
     lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
@@ -459,10 +460,13 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
     lenient().when(attachmentNode1.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode1.getPath()).thenReturn("/folder/subFolder/attachNode1");
     ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
     lenient().when(attachmentNode2.canAddMixin(eq("exo:privilegeable"))).thenReturn(false);
+    lenient().when(attachmentNode2.getPath()).thenReturn("/folder/subFolder/attachNode2");
     ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
     lenient().when(attachmentNode3.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode3.getPath()).thenReturn("/folder/subFolder/attachNode3");
     lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
     lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
     lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
@@ -508,10 +512,13 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     ExtendedNode attachmentNode1 = mock(ExtendedNode.class);
     lenient().when(attachmentNode1.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode1.getPath()).thenReturn("/folder/subFolder/attachNode1");
     ExtendedNode attachmentNode2 = mock(ExtendedNode.class);
     lenient().when(attachmentNode2.isNodeType(eq("exo:privilegeable"))).thenReturn(false);
+    lenient().when(attachmentNode2.getPath()).thenReturn("/folder/subFolder/attachNode2");
     ExtendedNode attachmentNode3 = mock(ExtendedNode.class);
     lenient().when(attachmentNode3.isNodeType(eq("exo:privilegeable"))).thenReturn(true);
+    lenient().when(attachmentNode3.getPath()).thenReturn("/folder/subFolder/attachNode3");
     lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode1);
     lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode2);
     lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode3);
@@ -552,6 +559,7 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(node.getProperty(eq("exo:attachmentsIds"))).thenReturn(attachmentIdsProperty);
     lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node attachmentNode = mock(Node.class);
+    lenient().when(attachmentNode.getPath()).thenReturn("/folder/subFolder/attachNode");
     lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
     lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
     lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);

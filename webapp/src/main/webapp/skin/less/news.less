@@ -539,7 +539,7 @@
   left: 0 ~'; /** orientation=lt */ ';
   right: 0 ~'; /** orientation=rt */ ';
   top: 0;
-  background: #FFFFFF;
+  background: @grayLighter;
   z-index: 10000;
 
   .btn[disabled] {
@@ -650,8 +650,10 @@
         .draftSavingStatus {
           margin-right: 7px ~'; /** orientation=lt */ ';
           margin-left: 7px ~'; /** orientation=rt */ ';
-          font-style: italic;
           padding-top: 10px;
+          font-family: Helvetica, regular, sans-serif;
+          font-size: 14px;
+          color: @grayDark;
         }
 
         button {
@@ -3895,8 +3897,49 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   filter: opacity(0.4);
 }
 
-.VuetifyApp .v-application p {
-  font-size: 14pt;
-  font-family: Helvetica, regular, sans-serif;
+#newsBody {
+  h1 {
+    display: block;
+    font-size: 2em ;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  h3 {
+    display: block;
+    font-size: 1.17em ;
+    margin-block-start: 1em ;
+    margin-block-end: 1em ;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  p {
+    font-size:14pt;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
 }
-

@@ -374,7 +374,9 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
           String attachmentId = value.getString();
           try {
             Node attachmentNode = newsNode.getSession().getNodeByUUID(attachmentId);
-            attachmentsNode.add(attachmentNode);
+            if (!attachmentNode.getPath().startsWith("/Quarantine/")) {
+              attachmentsNode.add(attachmentNode);
+            }
           } catch (Exception e) {
             LOG.error("Cannot get News attachment " + attachmentId + " of News " + newsNode.getUUID(), e);
           }

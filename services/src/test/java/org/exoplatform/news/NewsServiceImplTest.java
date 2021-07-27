@@ -1253,7 +1253,7 @@ public class NewsServiceImplTest {
   }
   
   @Test
-  public void shouldScheduleNews() throws Exception {
+  public void shouldScheduleOrCancelNews() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
@@ -1292,6 +1292,10 @@ public class NewsServiceImplTest {
     scheduledNews.setSchedulePostDate(datePostScheduled);
     scheduledNews.setPublicationState("staged");
 
+    News draftNews = new News();
+    draftNews.setPublicationState("draft");
+    draftNews.setSchedulePostDate(null);
+
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
@@ -1299,7 +1303,7 @@ public class NewsServiceImplTest {
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
     Mockito.doReturn(scheduledNews).when(newsServiceSpy).scheduleNews(news);
-
+    Mockito.doReturn(draftNews).when(newsServiceSpy).cancelScheduleNews(news);
 
     // When
     News scheduleNews = newsServiceSpy.scheduleNews(news);
@@ -1308,6 +1312,13 @@ public class NewsServiceImplTest {
     assertNotNull(scheduleNews);
     assertEquals("staged", scheduleNews.getPublicationState());
     assertEquals("06/18/2021 15:01:16 +0100", scheduleNews.getSchedulePostDate());
+
+    // When
+    News cancelScheduleNews =  newsServiceSpy.cancelScheduleNews(news);
+    // Then
+    assertNotNull(cancelScheduleNews);
+    assertEquals("draft", cancelScheduleNews.getPublicationState());
+    assertNull(cancelScheduleNews.getSchedulePostDate());
   }
 
   @Test

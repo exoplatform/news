@@ -41,20 +41,19 @@ const newsActivityTypeExtensionOptions = {
   },
   extendSharedActivity: (activity, isActivityDetail) => isActivityDetail,
   showSharedInformationFooter: (activity, isActivityDetail) => isActivityDetail,
-  init: (activity, isActivityDetail) => {
-    if (!isActivityDetail) {
-      let activityId = activity.id;
-      if (activity.parentActivity) {
-        activityId = activity.parentActivity.id;
-      }
-      return Vue.prototype.$newsServices.getNewsByActivityId(activityId)
-        .then(news => activity.news = news);
+  init: activity => {
+    let activityId = activity.id;
+    if (activity.parentActivity) {
+      activityId = activity.parentActivity.id;
     }
+    return Vue.prototype.$newsServices.getNewsByActivityId(activityId)
+      .then(news => activity.news = news);
   },
   canEdit: () => false,
   canShare: () => true,
   hideOnDelete: true,
   supportsThumbnail: true,
+  windowTitlePrefixKey: 'news.window.title',
   getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL || '/news/images/news.png',
   getThumbnailProperties: (activity) => !(activity && activity.news && activity.news.illustrationURL) && {
     height: '90px',

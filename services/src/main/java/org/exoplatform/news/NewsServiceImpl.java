@@ -1202,6 +1202,36 @@ public class NewsServiceImpl implements NewsService {
     return scheduledNews;
   }
 
+  public News cancelScheduleNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+
+                                                 repositoryService.getCurrentRepository());
+    News draftNews = null;
+    try {
+      Node unScheduledNewsNode = session.getNodeByUUID(news.getId());
+      if (unScheduledNewsNode == null) {
+        throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
+      }
+      String schedulePostDate = news.getSchedulePostDate();
+      if (schedulePostDate != null) {
+        unScheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
+        unScheduledNewsNode.save();
+        publicationService.changeState(unScheduledNewsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
+      }
+      draftNews = convertNodeToNews(unScheduledNewsNode, false);
+      draftNews.setSchedulePostDate(null);
+    } finally {
+      if (session != null) {
+        session.logout();
+      }
+    }
+    return draftNews;
+  }
+
   protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
     if (activity.getId() != null) {
       SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);

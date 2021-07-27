@@ -26,13 +26,12 @@
             <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
           </v-radio>
           <v-radio
-            v-if="allowPostingLater"
             value="later"
             class="mt-4"
             @click="changeDisable">
             <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
           </v-radio>
-          <div v-if="(postArticleMode==='later' && allowPostingLater) || !allowNotPost && postArticleMode !=='immediate'" class="mt-4 ml-4">
+          <div v-if="showPostLaterMessage" class="mt-4 ml-4">
             <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
             <div class="d-flex flex-row flex-grow-1">
               <slot name="postDate"></slot>
@@ -51,13 +50,12 @@
           </div>
           <v-radio
             v-if="allowNotPost"
-            :label="$t('news.composer.notPost')"
             value="notPost"
             class="postModeText mt-4"
             @click="changeDisable">
             <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
           </v-radio>
-          <div v-if="allowNotPost && postArticleMode!=='later' && postArticleMode !=='immediate'" class="grey--text my-4 ml-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
+          <div v-if="showDontPostMessage" class="grey--text my-4 ml-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
         </v-radio-group>
       </template>
       <template slot="footer">
@@ -101,7 +99,6 @@ export default {
     disabled: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
-    allowPostingLater: false,
     editScheduledNews: false,
     allowNotPost: false,
     schedulePostDate: null,
@@ -142,11 +139,15 @@ export default {
       const currentDate = new Date();
       return this.postDate && Number(new Date(this.postDate.getTime())) < currentDate.getTime() ? new Date(currentDate.getTime() + 1800000) : null;
     },
+    showDontPostMessage() {
+      return this.allowNotPost && this.postArticleMode !== 'later' && this.postArticleMode !== 'immediate';
+    },
+    showPostLaterMessage() {
+      return this.postArticleMode === 'later' || !this.allowNotPost && this.postArticleMode !== 'immediate';
+    }
   },
   created() {
     this.initializeDate();
-    this.$featureService.isFeatureEnabled('news.postLater')
-      .then(enabled => this.allowPostingLater = enabled);
     this.$root.$on('open-schedule-drawer', (scheduleMode) => {
       this.editScheduledNews = scheduleMode;
       if (scheduleMode === 'editScheduledNews') {

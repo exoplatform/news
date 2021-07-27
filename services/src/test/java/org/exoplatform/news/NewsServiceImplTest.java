@@ -1829,7 +1829,7 @@ public class NewsServiceImplTest {
     when(exoActivitiesProperty.getString()).thenReturn("1:1;2:2;2:3");
 
     // When
-    newsService.deleteNews("1", false);
+    newsService.deleteNews("1", "root", false);
 
     // Then
     verify(session, times(1)).getNodeByUUID(nullable(String.class));

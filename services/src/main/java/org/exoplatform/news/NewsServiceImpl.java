@@ -591,10 +591,11 @@ public class NewsServiceImpl implements NewsService {
    * Delete news
    * 
    * @param newsId the news id to delete
+   * @param currentUser
    * @param isDraft
    * @throws Exception when error
    */
-  public void deleteNews(String newsId, boolean isDraft) throws Exception {
+  public void deleteNews(String newsId, String currentUser, boolean isDraft) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -626,7 +627,7 @@ public class NewsServiceImpl implements NewsService {
                 .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
-    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, getCurrentUserId(), convertNodeToNews(node, false));
+    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, convertNodeToNews(node, false));
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();

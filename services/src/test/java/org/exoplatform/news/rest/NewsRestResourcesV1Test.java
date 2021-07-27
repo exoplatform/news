@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.model.NewsAttachment;
-import org.exoplatform.services.attachments.model.Attachment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1294,7 +1293,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", false);
+    verify(newsService).deleteNews("1", "john", false);
   }
 
   @Test
@@ -1326,7 +1325,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", false);
+    verify(newsService).deleteNews("1", "john", false);
   }
 
   @Test
@@ -1354,7 +1353,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test
@@ -1378,7 +1377,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test
@@ -1402,7 +1401,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test

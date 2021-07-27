@@ -116,7 +116,7 @@
 
   .newsTitle {
     padding-bottom: 10px;
-    font-weight: bold;
+    font-family: Helvetica, regular, sans-serif;
 
     a {
       color: @textColorDefault;
@@ -291,7 +291,7 @@
         margin: 20px auto 0;
         .newsTitleLink {
           color: @textColorDefault;
-          font-size: 24px;
+          font-size: 21pt;
           line-height: 3.5rem;
         }
       }
@@ -354,8 +354,8 @@
       max-width: 80%;
       margin: auto;
       font-style: italic;
-      font-size: 16px;
-      color: grey;
+      font-size: 16pt;
+      color: @grayLight;
     }
     .fullDetailsBody {
       border-top: 1px #ced2d5 solid;
@@ -363,8 +363,8 @@
       padding-top: 20px;
       padding-bottom: 30px;
       letter-spacing: .1px;
-      line-height: 1.7em;
-      font-size: 14px;
+      line-height: 1.6em;
+      font-size: 14pt;
       max-width: 80%;
       margin: auto;
       word-break: break-word;
@@ -396,7 +396,7 @@
     }
 
     .fullDetailsBody span:first-of-type {
-      line-height: 1.7em;
+      line-height: 1.6em;
     }
   }
 
@@ -539,7 +539,7 @@
   left: 0 ~'; /** orientation=lt */ ';
   right: 0 ~'; /** orientation=rt */ ';
   top: 0;
-  background: #FFFFFF;
+  background: @grayLighter;
   z-index: 10000;
 
   .btn[disabled] {
@@ -650,8 +650,10 @@
         .draftSavingStatus {
           margin-right: 7px ~'; /** orientation=lt */ ';
           margin-left: 7px ~'; /** orientation=rt */ ';
-          font-style: italic;
           padding-top: 10px;
+          font-family: Helvetica, regular, sans-serif;
+          font-size: 14px;
+          color: @grayDark;
         }
 
         button {
@@ -705,7 +707,6 @@
 
   #newsForm {
     padding: 2px 0;
-    margin-bottom: 55px;
     overflow: auto;
     z-index: 5;
     background-color: #eeeeee;
@@ -3896,3 +3897,49 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   filter: opacity(0.4);
 }
 
+#newsBody {
+  h1 {
+    display: block;
+    font-size: 2em ;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  h3 {
+    display: block;
+    font-size: 1.17em ;
+    margin-block-start: 1em ;
+    margin-block-end: 1em ;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+  p {
+    font-size:14pt;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+    line-height: 1.2;
+    color: @grayDark;
+  }
+}

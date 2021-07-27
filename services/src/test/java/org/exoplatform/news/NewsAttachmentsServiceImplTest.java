@@ -206,9 +206,14 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(session.getNodeByUUID(eq("id123"))).thenReturn(node);
     Node attachmentNode = mock(Node.class);
     lenient().when(attachmentNode.getPath()).thenReturn("/folder/subFolder/attachNode");
+    Node attachmentNode1 = mock(Node.class);
+    lenient().when(attachmentNode1.getPath()).thenReturn("/folder/subFolder/attachNode1");
+    Node attachmentNode2 = mock(Node.class);
+    // quarantined attachment
+    lenient().when(attachmentNode2.getPath()).thenReturn("/Quarantine/attachNode2");
     lenient().when(session.getNodeByUUID(eq("idAttach1"))).thenReturn(attachmentNode);
-    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode);
-    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode);
+    lenient().when(session.getNodeByUUID(eq("idAttach2"))).thenReturn(attachmentNode1);
+    lenient().when(session.getNodeByUUID(eq("idAttach3"))).thenReturn(attachmentNode2);
 
 
     // When
@@ -216,7 +221,7 @@ public class NewsAttachmentsServiceImplTest {
 
     // Then
     assertNotNull(newsAttachments);
-    assertEquals(3, newsAttachments.size());
+    assertEquals(2, newsAttachments.size());
   }
 
   @Test

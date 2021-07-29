@@ -12,6 +12,10 @@
             <name>portlet-view-dispatched-file-path</name>
             <value>/news-activity-composer-app/index.jsp</value>
         </init-param>
+        <init-param>
+          <name>preload.resource.bundles</name>
+          <value>locale.portlet.news.News|locale.attachmentsSelector.attachments</value>
+        </init-param>
         <supports>
             <mime-type>text/html</mime-type>
         </supports>
@@ -29,6 +33,10 @@
         <init-param>
             <name>portlet-view-dispatched-file-path</name>
             <value>/news/news.html</value>
+        </init-param>
+        <init-param>
+          <name>preload.resource.bundles</name>
+          <value>locale.portlet.news.News|locale.social.Webui</value>
         </init-param>
         <expiration-cache>-1</expiration-cache>
         <cache-scope>PUBLIC</cache-scope>
@@ -50,6 +58,10 @@
             <name>portlet-view-dispatched-file-path</name>
             <value>/news-extensions/newsExtensions.html</value>
         </init-param>
+        <init-param>
+          <name>preload.resource.bundles</name>
+          <value>locale.portlet.news.News|locale.social.Webui</value>
+        </init-param>
         <expiration-cache>-1</expiration-cache>
         <cache-scope>PUBLIC</cache-scope>
         <supports>
@@ -69,6 +81,10 @@
         <init-param>
             <name>portlet-view-dispatched-file-path</name>
             <value>/news-details-app/index.jsp</value>
+        </init-param>
+        <init-param>
+          <name>preload.resource.bundles</name>
+          <value>locale.portlet.news.News|locale.attachmentsSelector.attachments</value>
         </init-param>
         <supports>
             <mime-type>text/html</mime-type>

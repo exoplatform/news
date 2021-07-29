@@ -29,15 +29,7 @@ public class NotificationUtils {
     return user.getFullName();
   }
 
-  public static String getNewsIllustration(News news) throws Exception {
-    SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
+  public static String getNewsIllustration(News news, Session session) throws Exception {
     StringBuffer illustrationURL = new StringBuffer();
     String currentDomain = CommonsUtils.getCurrentDomain();
     if (!currentDomain.endsWith("/")) {

@@ -196,12 +196,40 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     if (StringUtils.isEmpty(news.getId())) {
       news = createNewsDraft(news);
     } else {
-      postNewsActivity(news);
+      postNewsActivity(news, session);
       updateNews(news);
-      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
+    }
+
+    if (news.isPinned()) {
+      pinNews(news.getId());
+    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    return news;
+  }
+
+  public News createNews(News news, Session session) throws Exception {
+    if (StringUtils.isEmpty(news.getId())) {
+      news = createNewsDraft(news);
+    } else {
+      try {
+        postNewsActivity(news, session);
+        updateNews(news);
+        sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
+      } finally {
+        if (session != null) {
+          session.logout();
+        }
+      }
     }
 
     if (news.isPinned()) {
@@ -363,7 +391,7 @@ public class NewsServiceImpl implements NewsService {
               newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
             });
           }
-          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
+          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS, session);
         }
         indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
       } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
@@ -473,7 +501,7 @@ public class NewsServiceImpl implements NewsService {
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
-    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -775,7 +803,7 @@ public class NewsServiceImpl implements NewsService {
    * @param news The news to post as an activity
    * @throws Exception when error
    */
-  void postNewsActivity(News news) throws Exception {
+  void postNewsActivity(News news, Session session) throws Exception {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), false);
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -792,7 +820,7 @@ public class NewsServiceImpl implements NewsService {
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
 
-    updateNewsActivities(activity, news);
+    updateNewsActivities(activity, news, session);
   }
 
   private String getNodeRelativePath(Calendar now) {
@@ -1228,33 +1256,20 @@ public class NewsServiceImpl implements NewsService {
     return draftNews;
   }
 
-  protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
-    if (activity.getId() != null) {
-      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-      Session session = sessionProvider.getSession(
-                                                   repositoryService.getCurrentRepository()
-                                                                    .getConfiguration()
-                                                                    .getDefaultWorkspaceName(),
-                                                   repositoryService.getCurrentRepository());
-      try {
-        if (!StringUtils.isEmpty(news.getId())) {
-          Node newsNode = session.getNodeByUUID(news.getId());
-          if (newsNode.hasProperty("exo:activities")) {
-            String updatedNewsActivities = news.getSpaceId().concat(":").concat(activity.getId());
-            newsNode.setProperty("exo:activities", updatedNewsActivities);
-            newsNode.save();
-            news.setActivities(updatedNewsActivities);
-          }
-        }
-      } finally {
-        if (session != null) {
-          session.logout();
-        }
+  protected void updateNewsActivities(ExoSocialActivity activity, News news, Session session) throws Exception {
+    if (activity.getId() != null && !StringUtils.isEmpty(news.getId())) {
+      Node newsNode = session.getNodeByUUID(news.getId());
+      if (newsNode.hasProperty("exo:activities")) {
+        String updatedNewsActivities = news.getSpaceId().concat(":").concat(activity.getId());
+        newsNode.setProperty("exo:activities", updatedNewsActivities);
+        newsNode.save();
+        news.setActivities(updatedNewsActivities);
       }
     }
   }
+  
 
-  protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+  protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context, Session session) throws Exception {
     String newsId = news.getId();
     String contentAuthor = news.getAuthor();
     String currentUser = getCurrentUserId() != null ? getCurrentUserId() : contentAuthor;
@@ -1271,7 +1286,7 @@ public class NewsServiceImpl implements NewsService {
     }
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, contentAuthor);
     String authorAvatarUrl = LinkProviderUtils.getUserAvatarUrl(identity.getProfile());
-    String illustrationURL = NotificationUtils.getNewsIllustration(news);
+    String illustrationURL = NotificationUtils.getNewsIllustration(news, session);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();
 

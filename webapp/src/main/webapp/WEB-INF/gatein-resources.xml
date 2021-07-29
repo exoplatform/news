@@ -71,7 +71,7 @@
         <module>filedrop</module>
       </depends>
       <depends>
-        <module>ExoAttachmentsApp</module>
+        <module>LegacyComposerAttachments</module>
         <as>attachmentsApp</as>
       </depends>
     </module>
@@ -221,7 +221,8 @@
       <module>filedrop</module>
     </depends>
     <depends>
-      <module>ExoAttachmentsApp</module>
+      <module>LegacyComposerAttachments</module>
+      <as>attachmentsApp</as>
     </depends>
   </module>
 
@@ -242,20 +243,6 @@
     </depends>
     <depends>
       <module>vuetify</module>
-    </depends>
-  </module>
-
-  <module>
-    <name>NewsActivity</name>
-    <script>
-      <path>/js/webui/UINewsActivity.js</path>
-    </script>
-    <depends>
-      <module>socialUtil</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-      <as>$</as>
     </depends>
   </module>
 
@@ -318,7 +305,7 @@
       <module>commonVueComponents</module>
     </depends>
     <depends>
-      <module>snackbarComponent</module>
+      <module>newsSnackbarComponent</module>
     </depends>
     <depends>
       <module>vue</module>

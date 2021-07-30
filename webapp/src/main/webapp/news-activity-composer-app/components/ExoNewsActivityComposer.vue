@@ -11,7 +11,9 @@
       v-show="canCreatNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
-      <schedule-news-drawer @post-article="postNews" />
+      <schedule-news-drawer
+        :posting-news="postingNews"
+        @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
           <div class="newsFormLeftActions">

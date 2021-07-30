@@ -27,5 +27,17 @@
       <set-method>addActivityEventListener</set-method>
       <type>org.exoplatform.news.listener.NewsActivityListener</type>
     </component-plugin>
+    <component-plugin>
+      <name>ActivityNewsProcessor</name>
+      <set-method>addProcessorPlugin</set-method>
+      <type>org.exoplatform.news.activity.processor.ActivityNewsProcessor</type>
+      <init-params>
+        <value-param>
+          <name>priority</name>
+          <description>priority of this processor (lower are executed first)</description>
+          <value>30</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
   </external-component-plugins>
 </configuration>

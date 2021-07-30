@@ -41,13 +41,15 @@ const newsActivityTypeExtensionOptions = {
   },
   extendSharedActivity: (activity, isActivityDetail) => isActivityDetail,
   showSharedInformationFooter: (activity, isActivityDetail) => isActivityDetail,
-  init: activity => {
+  init: (activity, isActivityDetail) => {
     let activityId = activity.id;
     if (activity.parentActivity) {
       activityId = activity.parentActivity.id;
     }
-    return Vue.prototype.$newsServices.getNewsByActivityId(activityId)
-      .then(news => activity.news = news);
+    if (!activity.news || isActivityDetail) {
+      return Vue.prototype.$newsServices.getNewsByActivityId(activityId)
+        .then(news => activity.news = news);
+    }
   },
   canEdit: () => false,
   canShare: () => true,

@@ -42,8 +42,6 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
 
   private SessionProviderService sessionProviderService;
 
-  private RepositoryService      repositoryService;
-
 
   public NewsPublicationListener() {
     newsService = WCMCoreUtils.getService(NewsService.class);

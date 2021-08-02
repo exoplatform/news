@@ -221,15 +221,9 @@ public class NewsServiceImpl implements NewsService {
     if (StringUtils.isEmpty(news.getId())) {
       news = createNewsDraft(news);
     } else {
-      try {
         postNewsActivity(news, session);
         updateNews(news);
         sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
-      } finally {
-        if (session != null) {
-          session.logout();
-        }
-      }
     }
 
     if (news.isPinned()) {

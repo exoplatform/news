@@ -707,8 +707,8 @@ public class NewsServiceImpl implements NewsService {
         memberSpaceActivities.append(activities[0]).append(";");
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-          ExoSocialActivity exoSocialActivity = activityManager.getActivity(activities[i].split(":")[1]);
-          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && exoSocialActivity != null) {
+          String activityId = activities[i].split(":")[1];
+          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && activityManager.isActivityExists(activityId)) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }

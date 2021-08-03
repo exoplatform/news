@@ -51,8 +51,7 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
   public void onEvent(Event<CmsService, Node> event) throws Exception {
     ExoContainer container = PortalContainer.getInstance();
     RepositoryService repositoryService = container.getComponentInstanceOfType(RepositoryService.class);
-    SessionProvider systemProvider = SessionProvider.createSystemProvider();
-    sessionProviderService.setSessionProvider(null, systemProvider);
+    SessionProvider systemProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = systemProvider.getSession(
                                                 repositoryService.getCurrentRepository()
                                                                  .getConfiguration()
@@ -63,7 +62,13 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
       if (targetNode.isNodeType("exo:news") && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.PUBLISHED)) {
         News news = newsService.convertNodeToNews(targetNode, false);
         if (StringUtils.isEmpty(news.getActivities())) {
-          newsService.createNews(news, session);
+          try {
+            newsService.createNews(news, session);
+          } finally {
+            if (session != null) {
+              session.logout();
+            }
+          }
         }
       }
     }

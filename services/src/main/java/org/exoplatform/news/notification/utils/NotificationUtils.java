@@ -29,34 +29,20 @@ public class NotificationUtils {
     return user.getFullName();
   }
 
-  public static String getNewsIllustration(News news) throws Exception {
-    SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    RepositoryService repositoryService = CommonsUtils.getService(RepositoryService.class);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
+  public static String getNewsIllustration(News news, Session session) throws Exception {
     StringBuffer illustrationURL = new StringBuffer();
     String currentDomain = CommonsUtils.getCurrentDomain();
     if (!currentDomain.endsWith("/")) {
       currentDomain += "/";
     }
-    try {
-      Node newsNode = session.getNodeByUUID(news.getId());
-      if (newsNode == null) {
-        throw new ItemNotFoundException("Cannot find a node with UUID equals to " + news.getId() + ", it may not exist");
-      }
-      if (newsNode.hasNode("illustration")) {
-        illustrationURL.append(currentDomain).append("portal/rest/v1/news/").append(news.getId()).append("/illustration");
-      } else {
-        illustrationURL.append(currentDomain).append("news/images/newsImageDefault.png");
-      }
-    } finally {
-      if (session != null) {
-        session.logout();
-      }
+    Node newsNode = session.getNodeByUUID(news.getId());
+    if (newsNode == null) {
+      throw new ItemNotFoundException("Cannot find a node with UUID equals to " + news.getId() + ", it may not exist");
+    }
+    if (newsNode.hasNode("illustration")) {
+      illustrationURL.append(currentDomain).append("portal/rest/v1/news/").append(news.getId()).append("/illustration");
+    } else {
+      illustrationURL.append(currentDomain).append("news/images/newsImageDefault.png");
     }
     return illustrationURL.toString();
   }

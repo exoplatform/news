@@ -3,6 +3,7 @@ package org.exoplatform.news;
 import java.util.List;
 
 import javax.jcr.Node;
+import javax.jcr.Session;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.news.filter.NewsFilter;
@@ -112,5 +113,7 @@ public interface NewsService {
   News scheduleNews(News news) throws Exception;
 
   News cancelScheduleNews(News news) throws Exception;
+
+  News createNews(News news, Session session) throws Exception;
 
 }

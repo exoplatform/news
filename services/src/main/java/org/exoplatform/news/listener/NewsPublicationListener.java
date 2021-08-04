@@ -42,7 +42,6 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
 
   private SessionProviderService sessionProviderService;
 
-
   public NewsPublicationListener() {
     newsService = WCMCoreUtils.getService(NewsService.class);
     sessionProviderService = WCMCoreUtils.getService(SessionProviderService.class);
@@ -52,24 +51,24 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
     ExoContainer container = PortalContainer.getInstance();
     RepositoryService repositoryService = container.getComponentInstanceOfType(RepositoryService.class);
     SessionProvider systemProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = systemProvider.getSession(
-                                                repositoryService.getCurrentRepository()
-                                                                 .getConfiguration()
-                                                                 .getDefaultWorkspaceName(),
-                                                repositoryService.getCurrentRepository());
-    if (AuthoringPublicationConstant.POST_CHANGE_STATE_EVENT.equals(event.getEventName())) {
-      Node targetNode = event.getData();
-      if (targetNode.isNodeType("exo:news") && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString().equals(PublicationDefaultStates.PUBLISHED)) {
-        News news = newsService.convertNodeToNews(targetNode, false);
-        if (StringUtils.isEmpty(news.getActivities())) {
-          try {
+    Session session = null;
+    try {
+      session = systemProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
+                                          repositoryService.getCurrentRepository());
+      if (AuthoringPublicationConstant.POST_CHANGE_STATE_EVENT.equals(event.getEventName())) {
+        Node targetNode = event.getData();
+        if (targetNode.isNodeType("exo:news") && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+                                                           .getString()
+                                                           .equals(PublicationDefaultStates.PUBLISHED)) {
+          News news = newsService.convertNodeToNews(targetNode, false);
+          if (StringUtils.isEmpty(news.getActivities())) {
             newsService.createNews(news, session);
-          } finally {
-            if (session != null) {
-              session.logout();
-            }
           }
         }
+      }
+    } finally {
+      if (session != null) {
+        session.logout();
       }
     }
   }

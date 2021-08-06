@@ -62,6 +62,7 @@
         <div v-if="editScheduledNews !== 'editScheduledNews'" class="d-flex justify-end">
           <v-btn
             :disabled="disabled"
+            :loading="postingNews"
             class="btn btn-primary ms-2"
             @click="selectPostMode">
             {{ saveButtonLabel }}
@@ -92,6 +93,10 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    postingNews: {
+      type: Boolean,
+      default: false
     },
   },
   data: () => ({

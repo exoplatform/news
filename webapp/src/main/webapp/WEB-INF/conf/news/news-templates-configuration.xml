@@ -43,21 +43,6 @@
           <name>portlet.template.path</name>
           <value>war:/conf/news/application-templates/content-list-viewer</value>
         </value-param>
-        <object-param>
-          <name>News Pin CLV template</name>
-          <description>News Pin CLV template</description>
-          <object type="org.exoplatform.services.cms.views.PortletTemplatePlugin$PortletTemplateConfig">
-            <field name="title">
-              <string>News Pin</string>
-            </field>
-            <field name="templateName">
-              <string>NewsPin.gtmpl</string>
-            </field>
-            <field name="category">
-              <string>list</string>
-            </field>
-          </object>
-        </object-param>
 
         <object-param>
           <name>Latest News CLV template</name>

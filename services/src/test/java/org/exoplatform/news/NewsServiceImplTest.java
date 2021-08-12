@@ -13,6 +13,7 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.version.*;
 
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -64,7 +65,6 @@ import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
 import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
-import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -135,7 +135,7 @@ public class NewsServiceImplTest {
   AuthoringPublicationPlugin authoringPublicationPlugin;
 
   @Mock
-  HTMLUploadImageProcessor   imageProcessor;
+  HTMLUploadImageProcessor imageProcessor;
 
   @Mock
   NewsSearchConnector        newsSearchConnector;
@@ -1740,7 +1740,7 @@ public class NewsServiceImplTest {
     when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(draftNode);
     when(publicationManagerImpl.getLifecycle(nullable(String.class))).thenReturn(newsLifecycle);
     when(wcmPublicationServiceImpl.getWebpagePublicationPlugins()).thenReturn(publicationPlugins);
-    when(imageProcessor.processImages(news.getBody(), draftNode, "images")).thenReturn("");
+    when(imageProcessor.processImages(news.getBody(), draftNode.getUUID(), "images")).thenReturn("");
     when(draftNode.canAddMixin(nullable(String.class))).thenReturn(true);
 
     // When

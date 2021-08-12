@@ -63,7 +63,7 @@ import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.Lifecy
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
-import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
+import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -346,12 +346,12 @@ public class NewsServiceImpl implements NewsService {
 
     Node newsNode = session.getNodeByUUID(news.getId());
     if (newsNode != null) {
+      String processedBody = imageProcessor.processImages(news.getBody(), newsNode.getUUID(), "images");
       String oldBody = newsNode.getProperty("exo:body").getString();
       Set<String> previousMentions = NewsUtils.processMentions(oldBody);
       newsNode.setProperty("exo:title", news.getTitle());
       newsNode.setProperty("exo:name", news.getTitle());
       newsNode.setProperty("exo:summary", news.getSummary());
-      String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
       news.setBody(processedBody);
       newsNode.setProperty("exo:body", processedBody);
       newsNode.setProperty("exo:dateModified", Calendar.getInstance());
@@ -962,7 +962,7 @@ public class NewsServiceImpl implements NewsService {
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
     publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
+    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode.getUUID(), "images"));
     spaceNewsRootNode.save();
 
     if (StringUtils.isNotEmpty(news.getUploadId())) {

@@ -16,7 +16,7 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
 <script>
 	require( ["SHARED/jquery", "SHARED/bootstrap", "SHARED/bts_carousel" ], function(jQuery){
 		jQuery(document).ready(function () {
-			jQuery('.eventAlAUne').carousel({
+			jQuery('#eventAlAUne').carousel({
 				interval: 5000
 			});
 		});

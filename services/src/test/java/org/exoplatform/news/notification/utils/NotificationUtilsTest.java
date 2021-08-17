@@ -107,7 +107,7 @@ public class NotificationUtilsTest {
     news.setId("id123");
 
     // When
-    String illustrationUrl = NotificationUtils.getNewsIllustration(news);
+    String illustrationUrl = NotificationUtils.getNewsIllustration(news, session);
 
     assertEquals("http://localhost:8080/news/images/newsImageDefault.png", illustrationUrl);
   }

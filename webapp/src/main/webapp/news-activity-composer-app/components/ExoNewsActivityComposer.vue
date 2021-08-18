@@ -275,7 +275,7 @@ export default {
       if (!this.illustrationChanged && !this.attachmentsChanged
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
-                 && this.news.body === this.originalNews.body
+                 && this.getString(this.news.body) === this.getString(this.originalNews.body)
                  && this.news.pinned === this.originalNews.pinned
                  && this.news.publicationState !== 'draft') {
         return true;
@@ -848,6 +848,9 @@ export default {
         elementNewTop.classList.remove('darkComposerEffect');
         elementNewTop.classList.add('greyComposerEffect');
       });
+    },
+    getString(body) {
+      return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     }
   }
 };

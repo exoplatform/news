@@ -47,6 +47,7 @@
     ResourceBundleService resourceBundleService = CommonsUtils.getService(ResourceBundleService.class);
     newsResourceBundle = resourceBundleService.getResourceBundle("locale.portlet.news.News", Util.getPortalRequestContext().getLocale());
     def header = _ctx.appRes("news.latest.header");
+    def prefHeader = StringUtils.isNotBlank(uicomponent.getHeader()) ? uicomponent.getHeader() : header;
     def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER) && header?.trim();
     def siteName = Util.getPortalRequestContext().getPortalOwner();
     def seeAllUrl = "/portal/" + siteName + "/news?filter=pinned";
@@ -69,7 +70,7 @@
     def params = """ {
       newsInfo: ${JsonOutput.toJson(newsInfos)},
       seeAllLabel: '$seeAll',
-      header: '${header}',
+      header: '${prefHeader}',
       url: '${seeAllUrl}',
       isShowHeader: '${isShowHeader}'
     } """

@@ -152,7 +152,9 @@ export default {
     }
   },
   created() {
-    this.initializeDate();
+    if (this.newsId) {
+      this.initializeDate();
+    }
     this.$root.$on('open-schedule-drawer', (scheduleMode) => {
       this.editScheduledNews = scheduleMode;
       if (scheduleMode === 'editScheduledNews') {

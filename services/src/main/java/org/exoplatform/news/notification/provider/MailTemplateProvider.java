@@ -171,18 +171,11 @@ public class MailTemplateProvider extends TemplateProvider {
     }
 
     protected String buildDigestMsg(List<NotificationInfo> notifications, TemplateContext templateContext) {
-      Map<String, List<NotificationInfo>> map = new HashMap<>();
-      for (NotificationInfo notificationInfo : notifications) {
-        String notificationId = notificationInfo.getValueOwnerParameter(NotificationConstants.CONTEXT);
-        map.computeIfAbsent(notificationId, key -> new LinkedList<>()).add(notificationInfo);
-      }
       StringBuilder sb = new StringBuilder();
-      for (Map.Entry<String, List<NotificationInfo>> notification : map.entrySet()) {
-        List<NotificationInfo> notificationInfos = notification.getValue();
-        NotificationInfo first = notificationInfos.get(0);
-        templateContext.put("CONTENT_TITLE", first.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE));
-        templateContext.put("USER", first.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR));
-        templateContext.put("SPACE_TITLE", first.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE));
+      for (NotificationInfo notification : notifications) {
+        templateContext.put("CONTENT_TITLE", notification.getValueOwnerParameter(NotificationConstants.CONTENT_TITLE));
+        templateContext.put("USER", notification.getValueOwnerParameter(NotificationConstants.CONTENT_AUTHOR));
+        templateContext.put("SPACE_TITLE", notification.getValueOwnerParameter(NotificationConstants.CONTENT_SPACE));
         templateContext.digestType(DigestTemplate.ElementType.DIGEST_ONE.getValue());
 
         sb.append("<li style=\"margin: 0 0 13px 14px; font-size: 13px; line-height: 18px; font-family: HelveticaNeue, Helvetica, Arial, sans-serif;\">");

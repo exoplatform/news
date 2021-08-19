@@ -433,6 +433,13 @@ export default {
           },
           change: function (evt) {
             self.news.body = evt.editor.getData();
+            self.autoSave();
+          },
+          drop: function (evt) {
+            window.setTimeout(() => {
+              self.news.body = evt.editor.getData();
+              self.autoSave();
+            }, 1000);
           }
         }
       });

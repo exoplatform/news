@@ -370,6 +370,14 @@ export default {
           },
           change: function (evt) {
             self.news.body = evt.editor.getData();
+            self.autoSave();
+          },
+          drop: function (evt) {
+            const timeout = 1000;
+            window.setTimeout(() => {
+              self.news.body = evt.editor.getData();
+              self.autoSave();
+            }, timeout);
           }
         }
       });

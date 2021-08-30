@@ -54,13 +54,6 @@
               <a class="activityLinkColor newsTitleLink">{{ newsTitle }}</a>
             </div>
             <div v-if="archivedNews" class="newsArchived">
-              <exo-news-archive
-                v-if="archivedNews"
-                :news-id="newsId"
-                :news-archived="archivedNews"
-                :news-title="newsTitle"
-                :pinned="news.pinned"
-                @update-archived-field="updateArchivedField" />
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
@@ -254,7 +247,7 @@ export default {
     },
     archivedNews() {
       return this.news && this.news.archived;
-    },
+    },    
     illustrationURL() {
       return this.news && this.news.illustrationURL;
     },
@@ -330,10 +323,6 @@ export default {
     }
   },
   methods: {
-    updateArchivedField() {
-      // eslint-disable-next-line vue/no-mutating-props
-      this.news.archived = false;
-    },
     openPreview(attachedFile) {
       const self = this;
       window.require(['SHARED/documentPreview'], function(documentPreview) {

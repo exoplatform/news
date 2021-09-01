@@ -109,7 +109,7 @@ public class NotificationUtilsTest {
     // When
     String illustrationUrl = NotificationUtils.getNewsIllustration(news, session);
 
-    assertEquals("http://localhost:8080/news/images/newsImageDefault.png", illustrationUrl);
+    assertEquals("http://localhost:8080/news/images/news.png", illustrationUrl);
   }
 
 }

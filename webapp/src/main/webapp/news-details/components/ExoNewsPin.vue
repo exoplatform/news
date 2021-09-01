@@ -11,7 +11,7 @@
       id="newsPinButton"
       :title="pinLabel"
       :class="[newsArchived ? 'unauthorizedPin' : '']"
-      class="btn my-7 mr-10"
+      class="btn my-5"
       @click="confirmAction">
       <v-icon
         :class="broadcastArticleClass"

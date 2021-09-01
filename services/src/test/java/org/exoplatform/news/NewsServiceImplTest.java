@@ -13,6 +13,7 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.version.*;
 
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -64,7 +65,6 @@ import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
 import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
-import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -135,7 +135,7 @@ public class NewsServiceImplTest {
   AuthoringPublicationPlugin authoringPublicationPlugin;
 
   @Mock
-  HTMLUploadImageProcessor   imageProcessor;
+  HTMLUploadImageProcessor imageProcessor;
 
   @Mock
   NewsSearchConnector        newsSearchConnector;
@@ -1151,8 +1151,8 @@ public class NewsServiceImplTest {
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
     when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
     Mockito.doNothing()
-            .when(newsServiceSpy)
-            .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+           .when(newsServiceSpy)
+           .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
 
     // When
     newsServiceSpy.pinNews("id123");
@@ -1238,11 +1238,11 @@ public class NewsServiceImplTest {
 
     Mockito.doNothing().when(newsServiceSpy).pinNews("id123");
     Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
-    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft);
+    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft, session);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
     Mockito.doNothing()
            .when(newsServiceSpy)
-           .sendNotification(createdNewsDraft, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+           .sendNotification(createdNewsDraft, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
     // When
     News createdNews = newsServiceSpy.createNews(news);
 
@@ -1740,7 +1740,7 @@ public class NewsServiceImplTest {
     when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(draftNode);
     when(publicationManagerImpl.getLifecycle(nullable(String.class))).thenReturn(newsLifecycle);
     when(wcmPublicationServiceImpl.getWebpagePublicationPlugins()).thenReturn(publicationPlugins);
-    when(imageProcessor.processImages(news.getBody(), draftNode, "images")).thenReturn("");
+    when(imageProcessor.processImages(news.getBody(), draftNode.getUUID(), "images")).thenReturn("");
     when(draftNode.canAddMixin(nullable(String.class))).thenReturn(true);
 
     // When
@@ -1893,9 +1893,9 @@ public class NewsServiceImplTest {
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     Mockito.doReturn(news).when(newsServiceSpy).createNewsDraft(news);
-    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
+    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news, session);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
 
     // When
     newsServiceSpy.createNews(news);
@@ -1963,16 +1963,16 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
     when(spaceService.getSpaceById("1")).thenReturn(space1);
     Mockito.doReturn(news).when(newsServiceSpy).updateNews(news);
-    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news);
+    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(news, session);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    Mockito.doNothing().when(newsServiceSpy).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
 
     // When
     newsServiceSpy.createNews(news);
 
     // Then
     verify(newsServiceSpy, times(1)).updateNews(news);
-    verify(newsServiceSpy, times(1)).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    verify(newsServiceSpy, times(1)).sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
   }
 
   @Test
@@ -2685,7 +2685,7 @@ public class NewsServiceImplTest {
     when(spaceService.getSpaceById("1")).thenReturn(space);
 
     // When
-    newsService.postNewsActivity(news);
+    newsService.postNewsActivity(news, session);
 
     // Then
     ArgumentCaptor<Identity> identityCaptor = ArgumentCaptor.forClass(Identity.class);
@@ -2748,7 +2748,7 @@ public class NewsServiceImplTest {
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
     when(newsNode.hasProperty("exo:activities")).thenReturn(true);
     // When
-    newsService.updateNewsActivities(activity, news);
+    newsService.updateNewsActivities(activity, news, session);
 
     // Then
     assertEquals("1:38", news.getActivities());
@@ -2914,7 +2914,7 @@ public class NewsServiceImplTest {
     exceptionRule.expect(NullPointerException.class);
     exceptionRule.expectMessage("Cannot find a space with id 1, it may not exist");
 
-    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
 
   }
 
@@ -2976,7 +2976,7 @@ public class NewsServiceImplTest {
     exceptionRule.expect(ItemNotFoundException.class);
     exceptionRule.expectMessage("Cannot find a node with UUID equals to id123, it may not exist");
 
-    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
 
   }
 
@@ -3087,7 +3087,7 @@ public class NewsServiceImplTest {
     setRootAsCurrentIdentity();
 
     // When
-    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    newsService.sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
 
     // Then
     verify(notificationExecutor, times(1)).execute(ctx);

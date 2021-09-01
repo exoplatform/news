@@ -63,7 +63,7 @@ import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.Lifecy
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
-import org.exoplatform.social.ckeditor.HTMLUploadImageProcessor;
+import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -196,12 +196,40 @@ public class NewsServiceImpl implements NewsService {
    * @throws Exception when error
    */
   public News createNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
     if (StringUtils.isEmpty(news.getId())) {
       news = createNewsDraft(news);
     } else {
-      postNewsActivity(news);
+      try {
+        postNewsActivity(news, session);
+        updateNews(news);
+        sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
+      } finally {
+        if (session != null) {
+          session.logout();
+        }
+      }
+    }
+
+    if (news.isPinned()) {
+      pinNews(news.getId());
+    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    return news;
+  }
+
+  public News createNews(News news, Session session) throws Exception {
+    if (StringUtils.isEmpty(news.getId())) {
+      news = createNewsDraft(news);
+    } else {
+      postNewsActivity(news, session);
       updateNews(news);
-      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
     }
 
     if (news.isPinned()) {
@@ -317,12 +345,12 @@ public class NewsServiceImpl implements NewsService {
 
     Node newsNode = session.getNodeByUUID(news.getId());
     if (newsNode != null) {
+      String processedBody = imageProcessor.processImages(news.getBody(), newsNode.getUUID(), "images");
       String oldBody = newsNode.getProperty("exo:body").getString();
       Set<String> previousMentions = NewsUtils.processMentions(oldBody);
       newsNode.setProperty("exo:title", news.getTitle());
       newsNode.setProperty("exo:name", news.getTitle());
       newsNode.setProperty("exo:summary", news.getSummary());
-      String processedBody = imageProcessor.processImages(news.getBody(), newsNode, "images");
       news.setBody(processedBody);
       newsNode.setProperty("exo:body", processedBody);
       newsNode.setProperty("exo:dateModified", Calendar.getInstance());
@@ -362,7 +390,7 @@ public class NewsServiceImpl implements NewsService {
               newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
             });
           }
-          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
+          sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS, session);
         }
         indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
       } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
@@ -474,7 +502,7 @@ public class NewsServiceImpl implements NewsService {
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
-    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
   }
 
   public void unpinNews(String newsId) throws Exception {
@@ -711,8 +739,8 @@ public class NewsServiceImpl implements NewsService {
         memberSpaceActivities.append(activities[0]).append(";");
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-          ExoSocialActivity exoSocialActivity = activityManager.getActivity(activities[i].split(":")[1]);
-          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && exoSocialActivity != null) {
+          String activityId = activities[i].split(":")[1];
+          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && activityManager.isActivityExists(activityId)) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }
@@ -779,7 +807,7 @@ public class NewsServiceImpl implements NewsService {
    * @param news The news to post as an activity
    * @throws Exception when error
    */
-  void postNewsActivity(News news) throws Exception {
+  void postNewsActivity(News news, Session session) throws Exception {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor(), false);
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -796,7 +824,7 @@ public class NewsServiceImpl implements NewsService {
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
 
-    updateNewsActivities(activity, news);
+    updateNewsActivities(activity, news, session);
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, getCurrentUserId(), news);
   }
 
@@ -939,7 +967,7 @@ public class NewsServiceImpl implements NewsService {
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
     publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode, "images"));
+    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode.getUUID(), "images"));
     spaceNewsRootNode.save();
 
     if (StringUtils.isNotEmpty(news.getUploadId())) {
@@ -1233,33 +1261,20 @@ public class NewsServiceImpl implements NewsService {
     return draftNews;
   }
 
-  protected void updateNewsActivities(ExoSocialActivity activity, News news) throws Exception {
-    if (activity.getId() != null) {
-      SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-      Session session = sessionProvider.getSession(
-                                                   repositoryService.getCurrentRepository()
-                                                                    .getConfiguration()
-                                                                    .getDefaultWorkspaceName(),
-                                                   repositoryService.getCurrentRepository());
-      try {
-        if (!StringUtils.isEmpty(news.getId())) {
-          Node newsNode = session.getNodeByUUID(news.getId());
-          if (newsNode.hasProperty("exo:activities")) {
-            String updatedNewsActivities = news.getSpaceId().concat(":").concat(activity.getId());
-            newsNode.setProperty("exo:activities", updatedNewsActivities);
-            newsNode.save();
-            news.setActivities(updatedNewsActivities);
-          }
-        }
-      } finally {
-        if (session != null) {
-          session.logout();
-        }
+  protected void updateNewsActivities(ExoSocialActivity activity, News news, Session session) throws Exception {
+    if (activity.getId() != null && !StringUtils.isEmpty(news.getId())) {
+      Node newsNode = session.getNodeByUUID(news.getId());
+      if (newsNode.hasProperty("exo:activities")) {
+        String updatedNewsActivities = news.getSpaceId().concat(":").concat(activity.getId());
+        newsNode.setProperty("exo:activities", updatedNewsActivities);
+        newsNode.save();
+        news.setActivities(updatedNewsActivities);
       }
     }
   }
+  
 
-  protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+  protected void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context, Session session) throws Exception {
     String newsId = news.getId();
     String contentAuthor = news.getAuthor();
     String currentUser = getCurrentUserId() != null ? getCurrentUserId() : contentAuthor;
@@ -1276,7 +1291,7 @@ public class NewsServiceImpl implements NewsService {
     }
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, contentAuthor);
     String authorAvatarUrl = LinkProviderUtils.getUserAvatarUrl(identity.getProfile());
-    String illustrationURL = NotificationUtils.getNewsIllustration(news);
+    String illustrationURL = NotificationUtils.getNewsIllustration(news, session);
     String activityLink = NotificationUtils.getNotificationActivityLink(contentSpace, contentActivityId, isMember);
     String contentSpaceName = contentSpace.getDisplayName();
 

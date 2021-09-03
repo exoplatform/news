@@ -10,6 +10,13 @@
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
+    <exo-news-details-action-menu
+      v-if="showEditButton"
+      :news="news"
+      :show-edit-button="showEditButton"
+      :show-delete-button="showDeleteButton"
+      @delete="deleteConfirmDialog"
+      @edit="editLink" />
     <div class="newsDetailsIcons">
       <exo-news-pin
         v-if="showPinButton"
@@ -18,13 +25,6 @@
         :news-archived="archivedNews"
         :news-title="newsTitle" />
     </div>
-    <exo-news-details-action-menu
-      v-if="showEditButton"
-      :news="news"
-      :show-edit-button="showEditButton"
-      :show-delete-button="showDeleteButton"
-      @delete="deleteConfirmDialog"
-      @edit="editLink" />
     <exo-confirm-dialog
       ref="deleteConfirmDialog"
       :message="$t('news.message.confirmDeleteNews')"

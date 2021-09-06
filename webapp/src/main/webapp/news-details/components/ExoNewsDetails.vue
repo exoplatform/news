@@ -52,9 +52,9 @@
           <div class="news-top-information d-flex">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ newsTitle }}</a>
-            </div>
-            <div v-if="archivedNews" class="newsArchived">
-              <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
+              <div v-if="archivedNews" class="newsArchived">
+                <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
+              </div>
             </div>
           </div>
           <div class="newsInformationBackground">

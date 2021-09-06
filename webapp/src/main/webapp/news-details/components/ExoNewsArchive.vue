@@ -5,7 +5,7 @@
       id="messageArchive"
       class="confirmPinMessage">
       <transition name="fade">
-        <div :class="[successArchive ? 'alert-success' : 'alert-error']" class="alert">
+        <div :class="[successArchive ? 'alert-success' : 'alert-error']" class="alert text-center">
           <i :class="[successArchive ? 'uiIconSuccess' : 'uiIconError']"></i>
           <span>{{ messageArchive }}</span>
         </div>

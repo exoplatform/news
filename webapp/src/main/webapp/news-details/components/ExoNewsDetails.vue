@@ -1,6 +1,6 @@
 <template>
   <div id="newsDetails">
-    <a class="backBtn" :href="backURL"><i class="uiIconBack"></i></a>
+    <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
     <v-btn
       v-if="publicationState === 'staged'"
       class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
@@ -10,6 +10,14 @@
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
+    <div class="newsDetailsIcons">
+      <exo-news-pin
+        v-if="showPinButton"
+        :news-id="newsId"
+        :news-pinned="news.pinned"
+        :news-archived="archivedNews"
+        :news-title="newsTitle" />
+    </div>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -41,26 +49,11 @@
             alt="News">
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIcons">
-            <exo-news-pin
-              v-if="showPinButton"
-              :news-id="newsId"
-              :news-pinned="news.pinned"
-              :news-archived="archivedNews"
-              :news-title="newsTitle" />
-          </div>
           <div class="news-top-information d-flex">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ newsTitle }}</a>
             </div>
             <div v-if="archivedNews" class="newsArchived">
-              <exo-news-archive
-                v-if="archivedNews"
-                :news-id="newsId"
-                :news-archived="archivedNews"
-                :news-title="newsTitle"
-                :pinned="news.pinned"
-                @update-archived-field="updateArchivedField" />
               <span class="newsArchiveLabel"> ( {{ $t('news.archive.label') }} ) </span>
             </div>
           </div>
@@ -254,7 +247,7 @@ export default {
     },
     archivedNews() {
       return this.news && this.news.archived;
-    },
+    },    
     illustrationURL() {
       return this.news && this.news.illustrationURL;
     },
@@ -330,10 +323,6 @@ export default {
     }
   },
   methods: {
-    updateArchivedField() {
-      // eslint-disable-next-line vue/no-mutating-props
-      this.news.archived = false;
-    },
     openPreview(attachedFile) {
       const self = this;
       window.require(['SHARED/documentPreview'], function(documentPreview) {

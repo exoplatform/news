@@ -95,7 +95,7 @@ export function initExtensions() {
   if (eXo.env.portal.spaceId) {
     canUserCreateNews(eXo.env.portal.spaceId)
       .then(canCreateNews => {
-        switchToArticleActivityComposerPlugin.enabled = newsActivityComposerPlugin.enabled = eXo.env.portal.spaceId && canCreateNews;
+        switchToArticleActivityComposerPlugin.enabled = newsActivityComposerPlugin.enabled = (eXo.env.portal.spaceId && eXo.env.portal.spaceId !== '') && canCreateNews;
         extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-action', newsActivityComposerPlugin);
         document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));
       });

@@ -1,6 +1,6 @@
 <template>
   <div id="newsDetails">
-    <a class="backBtn" :href="backURL"><i class="uiIconBack"></i></a>
+    <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
     <v-btn
       v-if="publicationState === 'staged'"
       class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
@@ -10,6 +10,14 @@
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
+    <div class="newsDetailsIcons">
+      <exo-news-pin
+        v-if="showPinButton"
+        :news-id="newsId"
+        :news-pinned="news.pinned"
+        :news-archived="archivedNews"
+        :news-title="newsTitle" />
+    </div>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"
@@ -41,14 +49,6 @@
             alt="News">
         </div>
         <div class="newsDetails">
-          <div class="newsDetailsIcons">
-            <exo-news-pin
-              v-if="showPinButton"
-              :news-id="newsId"
-              :news-pinned="news.pinned"
-              :news-archived="archivedNews"
-              :news-title="newsTitle" />
-          </div>
           <div class="news-top-information d-flex">
             <div id="titleNews" class="newsTitle newsTitleMobile">
               <a class="activityLinkColor newsTitleLink">{{ newsTitle }}</a>

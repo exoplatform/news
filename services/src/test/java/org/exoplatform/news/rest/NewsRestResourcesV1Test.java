@@ -9,11 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.model.NewsAttachment;
-import org.exoplatform.services.attachments.model.Attachment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1293,7 +1293,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", false);
+    verify(newsService).deleteNews("1", "john", false);
   }
 
   @Test
@@ -1325,7 +1325,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", false);
+    verify(newsService).deleteNews("1", "john", false);
   }
 
   @Test
@@ -1353,7 +1353,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test
@@ -1377,7 +1377,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test
@@ -1401,7 +1401,7 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", false);
+    verify(newsService, never()).deleteNews("1", "root", false);
   }
 
   @Test
@@ -1957,6 +1957,7 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+
   public void shouldScheduleNewsWhenUserIsSpaceManagerOrSpaceRedactor() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
@@ -1964,6 +1965,7 @@ public class NewsRestResourcesV1Test {
                                                                       spaceService,
                                                                       identityManager,
                                                                       container);
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
@@ -2054,5 +2056,64 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
+  public void getNewsIllustrationTest() {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    Request request = mock(Request.class);
+    News news = new News();
+    news.setSpaceId("1");
+    news.setAuthor("john");
+    news.setPinned(true);
+    news.setIllustrationUpdateDate(new Date());
+    news.setIllustration("illustration".getBytes());
+
+    lenient().when(newsService.getNewsById("1", false)).thenReturn(news);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsIllustration(request, "1");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    byte[] illustration = (byte[]) response.getEntity();
+    assertNotNull(illustration);
+    assertEquals("illustration", new String(illustration));
+  }
+
+  @Test
+  public void canCreateNewsTest() {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+
+    Space space = new Space();
+    space.setId("1");
+
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(spaceService.getSpaceById("1")).thenReturn(space);
+
+    // When
+    Response response = newsRestResourcesV1.canCreateNews(request, "1");
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+    lenient().when(spaceService.isMember(space, "john")).thenReturn(true);
+    // When
+    response = newsRestResourcesV1.canCreateNews(request, "1");
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    String canCreateNews = (String) response.getEntity();
+    assertNotNull(canCreateNews);
+    assertEquals("true", canCreateNews);
   }
 }

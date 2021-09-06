@@ -25,6 +25,14 @@
       :show-delete-button="showDeleteButton"
       @delete="deleteConfirmDialog"
       @edit="editLink" />
+    <div class="newsDetailsIcons">
+      <exo-news-pin
+        v-if="showPinButton"
+        :news-id="newsId"
+        :news-pinned="news.pinned"
+        :news-archived="archivedNews"
+        :news-title="newsTitle" />
+    </div>
     <exo-confirm-dialog
       ref="deleteConfirmDialog"
       :message="$t('news.message.confirmDeleteNews')"

@@ -197,7 +197,7 @@ export default {
     for (let i=0; i<this.newsInfo.length; i++){
       if (this.newsInfo[i].illustrationURL === null) {
         // eslint-disable-next-line vue/no-mutating-props
-        this.newsInfo[i].illustrationURL = '/news/images/newsImageDefault.png';
+        this.newsInfo[i].illustrationURL = '/news/images/news.png';
       }
     }
   },

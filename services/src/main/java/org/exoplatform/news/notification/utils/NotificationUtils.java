@@ -42,7 +42,7 @@ public class NotificationUtils {
     if (newsNode.hasNode("illustration")) {
       illustrationURL.append(currentDomain).append("portal/rest/v1/news/").append(news.getId()).append("/illustration");
     } else {
-      illustrationURL.append(currentDomain).append("news/images/newsImageDefault.png");
+      illustrationURL.append(currentDomain).append("news/images/news.png");
     }
     return illustrationURL.toString();
   }

@@ -60,7 +60,7 @@ NewsService newsService = CommonsUtils.getService(NewsService.class);
 						imgSrc = WCMCoreUtils.generateImageURI(imageNode, null);
 					} 
 					else {
-						imgSrc = '/news/images/newsImageDefault.png';
+						imgSrc = '/news/images/news.png';
 					}
 				}
 

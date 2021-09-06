@@ -235,7 +235,6 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
     return news;
   }
 
@@ -419,6 +418,7 @@ public class NewsServiceImpl implements NewsService {
         }
       }
     }
+    NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, getCurrentUserId(), news);
     return news;
   }
 
@@ -464,6 +464,7 @@ public class NewsServiceImpl implements NewsService {
       newsNode.setProperty("exo:viewsCount", news.getViewsCount());
       newsNode.setProperty("exo:viewers", newsViewers);
       newsNode.save();
+      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, getCurrentUserId(), news);
     }
   }
 
@@ -606,6 +607,7 @@ public class NewsServiceImpl implements NewsService {
           newsNode.setProperty("exo:activities", sharedActivityId);
         }
         newsNode.save();
+        NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, getCurrentUserId(), news);
       }
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
@@ -617,10 +619,11 @@ public class NewsServiceImpl implements NewsService {
    * Delete news
    * 
    * @param newsId the news id to delete
+   * @param currentUser
    * @param isDraft
    * @throws Exception when error
    */
-  public void deleteNews(String newsId, boolean isDraft) throws Exception {
+  public void deleteNews(String newsId, String currentUser, boolean isDraft) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
 
     Session session = sessionProvider.getSession(
@@ -652,6 +655,7 @@ public class NewsServiceImpl implements NewsService {
                 .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
+    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, convertNodeToNews(node, false));
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();
@@ -821,6 +825,7 @@ public class NewsServiceImpl implements NewsService {
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
 
     updateNewsActivities(activity, news, session);
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, getCurrentUserId(), news);
   }
 
   private String getNodeRelativePath(Calendar now) {

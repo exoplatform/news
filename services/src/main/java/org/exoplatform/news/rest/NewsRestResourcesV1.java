@@ -21,7 +21,6 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.deprecation.DeprecatedAPI;
 import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
@@ -289,6 +288,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
+      if (!editMode) {
+        newsService.markAsRead(news, authenticatedUser);
+      }
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
         News filteredNews = new News();
         Set<Space> spacesList = new HashSet<>();
@@ -683,7 +685,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             RequestLifeCycle.begin(container);
             try {
               newsToDeleteQueue.remove(id);
-              newsService.deleteNews(id, isDraft);
+              newsService.deleteNews(id, authenticatedUser, isDraft);
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", authenticatedUser, e);
             } catch (Exception e) {
@@ -695,7 +697,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }, delay, TimeUnit.SECONDS);
       } else {
         newsToDeleteQueue.remove(id);
-        newsService.deleteNews(id, isDraft);
+        newsService.deleteNews(id, authenticatedUser, isDraft);
       }
       return Response.ok().build();
     } catch (Exception e) {

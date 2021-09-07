@@ -289,6 +289,7 @@ export default {
           return this.$nextTick();
         })
         .finally(() => {
+          document.title = this.$t('news.window.title', {0: this.news.title});
           this.$root.$emit('application-loaded');
         });
     } else {

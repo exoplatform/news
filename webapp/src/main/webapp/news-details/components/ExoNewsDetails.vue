@@ -10,14 +10,6 @@
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
-    <div class="newsDetailsIcons">
-      <exo-news-pin
-        v-if="showPinButton"
-        :news-id="newsId"
-        :news-pinned="news.pinned"
-        :news-archived="archivedNews"
-        :news-title="newsTitle" />
-    </div>
     <exo-news-details-action-menu
       v-if="showEditButton"
       :news="news"

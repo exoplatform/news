@@ -812,7 +812,30 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.serverError().build();
     }
   }
-  
+
+  @GET
+  @Path("canPublishNews")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RolesAllowed("users")
+  @ApiOperation(value = "check if the current user can broadcast a news to all users", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to broadcast a news is returned"),
+          @ApiResponse(code = 400, message = "Invalid query input"),
+          @ApiResponse(code = 401, message = "User not authorized to create a news"),
+          @ApiResponse(code = 404, message = "Space not found"),
+          @ApiResponse(code = 500, message = "Internal server error") })
+  public Response canPublishNews(@Context HttpServletRequest request) {
+    try {
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      return Response.ok(String.valueOf(newsService.canPublishNews())).build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the authenticated user can create a news", e);
+      return Response.serverError().build();
+    }
+  }
+
   private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
     NewsFilter newsFilter = new NewsFilter();
 
@@ -877,4 +900,5 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private boolean canScheduleNews(String authenticatedUser, Space space) {
     return spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser);
   }
+
 }

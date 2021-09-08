@@ -96,7 +96,7 @@ public interface NewsService {
    */
   boolean canEditNews(News news, String authenticatedUser);
 
-  public boolean canPinNews();
+  public boolean canPublishNews();
   
   boolean canArchiveNews(String newsAuthor);
 

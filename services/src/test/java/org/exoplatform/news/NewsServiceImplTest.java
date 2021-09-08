@@ -2605,10 +2605,10 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     // When
-    boolean canPinNews = newsService.canPinNews();
+    boolean canPublishNews = newsService.canPublishNews();
 
     // Then
-    assertEquals(false, canPinNews);
+    assertEquals(false, canPublishNews);
 
   }
 
@@ -2639,10 +2639,10 @@ public class NewsServiceImplTest {
     setCurrentIdentity();
 
     // When
-    boolean canPinNews = newsService.canPinNews();
+    boolean canPublishNews = newsService.canPublishNews();
 
     // Then
-    assertEquals(true, canPinNews);
+    assertEquals(true, canPublishNews);
 
   }
 

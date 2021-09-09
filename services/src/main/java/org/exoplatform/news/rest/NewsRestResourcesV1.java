@@ -817,8 +817,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("canPublishNews")
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
-  @ApiOperation(value = "check if the current user can broadcast a news to all users", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to broadcast a news is returned"),
+  @ApiOperation(value = "check if the current user can publish a news to all users", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can publish a news to all users", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to publish a news is returned"),
           @ApiResponse(code = 400, message = "Invalid query input"),
           @ApiResponse(code = 401, message = "User not authorized to create a news"),
           @ApiResponse(code = 404, message = "Space not found"),
@@ -831,7 +831,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
       return Response.ok(String.valueOf(newsService.canPublishNews())).build();
     } catch (Exception e) {
-      LOG.error("Error when checking if the authenticated user can create a news", e);
+      LOG.error("Error when checking if the authenticated user can publish a news to all users", e);
       return Response.serverError().build();
     }
   }

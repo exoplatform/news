@@ -1219,6 +1219,9 @@ public class NewsServiceImpl implements NewsService {
         startPublishedDate.setTime(format.parse(schedulePostDate));
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
+        if (news.isPinned()) {
+          scheduledNewsNode.setProperty("exo:pinned", true);
+        }
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }

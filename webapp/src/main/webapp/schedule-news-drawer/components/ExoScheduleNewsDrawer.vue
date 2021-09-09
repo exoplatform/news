@@ -29,7 +29,7 @@
           <div class="d-flex flex-row">
             <v-checkbox
               v-model="publishToAll"
-              value="John">
+              value="true">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
           </div>
@@ -233,7 +233,7 @@ export default {
         });
     },
     selectPostMode() {
-      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode);
+      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publishToAll);
     },
     changeDisable() {
       const postDate = new Date(this.postDate);

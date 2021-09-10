@@ -11,7 +11,7 @@
       show-overlay
       body-classes="hide-scroll decrease-z-index-more"
       right
-      @closed="disabled = false">
+      @closed="closeDrawer">
       <template v-if="editScheduledNews !== 'editScheduledNews'" slot="title">
         {{ $t('news.composer.postArticle') }}
       </template>
@@ -29,7 +29,7 @@
           <div class="d-flex flex-row">
             <v-checkbox
               v-model="publish"
-              value="true">
+              @click="changeSelection">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
           </div>
@@ -138,6 +138,7 @@ export default {
     postDate: null,
     canPublishNews: false,
     publish: false,
+    news: null,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -162,6 +163,9 @@ export default {
       newDate.setSeconds(0);
       this.postDate = newDate;
     },
+    selected() {
+      this.publish = this.selected;
+    },
   },
   computed: {
     saveButtonLabel() {
@@ -179,7 +183,13 @@ export default {
     },
     showPostLaterMessage() {
       return this.postArticleMode === 'later' || !this.allowNotPost && this.postArticleMode !== 'immediate';
-    }
+    },
+    selected() {
+      return this.news && this.news.pinned;
+    },
+  },
+  mounted() {
+    this.publish = this.selected;
   },
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -227,7 +237,8 @@ export default {
     initializeDate() {
       this.$newsServices.getNewsById(this.newsId, false)
         .then(news => {
-          if (news !== null && news.schedulePostDate) {
+          if (news) {
+            this.news = news;
             this.schedulePostDate = news.schedulePostDate;
           }
         });
@@ -238,10 +249,18 @@ export default {
     changeDisable() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime();
+      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime() && this.selected === this.publish;
     },
     closeDrawer() {
+      this.publish = this.news.pinned;
+      this.disabled = false;
       this.$refs.postNewsDrawer.close();
+    },
+    changeSelection() {
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime() && this.selected === this.publish;
+      this.publish = !this.selected;
     }
   }
 };

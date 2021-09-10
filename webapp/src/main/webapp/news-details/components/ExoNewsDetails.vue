@@ -1,30 +1,23 @@
 <template>
   <div id="newsDetails">
-    <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
-    <v-btn
-      v-if="publicationState === 'staged'"
-      class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
-      @click="$root.$emit('open-schedule-drawer','editScheduledNews')">
-      {{ $t("news.composer.btn.scheduleArticle") }}
-    </v-btn>
+    <exo-news-details-toolbar
+      v-if="!isMobile"
+      :news="news"
+      :news-id="newsId"
+      :activity-id="activityId"
+      :show-edit-button="showEditButton"
+      :show-delete-button="showDeleteButton"
+      :show-pin-button="showPinButton" />
+    <exo-news-details-toolbar-mobile
+      v-if="isMobile"
+      :news="news"
+      :illustration-url="illustrationURL"
+      :show-edit-button="showEditButton"
+      :show-delete-button="showDeleteButton"
+      :show-pin-button="showPinButton" />
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
-    <exo-news-details-action-menu
-      v-if="showEditButton"
-      :news="news"
-      :show-edit-button="showEditButton"
-      :show-delete-button="showDeleteButton"
-      @delete="deleteConfirmDialog"
-      @edit="editLink" />
-    <div class="newsDetailsIcons">
-      <exo-news-pin
-        v-if="showPinButton"
-        :news-id="newsId"
-        :news-pinned="news.pinned"
-        :news-archived="archivedNews"
-        :news-title="newsTitle" />
-    </div>
     <exo-confirm-dialog
       ref="deleteConfirmDialog"
       :message="$t('news.message.confirmDeleteNews')"
@@ -40,7 +33,7 @@
         <h3>{{ $t('news.archive.text') }}</h3>
       </div>
     </div>
-    <div v-else class="newsDetails-description">
+    <div v-else-if="!isMobile" class="newsDetails-description">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="illustrationURL" class="illustration">
           <img
@@ -148,6 +141,9 @@
         </div>
       </div>
     </div>
+    <div v-if="isMobile" class="newsDetailsMobileBody">
+      <exo-news-details-body-mobile :news="news" />
+    </div>
     <exo-news-notification-alerts />
   </div>
 </template>
@@ -218,9 +214,6 @@ export default {
     authorAvatarURL() {
       return this.news && (this.news.profileAvatarURL || this.news.authorAvatarUrl);
     },
-    backURL() {
-      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
-    },
     updaterFullName() {
       return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
     },
@@ -272,8 +265,13 @@ export default {
     scheduleDate() {
       return this.news && this.news.schedulePostDate;
     },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
   },
   created() {
+    this.$root.$on('delete-news', this.deleteConfirmDialog);
+    this.$root.$on('edit-news', this.editLink);
     if (!this.news || !this.news.spaceId) {
       this.$newsServices.getNewsById(this.newsId)
         .then(news => {

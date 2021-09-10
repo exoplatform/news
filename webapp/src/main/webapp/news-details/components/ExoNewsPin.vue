@@ -1,5 +1,5 @@
 <template>
-  <div id="pinNewsActivity">
+  <div id="pinNewsActivity" class="newsDetailsIcons">
     <exo-confirm-dialog
       ref="publishConfirmDialog"
       :title="confirmDialogTitle"

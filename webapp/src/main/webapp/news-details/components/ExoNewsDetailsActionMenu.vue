@@ -18,7 +18,7 @@
     </template>
 
     <v-list>
-      <v-list-item v-if="showEditButton" @click="$emit('edit')">
+      <v-list-item v-if="showEditButton" @click="$root.$emit('edit-news')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.edit') }}
         </v-list-item-title>
@@ -28,12 +28,12 @@
           {{ $t('news.details.header.menu.share') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showResumeButton" @click="$emit('edit')">
+      <v-list-item v-if="showResumeButton" @click="$root.$emit('edit-news')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.resume') }}
         </v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="showDeleteButton" @click="$emit('delete')">
+      <v-list-item v-if="showDeleteButton" @click="$root.$emit('delete-news')">
         <v-list-item-title>
           {{ $t('news.details.header.menu.delete') }}
         </v-list-item-title>

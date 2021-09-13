@@ -1,8 +1,10 @@
 <template>
   <v-app-bar
     absolute
+    flat
     :src="illustrationUrl"
-    prominent>
+    prominent
+    class="news-details-toolbar">
     <v-app-bar-nav-icon>
       <v-btn
         class="newsDetailsMenuBtn my-2"
@@ -37,11 +39,6 @@ export default {
       required: false,
       default: null
     },
-    illustrationUrl: {
-      type: String,
-      required: false,
-      default: null
-    },
     showEditButton: {
       type: Boolean,
       required: false,
@@ -61,6 +58,9 @@ export default {
   computed: {
     backURL() {
       return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+    },
+    illustrationUrl() {
+      return this.news && this.news.illustrationURL;
     },
   }
 };

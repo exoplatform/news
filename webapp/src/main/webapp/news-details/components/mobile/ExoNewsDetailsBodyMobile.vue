@@ -1,10 +1,10 @@
 <template>
   <div class="newsBodyHeader">
-    <div class="d-flex flex-row py-2 ms-2 font-weight-bold subtitle-1">
+    <div class="d-flex flex-row pa-2 font-weight-bold subtitle-1">
       {{ newsTitle }}
     </div>
-    <div class="d-flex flex-row py-2">
-      <div class="flex-column ms-2">
+    <div class="d-flex flex-row pa-2">
+      <div class="flex-column">
         <exo-user-avatar
           :username="news.author"
           :fullname="news.author"
@@ -27,48 +27,21 @@
           class="align-center my-auto text-truncate flex-grow-0 flex" />
       </div>
     </div>
-    <div id="informationNews" class="newsInformation d-flex flex-row py-2">
-      <div class="newsAuthor">
-        <template v-if="publicationDate">
-          <date-format
-            :value="publicationDate"
-            :format="dateFormat"
-            class="newsInformationValue newsPostedDate news-details-information" />
-        </template>
-        <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
-      </div>
-      <div v-if="showUpdateInfo" class="newsUpdater">
-        <div v-if="publicationState !== 'staged'">
-          <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
-        </div>
-        <div v-else>
-          <span class="newsInformationLabel">{{ $t('news.details.scheduled') }} </span>
-        </div>
-        <div>
-          <template v-if="publicationState !== 'staged' && updatedDate">
-            <date-format
-              :value="updatedDate"
-              :format="dateFormat"
-              class="newsInformationValue newsUpdatedDate" />
-          </template>
-          <template v-else-if="publicationState === 'staged'">
-            <date-format
-              :value="scheduleDate"
-              :format="dateFormat"
-              class="newsInformationValue newsUpdatedDate" />
-            <span class="newsInformationValue">-</span>
-            <date-format
-              :value="scheduleDate"
-              :format="dateTimeFormat"
-              class="newsInformationValue newsUpdatedDate ml-1 me-1" />
-          </template>
-          <div v-else-if="news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
-          <div v-if="notSameUpdater">
-            <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
-            <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
-          </div>
-        </div>
-      </div>
+    <div class="d-flex flex-row caption grey--text text-darken-4">
+      <v-icon x-small class="ms-4 me-1">far fa-clock</v-icon>
+      <template v-if="publicationDate">
+        <date-format
+          :value="publicationDate"
+          :format="dateFormat" />
+      </template>
+      <span v-else-if="postedDate">- {{ postedDate }}</span>
+    </div>
+    <div class="d-flex flex-row caption font-italic grey--text text-darken-1 pa-4">
+      <span v-html="newsSummary"></span>
+    </div>
+    <v-divider class="mx-4 my-4" />
+    <div class="d-flex flex-row pa-4">
+      <span v-html="newsBody"></span>
     </div>
   </div>
 </template>
@@ -84,6 +57,15 @@ export default {
   },
   data: () => ({
     currentSpace: null,
+    dateFormat: {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+    dateTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+    },
   }),
   computed: {
     newsTitle() {
@@ -120,6 +102,24 @@ export default {
     updatedDate() {
       return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
     },
+    postedDate() {
+      return this.news && this.news.postedDate;
+    },
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+    scheduleDate() {
+      return this.news && this.news.schedulePostDate;
+    },
+    showUpdateInfo() {
+      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
+    },
+    newsSummary() {
+      return this.news && this.targetBlank(this.news.summary);
+    },
+    newsBody() {
+      return this.news && this.targetBlank(this.news.body);
+    },
   },
   created() {
     if (this.news && this.news.spaceId) {
@@ -134,7 +134,24 @@ export default {
             this.currentSpace = space;
           }
         });
-    }
+    },
+    targetBlank: function (content) {
+      const internal = location.host + eXo.env.portal.context;
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      const links = docElement.getElementsByTagName('a');
+      for (let i=0; i < links.length ; i++) {
+        let href = links[i].href.replace(/(^\w+:|^)\/\//, '');
+        if (href.endsWith('/')) {
+          href = href.slice(0, -1);
+        }
+        if (href !== location.host && !href.startsWith(internal)) {
+          links[i].setAttribute('target', '_blank');
+          links[i].setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+      return docElement.innerHTML;
+    },
   }
 };
 </script>

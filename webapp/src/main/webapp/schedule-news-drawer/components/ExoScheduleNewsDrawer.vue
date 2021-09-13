@@ -28,7 +28,7 @@
           </div>
           <div class="d-flex flex-row">
             <v-checkbox
-              v-model="publishToAll"
+              v-model="publish"
               value="true">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
@@ -137,7 +137,7 @@ export default {
     schedulePostDate: null,
     postDate: null,
     canPublishNews: false,
-    publishToAll: false,
+    publish: false,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -233,7 +233,7 @@ export default {
         });
     },
     selectPostMode() {
-      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publishToAll);
+      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
     },
     changeDisable() {
       const postDate = new Date(this.postDate);

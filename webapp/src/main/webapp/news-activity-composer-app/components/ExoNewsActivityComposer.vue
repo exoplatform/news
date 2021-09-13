@@ -556,9 +556,9 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publishToAll) {
-      this.news.pinned = (publishToAll === 'true');
-      if (publishToAll !== 'true' && this.news.pinned === true) {
+    postNews: function (schedulePostDate, postArticleMode, publish) {
+      this.news.pinned = (publish === 'true');
+      if (publish !== 'true' && this.news.pinned === true) {
         const confirmText = this.$t('news.broadcast.confirm');
         const captionText = this.$t('news.broadcast.action');
         const confirmButton = this.$t('news.broadcast.btn.confirm');

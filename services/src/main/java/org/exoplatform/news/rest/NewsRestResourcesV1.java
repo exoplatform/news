@@ -819,10 +819,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @RolesAllowed("users")
   @ApiOperation(value = "check if the current user can publish a news to all users", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can publish a news to all users", consumes = "application/json")
   @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to publish a news is returned"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 401, message = "User not authorized to create a news"),
-          @ApiResponse(code = 404, message = "Space not found"),
-          @ApiResponse(code = 500, message = "Internal server error") })
+          @ApiResponse(code = 401, message = "User not authorized to publish a news")})
   public Response canPublishNews(@Context HttpServletRequest request) {
     try {
       String authenticatedUser = request.getRemoteUser();

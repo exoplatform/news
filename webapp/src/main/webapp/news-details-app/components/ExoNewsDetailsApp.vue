@@ -1,5 +1,5 @@
 <template>
-  <div id="newsDetail">
+  <div id="newsDetails">
     <div v-if="notFound" class="articleNotFound">
       <i class="iconNotFound"></i>
       <h3>{{ $t('news.details.restricted') }}</h3>

@@ -397,8 +397,9 @@ export default {
       }
       return docElement.innerHTML;
     },
-    postNews(schedulePostDate, postArticleMode) {
+    postNews(schedulePostDate, postArticleMode, publish) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
+      this.news.pinned = (publish === 'true');
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

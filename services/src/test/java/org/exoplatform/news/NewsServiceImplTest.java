@@ -340,7 +340,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewPinnedNewsWhenNotSpaceMember() throws Exception {
+  public void shouldCanViewPublishedNewsWhenNotSpaceMember() throws Exception {
     NewsService newsService = buildNewsService();
     
     String spaceId = "space1";
@@ -355,7 +355,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewPinnedStagedNewsWhenNotSpaceMember() throws Exception {
+  public void shouldCanViewPublishedStagedNewsWhenNotSpaceMember() throws Exception {
     NewsService newsService = buildNewsService();
 
     String spaceId = "space1";
@@ -369,7 +369,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewNotPinnedAndPublishedNewsWhenSuperManager() throws Exception {
+  public void shouldCanViewNotPublishedAndPostedNewsWhenSuperManager() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String superUser = "mary";
@@ -383,7 +383,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCantViewNotPinnedAndStagedNewsWhenSuperManager() throws Exception {
+  public void shouldCantViewNotPublishedAndStagedNewsWhenSuperManager() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String superUser = "mary";
@@ -398,7 +398,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCantViewNotPinnedAndStagedNewsWhenIsMember() throws Exception {
+  public void shouldCantViewNotPublishedAndStagedNewsWhenIsMember() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String username = "mary";
@@ -413,7 +413,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewNotPinnedAndSpaceMember() throws Exception {
+  public void shouldCanViewNotPublishedAndSpaceMember() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String username = "mary";
@@ -428,7 +428,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewNotPinnedAndStagedNewsAndSpaceManager() throws Exception {
+  public void shouldCanViewNotPublishedAndStagedNewsAndSpaceManager() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String username = "mary";
@@ -442,7 +442,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewNotPinnedAndStagedNewsAndSpaceRedactor() throws Exception {
+  public void shouldCanViewNotPublishedAndStagedNewsAndSpaceRedactor() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String username = "mary";
@@ -457,7 +457,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCanViewNotPinnedAndStagedNewsAndIsAuthor() throws Exception {
+  public void shouldCanViewNotPublishedAndStagedNewsAndIsAuthor() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
     String username = "mary";
@@ -1093,7 +1093,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldPinNews() throws Exception {
+  public void shouldPublishNews() throws Exception {
     // Given
 
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
@@ -1120,15 +1120,15 @@ public class NewsServiceImplTest {
 
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
-    Node pinnedRootNode = mock(Node.class);
+    Node publishedRootNode = mock(Node.class);
     Node newsFolderNode = mock(Node.class);
     Node applicationDataNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
 
     News news = new News();
-    news.setTitle("pinned title");
-    news.setSummary("pinned summary");
-    news.setBody("pinned body");
+    news.setTitle("published title");
+    news.setSummary("published summary");
+    news.setBody("published body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1149,7 +1149,7 @@ public class NewsServiceImplTest {
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
-    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
     Mockito.doNothing()
            .when(newsServiceSpy)
            .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
@@ -1166,7 +1166,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldCreateNewsDraftAndPinIt() throws Exception {
+  public void shouldCreateNewsDraftAndPublishIt() throws Exception {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
@@ -1189,9 +1189,9 @@ public class NewsServiceImplTest {
                                                       newsESSearchConnector,
                                                       userACL);
     News news = new News();
-    news.setTitle("new pinned news title");
-    news.setSummary("new pinned news summary");
-    news.setBody("new pinned news body");
+    news.setTitle("new published news title");
+    news.setSummary("new published news summary");
+    news.setBody("new published news body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1322,7 +1322,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldUnPinNews() throws Exception {
+  public void shouldUnPublishNews() throws Exception {
     // Given
 
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
@@ -1348,17 +1348,17 @@ public class NewsServiceImplTest {
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
-    Node pinnedRootNode = mock(Node.class);
+    Node publishRootNode = mock(Node.class);
     Node newsFolderNode = mock(Node.class);
     Node applicationDataNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
-    Node pinnedNode = mock(Node.class);
+    Node publishedNode = mock(Node.class);
     Property property = mock(Property.class);
 
     News news = new News();
-    news.setTitle("unpinned");
-    news.setSummary("unpinned summary");
-    news.setBody("unpinned body");
+    news.setTitle("unpublished");
+    news.setSummary("unpublished summary");
+    news.setBody("unpublished body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1381,8 +1381,8 @@ public class NewsServiceImplTest {
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
-    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
-    when(newsFolderNode.getNode("unpinned")).thenReturn(pinnedNode);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishRootNode);
+    when(newsFolderNode.getNode("unpinned")).thenReturn(publishedNode);
     when(newsNode.getName()).thenReturn("unpinned");
     // When
     newsServiceSpy.unpinNews("id123");
@@ -1390,13 +1390,13 @@ public class NewsServiceImplTest {
     // Then
     verify(newsNode, times(1)).save();
     verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(false));
-    verify(pinnedNode, times(1)).remove();
+    verify(publishedNode, times(1)).remove();
     verify(newsFolderNode, times(1)).save();
 
   }
 
   @Test
-  public void shouldNotUnPinNewsAsNewsNodeIsNull() throws Exception {
+  public void shouldNotUnPublishNewsAsNewsNodeIsNull() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
@@ -1421,9 +1421,9 @@ public class NewsServiceImplTest {
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     News news = new News();
-    news.setTitle("unpinned");
-    news.setSummary("unpinned summary");
-    news.setBody("unpinned body");
+    news.setTitle("unpublished");
+    news.setSummary("unpublished summary");
+    news.setBody("unpublished body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1445,7 +1445,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotUnPinNewsAsNewsIsNull() throws Exception {
+  public void shouldNotUnPublishNewsAsNewsIsNull() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
@@ -1483,7 +1483,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotUnPinNewsAsPinnedRootNodeIsNull() throws Exception {
+  public void shouldNotUnPublishNewsAsPublishedRootNodeIsNull() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
@@ -1513,9 +1513,9 @@ public class NewsServiceImplTest {
     Node newsRootNode = mock(Node.class);
 
     News news = new News();
-    news.setTitle("unpinned");
-    news.setSummary("unpinned summary");
-    news.setBody("unpinned body");
+    news.setTitle("unpublished");
+    news.setSummary("unpublished summary");
+    news.setBody("unpublished body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1545,7 +1545,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotUnPinNewsAsNewsFolderNodeIsNull() throws Exception {
+  public void shouldNotUnPublishNewsAsNewsFolderNodeIsNull() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
@@ -1572,12 +1572,12 @@ public class NewsServiceImplTest {
     ExtendedNode newsNode = mock(ExtendedNode.class);
     Node applicationDataNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
-    Node pinnedRootNode = mock(Node.class);
+    Node publishedRootNode = mock(Node.class);
 
     News news = new News();
-    news.setTitle("unpinned");
-    news.setSummary("unpinned summary");
-    news.setBody("unpinned body");
+    news.setTitle("unpublished");
+    news.setSummary("unpublished summary");
+    news.setBody("unpublished body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1598,7 +1598,7 @@ public class NewsServiceImplTest {
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
-    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
     exceptionRule.expect(Exception.class);
     exceptionRule.expectMessage("Unable to find the parent node of the current pinned node");
 
@@ -1607,7 +1607,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotUnPinNewsAsPinnedNodeIsNull() throws Exception {
+  public void shouldNotUnPublishedNewsAsPublishedNodeIsNull() throws Exception {
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
 
@@ -1634,13 +1634,13 @@ public class NewsServiceImplTest {
     ExtendedNode newsNode = mock(ExtendedNode.class);
     Node applicationDataNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
-    Node pinnedRootNode = mock(Node.class);
+    Node publishedRootNode = mock(Node.class);
     Node newsFolderNode = mock(Node.class);
 
     News news = new News();
-    news.setTitle("unpinned");
-    news.setSummary("unpinned summary");
-    news.setBody("unpinned body");
+    news.setTitle("unpublished");
+    news.setSummary("unpublished summary");
+    news.setBody("unpublished body");
     news.setUploadId(null);
     String sDate1 = "22/08/2019";
     Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -1661,7 +1661,7 @@ public class NewsServiceImplTest {
     when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
     when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
     when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
-    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(pinnedRootNode);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
     when(newsFolderNode.getNode("unpinned")).thenReturn(null);
     exceptionRule.expect(Exception.class);
     exceptionRule.expectMessage("Unable to find the current pinned node");
@@ -2573,7 +2573,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotAuthorizeTheCurrentUserToPinNews() {
+  public void shouldNotAuthorizeTheCurrentUserToPublishNews() {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
@@ -2605,15 +2605,15 @@ public class NewsServiceImplTest {
     ConversationState.setCurrent(state);
 
     // When
-    boolean canPinNews = newsService.canPinNews();
+    boolean canPublishNews = newsService.canPublishNews();
 
     // Then
-    assertEquals(false, canPinNews);
+    assertEquals(false, canPublishNews);
 
   }
 
   @Test
-  public void shouldAuthorizeTheCurrentUserToPinNews() {
+  public void shouldAuthorizeTheCurrentUserToPublishNews() {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
@@ -2639,10 +2639,10 @@ public class NewsServiceImplTest {
     setCurrentIdentity();
 
     // When
-    boolean canPinNews = newsService.canPinNews();
+    boolean canPublishNews = newsService.canPublishNews();
 
     // Then
-    assertEquals(true, canPinNews);
+    assertEquals(true, canPublishNews);
 
   }
 
@@ -2906,7 +2906,7 @@ public class NewsServiceImplTest {
                                                       userACL);
 
     News news = new News();
-    news.setTitle("unpinned");
+    news.setTitle("unpublished");
     news.setAuthor("root");
     news.setSpaceId("1");
     news.setActivities("1:38");
@@ -2946,7 +2946,7 @@ public class NewsServiceImplTest {
                                                       userACL);
 
     News news = new News();
-    news.setTitle("unpinned");
+    news.setTitle("unpublished");
     news.setAuthor("root");
     news.setId("id123");
     news.setSpaceId("1");
@@ -3095,7 +3095,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldGetAllPinnedNewsNodesWhenExists() throws Exception {
+  public void shouldGetAllPubishedNewsNodesWhenExists() throws Exception {
     // Given
     NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
                                                       sessionProviderService,

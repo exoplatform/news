@@ -556,16 +556,9 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate) {
-      if (this.news.pinned === true) {
-        const confirmText = this.$t('news.broadcast.confirm');
-        const captionText = this.$t('news.broadcast.action');
-        const confirmButton = this.$t('news.broadcast.btn.confirm');
-        const cancelButton = this.$t('news.edit.cancel');
-        eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: this.doPostNews(schedulePostDate), label: confirmButton}], captionText, confirmText, cancelButton);
-      } else {
-        this.doPostNews(schedulePostDate);
-      }
+    postNews: function (schedulePostDate, postArticleMode, publish) {
+      this.news.pinned = (publish === 'true');
+      this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {
       this.postingNews = true;

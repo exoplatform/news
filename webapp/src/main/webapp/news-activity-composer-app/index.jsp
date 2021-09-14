@@ -3,7 +3,7 @@
 
 <%
   NewsService newsService = CommonsUtils.getService(NewsService.class);
-  boolean showPinInput = newsService.canPinNews();
+  boolean showPinInput = newsService.canPublishNews();
 %>
 <div class="VuetifyApp">
   <div id="NewsComposerApp">

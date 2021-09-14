@@ -118,7 +118,7 @@
     def newsAttachments = news.attachments;
 
     def showEditButton = newsService.canEditNews(news.author, news.spaceId);
-    def showPinInput = newsService.canPinNews();
+    def showPinInput = newsService.canPublishNews();
     def hiddenSpace = news.hiddenSpace;
 
     def params = """ {

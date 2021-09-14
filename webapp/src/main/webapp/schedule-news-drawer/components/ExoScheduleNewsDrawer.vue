@@ -29,7 +29,7 @@
           <div class="d-flex flex-row">
             <v-checkbox
               v-model="publish"
-              @click="changeSelection">
+              @click="changePublishStatus">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
           </div>
@@ -48,13 +48,13 @@
             <v-radio-group v-model="postArticleMode">
               <v-radio
                 value="immediate"
-                @click="changeDisable">
+                @click="changePostArticleMode">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
               </v-radio>
               <v-radio
                 value="later"
                 class="mt-4"
-                @click="changeDisable">
+                @click="changePostArticleMode">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
               </v-radio>
               <div v-if="showPostLaterMessage" class="mt-4">
@@ -78,7 +78,7 @@
                 v-if="allowNotPost"
                 value="notPost"
                 class="postModeText mt-4"
-                @click="changeDisable">
+                @click="changePostArticleMode">
                 <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
               </v-radio>
               <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
@@ -246,20 +246,18 @@ export default {
     selectPostMode() {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
     },
-    changeDisable() {
+    changePostArticleMode() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime() && this.selected === this.publish;
+      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime();
     },
     closeDrawer() {
       this.publish = this.news.pinned;
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
     },
-    changeSelection() {
-      const postDate = new Date(this.postDate);
-      const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime() && this.selected === this.publish;
+    changePublishStatus() {
+      this.disabled = this.selected === this.publish;
       this.publish = !this.selected;
     }
   }

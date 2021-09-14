@@ -128,6 +128,17 @@ export default {
       default: null
     },
   },
+  data: () => ({
+    dateFormat: {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+    dateTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+    },
+  }),
   computed: {
     archivedNews() {
       return this.news && this.news.archived;

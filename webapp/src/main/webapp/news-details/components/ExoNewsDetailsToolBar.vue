@@ -8,12 +8,12 @@
       {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
     <exo-news-details-action-menu
-      v-if="showEditButton"
+      v-if="showEditButton && publicationState !== 'staged'"
       :news="news"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton" />
     <exo-news-pin
-      v-if="showPinButton"
+      v-if="showPinButton && publicationState !== 'staged'"
       :news-id="news.newsId"
       :news-pinned="news.pinned"
       :news-archived="archivedNews"
@@ -81,6 +81,9 @@ export default {
     publicationState() {
       return this.news && this.news.publicationState;
     },
+    newsTitle() {
+      return this.news && this.news.title;
+    }
   },
 };
 </script>

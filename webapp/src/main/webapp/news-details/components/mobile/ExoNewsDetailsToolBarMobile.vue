@@ -19,6 +19,7 @@
     </v-app-bar-nav-icon>
     <v-spacer />
     <v-btn
+      v-if="publicationState !== 'staged'"
       class="newsDetailsMenuBtn my-2"
       fab
       dark
@@ -27,7 +28,15 @@
         v-if="showEditButton"
         :news="news"
         :show-edit-button="showEditButton"
-        :show-delete-button="showDeleteButton" />
+        :show-delete-button="showDeleteButton"
+        :show-pin-button="showPinButton"
+        :publish-label="publishLabel" />
+    </v-btn>
+    <v-btn
+      v-if="publicationState === 'staged'"
+      class="btn newsDetailsActionMenu my-2 pull-right"
+      @click="$root.$emit('open-schedule-drawer','editScheduledNews')">
+      {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
   </v-app-bar>
 </template>
@@ -60,8 +69,11 @@ export default {
       return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
     },
     illustrationUrl() {
-      return this.news && this.news.illustrationURL;
+      return this.news && this.news.illustrationURL ? this.news.illustrationURL : '/news/images/news.png';
     },
-  }
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+  },
 };
 </script>

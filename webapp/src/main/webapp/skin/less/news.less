@@ -29,6 +29,13 @@
       }
     }
   }
+  #newsDetails {
+    #newsFullDetails {
+      .newsContent {
+        background-color: @baseBackground;
+      }
+    }
+  }
   #newsDetails .newsDetailsActionMenu {
     margin: 20px 20px 13px 0;
   }
@@ -2886,9 +2893,6 @@
 /*====================== Responsive ==========================*/
 
 @media screen and (max-width: 480px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .uiComposer .share-buttons-down .newsEditorComposerLink {
     margin-right: 0 ~'; /** orientation=lt */ ';
     margin-left: 0 ~'; /** orientation=rt */ ';
@@ -2962,9 +2966,6 @@
 }
 
 @media screen and (max-width: 630px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .contentSharedNews{
     padding: 1px;
   }
@@ -3280,9 +3281,6 @@
   }
 }
 @media screen and (max-width: 380px){
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .sharedInfo{
     .userInfo{
       text-overflow: ellipsis;
@@ -3302,17 +3300,12 @@
 
 }
 @media screen and (max-width: 375px){
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .news-details-information {
     width: 20%;
   }
 }
 @media screen and (max-width: 768px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
+
   .newsDetails-description a.activityLinkColor.newsTitleLink {
     display: inline-block;
   }
@@ -3414,9 +3407,6 @@
 }
 
 @media screen and (min-width: 481px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .newsDetails {
     .newsAttachmentsTitle {
       width: 80%;
@@ -3443,9 +3433,6 @@
 }
 
 @media screen and (max-width: 630px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .skeletonContainer {
     margin-top: 2%;
     margin-left: 1% ~'; /** orientation=lt */ ';
@@ -3587,9 +3574,6 @@
 }
 
 @media (max-width: 460px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   #eventAlAUne .carousel-indicators {
     position: relative;
   }
@@ -3678,9 +3662,6 @@ p.caption-title:after {
 }
 
 @media (max-width: 520px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
-  }
   .caption-description {
     display: none;
   }
@@ -3883,8 +3864,11 @@ p.caption-title:after {
   }
 }
 @media (max-width: 959px) {
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
+  .VuetifyApp #newsDetail {
+    padding: 0;
+    #newsDetails .newsDetailsActionMenu {
+      margin: 0;
+    }
   }
 }
 input.ignore-vuetify-classes.datePickerText.flex-grow-0 {

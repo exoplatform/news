@@ -8,7 +8,10 @@
       v-else
       id="newsFullDetails"
       :news="news"
-      :news-id="newsId" />
+      :news-id="newsId"
+      :show-edit-button="showEditButton"
+      :show-pin-button="showPinButton"
+      :show-delete-button="showDeleteButton" />
   </div>
 </template>
 
@@ -23,12 +26,18 @@ export default {
   data: () => ({
     news: null,
     notFound: false,
+    showEditButton: false,
+    showPinButton: false,
+    showDeleteButton: false,
   }),
   created() {
     this.$newsServices.getNewsById(this.newsId, false)
       .then(news => {
         if (news !== null) {
           this.news = news;
+          this.showEditButton = this.news.canEdit;
+          this.showPinButton = this.news.canPublish;
+          this.showDeleteButton = this.news.canDelete;
           if (!this.news.spaceMember) {
             this.$root.$emit('restricted-space', this.news.spaceDisplayName);
           }

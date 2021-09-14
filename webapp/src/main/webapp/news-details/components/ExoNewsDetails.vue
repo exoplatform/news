@@ -29,7 +29,9 @@
       :news="news" />
     <exo-news-details-body-mobile
       v-if="isMobile"
-      :news="news" />
+      :news="news"
+      :news-id="newsId"
+      :space="currentSpace" />
     <exo-news-notification-alerts />
   </div>
 </template>
@@ -70,6 +72,7 @@ export default {
   },
   data() {
     return {
+      currentSpace: null,
       spaceId: null,
       updaterIdentity: null,
       BYTES_IN_MB: 1048576,
@@ -96,6 +99,7 @@ export default {
       this.$newsServices.getNewsById(this.newsId)
         .then(news => {
           this.spaceId = news.spaceId;
+          this.getSpaceById(this.spaceId);
           if (!this.news) {
             this.news = news;
           }
@@ -112,6 +116,7 @@ export default {
         });
     } else {
       this.spaceId = this.news.spaceId;
+      this.getSpaceById(this.spaceId );
       if (!this.news.newsId) {
         this.news.newsId = this.newsId;
       }
@@ -142,6 +147,14 @@ export default {
     }
   },
   methods: {
+    getSpaceById(spaceId) {
+      this.$spaceService.getSpaceById(spaceId, 'identity')
+        .then((space) => {
+          if (space && space.identity && space.identity.id) {
+            this.currentSpace = space;
+          }
+        });
+    },
     editLink() {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_target');

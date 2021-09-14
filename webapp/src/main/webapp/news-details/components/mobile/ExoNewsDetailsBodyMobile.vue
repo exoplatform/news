@@ -1,15 +1,15 @@
 <template>
-  <div class="newsBodyHeader">
-    <div class="d-flex flex-row pa-2 font-weight-bold subtitle-1">
+  <div class="newsContent">
+    <div class="d-flex flex-row pa-2 ms-2 font-weight-bold subtitle-1">
       {{ newsTitle }}
     </div>
-    <div class="d-flex flex-row pa-2">
-      <div class="flex-column">
+    <div class="d-flex flex-row pa-2 ms-2">
+      <div v-if="news" class="flex-column">
         <exo-user-avatar
-          :username="news.author"
-          :fullname="news.author"
+          :username="newsAuthor"
+          :fullname="authorFullName"
           :size="32"
-          :title="news.author"
+          :title="newsAuthor"
           :retrieve-extra-information="false"
           :labels="labels"
           class="align-center my-auto text-truncate flex-grow-0 flex" />
@@ -19,22 +19,16 @@
       </v-icon>
       <div class="flex-column">
       </div>
-      <div class="flex-column">
+      <div v-if="space" class="flex-column">
         <exo-space-avatar
-          :space="currentSpace"
+          :space="space"
           :size="32"
           :labels="labels"
           class="align-center my-auto text-truncate flex-grow-0 flex" />
       </div>
     </div>
-    <div class="d-flex flex-row caption grey--text text-darken-4">
-      <v-icon x-small class="ms-4 me-1">far fa-clock</v-icon>
-      <template v-if="publicationDate">
-        <date-format
-          :value="publicationDate"
-          :format="dateFormat" />
-      </template>
-      <span v-else-if="postedDate">- {{ postedDate }}</span>
+    <div class="d-flex flex-row caption text-light-color">
+      <exo-news-details-time :news="news" />
     </div>
     <div class="d-flex flex-row caption font-italic grey--text text-darken-1 pa-4">
       <span v-html="newsSummary"></span>
@@ -54,9 +48,18 @@ export default {
       required: false,
       default: null
     },
+    newsId: {
+      type: String,
+      required: false,
+      default: null
+    },
+    space: {
+      type: Object,
+      required: false,
+      default: null
+    },
   },
   data: () => ({
-    currentSpace: null,
     dateFormat: {
       year: 'numeric',
       month: 'long',
@@ -87,32 +90,8 @@ export default {
         members: this.$t('space.members'),
       };
     },
-    updaterFullName() {
-      return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
-    },
-    updaterProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
-    },
-    notSameUpdater() {
-      return this.news && this.news.updater !=='__system' && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
-    },
-    publicationDate() {
-      return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
-    },
-    updatedDate() {
-      return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
-    },
-    postedDate() {
-      return this.news && this.news.postedDate;
-    },
     publicationState() {
       return this.news && this.news.publicationState;
-    },
-    scheduleDate() {
-      return this.news && this.news.schedulePostDate;
-    },
-    showUpdateInfo() {
-      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
     },
     newsSummary() {
       return this.news && this.targetBlank(this.news.summary);
@@ -120,22 +99,15 @@ export default {
     newsBody() {
       return this.news && this.targetBlank(this.news.body);
     },
-  },
-  created() {
-    if (this.news && this.news.spaceId) {
-      this.getSpaceById();
-    }
+    authorFullName() {
+      return this.news && (this.news.authorFullName || this.news.authorDisplayName);
+    },
+    newsAuthor() {
+      return this.news && this.news.author;
+    },
   },
   methods: {
-    getSpaceById() {
-      this.$spaceService.getSpaceById(this.news.spaceId, 'identity')
-        .then((space) => {
-          if (space && space.identity && space.identity.id) {
-            this.currentSpace = space;
-          }
-        });
-    },
-    targetBlank: function (content) {
+    targetBlank(content) {
       const internal = location.host + eXo.env.portal.context;
       const domParser = new DOMParser();
       const docElement = domParser.parseFromString(content, 'text/html').documentElement;

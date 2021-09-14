@@ -1,0 +1,83 @@
+<template>
+  <div class="d-flex flex-row">
+    <v-icon x-small class="flex-column ms-4 me-1">far fa-clock</v-icon>
+    <div class="me-1">
+      <span>{{ postModeLabel }} </span>
+    </div>
+    <template v-if="publicationDate" class="flex-column">
+      <date-format
+        :value="publicationDate"
+        :format="dateFormat" />
+    </template>
+    <span v-else-if="postedDate" class="flex-column">- {{ postedDate }}</span>
+    <template v-else-if="publicationState === 'staged'" class="flex-column">
+      <date-format
+        :value="scheduleDate"
+        :format="dateFormat" />
+      <span>-</span>
+      <date-format
+        :value="scheduleDate"
+        :format="dateTimeFormat" />
+    </template>
+    <div v-else-if="updatedDate" class="flex-column">{{ updatedDate }}</div>
+    <div v-if="notSameUpdater" class="flex-column">
+      <span> {{ $t('news.activity.by') }} </span>
+      <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    news: {
+      type: Object,
+      required: false,
+      default: null
+    },
+  },
+  data: () => ({
+    dateFormat: {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+    dateTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+    },
+  }),
+  computed: {
+    publicationDate() {
+      return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
+    },
+    updatedDate() {
+      return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
+    },
+    postedDate() {
+      return this.news && this.news.postedDate;
+    },
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+    scheduleDate() {
+      return this.news && this.news.schedulePostDate;
+    },
+    notSameUpdater() {
+      return this.news && this.news.updater !=='__system' && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
+    },
+    updaterProfileURL() {
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+    },
+    showUpdateInfo() {
+      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
+    },
+    postModeLabel() {
+      return this.publicationState === 'staged' && this.updatedDate ? this.$t('news.details.scheduled') :this.$t('news.activity.lastUpdated');
+    },
+    updaterFullName() {
+      return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
+    },
+  }
+};
+</script>

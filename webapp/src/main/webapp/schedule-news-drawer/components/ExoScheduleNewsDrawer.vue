@@ -28,8 +28,7 @@
           </div>
           <div class="d-flex flex-row">
             <v-checkbox
-              v-model="publish"
-              @click="changePublishStatus">
+              v-model="publish">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
           </div>
@@ -47,14 +46,12 @@
           <div class="d-flex flex-row">
             <v-radio-group v-model="postArticleMode">
               <v-radio
-                value="immediate"
-                @click="changePostArticleMode">
+                value="immediate">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
               </v-radio>
               <v-radio
                 value="later"
-                class="mt-4"
-                @click="changePostArticleMode">
+                class="mt-4">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
               </v-radio>
               <div v-if="showPostLaterMessage" class="mt-4">
@@ -77,8 +74,7 @@
               <v-radio
                 v-if="allowNotPost"
                 value="notPost"
-                class="postModeText mt-4"
-                @click="changePostArticleMode">
+                class="postModeText mt-4">
                 <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
               </v-radio>
               <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
@@ -92,7 +88,7 @@
             :disabled="disabled"
             :loading="postingNews"
             class="btn btn-primary ms-2"
-            @click="selectPostMode">
+            @click="postArticle">
             {{ saveButtonLabel }}
           </v-btn>
         </div>
@@ -105,7 +101,7 @@
           <v-btn
             :disabled="disabled"
             class="btn btn-primary ms-2"
-            @click="selectPostMode">
+            @click="postArticle">
             {{ $t('news.composer.confirm') }}
           </v-btn>
         </div>
@@ -129,7 +125,6 @@ export default {
   },
   data: () => ({
     drawer: false,
-    disabled: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
     editScheduledNews: false,
@@ -187,9 +182,11 @@ export default {
     selected() {
       return this.news && this.news.pinned;
     },
-  },
-  mounted() {
-    this.publish = this.selected;
+    disabled() {
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
+    }
   },
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -243,23 +240,14 @@ export default {
           }
         });
     },
-    selectPostMode() {
+    postArticle() {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
-    },
-    changePostArticleMode() {
-      const postDate = new Date(this.postDate);
-      const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime();
     },
     closeDrawer() {
       this.publish = this.news.pinned;
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
     },
-    changePublishStatus() {
-      this.disabled = this.selected === this.publish;
-      this.publish = !this.selected;
-    }
   }
 };
 </script>

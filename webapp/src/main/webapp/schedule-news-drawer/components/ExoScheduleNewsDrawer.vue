@@ -11,7 +11,7 @@
       show-overlay
       body-classes="hide-scroll decrease-z-index-more"
       right
-      @closed="disabled = false">
+      @closed="closeDrawer">
       <template v-if="editScheduledNews !== 'editScheduledNews'" slot="title">
         {{ $t('news.composer.postArticle') }}
       </template>
@@ -28,8 +28,7 @@
           </div>
           <div class="d-flex flex-row">
             <v-checkbox
-              v-model="publish"
-              value="true">
+              v-model="publish">
               <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
             </v-checkbox>
           </div>
@@ -47,14 +46,12 @@
           <div class="d-flex flex-row">
             <v-radio-group v-model="postArticleMode">
               <v-radio
-                value="immediate"
-                @click="changeDisable">
+                value="immediate">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
               </v-radio>
               <v-radio
                 value="later"
-                class="mt-4"
-                @click="changeDisable">
+                class="mt-4">
                 <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
               </v-radio>
               <div v-if="showPostLaterMessage" class="mt-4">
@@ -77,8 +74,7 @@
               <v-radio
                 v-if="allowNotPost"
                 value="notPost"
-                class="postModeText mt-4"
-                @click="changeDisable">
+                class="postModeText mt-4">
                 <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
               </v-radio>
               <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
@@ -92,7 +88,7 @@
             :disabled="disabled"
             :loading="postingNews"
             class="btn btn-primary ms-2"
-            @click="selectPostMode">
+            @click="postArticle">
             {{ saveButtonLabel }}
           </v-btn>
         </div>
@@ -105,7 +101,7 @@
           <v-btn
             :disabled="disabled"
             class="btn btn-primary ms-2"
-            @click="selectPostMode">
+            @click="postArticle">
             {{ $t('news.composer.confirm') }}
           </v-btn>
         </div>
@@ -129,7 +125,6 @@ export default {
   },
   data: () => ({
     drawer: false,
-    disabled: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
     editScheduledNews: false,
@@ -138,6 +133,7 @@ export default {
     postDate: null,
     canPublishNews: false,
     publish: false,
+    news: null,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -162,6 +158,9 @@ export default {
       newDate.setSeconds(0);
       this.postDate = newDate;
     },
+    selected() {
+      this.publish = this.selected;
+    },
   },
   computed: {
     saveButtonLabel() {
@@ -179,6 +178,14 @@ export default {
     },
     showPostLaterMessage() {
       return this.postArticleMode === 'later' || !this.allowNotPost && this.postArticleMode !== 'immediate';
+    },
+    selected() {
+      return this.news && this.news.pinned;
+    },
+    disabled() {
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
     }
   },
   created() {
@@ -227,22 +234,20 @@ export default {
     initializeDate() {
       this.$newsServices.getNewsById(this.newsId, false)
         .then(news => {
-          if (news !== null && news.schedulePostDate) {
+          if (news) {
+            this.news = news;
             this.schedulePostDate = news.schedulePostDate;
           }
         });
     },
-    selectPostMode() {
+    postArticle() {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
     },
-    changeDisable() {
-      const postDate = new Date(this.postDate);
-      const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime();
-    },
     closeDrawer() {
+      this.publish = this.news.pinned;
+      this.disabled = false;
       this.$refs.postNewsDrawer.close();
-    }
+    },
   }
 };
 </script>

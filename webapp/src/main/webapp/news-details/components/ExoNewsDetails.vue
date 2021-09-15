@@ -168,7 +168,7 @@ export default {
     activityId: {
       type: String,
       required: false,
-      default: null
+      default: ''
     },
     showEditButton: {
       type: Boolean,
@@ -399,7 +399,7 @@ export default {
     },
     postNews(schedulePostDate, postArticleMode, publish) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
-      this.news.pinned = (publish === 'true');
+      this.news.pinned = publish;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

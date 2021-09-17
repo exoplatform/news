@@ -791,6 +791,13 @@ public class NewsServiceImpl implements NewsService {
       news.setAuthorAvatarUrl(identity.getProfile().getAvatarUrl());
     }
 
+    if(StringUtils.isNotBlank(news.getUpdater())) {
+      Identity updaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getUpdater(), true);
+      if (updaterIdentity != null && updaterIdentity.getProfile() != null) {
+        news.setUpdaterFullName(updaterIdentity.getProfile().getFullName());
+      }
+    }
+
     Identity draftUpdaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getDraftUpdater(), true);
     if (draftUpdaterIdentity != null && draftUpdaterIdentity.getProfile() != null) {
       news.setDraftUpdaterDisplayName(draftUpdaterIdentity.getProfile().getFullName());

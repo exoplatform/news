@@ -168,13 +168,10 @@ export default {
       return this.news && this.targetBlank(this.news.body);
     },
     updaterFullName() {
-      return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
+      return this.news && this.news.updater !=='__system' ? this.news.updaterFullName : this.news.authorFullName;
     },
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
-    },
-    notSameUpdater() {
-      return this.news && this.news.updater !=='__system' && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
     },
     publicationDate() {
       return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
@@ -202,6 +199,9 @@ export default {
     },
     publicationState() {
       return this.news && this.news.publicationState;
+    },
+    notSameUpdater() {
+      return this.news && this.news.updater !=='__system' && this.news.updater !== this.news.author;
     },
     scheduleDate() {
       return this.news && this.news.schedulePostDate;

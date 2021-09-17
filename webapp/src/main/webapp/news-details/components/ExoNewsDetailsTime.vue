@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row">
+  <div v-if="news" class="d-flex flex-row">
     <v-icon x-small class="flex-column ms-4 me-1">far fa-clock</v-icon>
     <div class="me-1">
       <span>{{ postModeLabel }} </span>
@@ -20,9 +20,9 @@
         :format="dateTimeFormat" />
     </template>
     <div v-else-if="updatedDate" class="flex-column">{{ updatedDate }}</div>
+    <div v-if="notSameUpdater" class="me-1 flex-column me-1"> {{ $t('news.activity.by') }}</div>
     <div v-if="notSameUpdater" class="flex-column">
-      <span> {{ $t('news.activity.by') }} </span>
-      <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
+      <a :href="updaterProfileURL">{{ updaterFullName }}</a>
     </div>
   </div>
 </template>
@@ -64,7 +64,7 @@ export default {
       return this.news && this.news.schedulePostDate;
     },
     notSameUpdater() {
-      return this.news && this.news.updater !=='__system' && (this.news.updater !== this.news.author || this.news.authorFullName !== this.news.updaterFullName);
+      return this.news && this.news.updater !=='__system' && this.news.updater !== this.news.author;
     },
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
@@ -76,7 +76,7 @@ export default {
       return this.publicationState === 'staged' && this.updatedDate ? this.$t('news.details.scheduled') :this.$t('news.activity.lastUpdated');
     },
     updaterFullName() {
-      return (this.news && this.news.updaterFullName) || (this.updaterIdentity && this.updaterIdentity.profile && this.updaterIdentity.profile.fullname);
+      return this.news && this.news.updater !=='__system' ? this.news.updaterFullName : this.news.authorFullName;
     },
   }
 };

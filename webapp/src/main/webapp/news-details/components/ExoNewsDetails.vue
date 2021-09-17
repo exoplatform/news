@@ -74,7 +74,6 @@ export default {
     return {
       currentSpace: null,
       spaceId: null,
-      updaterIdentity: null,
       BYTES_IN_MB: 1048576,
       dateFormat: {
         year: 'numeric',
@@ -119,10 +118,6 @@ export default {
       this.getSpaceById(this.spaceId );
       if (!this.news.newsId) {
         this.news.newsId = this.newsId;
-      }
-      if (this.notSameUpdater && this.news && this.news.updater) {
-        this.$identityService.getIdentityByProviderIdAndRemoteId('organization', this.news.updater)
-          .then(identity => this.updaterIdentity = identity);
       }
       this.$root.$emit('application-loaded');
     }

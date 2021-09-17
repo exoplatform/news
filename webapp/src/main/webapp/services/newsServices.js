@@ -254,3 +254,14 @@ export function undoDeleteNews(newsId) {
     }
   });
 }
+
+export function canPublishNews() {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canPublishNews`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}

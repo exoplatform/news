@@ -13,6 +13,7 @@
       class="newsComposer">
       <schedule-news-drawer
         :posting-news="postingNews"
+        :news-id="newsId"
         @post-article="postNews" />
       <div class="newsComposerActions">
         <div class="newsFormButtons">
@@ -557,7 +558,7 @@ export default {
       }
     },
     postNews: function (schedulePostDate, postArticleMode, publish) {
-      this.news.pinned = (publish === 'true');
+      this.news.pinned = publish;
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {

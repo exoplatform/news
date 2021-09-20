@@ -213,7 +213,7 @@ export default {
       return this.news && (this.news.authorFullName || this.news.authorDisplayName);
     },
     authorProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.author}`;
     },
     authorAvatarURL() {
       return this.news && (this.news.profileAvatarURL || this.news.authorAvatarUrl);

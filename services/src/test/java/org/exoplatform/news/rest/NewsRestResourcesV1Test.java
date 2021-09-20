@@ -1024,7 +1024,7 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
-  public void shouldGetNotAuthorizedWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
+  public void shouldGetOkWhenCreatingNewsDraftAndNewsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
                                                                       newsAttachmentsService,
@@ -1046,7 +1046,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.createNews(request, news);
 
     // Then
-    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test

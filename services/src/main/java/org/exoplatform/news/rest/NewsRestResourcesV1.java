@@ -885,11 +885,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   }
   
   private boolean canCreateNews(String authenticatedUser, Space space) throws Exception {
-    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     return space != null && 
           (spaceService.isSuperManager(authenticatedUser) || spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser) ||
-          spaceService.isMember(space, authenticatedUser) && ArrayUtils.isEmpty(space.getRedactors())) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
-          currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, "*");
+          spaceService.isMember(space, authenticatedUser) && ArrayUtils.isEmpty(space.getRedactors()));
   }
   
   private boolean canViewNews(String authenticatedUser, Space space) throws Exception {

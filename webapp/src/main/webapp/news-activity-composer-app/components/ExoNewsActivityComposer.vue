@@ -15,45 +15,55 @@
         :posting-news="postingNews"
         :news-id="newsId"
         @post-article="postNews" />
-      <div class="newsComposerActions">
-        <div class="newsFormButtons">
-          <div class="newsFormLeftActions">
-            <img src="/news/images/news.png">
-            <span class="newsFormTitle">{{ newsFormTitle }}</span>
+      <div class="newsComposerToolbar">
+        <div class="d-flex flex-row py-2">
+          <v-avatar
+            height="40"
+            min-height="40"
+            width="40"
+            min-width="40"
+            max-width="40"
+            size="40"
+            class="mx-3 my-auto spaceAvatar space-avatar-header">
+            <v-img src="/news/images/news.png" />
+          </v-avatar>
+          <div class="d-flex flex-grow-1 flex-column my-auto align-left">
+            <span class="flex-row text-truncate subtitle-1">{{ newsFormTitle }}</span>
+            <span v-if="spaceDisplayName " class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
-          <div class="newsFormRightActions">
-            <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+          <div class="d-flex d-flex flex-grow-0">
+            <span class="caption my-auto me-1 flex-shrink-0 text-truncate">{{ draftSavingStatus }}</span>
             <v-btn
               v-show="!editMode"
               id="newsPost"
               :loading="postingNews"
               :disabled="postDisabled || postingNews"
               elevation="0"
-              class="btn btn-primary"
+              class="btn btn-primary my-auto me-2"
               @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
-          </div>
-          <div v-show="editMode">
-            <div class="d-flex flex-row">
-              <v-btn
-                id="newsEdit"
-                :disabled="updateDisabled"
-                class="btn btn-primary mr-2 "
-                @click.prevent="updateNews">
-                {{ $t("news.edit.update") }}
-              </v-btn>
-              <v-btn
-                id="newsUpdateAndPost"
-                :disabled="news.archived ? true: updateDisabled"
-                :class="[news.archived ? 'unauthorizedPin' : '']"
-                class="btn mr-2"
-                @click.prevent="updateAndPostNews">
-                {{ $t("news.edit.update.post") }}
-              </v-btn>
-              <v-btn class="btn mr-6" @click="goBack">
-                {{ $t("news.composer.btn.cancel") }}
-              </v-btn>
+            <div v-show="editMode">
+              <div class="d-flex flex-row">
+                <v-btn
+                  id="newsEdit"
+                  :disabled="updateDisabled"
+                  class="btn btn-primary"
+                  @click.prevent="updateNews">
+                  {{ $t("news.edit.update") }}
+                </v-btn>
+                <v-btn
+                  id="newsUpdateAndPost"
+                  :disabled="news.archived ? true: updateDisabled"
+                  :class="[news.archived ? 'unauthorizedPin' : '']"
+                  class="btn ms-2 me-2"
+                  @click.prevent="updateAndPostNews">
+                  {{ $t("news.edit.update.post") }}
+                </v-btn>
+                <v-btn class="btn me-2" @click="goBack">
+                  {{ $t("news.composer.btn.cancel") }}
+                </v-btn>
+              </div>
             </div>
           </div>
         </div>
@@ -190,7 +200,7 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    }
+    },
   },
   data() {
     return {
@@ -254,6 +264,9 @@ export default {
       },
       canScheduleNews: false,
       scheduleMode: '',
+      newsToolbar: [],
+      switchView: false,
+      spaceDisplayName: '',
     };
   },
   computed: {
@@ -292,7 +305,10 @@ export default {
     },
     draftWarningText() {
       return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
-    }
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
   },
   watch: {
     'news.title': function() {
@@ -373,14 +389,21 @@ export default {
       shareButton.style.display = 'block';
     }
   },
+  created() {
+    document.addEventListener('switch-view-plugins', () => {
+      this.changeView();
+    });
+  },
   methods: {
     initCKEditor: function() {
       if (CKEDITOR.instances['newsContent'] && CKEDITOR.instances['newsContent'].destroy) {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
       CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+      CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
+      CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video,switchView,attachFile';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -392,6 +415,25 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
+      if (this.isMobile) {
+        this.newsToolbar.push(
+          { name: 'switchView', items: ['switchView'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'links', items: [ 'selectImage', 'Video'] },
+          { name: 'attachFile', items: ['attachFile'] },
+        );
+      } else {
+        this.newsToolbar.push(
+          { name: 'format', items: ['Format'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'fontsize', items: ['FontSize'] },
+          { name: 'colors', items: [ 'TextColor' ] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+        );
+      }
 
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
@@ -403,15 +445,7 @@ export default {
         toolbarLocation: 'top',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-        toolbar: [
-          { name: 'format', items: ['Format'] },
-          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'fontsize', items: ['FontSize'] },
-          { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
-        ],
+        toolbar: this.newsToolbar,
         format_tags: 'p;h1;h2;h3',
         autoGrow_minHeight: self.newsFormContentHeight,
         height: self.newsFormContentHeight,
@@ -422,6 +456,12 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
+            const elementNewTop3 = document.getElementById('cke_14');
+            const elementNewTop4 = document.getElementById('cke_18');
+            const elementNewTop5 = document.getElementById('cke_22');
+            elementNewTop3.style.borderRight = 'none';
+            elementNewTop4.style.display = 'none';
+            elementNewTop5.style.display = 'none';
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -466,7 +506,12 @@ export default {
     displayFormTitle: function() {
       if (!this.editMode) {
         this.$newsServices.getSpaceById(this.spaceId).then(space => {
-          this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+          if (this.isMobile) {
+            this.newsFormTitle = `${this.$t('news.create.createNews')}`;
+            this.spaceDisplayName = space.displayName;
+          } else {
+            this.newsFormTitle = this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+          }
         });
       } else {
         this.newsFormTitle = this.$t('news.edit.editNews');
@@ -852,6 +897,30 @@ export default {
     },
     getString(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+    },
+    changeView() {
+      const elementNewTop1 = document.getElementById('cke_7');
+      const elementNewTop2 = document.getElementById('cke_9');
+      const elementNewTop3 = document.getElementById('cke_14');
+      const elementNewTop4 = document.getElementById('cke_18');
+      const elementNewTop5 = document.getElementById('cke_22');
+      elementNewTop3.style.borderRight = 'none';
+      elementNewTop4.style.display = 'none';
+      if (!this.switchView) {
+        elementNewTop1.style.borderRight = 'none';
+        elementNewTop2.style.display = 'none';
+        elementNewTop3.style.display = 'none';
+        elementNewTop4.style.display = 'initial';
+        elementNewTop4.style.borderRight = 'none';
+        elementNewTop5.style.display = 'initial';
+        this.switchView = true;
+      } else {
+        elementNewTop1.style.display = 'initial';
+        elementNewTop2.style.display = 'initial';
+        elementNewTop3.style.display = 'initial';
+        elementNewTop5.style.display = 'none';
+        this.switchView = false;
+      }
     }
   }
 };

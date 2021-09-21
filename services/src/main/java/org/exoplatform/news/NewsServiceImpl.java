@@ -91,8 +91,6 @@ public class NewsServiceImpl implements NewsService {
 
   public static final String       APPLICATION_DATA_PATH           = "/Application Data";
 
-  private static final String      MANAGER_MEMBERSHIP_NAME         = "manager";
-
   private static final String      PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";

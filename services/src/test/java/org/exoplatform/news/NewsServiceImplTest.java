@@ -2527,53 +2527,7 @@ public class NewsServiceImplTest {
   }
 
   @Test
-  public void shouldNotAuthorizeTheCurrentUserToEditNews() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "member");
-    MembershipEntry membershipentry1 = new MembershipEntry("space1", "member");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    memberships.add(membershipentry1);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("david", "space1");
-
-    // Then
-    assertEquals(false, canEditNews);
-
-  }
-
-  @Test
-  public void shouldAuthorizeSpaceMangerToEditNewsWhenCurrentUserIsManager() {
+  public void shouldAuthorizeSpaceMangerToEditNews() {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);

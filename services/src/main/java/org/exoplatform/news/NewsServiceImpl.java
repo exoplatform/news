@@ -1081,8 +1081,7 @@ public class NewsServiceImpl implements NewsService {
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || spaceService.isSuperManager(authenticatedUser)
         || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-        || currentIdentity.isMemberOf(currentSpace.getGroupId(), MANAGER_MEMBERSHIP_NAME)
-        || currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*");
+        || spaceService.isManager(currentSpace, currentIdentity.getUserId());
   }
 
   @Override

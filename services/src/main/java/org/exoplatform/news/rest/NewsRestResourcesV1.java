@@ -895,7 +895,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   }
 
   private boolean canScheduleNews(String authenticatedUser, Space space) {
-    return spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser);
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    return spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
 }

@@ -12,8 +12,7 @@
 /*============== Activity News ====================*/
 
 .VuetifyApp {
-  #newsDetail {
-    padding: 10px 8%;
+  #newsDetails {
     .articleNotFound {
       text-align: center;
       margin: 200px auto auto;
@@ -35,13 +34,13 @@
         background-color: @baseBackground;
       }
     }
-  }
-  #newsDetails .newsDetailsActionMenu {
-    margin: 20px 20px 13px 0;
-  }
-  #newsDetails .newsDetailsMenuBtn {
-    color: @grayDark;
-    opacity: 0.7;
+    .newsDetailsActionMenu {
+      margin: 20px 20px 13px 0;
+    }
+    .newsDetailsMenuBtn {
+      color: @grayDark;
+      opacity: 0.7;
+    }
   }
   .newsDetailsIcons {
     top: -9px;
@@ -3864,11 +3863,11 @@ p.caption-title:after {
   }
 }
 @media (max-width: 959px) {
-  .VuetifyApp #newsDetail {
+  .VuetifyApp #newsDetails {
     padding: 0;
-  }
-  .VuetifyApp #newsDetails .newsDetailsActionMenu {
-    margin: 0;
+    .newsDetailsActionMenu {
+      margin: 0;
+    }
   }
 }
 input.ignore-vuetify-classes.datePickerText.flex-grow-0 {

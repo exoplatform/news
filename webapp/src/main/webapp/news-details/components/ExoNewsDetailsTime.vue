@@ -20,7 +20,7 @@
         :format="dateTimeFormat" />
     </template>
     <div v-else-if="updatedDate" class="flex-column">{{ updatedDate }}</div>
-    <div v-if="notSameUpdater" class="me-1 flex-column me-1"> {{ $t('news.activity.by') }}</div>
+    <div v-if="notSameUpdater" class="ms-1 flex-column me-1"> {{ $t('news.activity.by') }}</div>
     <div v-if="notSameUpdater" class="flex-column">
       <a :href="updaterProfileURL">{{ updaterFullName }}</a>
     </div>

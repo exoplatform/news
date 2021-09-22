@@ -29,8 +29,7 @@
         :news="news"
         :show-edit-button="showEditButton"
         :show-delete-button="showDeleteButton"
-        :show-pin-button="showPinButton"
-        :publish-label="publishLabel" />
+        :show-publish-button="showPublishButton" />
     </v-btn>
     <v-btn
       v-if="publicationState === 'staged'"
@@ -53,7 +52,7 @@ export default {
       required: false,
       default: false
     },
-    showPinButton: {
+    showPublishButton: {
       type: Boolean,
       required: false,
       default: false

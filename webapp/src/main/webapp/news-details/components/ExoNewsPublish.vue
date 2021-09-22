@@ -1,5 +1,5 @@
 <template>
-  <div id="pinNewsActivity" class="newsDetailsIcons">
+  <div id="publishNewsActivity" class="newsDetailsIcons">
     <exo-confirm-dialog
       ref="publishConfirmDialog"
       :title="confirmDialogTitle"
@@ -33,7 +33,7 @@ export default {
       required: true,
       default: null
     },
-    newsPinned: {
+    newsPublished: {
       type: Boolean,
       required: true,
       default: false

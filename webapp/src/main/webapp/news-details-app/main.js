@@ -24,7 +24,7 @@ export function init() {
     `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.attachmentsSelector.attachments-${lang}.json`
   ];
 
-  const appId = 'newsDetail';
+  const appId = 'newsDetails';
   const appElement = document.createElement('div');
   appElement.id = appId;
   // getting locale resources

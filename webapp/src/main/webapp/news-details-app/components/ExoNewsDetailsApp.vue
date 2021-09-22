@@ -10,7 +10,7 @@
       :news="news"
       :news-id="newsId"
       :show-edit-button="showEditButton"
-      :show-pin-button="showPinButton"
+      :show-publish-button="showPublishButton"
       :show-delete-button="showDeleteButton" />
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
     news: null,
     notFound: false,
     showEditButton: false,
-    showPinButton: false,
+    showPublishButton: false,
     showDeleteButton: false,
   }),
   created() {
@@ -36,7 +36,7 @@ export default {
         if (news !== null) {
           this.news = news;
           this.showEditButton = this.news.canEdit;
-          this.showPinButton = this.news.canPublish;
+          this.showPublishButton = this.news.canPublish;
           this.showDeleteButton = this.news.canDelete;
           if (!this.news.spaceMember) {
             this.$root.$emit('restricted-space', this.news.spaceDisplayName);

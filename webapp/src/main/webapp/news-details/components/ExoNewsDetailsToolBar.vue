@@ -12,10 +12,10 @@
       :news="news"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton" />
-    <exo-news-pin
-      v-if="showPinButton && publicationState !== 'staged'"
+    <exo-news-publish
+      v-if="showPublishButton && publicationState !== 'staged'"
       :news-id="news.newsId"
-      :news-pinned="news.pinned"
+      :news-published="news.pinned"
       :news-archived="archivedNews"
       :news-title="newsTitle" />
   </div>
@@ -44,7 +44,7 @@ export default {
       required: false,
       default: false
     },
-    showPinButton: {
+    showPublishButton: {
       type: Boolean,
       required: false,
       default: false

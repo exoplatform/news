@@ -39,7 +39,7 @@
             {{ $t('news.details.header.menu.delete') }}
           </v-list-item-title>
         </v-list-item>
-        <v-list-item v-if="isMobile && showPinButton" @click="confirmAction">
+        <v-list-item v-if="isMobile && showPublishButton" @click="confirmAction">
           <v-list-item-title>
             {{ publishLabel }}
           </v-list-item-title>
@@ -50,9 +50,9 @@
       ref="publishConfirmDialog"
       :title="confirmDialogTitle"
       :message="confirmDialogMessage"
-      :ok-label="$t('news.broadcast.btn.confirm')"
-      :cancel-label="$t('news.broadcast.btn.cancel')"
-      @ok="updatePinnedField" />
+      :ok-label="$t('news.publish.btn.confirm')"
+      :cancel-label="$t('news.publish.btn.cancel')"
+      @ok="updatePublishedField" />
   </div>
 </template>
 
@@ -64,11 +64,6 @@ export default {
       type: Object,
       required: false,
       default: null
-    },
-    newsPinned: {
-      type: Boolean,
-      required: true,
-      default: false
     },
     newsArchived: {
       type: Boolean,
@@ -95,7 +90,7 @@ export default {
       required: false,
       default: false
     },
-    showPinButton: {
+    showPublishButton: {
       type: Boolean,
       required: false,
       default: false
@@ -103,21 +98,22 @@ export default {
   },
   data: () => ({
     actionMenu: null,
-    messagePin: '',
-    successPin: true,
+    publishMessage: '',
+    publishSuccess: true,
+    newsPublished: false,
   }),
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
     confirmDialogTitle() {
-      return this.newsPinned && this.$t('news.unbroadcast.action') || this.$t('news.broadcast.action');
+      return this.newsPublished && this.$t('news.unpublish.action') || this.$t('news.publish.action');
     },
     confirmDialogMessage() {
-      return this.newsPinned && this.$t('news.unbroadcast.confirm', {0: this.news.title}) || this.$t('news.broadcast.confirm');
+      return this.newsPublished && this.$t('news.unpublish.confirm', {0: this.news.title}) || this.$t('news.publish.confirm');
     },
     publishLabel() {
-      return this.newsPinned ? this.$t('news.details.header.menu.unpublish'): this.$t('news.details.header.menu.publish');
+      return this.newsPublished ? this.$t('news.details.header.menu.unpublish'): this.$t('news.details.header.menu.publish');
     },
   },
   mounted() {
@@ -129,11 +125,11 @@ export default {
     confirmAction() {
       this.$refs.publishConfirmDialog.open();
     },
-    updatePinnedField: function () {
-      const pinMessageTime = 5000;
+    updatePublishedField() {
+      const publishMessageTime = 5000;
       const context = this;
       let updatedNews = null;
-      if (this.newsPinned === false) {
+      if (this.newsPublished === false) {
         updatedNews = {
           pinned: true,
         };
@@ -150,32 +146,32 @@ export default {
         method: 'PATCH',
         body: JSON.stringify(updatedNews)
       }).then (function() {
-        context.showPinMessage = true;
-        if (context.newsPinned === false) {
-          context.messagePin = context.$t('news.broadcast.success');
+        context.showPublishMessage = true;
+        if (context.newsPublished === false) {
+          context.publishMessage = context.$t('news.publish.success');
           // eslint-disable-next-line vue/no-mutating-props
-          context.newsPinned = true;
+          context.newsPublished = true;
         } else {
-          context.messagePin = context.$t('news.unbroadcast.success');
+          context.publishMessage = context.$t('news.unpublish.success');
           // eslint-disable-next-line vue/no-mutating-props
-          context.newsPinned = false;
+          context.newsPublished = false;
         }
         setTimeout(function () {
-          context.showPinMessage = false;
-        }, pinMessageTime);
+          context.showPublishMessage = false;
+        }, publishMessageTime);
       })
         .catch (function() {
-          context.showPinMessage = true;
-          context.successPin = false;
-          if (context.newsPinned === false) {
-            context.messagePin = context.$t('news.broadcast.error');
+          context.showPublishMessage = true;
+          context.publishSuccess = false;
+          if (context.newsPublished === false) {
+            context.publishMessage = context.$t('news.publish.error');
           } else {
-            context.messagePin = context.$t('news.unbroadcast.error');
+            context.publishMessage = context.$t('news.unpublish.error');
           }
           setTimeout(function () {
-            context.successPin = true;
-            context.showPinMessage = false;
-          }, pinMessageTime);
+            context.publishSuccess = true;
+            context.showPublishMessage = false;
+          }, publishMessageTime);
         });
     },
   }

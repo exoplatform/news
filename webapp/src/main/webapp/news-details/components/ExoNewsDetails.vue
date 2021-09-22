@@ -7,13 +7,13 @@
       :activity-id="activityId"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton"
-      :show-pin-button="showPinButton" />
+      :show-publish-button="showPublishButton" />
     <exo-news-details-toolbar-mobile
       v-if="isMobile"
       :news="news"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton"
-      :show-pin-button="showPinButton" />
+      :show-publish-button="showPublishButton" />
     <schedule-news-drawer
       @post-article="postNews"
       :news-id="newsId" />
@@ -59,7 +59,7 @@ export default {
       required: false,
       default: false
     },
-    showPinButton: {
+    showPublishButton: {
       type: Boolean,
       required: false,
       default: false

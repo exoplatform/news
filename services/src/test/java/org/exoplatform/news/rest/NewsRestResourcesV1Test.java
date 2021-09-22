@@ -944,6 +944,9 @@ public class NewsRestResourcesV1Test {
                                                                       identityManager,
                                                                       container);
     HttpServletRequest request = mock(HttpServletRequest.class);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     News news = new News();
     news.setId("1");
@@ -1033,6 +1036,9 @@ public class NewsRestResourcesV1Test {
                                                                       container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
     News news = new News();
     news.setId("1");
     news.setSpaceId("1");

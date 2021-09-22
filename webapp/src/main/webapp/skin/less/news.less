@@ -12,7 +12,8 @@
 /*============== Activity News ====================*/
 
 .VuetifyApp {
-  #newsDetails {
+  #newsDetailApp {
+    padding: 10px 8%;
     .articleNotFound {
       text-align: center;
       margin: 200px auto auto;
@@ -29,6 +30,13 @@
     }
   }
   #newsDetails {
+    .newsDetailsTitle {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
     #newsFullDetails {
       .newsContent {
         background-color: @baseBackground;
@@ -3863,9 +3871,11 @@ p.caption-title:after {
   }
 }
 @media (max-width: 959px) {
-  .VuetifyApp #newsDetails {
-    padding: 0;
-    .newsDetailsActionMenu {
+  .VuetifyApp {
+    #newsDetailApp {
+      padding: 0;
+    }
+    #newsDetails .newsDetailsActionMenu {
       margin: 0;
     }
   }

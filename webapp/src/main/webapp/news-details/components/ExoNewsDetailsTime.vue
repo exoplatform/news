@@ -1,16 +1,18 @@
 <template>
   <div v-if="news" class="d-flex flex-row">
-    <v-icon x-small class="flex-column ms-4 me-1">far fa-clock</v-icon>
-    <div class="me-1">
+    <div class="flex-column my-auto">
+      <v-icon x-small class="ms-4 me-1">far fa-clock</v-icon>
+    </div>
+    <div class="flex-column me-1 my-auto">
       <span>{{ postModeLabel }} </span>
     </div>
-    <template v-if="publicationDate" class="flex-column">
+    <template v-if="publicationDate" class="flex-column my-auto">
       <date-format
         :value="publicationDate"
         :format="dateFormat" />
     </template>
-    <span v-else-if="postedDate" class="flex-column">- {{ postedDate }}</span>
-    <template v-else-if="publicationState === 'staged'" class="flex-column">
+    <span v-else-if="postedDate" class="flex-column my-auto">- {{ postedDate }}</span>
+    <template v-else-if="publicationState === 'staged'" class="flex-column my-auto">
       <date-format
         :value="scheduleDate"
         :format="dateFormat" />
@@ -19,9 +21,9 @@
         :value="scheduleDate"
         :format="dateTimeFormat" />
     </template>
-    <div v-else-if="updatedDate" class="flex-column">{{ updatedDate }}</div>
-    <div v-if="notSameUpdater" class="ms-1 flex-column me-1"> {{ $t('news.activity.by') }}</div>
-    <div v-if="notSameUpdater" class="flex-column">
+    <div v-else-if="updatedDate" class="flex-column my-auto">{{ updatedDate }}</div>
+    <div v-if="notSameUpdater" class="ms-1 flex-column me-1 my-auto"> {{ $t('news.activity.by') }}</div>
+    <div v-if="notSameUpdater" class="flex-column my-auto">
       <a :href="updaterProfileURL">{{ updaterFullName }}</a>
     </div>
   </div>

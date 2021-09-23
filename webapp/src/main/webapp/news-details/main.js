@@ -40,7 +40,7 @@ export function init(params) {
           newsId: params.news.newsId,
           activityId: params.activityId,
           showEditButton: params.showEditButton,
-          showPinButton: params.showPinInput,
+          showPublishButton: params.showPinInput,
           showDeleteButton: params.news.canDelete,
         };
       },
@@ -50,7 +50,7 @@ export function init(params) {
                     :news-id="newsId"
                     :activity-id="activityId"
                     :show-edit-button="showEditButton"
-                    :show-pin-button="showPinButton"
+                    :show-publish-button="showPublishButton"
                     :show-delete-button="showDeleteButton"/>
                  </v-app>`,
       i18n,

@@ -7,9 +7,11 @@
     <exo-news-details
       v-else
       id="newsFullDetails"
-      style="display: none"
       :news="news"
-      :news-id="newsId" />
+      :news-id="newsId"
+      :show-edit-button="showEditButton"
+      :show-publish-button="showPublishButton"
+      :show-delete-button="showDeleteButton" />
   </div>
 </template>
 
@@ -24,13 +26,18 @@ export default {
   data: () => ({
     news: null,
     notFound: false,
+    showEditButton: false,
+    showPublishButton: false,
+    showDeleteButton: false,
   }),
   created() {
     this.$newsServices.getNewsById(this.newsId, false)
       .then(news => {
         if (news !== null) {
-          document.getElementById('newsFullDetails').style.display = 'initial';
           this.news = news;
+          this.showEditButton = this.news.canEdit;
+          this.showPublishButton = this.news.canPublish;
+          this.showDeleteButton = this.news.canDelete;
           if (!this.news.spaceMember) {
             this.$root.$emit('restricted-space', this.news.spaceDisplayName);
           }

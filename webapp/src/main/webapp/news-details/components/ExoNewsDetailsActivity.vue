@@ -5,7 +5,7 @@
     :news-id="newsId || sharedNewsId"
     :activity-id="activityId"
     :show-edit-button="showEditButton"
-    :show-pin-button="showPinButton"
+    :show-publish-button="showPublishButton"
     :show-delete-button="showDeleteButton" />
 </template>
 
@@ -45,7 +45,7 @@ export default {
     showEditButton() {
       return this.news && this.news.canEdit;
     },
-    showPinButton() {
+    showPublishButton() {
       return this.news && this.news.canPublish;
     },
   },

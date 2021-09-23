@@ -12,7 +12,7 @@
 /*============== Activity News ====================*/
 
 .VuetifyApp {
-  #newsDetail {
+  #newsDetailApp {
     padding: 10px 8%;
     .articleNotFound {
       text-align: center;
@@ -29,8 +29,26 @@
       }
     }
   }
-  #newsDetails .newsDetailsActionMenu {
-    margin: 20px 20px 13px 0;
+  #newsDetails {
+    .newsDetailsTitle {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+    #newsFullDetails {
+      .newsContent {
+        background-color: @baseBackground;
+      }
+    }
+    .newsDetailsActionMenu {
+      margin: 20px 20px 13px 0;
+    }
+    .newsDetailsMenuBtn {
+      color: @grayDark;
+      opacity: 0.7;
+    }
   }
   .newsDetailsIcons {
     top: -9px;
@@ -308,7 +326,7 @@
           font-size: 12px;
 
           .newsAuthor {
-            display: inline-flex;
+            display: flex;
 
             .newsAuthorName {
               color: black !important;
@@ -2872,6 +2890,10 @@
   margin-top: 21px;
 }
 
+.news-details-toolbar {
+  position: inherit!important;
+}
+
 /*====================== Responsive ==========================*/
 
 @media screen and (max-width: 480px) {
@@ -3028,10 +3050,6 @@
     max-height: 100% !important;
   }
 
-  .illustration {
-    margin-top: 50px;
-  }
-
   #newsDetails {
     .newsInformation {
       margin-left: 13px ~'; /** orientation=lt */ ';
@@ -3115,10 +3133,6 @@
     position: absolute;
     top: 0;
     width: 100%;
-  }
-
-  .newsDetails-header {
-    margin-top: 10%;
   }
 
   #newsDetails {
@@ -3851,6 +3865,16 @@ p.caption-title:after {
   }
   .noNewsImage {
     display: none;
+  }
+}
+@media (max-width: 959px) {
+  .VuetifyApp {
+    #newsDetailApp {
+      padding: 0;
+    }
+    #newsDetails .newsDetailsActionMenu {
+      margin: 0;
+    }
   }
 }
 input.ignore-vuetify-classes.datePickerText.flex-grow-0 {

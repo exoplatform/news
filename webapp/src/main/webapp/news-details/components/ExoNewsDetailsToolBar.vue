@@ -1,0 +1,89 @@
+<template>
+  <div class="newsDetailsTopBar">
+    <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
+    <v-btn
+      v-if="publicationState === 'staged'"
+      class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
+      @click="$root.$emit('open-schedule-drawer','editScheduledNews')">
+      {{ $t("news.composer.btn.scheduleArticle") }}
+    </v-btn>
+    <exo-news-details-action-menu
+      v-if="showEditButton && publicationState !== 'staged'"
+      :news="news"
+      :show-edit-button="showEditButton"
+      :show-delete-button="showDeleteButton" />
+    <exo-news-publish
+      v-if="showPublishButton && publicationState !== 'staged'"
+      :news-id="news.newsId"
+      :news-published="news.pinned"
+      :news-archived="archivedNews"
+      :news-title="newsTitle" />
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    news: {
+      type: Object,
+      required: false,
+      default: function() { return new Object(); }
+    },
+    newsId: {
+      type: String,
+      required: false,
+      default: null
+    },
+    activityId: {
+      type: String,
+      required: false,
+      default: null
+    },
+    showEditButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showPublishButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showDeleteButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
+  data() {
+    return {
+      spaceId: null,
+      updaterIdentity: null,
+      BYTES_IN_MB: 1048576,
+      dateFormat: {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      },
+      dateTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+      },
+    };
+  },
+  computed: {
+    backURL() {
+      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+    },
+    archivedNews() {
+      return this.news && this.news.archived;
+    },
+    publicationState() {
+      return this.news && this.news.publicationState;
+    },
+    newsTitle() {
+      return this.news && this.news.title;
+    }
+  },
+};
+</script>

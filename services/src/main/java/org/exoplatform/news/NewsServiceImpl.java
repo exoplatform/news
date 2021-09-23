@@ -792,7 +792,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     if(StringUtils.isNotBlank(news.getUpdater())) {
-      Identity updaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getUpdater(), true);
+      Identity updaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getUpdater());
       if (updaterIdentity != null && updaterIdentity.getProfile() != null) {
         news.setUpdaterFullName(updaterIdentity.getProfile().getFullName());
       }

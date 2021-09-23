@@ -248,14 +248,14 @@ export default {
       const domParser = new DOMParser();
       const docElement = domParser.parseFromString(content, 'text/html').documentElement;
       const links = docElement.getElementsByTagName('a');
-      for (let i=0; i < links.length ; i++) {
-        let href = links[i].href.replace(/(^\w+:|^)\/\//, '');
+      for (const link of links) {
+        let href = link.href.replace(/(^\w+:|^)\/\//, '');
         if (href.endsWith('/')) {
           href = href.slice(0, -1);
         }
         if (href !== location.host && !href.startsWith(internal)) {
-          links[i].setAttribute('target', '_blank');
-          links[i].setAttribute('rel', 'noopener noreferrer');
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
         }
       }
       return docElement.innerHTML;

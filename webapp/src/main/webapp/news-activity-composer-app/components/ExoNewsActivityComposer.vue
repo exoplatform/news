@@ -138,25 +138,6 @@
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
-      <!-- The following bloc is needed in order to display the pin confirmation popup -->
-      <!--begin -->
-      <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-        <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-          <div class="popupHeader clearfix">
-            <a class="uiIconClose pull-right" title="Close"></a>
-            <span class="PopupTitle popupTitle"></span>
-          </div>
-          <div class="PopupContent popupContent">
-            <ul class="singleMessage popupMessage resizable">
-              <li>
-                <span class="confirmationIcon contentMessage"></span>
-              </li>
-            </ul>
-            <div class="uiAction uiActionBorder"></div>
-          </div>
-        </div>
-      </div>
-      <!-- end -->
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -264,7 +245,6 @@ export default {
       },
       canScheduleNews: false,
       scheduleMode: '',
-      newsToolbar: [],
       switchView: false,
       spaceDisplayName: '',
     };
@@ -415,8 +395,9 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
+      const newsToolbar = [];
       if (this.isMobile) {
-        this.newsToolbar.push(
+        newsToolbar.push(
           { name: 'switchView', items: ['switchView'] },
           { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
@@ -424,7 +405,7 @@ export default {
           { name: 'attachFile', items: ['attachFile'] },
         );
       } else {
-        this.newsToolbar.push(
+        newsToolbar.push(
           { name: 'format', items: ['Format'] },
           { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
@@ -445,7 +426,7 @@ export default {
         toolbarLocation: 'top',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-        toolbar: this.newsToolbar,
+        toolbar: newsToolbar,
         format_tags: 'p;h1;h2;h3',
         autoGrow_minHeight: self.newsFormContentHeight,
         height: self.newsFormContentHeight,
@@ -456,12 +437,12 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
-            const elementNewTop3 = document.getElementById('cke_14');
-            const elementNewTop4 = document.getElementById('cke_18');
-            const elementNewTop5 = document.getElementById('cke_22');
-            elementNewTop3.style.borderRight = 'none';
-            elementNewTop4.style.display = 'none';
-            elementNewTop5.style.display = 'none';
+            const topButton3 = document.getElementById('cke_14');
+            const topButton4 = document.getElementById('cke_18');
+            const topButton5 = document.getElementById('cke_22');
+            topButton3.style.borderRight = 'none';
+            topButton4.style.display = 'none';
+            topButton5.style.display = 'none';
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -899,26 +880,26 @@ export default {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     changeView() {
-      const elementNewTop1 = document.getElementById('cke_7');
-      const elementNewTop2 = document.getElementById('cke_9');
-      const elementNewTop3 = document.getElementById('cke_14');
-      const elementNewTop4 = document.getElementById('cke_18');
-      const elementNewTop5 = document.getElementById('cke_22');
-      elementNewTop3.style.borderRight = 'none';
-      elementNewTop4.style.display = 'none';
+      const topButton = document.getElementById('cke_7');
+      const topButton2 = document.getElementById('cke_9');
+      const topButton3 = document.getElementById('cke_14');
+      const topButton4 = document.getElementById('cke_18');
+      const topButton5 = document.getElementById('cke_22');
+      topButton3.style.borderRight = 'none';
+      topButton4.style.display = 'none';
       if (!this.switchView) {
-        elementNewTop1.style.borderRight = 'none';
-        elementNewTop2.style.display = 'none';
-        elementNewTop3.style.display = 'none';
-        elementNewTop4.style.display = 'initial';
-        elementNewTop4.style.borderRight = 'none';
-        elementNewTop5.style.display = 'initial';
+        topButton.style.borderRight = 'none';
+        topButton2.style.display = 'none';
+        topButton3.style.display = 'none';
+        topButton4.style.display = 'initial';
+        topButton4.style.borderRight = 'none';
+        topButton5.style.display = 'initial';
         this.switchView = true;
       } else {
-        elementNewTop1.style.display = 'initial';
-        elementNewTop2.style.display = 'initial';
-        elementNewTop3.style.display = 'initial';
-        elementNewTop5.style.display = 'none';
+        topButton.style.display = 'initial';
+        topButton2.style.display = 'initial';
+        topButton3.style.display = 'initial';
+        topButton5.style.display = 'none';
         this.switchView = false;
       }
     }

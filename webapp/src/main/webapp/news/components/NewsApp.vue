@@ -85,7 +85,7 @@
               v-if="news.activities && news.activities.split(';')[1]"
               :news-id="news.newsId"
               :activities="news.activities" />
-            <exo-news-details-action-menu
+            <exo-news-details-action-menu-app
               v-if="!news.schedulePostDate"
               :news="news"
               :show-edit-button="news.canEdit && !isDraftsFilter"

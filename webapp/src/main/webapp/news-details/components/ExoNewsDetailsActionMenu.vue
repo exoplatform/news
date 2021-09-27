@@ -95,12 +95,17 @@ export default {
       required: false,
       default: false
     },
+    newsPublished: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data: () => ({
     actionMenu: null,
+    showPublishMessage: false,
     publishMessage: '',
     publishSuccess: true,
-    newsPublished: false,
   }),
   computed: {
     isMobile() {

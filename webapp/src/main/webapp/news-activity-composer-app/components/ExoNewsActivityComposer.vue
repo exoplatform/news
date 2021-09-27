@@ -24,12 +24,12 @@
             min-width="40"
             max-width="40"
             size="40"
-            class="mx-3 my-auto spaceAvatar space-avatar-header">
+            class="mx-3 my-auto">
             <v-img src="/news/images/news.png" />
           </v-avatar>
           <div class="d-flex flex-grow-1 flex-column my-auto align-left">
             <span class="flex-row text-truncate subtitle-1">{{ newsFormTitle }}</span>
-            <span v-if="spaceDisplayName " class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
+            <span v-if="spaceDisplayName" class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
           <div class="d-flex d-flex flex-grow-0">
             <span class="caption my-auto me-1 flex-shrink-0 text-truncate">{{ draftSavingStatus }}</span>
@@ -177,11 +177,6 @@ export default {
       required: false,
       default: null
     },
-    showPinInput: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
   },
   data() {
     return {
@@ -276,12 +271,6 @@ export default {
       }
 
       return false;
-    },
-    broadcastArticleClass() {
-      return this.news.pinned ? 'broadcastArticle' : 'unbroadcastArticle';
-    },
-    originalTitle() {
-      return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
     },
     draftWarningText() {
       return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
@@ -437,12 +426,12 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
-            const topButton3 = document.getElementById('cke_14');
-            const topButton4 = document.getElementById('cke_18');
-            const topButton5 = document.getElementById('cke_22');
-            topButton3.style.borderRight = 'none';
-            topButton4.style.display = 'none';
-            topButton5.style.display = 'none';
+            const numerotationGroupButton = document.getElementById('cke_14');
+            const attachMediaButton = document.getElementById('cke_18');
+            const attachFileButton = document.getElementById('cke_22');
+            numerotationGroupButton.style.borderRight = 'none';
+            attachMediaButton.style.display = 'none';
+            attachFileButton.style.display = 'none';
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -488,7 +477,7 @@ export default {
       if (!this.editMode) {
         this.$newsServices.getSpaceById(this.spaceId).then(space => {
           if (this.isMobile) {
-            this.newsFormTitle = `${this.$t('news.create.createNews')}`;
+            this.newsFormTitle = `${this.$t('news.composer.mobile.createNews')}`;
             this.spaceDisplayName = space.displayName;
           } else {
             this.newsFormTitle = this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
@@ -783,22 +772,7 @@ export default {
       }
     },
     confirmAndUpdateNews: function() {
-      if (this.news.pinned !== this.originalNews.pinned) {
-        let confirmText = this.$t('news.broadcast.confirm');
-        let captionText = this.$t('news.broadcast.action');
-        const confirmButton = this.$t('news.broadcast.btn.confirm');
-        const cancelButton = this.$t('news.broadcast.btn.cancel');
-        if (this.news.pinned === false) {
-          confirmText = this.$t('news.unbroadcast.confirm').replace('{0}', this.news.title);
-          captionText = this.$t('news.unbroadcast.action');
-        }
-        const self = this;
-        return new Promise(function(resolve) {
-          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews('published').then(resolve()); }, label: confirmButton}], captionText, confirmText, cancelButton);
-        });
-      } else {
-        return this.doUpdateNews('published');
-      }
+      return this.doUpdateNews('published');
     },
     doUpdateNews: function (publicationState) {
       const newsBody = this.replaceImagesURLs(this.getBody());
@@ -880,26 +854,26 @@ export default {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     changeView() {
-      const topButton = document.getElementById('cke_7');
-      const topButton2 = document.getElementById('cke_9');
-      const topButton3 = document.getElementById('cke_14');
-      const topButton4 = document.getElementById('cke_18');
-      const topButton5 = document.getElementById('cke_22');
-      topButton3.style.borderRight = 'none';
-      topButton4.style.display = 'none';
+      const switchViewButton = document.getElementById('cke_7');
+      const fontStyleGroupButton = document.getElementById('cke_9');
+      const numerotationGroupButton = document.getElementById('cke_14');
+      const attachMediaButton = document.getElementById('cke_18');
+      const attachFileButton = document.getElementById('cke_22');
+      numerotationGroupButton.style.borderRight = 'none';
+      attachMediaButton.style.display = 'none';
       if (!this.switchView) {
-        topButton.style.borderRight = 'none';
-        topButton2.style.display = 'none';
-        topButton3.style.display = 'none';
-        topButton4.style.display = 'initial';
-        topButton4.style.borderRight = 'none';
-        topButton5.style.display = 'initial';
+        switchViewButton.style.borderRight = 'none';
+        fontStyleGroupButton.style.display = 'none';
+        numerotationGroupButton.style.display = 'none';
+        attachMediaButton.style.display = 'initial';
+        attachMediaButton.style.borderRight = 'none';
+        attachFileButton.style.display = 'initial';
         this.switchView = true;
       } else {
-        topButton.style.display = 'initial';
-        topButton2.style.display = 'initial';
-        topButton3.style.display = 'initial';
-        topButton5.style.display = 'none';
+        switchViewButton.style.display = 'initial';
+        fontStyleGroupButton.style.display = 'initial';
+        numerotationGroupButton.style.display = 'initial';
+        attachFileButton.style.display = 'none';
         this.switchView = false;
       }
     }

@@ -968,11 +968,7 @@
       }
 
       .uiIconClose {
-        top: 15px;
-        right: 15px ~'; /** orientation=lt */ ';
-        left: 15px ~'; /** orientation=rt */ ';
-        width: 30px;
-        height: 30px;
+        display: none;
       }
 
       .uiIconClose:before {
@@ -3975,4 +3971,37 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
     line-height: 1.2;
     color: @grayDark;
   }
+}
+
+.videoDialog {
+  .uiPopupNews {
+    left: auto!important;
+    right: auto!important;
+    bottom: auto!important;
+    z-index: 10000!important;
+    position: fixed!important;
+    border: @tabNormalLinkHoverBorderBottom;
+  }
+  .cke_dialog .cke_dialog_body .cke_dialog_title {
+    background-color: @baseBackgroundDefault;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-bottom: @baseBackgroundDefault;
+    margin-bottom: 7px;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+    padding: 8px 10px 8px 15px;
+    font-size: 18px;
+    font-weight: bold;
+
+  }
+}
+
+.cke_dialog_background_cover.uiPopupWrapperNews {
+  overflow-y: auto;
+  background: @baseColorDefault;
+  opacity: 0.2;
+  z-index: 0!important;
 }

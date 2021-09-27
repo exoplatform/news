@@ -22,15 +22,17 @@ import org.exoplatform.social.core.space.spi.SpaceService;
  */
 public class NewsActivityListener extends ActivityListenerPlugin {
 
-  private static final Log LOG = ExoLogger.getLogger(NewsActivityListener.class);
+  private static final Log    LOG     = ExoLogger.getLogger(NewsActivityListener.class);
 
-  private ActivityManager  activityManager;
+  private static final String NEWS_ID = "newsId";
 
-  private IdentityManager  identityManager;
+  private ActivityManager     activityManager;
 
-  private SpaceService     spaceService;
+  private IdentityManager     identityManager;
 
-  private NewsService      newsService;
+  private SpaceService        spaceService;
+
+  private NewsService         newsService;
 
   public NewsActivityListener(ActivityManager activityManager,
                               IdentityManager identityManager,
@@ -50,8 +52,8 @@ public class NewsActivityListener extends ActivityListenerPlugin {
       String originalActivityId = sharedActivity.getTemplateParams().get("originalActivityId");
       ExoSocialActivity originalActivity = activityManager.getActivity(originalActivityId);
       if (originalActivity != null && originalActivity.getTemplateParams() != null
-          && originalActivity.getTemplateParams().containsKey("newsId")) {
-        String newsId = originalActivity.getTemplateParams().get("newsId");
+          && originalActivity.getTemplateParams().containsKey(NEWS_ID)) {
+        String newsId = originalActivity.getTemplateParams().get(NEWS_ID);
         try {
           News news = newsService.getNewsById(newsId, false);
           if (news != null) {
@@ -70,7 +72,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void likeActivity(ActivityLifeCycleEvent event) {
     super.likeActivity(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null) {
+    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       String userId = ConversationState.getCurrent().getIdentity().getUserId();
       try {
         News news = newsService.getNewsByActivityId(activity.getId(), userId);
@@ -85,7 +87,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void saveComment(ActivityLifeCycleEvent event) {
     super.saveComment(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null) {
+    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       String userId = ConversationState.getCurrent().getIdentity().getUserId();
       try {
         News news = newsService.getNewsByActivityId(activity.getParentId(), userId);

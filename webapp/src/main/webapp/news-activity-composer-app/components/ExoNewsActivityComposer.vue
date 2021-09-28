@@ -32,7 +32,7 @@
             <span v-if="spaceDisplayName" class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
           <div class="d-flex d-flex flex-grow-0">
-            <span class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
+            <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -118,6 +118,7 @@
         </div>
       </form>
       <v-btn
+        v-if="!isMobile"
         class="attachmentsButton"
         fixed
         bottom

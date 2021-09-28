@@ -16,7 +16,7 @@
         :news-id="newsId"
         @post-article="postNews" />
       <div class="newsComposerToolbar">
-        <div class="d-flex flex-row py-2">
+        <div id="composerToolbarInformation" class="d-flex flex-row py-2">
           <v-avatar
             height="40"
             min-height="40"
@@ -72,7 +72,7 @@
 
       <form id="newsForm" class="newsForm">
         <div class="newsFormInput">
-          <div class="newsFormAttachment">
+          <div id="newsFormAttachment" class="newsFormAttachment">
             <div class="control-group attachments">
               <div class="controls">
                 <exo-news-file-drop v-model="news.illustration" @change="autoSave" />
@@ -837,15 +837,39 @@ export default {
         });
       });
       element.on('contentDom', function () {
-        this.document.on('keyup', function(){
+        this.document.on('keyup', function() {
           elementNewTop.classList.add('darkComposerEffect');
         });
       });
-      $('#newsActivityComposer').parent().click(() => {
+      $('#newsSummary').parent().click(() => {
         elementNewTop.classList.remove('darkComposerEffect');
         elementNewTop.classList.add('greyComposerEffect');
       });
-      $('#newsActivityComposer').parent().keyup(() => {
+      $('#newsSummary').parent().keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsTitle').parent().click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsTitle').parent().keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#composerToolbarInformation').click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#composerToolbarInformation').keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsFormAttachment').parent().click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsFormAttachment').parent().keyup(() => {
         elementNewTop.classList.remove('darkComposerEffect');
         elementNewTop.classList.add('greyComposerEffect');
       });
@@ -854,6 +878,9 @@ export default {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     changeView() {
+      const elementNewTop = document.getElementById('newsTop');
+      elementNewTop.classList.remove('greyComposerEffect');
+      elementNewTop.classList.add('darkComposerEffect');
       const switchViewButton = document.getElementById('cke_7');
       const fontStyleGroupButton = document.getElementById('cke_9');
       const numerotationGroupButton = document.getElementById('cke_14');

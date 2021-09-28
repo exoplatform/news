@@ -32,19 +32,19 @@
             <span v-if="spaceDisplayName" class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
           <div class="d-flex d-flex flex-grow-0">
-            <span class="caption my-auto me-1 flex-shrink-0 text-truncate">{{ draftSavingStatus }}</span>
+            <span class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
             <v-btn
               v-show="!editMode"
               id="newsPost"
               :loading="postingNews"
               :disabled="postDisabled || postingNews"
               elevation="0"
-              class="btn btn-primary my-auto me-2"
+              class="btn btn-primary my-auto me-4"
               @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
             <div v-show="editMode">
-              <div class="d-flex flex-row">
+              <div class="d-flex flex-row me-2">
                 <v-btn
                   id="newsEdit"
                   :disabled="updateDisabled"
@@ -55,7 +55,7 @@
                 <v-btn
                   id="newsUpdateAndPost"
                   :disabled="news.archived ? true: updateDisabled"
-                  :class="[news.archived ? 'unauthorizedPin' : '']"
+                  :class="[news.archived ? 'unauthorizedPublish' : '']"
                   class="btn ms-2 me-2"
                   @click.prevent="updateAndPostNews">
                   {{ $t("news.edit.update.post") }}

@@ -23,6 +23,8 @@ public class News {
 
   private String               updater;
 
+  private String               updaterFullName;
+
   private String               draftUpdater;
 
   private String               draftUpdaterDisplayName;
@@ -403,4 +405,11 @@ public class News {
     this.timeZoneId = timeZoneId;
   }
 
+  public String getUpdaterFullName() {
+    return updaterFullName;
+  }
+
+  public void setUpdaterFullName(String updaterFullName) {
+    this.updaterFullName = updaterFullName;
+  }
 }

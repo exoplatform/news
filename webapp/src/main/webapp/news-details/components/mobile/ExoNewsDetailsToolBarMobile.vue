@@ -29,7 +29,8 @@
         :news="news"
         :show-edit-button="showEditButton"
         :show-delete-button="showDeleteButton"
-        :show-publish-button="showPublishButton" />
+        :show-publish-button="showPublishButton"
+        :news-published="news.pinned" />
     </v-btn>
     <v-btn
       v-if="publicationState === 'staged'"

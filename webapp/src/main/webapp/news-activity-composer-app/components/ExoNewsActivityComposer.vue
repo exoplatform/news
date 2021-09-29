@@ -15,45 +15,55 @@
         :posting-news="postingNews"
         :news-id="newsId"
         @post-article="postNews" />
-      <div class="newsComposerActions">
-        <div class="newsFormButtons">
-          <div class="newsFormLeftActions">
-            <img src="/news/images/news.png">
-            <span class="newsFormTitle">{{ newsFormTitle }}</span>
+      <div class="newsComposerToolbar">
+        <div id="composerToolbarInformation" class="d-flex flex-row py-2">
+          <v-avatar
+            height="40"
+            min-height="40"
+            width="40"
+            min-width="40"
+            max-width="40"
+            size="40"
+            class="mx-3 my-auto">
+            <v-img src="/news/images/news.png" />
+          </v-avatar>
+          <div class="d-flex flex-grow-1 flex-column my-auto align-left">
+            <span class="flex-row text-truncate subtitle-1">{{ newsFormTitle }}</span>
+            <span v-if="spaceDisplayName" class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
-          <div class="newsFormRightActions">
-            <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+          <div class="d-flex d-flex flex-grow-0">
+            <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
             <v-btn
               v-show="!editMode"
               id="newsPost"
               :loading="postingNews"
               :disabled="postDisabled || postingNews"
               elevation="0"
-              class="btn btn-primary"
+              class="btn btn-primary my-auto me-4"
               @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
-          </div>
-          <div v-show="editMode">
-            <div class="d-flex flex-row">
-              <v-btn
-                id="newsEdit"
-                :disabled="updateDisabled"
-                class="btn btn-primary mr-2 "
-                @click.prevent="updateNews">
-                {{ $t("news.edit.update") }}
-              </v-btn>
-              <v-btn
-                id="newsUpdateAndPost"
-                :disabled="news.archived ? true: updateDisabled"
-                :class="[news.archived ? 'unauthorizedPin' : '']"
-                class="btn mr-2"
-                @click.prevent="updateAndPostNews">
-                {{ $t("news.edit.update.post") }}
-              </v-btn>
-              <v-btn class="btn mr-6" @click="goBack">
-                {{ $t("news.composer.btn.cancel") }}
-              </v-btn>
+            <div v-show="editMode">
+              <div class="d-flex flex-row me-2">
+                <v-btn
+                  id="newsEdit"
+                  :disabled="updateDisabled"
+                  class="btn btn-primary"
+                  @click.prevent="updateNews">
+                  {{ $t("news.edit.update") }}
+                </v-btn>
+                <v-btn
+                  id="newsUpdateAndPost"
+                  :disabled="news.archived ? true: updateDisabled"
+                  :class="[news.archived ? 'unauthorizedPublish' : '']"
+                  class="btn ms-2 me-2"
+                  @click.prevent="updateAndPostNews">
+                  {{ $t("news.edit.update.post") }}
+                </v-btn>
+                <v-btn class="btn me-2" @click="goBack">
+                  {{ $t("news.composer.btn.cancel") }}
+                </v-btn>
+              </div>
             </div>
           </div>
         </div>
@@ -62,7 +72,7 @@
 
       <form id="newsForm" class="newsForm">
         <div class="newsFormInput">
-          <div class="newsFormAttachment">
+          <div id="newsFormAttachment" class="newsFormAttachment">
             <div class="control-group attachments">
               <div class="controls">
                 <exo-news-file-drop v-model="news.illustration" @change="autoSave" />
@@ -108,6 +118,7 @@
         </div>
       </form>
       <v-btn
+        v-if="!isMobile"
         class="attachmentsButton"
         fixed
         bottom
@@ -128,25 +139,6 @@
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
-      <!-- The following bloc is needed in order to display the pin confirmation popup -->
-      <!--begin -->
-      <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-        <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-          <div class="popupHeader clearfix">
-            <a class="uiIconClose pull-right" title="Close"></a>
-            <span class="PopupTitle popupTitle"></span>
-          </div>
-          <div class="PopupContent popupContent">
-            <ul class="singleMessage popupMessage resizable">
-              <li>
-                <span class="confirmationIcon contentMessage"></span>
-              </li>
-            </ul>
-            <div class="uiAction uiActionBorder"></div>
-          </div>
-        </div>
-      </div>
-      <!-- end -->
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -186,11 +178,6 @@ export default {
       required: false,
       default: null
     },
-    showPinInput: {
-      type: Boolean,
-      required: false,
-      default: true
-    }
   },
   data() {
     return {
@@ -254,6 +241,8 @@ export default {
       },
       canScheduleNews: false,
       scheduleMode: '',
+      switchView: false,
+      spaceDisplayName: '',
     };
   },
   computed: {
@@ -284,15 +273,12 @@ export default {
 
       return false;
     },
-    broadcastArticleClass() {
-      return this.news.pinned ? 'broadcastArticle' : 'unbroadcastArticle';
-    },
-    originalTitle() {
-      return this.news.pinned ? this.$t('news.unbroadcast.action') : this.$t('news.broadcast.action');
-    },
     draftWarningText() {
       return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
-    }
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
   },
   watch: {
     'news.title': function() {
@@ -373,14 +359,21 @@ export default {
       shareButton.style.display = 'block';
     }
   },
+  created() {
+    document.addEventListener('switch-view-plugins', () => {
+      this.changeView();
+    });
+  },
   methods: {
     initCKEditor: function() {
       if (CKEDITOR.instances['newsContent'] && CKEDITOR.instances['newsContent'].destroy) {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
       CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+      CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
+      CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video';
+      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video,switchView,attachFile';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
@@ -392,6 +385,26 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
+      const newsToolbar = [];
+      if (this.isMobile) {
+        newsToolbar.push(
+          { name: 'switchView', items: ['switchView'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'links', items: [ 'selectImage', 'Video'] },
+          { name: 'attachFile', items: ['attachFile'] },
+        );
+      } else {
+        newsToolbar.push(
+          { name: 'format', items: ['Format'] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
+          { name: 'fontsize', items: ['FontSize'] },
+          { name: 'colors', items: [ 'TextColor' ] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+        );
+      }
 
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
@@ -403,15 +416,7 @@ export default {
         toolbarLocation: 'top',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-        toolbar: [
-          { name: 'format', items: ['Format'] },
-          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'fontsize', items: ['FontSize'] },
-          { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
-        ],
+        toolbar: newsToolbar,
         format_tags: 'p;h1;h2;h3',
         autoGrow_minHeight: self.newsFormContentHeight,
         height: self.newsFormContentHeight,
@@ -422,6 +427,12 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
+            const numerotationGroupButton = document.getElementById('cke_14');
+            const attachMediaButton = document.getElementById('cke_18');
+            const attachFileButton = document.getElementById('cke_22');
+            numerotationGroupButton.style.borderRight = 'none';
+            attachMediaButton.style.display = 'none';
+            attachFileButton.style.display = 'none';
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -466,7 +477,12 @@ export default {
     displayFormTitle: function() {
       if (!this.editMode) {
         this.$newsServices.getSpaceById(this.spaceId).then(space => {
-          this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+          if (this.isMobile) {
+            this.newsFormTitle = `${this.$t('news.composer.mobile.createNews')}`;
+            this.spaceDisplayName = space.displayName;
+          } else {
+            this.newsFormTitle = this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+          }
         });
       } else {
         this.newsFormTitle = this.$t('news.edit.editNews');
@@ -757,22 +773,7 @@ export default {
       }
     },
     confirmAndUpdateNews: function() {
-      if (this.news.pinned !== this.originalNews.pinned) {
-        let confirmText = this.$t('news.broadcast.confirm');
-        let captionText = this.$t('news.broadcast.action');
-        const confirmButton = this.$t('news.broadcast.btn.confirm');
-        const cancelButton = this.$t('news.broadcast.btn.cancel');
-        if (this.news.pinned === false) {
-          confirmText = this.$t('news.unbroadcast.confirm').replace('{0}', this.news.title);
-          captionText = this.$t('news.unbroadcast.action');
-        }
-        const self = this;
-        return new Promise(function(resolve) {
-          eXo.social.PopupConfirmation.confirm('createdPinnedNews', [{action: function() { self.doUpdateNews('published').then(resolve()); }, label: confirmButton}], captionText, confirmText, cancelButton);
-        });
-      } else {
-        return this.doUpdateNews('published');
-      }
+      return this.doUpdateNews('published');
     },
     doUpdateNews: function (publicationState) {
       const newsBody = this.replaceImagesURLs(this.getBody());
@@ -837,21 +838,72 @@ export default {
         });
       });
       element.on('contentDom', function () {
-        this.document.on('keyup', function(){
+        this.document.on('keyup', function() {
           elementNewTop.classList.add('darkComposerEffect');
         });
       });
-      $('#newsActivityComposer').parent().click(() => {
+      $('#newsSummary').parent().click(() => {
         elementNewTop.classList.remove('darkComposerEffect');
         elementNewTop.classList.add('greyComposerEffect');
       });
-      $('#newsActivityComposer').parent().keyup(() => {
+      $('#newsSummary').parent().keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsTitle').parent().click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsTitle').parent().keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#composerToolbarInformation').click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#composerToolbarInformation').keyup(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsFormAttachment').parent().click(() => {
+        elementNewTop.classList.remove('darkComposerEffect');
+        elementNewTop.classList.add('greyComposerEffect');
+      });
+      $('#newsFormAttachment').parent().keyup(() => {
         elementNewTop.classList.remove('darkComposerEffect');
         elementNewTop.classList.add('greyComposerEffect');
       });
     },
     getString(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+    },
+    changeView() {
+      const elementNewTop = document.getElementById('newsTop');
+      elementNewTop.classList.remove('greyComposerEffect');
+      elementNewTop.classList.add('darkComposerEffect');
+      const switchViewButton = document.getElementById('cke_7');
+      const fontStyleGroupButton = document.getElementById('cke_9');
+      const numerotationGroupButton = document.getElementById('cke_14');
+      const attachMediaButton = document.getElementById('cke_18');
+      const attachFileButton = document.getElementById('cke_22');
+      numerotationGroupButton.style.borderRight = 'none';
+      attachMediaButton.style.display = 'none';
+      if (!this.switchView) {
+        switchViewButton.style.borderRight = 'none';
+        fontStyleGroupButton.style.display = 'none';
+        numerotationGroupButton.style.display = 'none';
+        attachMediaButton.style.display = 'initial';
+        attachMediaButton.style.borderRight = 'none';
+        attachFileButton.style.display = 'initial';
+        this.switchView = true;
+      } else {
+        switchViewButton.style.display = 'initial';
+        fontStyleGroupButton.style.display = 'initial';
+        numerotationGroupButton.style.display = 'initial';
+        attachFileButton.style.display = 'none';
+        this.switchView = false;
+      }
     }
   }
 };

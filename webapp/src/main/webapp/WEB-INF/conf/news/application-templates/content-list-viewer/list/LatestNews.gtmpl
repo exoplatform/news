@@ -24,7 +24,7 @@
   def currentPageData = uicomponent.getCurrentPageData();
   def nodes = new ArrayList();
   String sliderSpacePrettyName = System.getProperty("exo.news.slider.space.prettyName", "communication");  
-  def seeAll = _ctx.appRes("news.pinned.seeAll");
+  def seeAll = _ctx.appRes("news.published.seeAll");
   Space sliderSpace = spaceService.getSpaceByPrettyName(sliderSpacePrettyName);
   String sliderSpaceId = sliderSpace != null ? sliderSpace.getId() : null;
   for (int i=0 ; i < currentPageData.size(); i++) {

@@ -13,6 +13,7 @@ import javax.ws.rs.core.*;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.picocontainer.Startable;
 
 import org.exoplatform.common.http.HTTPStatus;
@@ -479,6 +480,87 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.ok(news).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @PUT
+  @Path("updateNewsDraftVisibility/{newsId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Update the current draft visibility", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "User not authorized to update the darft visibility"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response updateNewsDraftVisibility(@Context HttpServletRequest request,
+                             @ApiParam(value = "news id", required = true) @PathParam("newsId") String newsId,
+                             @ApiParam(value = "draft visibility id", required = true) String draftVisibility) {
+
+    if (newsId == null) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    if (draftVisibility == null) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    try {
+      newsService.setNewsDraftVisibility(newsId, draftVisibility);
+      return Response.ok().build();
+    } catch (Exception e) {
+      LOG.error("Error when updating the news  visibility" + newsId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("isCurentUserRedactorOrAuthor/{spaceId}/{newsId}")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Check if current user is redactor on given space or author of news.")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "Is redactor"),
+      @ApiResponse(code = 401, message = "User not authorized"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response isCurentUserRedactorOrAuthor(@Context Request request,
+                                               @ApiParam(value = "space Id", required = true) @PathParam("spaceId") String spaceId,
+                                               @ApiParam(value = "news Id", required = true) @PathParam("newsId") String newsId) {
+    try {
+      if (StringUtils.isBlank(spaceId)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      Space space = spaceService.getSpaceById(spaceId);
+      if (space == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      JSONObject jsonObject = new JSONObject();
+      String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
+      boolean isRedactor = spaceService.isRedactor(space, authenticatedUser);
+      boolean isAuthor = newsService.isNewsAuthor(newsId, authenticatedUser);
+      jsonObject.put("isRedactor", isRedactor);
+      jsonObject.put("isAuthor", isAuthor);
+      return Response.ok().entity(jsonObject.toString()).build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the user is redactor of space ", e);
+      return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("getDraftVisibility/{newsId}")
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Get the draft visibility")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "Draft visibility"),
+      @ApiResponse(code = 401, message = "User not authorized"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response getDraftVisibility(@Context Request request,
+                                      @ApiParam(value = "news Id", required = true) @PathParam("newsId") String newsId) {
+    try {
+      if (StringUtils.isBlank(newsId)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      String drafttVisibility = newsService.getNewsDraftVisibility(newsId);
+      return Response.ok().entity("{\"drafttVisibility\":\"" + drafttVisibility + "\"}").build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the user is redactor of space ", e);
       return Response.serverError().build();
     }
   }

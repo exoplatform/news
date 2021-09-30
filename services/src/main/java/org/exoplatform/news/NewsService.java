@@ -26,6 +26,30 @@ public interface NewsService {
   News getNewsById(String newsId, boolean editMode);
 
   /**
+   * Get the news draft visibility
+   *
+   * @param newsId {@link News} identifier
+   * @return {@link String} The news draft visibility
+   */
+  String getNewsDraftVisibility(String newsId) throws Exception;
+
+  /**
+   * Is news author
+   *
+   * @param newsId {@link News} identifier
+   * @return {@link String} Is news author
+   */
+  boolean isNewsAuthor(String newsId, String currentUser) throws Exception;
+
+  /**
+   * Set the news draft visibility
+   *
+   * @param newsId {@link News} identifier
+   * @param draftVisibility {@link News} The draft visibility
+   */
+  void setNewsDraftVisibility(String newsId, String draftVisibility) throws Exception;
+
+  /**
    * Retrives a news identified by its technical identifier
    * 
    * @param newsId {@link News} identifier

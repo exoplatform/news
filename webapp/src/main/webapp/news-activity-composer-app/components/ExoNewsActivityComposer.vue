@@ -23,6 +23,28 @@
           </div>
           <div class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
+            <v-select
+              v-if="isCurentUserRedactor"
+              ref="selectPriority"
+              v-model="draftVisibility"
+              :disabled="!isCurentUserAuthor"
+              label="value"
+              :items="items"
+              item-value="key"
+              class="selectMenuClass mr-7"
+              attach
+              solo
+              dense
+              @change="updateDraftVisibility()">
+              <template slot="item" slot-scope="{ item }">
+                <span class="fa"></span>
+                {{ item.value }}
+              </template>
+              <template slot="item" slot-scope="item">
+                <span class="fa"></span>
+                {{ item.value }}
+              </template>
+            </v-select>
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -147,6 +169,7 @@
         </div>
       </div>
       <!-- end -->
+      <exo-news-notification-alerts name="event-form" />
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -200,6 +223,7 @@ export default {
         title: '',
         body: '',
         summary: '',
+        draftVisibility: '',
         illustration: [],
         attachments: [],
         spaceId: '',
@@ -228,6 +252,10 @@ export default {
       newsFormTitlePlaceholder: `${this.$t('news.composer.placeholderTitleInput')}*`,
       newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
+      items: [
+        {key: 'PRIVATE',value: this.$t('news.composer.private')},
+        {key: 'SHARED',value: this.$t('news.composer.shared')},
+      ],
       newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',
       initDone: false,
@@ -235,6 +263,8 @@ export default {
       showDraftNews: false,
       postingNews: false,
       savingDraft: false,
+      isCurentUserRedactor: false,
+      isCurentUserAuthor: false,
       saveDraft: '',
       draftSavingStatus: '',
       illustrationChanged: false,
@@ -292,7 +322,7 @@ export default {
     },
     draftWarningText() {
       return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
-    }
+    },
   },
   watch: {
     'news.title': function() {
@@ -325,7 +355,15 @@ export default {
     elementNewTop.classList.add('darkComposerEffect');
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
-    
+
+    if (this.newsId) {
+      this.$newsServices.getDraftVisibility(this.newsId).then(data => {
+        this.draftVisibility = data.drafttVisibility.toUpperCase();
+      });
+    } else {
+      this.draftVisibility = 'PRIVATE';
+    }
+
     this.$newsServices.getSpaceById(this.spaceId).then(space => {
       this.currentSpace = space;
       this.spaceURL = this.currentSpace.prettyName;
@@ -353,6 +391,10 @@ export default {
       });
       this.$newsServices.canScheduleNews(this.currentSpace.id).then(canScheduleNews => {
         this.canScheduleNews = canScheduleNews;
+      });
+      this.$newsServices.isCurentUserRedactorOrAuthor(this.currentSpace.id, this.newsId).then(data => {
+        this.isCurentUserRedactor = data.isRedactor ;
+        this.isCurentUserAuthor = data.isAuthor ;
       });
     });
     
@@ -852,6 +894,10 @@ export default {
     },
     getString(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+    },
+    updateDraftVisibility(){
+      this.$root.$emit('update-draft-visibility', this.draftVisibility);
+      this.$newsServices.updateDraftVisibility(this.newsId, this.draftVisibility);
     }
   }
 };

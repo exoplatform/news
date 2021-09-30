@@ -95,11 +95,17 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String      PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
+  private static final String      PRIVATE_DRAFT       = "private";
+
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
 
   public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
+
+  public static final String       MIX_NEWS_DRAFT_VISIBILITY              = "mix:draftVisibility";
+
+  public static final String       MIX_NEWS_DRAFT_VISIBILITY_PROP         = "exo:draftVisibilityStatus";
 
   public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
 
@@ -420,6 +426,79 @@ public class NewsServiceImpl implements NewsService {
     }
     NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, getCurrentUserId(), news);
     return news;
+  }
+
+  /**
+   * Get the news draft visibility
+   *
+   * @param newsId The current user id
+   * @throws Exception when error
+   */
+  public String getNewsDraftVisibility(String newsId) throws Exception{
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                       repositoryService.getCurrentRepository()
+                                       .getConfiguration()
+                                       .getDefaultWorkspaceName(),
+                                        repositoryService.getCurrentRepository());
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode.canAddMixin(MIX_NEWS_DRAFT_VISIBILITY)) {
+      newsNode.addMixin(MIX_NEWS_DRAFT_VISIBILITY);
+    }
+    boolean alreadyExist = false;
+    String currentDraftVisibility = null;
+    if (newsNode.hasProperty(MIX_NEWS_DRAFT_VISIBILITY_PROP)) {
+       currentDraftVisibility = newsNode.getProperty(MIX_NEWS_DRAFT_VISIBILITY_PROP).getString();
+       alreadyExist = true;
+   }
+   if (!alreadyExist) {
+       newsNode.setProperty(MIX_NEWS_DRAFT_VISIBILITY_PROP, PRIVATE_DRAFT);
+       newsNode.save();
+       currentDraftVisibility = PRIVATE_DRAFT;
+   }
+    return currentDraftVisibility;
+  }
+
+  /**
+   * Set the news draft visibility
+   *
+   * @param newsId The news id
+   * @throws Exception when error
+   */
+  public void setNewsDraftVisibility(String newsId, String draftVisibility) throws Exception{
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                       repositoryService.getCurrentRepository()
+                                       .getConfiguration()
+                                       .getDefaultWorkspaceName(),
+                                        repositoryService.getCurrentRepository());
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode.hasProperty(MIX_NEWS_DRAFT_VISIBILITY_PROP)) {
+       newsNode.setProperty(MIX_NEWS_DRAFT_VISIBILITY_PROP, draftVisibility);
+       newsNode.save();
+    }
+  }
+
+  /**
+   * Is news author
+   *
+   * @param newsId The current user id
+   * @throws Exception when error
+   */
+  public boolean isNewsAuthor(String newsId, String currentUser) throws Exception{
+    if(newsId == null || newsId.equals("null")) return true;
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+            repositoryService.getCurrentRepository()
+                    .getConfiguration()
+                    .getDefaultWorkspaceName(),
+            repositoryService.getCurrentRepository());
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    String author = getStringProperty(newsNode, "exo:author");
+    return currentUser.equals(author);
   }
 
   /**

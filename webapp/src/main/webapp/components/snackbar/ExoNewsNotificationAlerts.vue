@@ -44,6 +44,21 @@ export default {
         });
       }
     });
+    this.$root.$on('update-draft-visibility', status => {
+      if (status === 'SHARED') {
+        const message = this.$t('news.composer.alert.shared.success');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'info',
+        });
+      } else {
+        const message = this.$t('news.composer.alert.private.success');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'info',
+        });
+      }
+    });
     this.$root.$on('activity-shared', (activityId, spaces) => {
       if (activityId && spaces && spaces.length > 0) {
         const spacesList = spaces.map(space => space.displayName);
@@ -67,7 +82,7 @@ export default {
   },
   methods: {
     addAlert(alert) {
-      const time = 5000;
+      const time = 10000;
       if (alert) {
         this.alerts.push(alert);
         window.setTimeout(() => this.deleteAlert(alert), time);

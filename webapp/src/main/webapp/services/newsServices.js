@@ -14,6 +14,43 @@ export function getNewsById(id, editMode) {
   });
 }
 
+export function isCurentUserRedactorOrAuthor(spaceId, newsId) {
+  return fetch(`${newsConstants.NEWS_API}/isCurentUserRedactorOrAuthor/${spaceId}/${newsId}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
+}
+
+export function getDraftVisibility(newsId) {
+  return fetch(`${newsConstants.NEWS_API}/getDraftVisibility/${newsId}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (!resp || !resp.ok) {
+      throw new Error('Response code indicates a server error', resp);
+    } else {
+      return resp.json();
+    }
+  });
+}
+
+export function updateDraftVisibility(newsId, draftVisibility) {
+  return fetch(`${newsConstants.NEWS_API}/updateNewsDraftVisibility/${newsId}`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    method: 'PUT',
+    body: draftVisibility
+  }).then(resp => resp.json());
+}
+
 export function getNewsByActivityId(activityId) {
   return fetch(`${newsConstants.NEWS_API}/byActivity/${activityId}`, {
     credentials: 'include',

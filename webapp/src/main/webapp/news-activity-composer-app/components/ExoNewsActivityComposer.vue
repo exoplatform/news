@@ -375,6 +375,9 @@ export default {
     document.addEventListener('switch-view-plugins', () => {
       this.changeView();
     });
+    document.addEventListener('attach-file-plugins', () => {
+      this.openApp();
+    });
   },
   methods: {
     initCKEditor: function() {
@@ -445,6 +448,11 @@ export default {
             numerotationGroupButton.style.borderRight = 'none';
             attachMediaButton.style.display = 'none';
             attachFileButton.style.display = 'none';
+            const spanBadge = document.createElement('span');
+            spanBadge.setAttribute('class','badge');
+            spanBadge.setAttribute('id','badge');
+            spanBadge.innerHTML = '0';
+            attachFileButton.appendChild(spanBadge);
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -816,8 +824,9 @@ export default {
     openApp() {
       this.$refs.attachmentsComponent.toggleAttachmentsDrawer();
     },
-    onHideAttachmentsDrawer: function(showAttachments){
-      this.showAttachmentsDrawer = showAttachments;
+    onHideAttachmentsDrawer: function(){
+      const spanBadge = document.getElementById('badge');
+      spanBadge.innerHTML = String(this.news.attachments.length);
     },
     setUploadingCount: function(uploadingCount) {
       this.uploading = uploadingCount > 0;

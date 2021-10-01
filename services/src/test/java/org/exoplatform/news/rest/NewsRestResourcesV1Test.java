@@ -168,6 +168,199 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldReturnOkWhenCheckCurrentUserState() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+    String username = "mary";
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
+    when(spaceService.isRedactor(space1, username)).thenReturn(true);
+    when(newsService.isNewsAuthor(news.getId(), username)).thenReturn(true);
+
+    // When
+    Response response = newsRestResourcesV1.currentUserStatus(request, news.getSpaceId(), news.getId());
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedWhenCheckCurrentUserState() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+
+    // When
+    Response response = newsRestResourcesV1.currentUserStatus(request, news.getSpaceId(), news.getId());
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnNotFoundWhenCheckCurrentUserState() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    String username = "mary";
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+    Space space1 = new Space();
+    space1.setId("1");
+    space1.setPrettyName("space1");
+
+    // When
+    Response response = newsRestResourcesV1.currentUserStatus(request, news.getSpaceId(), news.getId());
+
+    // Then
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnOkWhenGetingDraftVisibility() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    String username = "mary";
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+
+    // When
+    when(newsService.getNewsDraftVisibility(news.getId())).thenReturn("PRIVATE");
+    Response response = newsRestResourcesV1.getDraftVisibility(request, news.getId());
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenGetingDraftVisibility() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    String username = "mary";
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+
+    // When
+    Response response = newsRestResourcesV1.getDraftVisibility(request, null);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+
+  @Test
+  public void shouldReturnOkWhenSettingDraftVisibility() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    String username = "mary";
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+
+    // When
+    lenient().doNothing().when(newsService).setNewsDraftVisibility( news.getId(), "private");
+    Response response = newsRestResourcesV1.updateNewsDraftVisibility(request, news.getId(), "private");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSettingDraftVisibility() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container);
+
+    String username = "mary";
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRemoteUser()).thenReturn(username);
+    News news = new News();
+    news.setId("1");
+    news.setIllustration("illustration".getBytes());
+    news.setActivities("1:1;2:2");
+    news.setSpaceId("1");
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
+    news.setAuthor("mary");
+
+    // When
+    lenient().doNothing().when(newsService).setNewsDraftVisibility( news.getId(), "private");
+    Response response = newsRestResourcesV1.updateNewsDraftVisibility(request, news.getId(),"private");
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
   public void shouldReturnServerErrorWhenNewsWithActivitythrowsException() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,

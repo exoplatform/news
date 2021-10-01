@@ -64,7 +64,6 @@ public class NewsQueryBuilder {
           }
           sqlQuery.append("exo:spaceId = '").append(spaces.get(spaces.size() - 1)).append("') AND ");
         }
-        List<Space> redactorOrManagersSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
         if (filter.isDraftNews()) {
           IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
           Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
@@ -74,6 +73,7 @@ public class NewsQueryBuilder {
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = '')");
+          List<Space> redactorOrManagersSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
           int redactorOrManagersSpacesSize = redactorOrManagersSpaces.size();
           if(redactorOrManagersSpacesSize > 0) {
             sqlQuery.append("OR (");
@@ -87,9 +87,10 @@ public class NewsQueryBuilder {
             sqlQuery.append(" AND exo:draftVisibilityStatus = 'SHARED')");
           }
         } else if (filter.isScheduledNews()) {
+          List<Space> allowedScheduledNewsSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
           sqlQuery.append("publication:currentState = 'staged'");
           sqlQuery.append(" AND (exo:author = '").append(filter.getAuthor()).append("'");
-          for (Space space : redactorOrManagersSpaces ) {
+          for (Space space : allowedScheduledNewsSpaces ) {
             sqlQuery.append(" OR exo:spaceId = '").append(space.getId()).append("'");
           }
           sqlQuery.append(" )");

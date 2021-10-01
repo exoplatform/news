@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     addAlert(alert) {
-      const time = 10000;
+      const time = 5000;
       if (alert) {
         this.alerts.push(alert);
         window.setTimeout(() => this.deleteAlert(alert), time);

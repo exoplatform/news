@@ -490,14 +490,17 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Update the current draft visibility", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to update the darft visibility"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Check the current user status (redactor, author of news)"),
+                          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+                          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+                          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") })
   public Response updateNewsDraftVisibility(@Context HttpServletRequest request,
                              @ApiParam(value = "news id", required = true) @PathParam("newsId") String newsId,
                              @ApiParam(value = "draft visibility id", required = true) String draftVisibility) {
-
+    String authenticatedUser = request.getRemoteUser();
+    if (StringUtils.isBlank(authenticatedUser)) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
     if (newsId == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -514,16 +517,21 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   }
 
   @GET
-  @Path("isCurentUserRedactorOrAuthor/{spaceId}/{newsId}")
+  @Path("currentUserStatus/{spaceId}/{newsId}")
   @RolesAllowed("users")
   @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Check if current user is redactor on given space or author of news.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Is redactor"),
-      @ApiResponse(code = 401, message = "User not authorized"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response isCurentUserRedactorOrAuthor(@Context Request request,
-                                               @ApiParam(value = "space Id", required = true) @PathParam("spaceId") String spaceId,
-                                               @ApiParam(value = "news Id", required = true) @PathParam("newsId") String newsId) {
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Check the current user status (redactor, author of news)"),
+                          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+                          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+                          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error")})
+  public Response currentUserStatus(@Context HttpServletRequest request,
+                                    @ApiParam(value = "space Id", required = true) @PathParam("spaceId") String spaceId,
+                                    @ApiParam(value = "news Id", required = true) @PathParam("newsId") String newsId) {
     try {
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       if (StringUtils.isBlank(spaceId)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
@@ -532,14 +540,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       JSONObject jsonObject = new JSONObject();
-      String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
       boolean isRedactor = spaceService.isRedactor(space, authenticatedUser);
       boolean isAuthor = newsService.isNewsAuthor(newsId, authenticatedUser);
       jsonObject.put("isRedactor", isRedactor);
       jsonObject.put("isAuthor", isAuthor);
       return Response.ok().entity(jsonObject.toString()).build();
     } catch (Exception e) {
-      LOG.error("Error when checking if the user is redactor of space ", e);
+      LOG.error("Error when checking if the user is redactor of space or author of news ", e);
       return Response.serverError().build();
     }
   }
@@ -548,17 +555,24 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("getDraftVisibility/{newsId}")
   @RolesAllowed("users")
   @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Get the draft visibility")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Draft visibility"),
-      @ApiResponse(code = 401, message = "User not authorized"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response getDraftVisibility(@Context Request request,
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Draft visibility"),
+                          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+                          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+                          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") })
+  public Response getDraftVisibility(@Context HttpServletRequest request,
                                       @ApiParam(value = "news Id", required = true) @PathParam("newsId") String newsId) {
     try {
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
       if (StringUtils.isBlank(newsId)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      String drafttVisibility = newsService.getNewsDraftVisibility(newsId);
-      return Response.ok().entity("{\"drafttVisibility\":\"" + drafttVisibility + "\"}").build();
+      String draftVisibility = newsService.getNewsDraftVisibility(newsId);
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put("drafttVisibility", draftVisibility);
+      return Response.ok().entity(jsonObject.toString()).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the user is redactor of space ", e);
       return Response.serverError().build();

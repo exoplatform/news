@@ -215,6 +215,134 @@ public class NewsServiceImplTest {
     assertNull(news);
   }
 
+  @Test
+  public void testIsNewsAuthor() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService,
+            indexingService,
+            newsESSearchConnector,
+            userACL);
+    News news = new News();
+    news.setTitle("new published news title");
+    news.setSummary("new published news summary");
+    news.setBody("new published news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+    News createdNewsDraft = new News();
+    createdNewsDraft.setId("id123");
+    createdNewsDraft.setPinned(true);
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    node.setProperty("exo:author", "Test");
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
+
+    // When
+    boolean isNewsAuthor = newsService.isNewsAuthor("id123", "root");
+
+    // Then
+    assertEquals(false, isNewsAuthor);
+
+    // When
+    isNewsAuthor = newsService.isNewsAuthor(null, "root");
+
+    // Then
+    assertEquals(true, isNewsAuthor);
+
+  }
+
+  @Test
+  public void testGetDraftVisibility() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
+            sessionProviderService,
+            nodeHierarchyCreator,
+            dataDistributionManager,
+            spaceService,
+            activityManager,
+            identityManager,
+            uploadService,
+            imageProcessor,
+            linkManager,
+            publicationServiceImpl,
+            publicationManagerImpl,
+            wcmPublicationServiceImpl,
+            newsSearchConnector,
+            newsAttachmentsService,
+            indexingService,
+            newsESSearchConnector,
+            userACL);
+    News news = new News();
+    news.setTitle("new published news title");
+    news.setSummary("new published news summary");
+    news.setBody("new published news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPinned(true);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+    News createdNewsDraft = new News();
+    createdNewsDraft.setId("id123");
+    createdNewsDraft.setPinned(true);
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    Node node = mock(Node.class);
+    node.setProperty("exo:author", "Test");
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
+
+    // When
+    String draftVisisbility = newsService.getNewsDraftVisibility("id123");
+
+    // Then
+    assertEquals(draftVisisbility, "private");
+
+    // When
+    when(node.canAddMixin("mix:draftVisibility")).thenReturn(true);
+    when(node.hasProperty("exo:draftVisibilityStatus")).thenReturn(true);
+    Property property = mock(Property.class);
+    when(property.getString()).thenReturn("shared");
+    when(node.getProperty(eq("exo:draftVisibilityStatus"))).thenReturn(property);
+    newsService.setNewsDraftVisibility("id123", "shared");
+    draftVisisbility = newsService.getNewsDraftVisibility("id123");
+
+    // Then
+    assertEquals(draftVisisbility, "shared");
+
+  }
+
   @PrepareForTest({ PortalContainer.class, CommonsUtils.class })
   @Test
   public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {

@@ -15,7 +15,7 @@ export function getNewsById(id, editMode) {
 }
 
 export function isCurentUserRedactorOrAuthor(spaceId, newsId) {
-  return fetch(`${newsConstants.NEWS_API}/isCurentUserRedactorOrAuthor/${spaceId}/${newsId}`, {
+  return fetch(`${newsConstants.NEWS_API}/currentUserStatus/${spaceId}/${newsId}`, {
     credentials: 'include',
     method: 'GET',
   }).then((resp) => {

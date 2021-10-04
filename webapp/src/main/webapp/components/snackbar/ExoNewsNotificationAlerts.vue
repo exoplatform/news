@@ -45,7 +45,7 @@ export default {
       }
     });
     this.$root.$on('update-draft-visibility', status => {
-      if (status === 'SHARED') {
+      if (status === 'shared') {
         const message = this.$t('news.composer.alert.shared.success');
         this.$root.$emit('news-notification-alert', {
           message,

@@ -24,27 +24,18 @@
           <div class="newsFormRightActions">
             <p class="draftSavingStatus">{{ draftSavingStatus }}</p>
             <v-select
-              v-if="isCurentUserRedactor"
+              v-if="isCurentUserRedactor || isCurentUserSpaceManager"
               ref="selectPriority"
               v-model="draftVisibility"
               :disabled="!isCurentUserAuthor"
-              label="value"
               :items="items"
               item-value="key"
+              item-text="value"
               class="selectMenuClass mr-7"
               attach
               solo
               dense
-              @change="updateDraftVisibility()">
-              <template slot="item" slot-scope="{ item }">
-                <span class="fa"></span>
-                {{ item.value }}
-              </template>
-              <template slot="item" slot-scope="item">
-                <span class="fa"></span>
-                {{ item.value }}
-              </template>
-            </v-select>
+              @change="updateDraftVisibility()" />
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -253,8 +244,8 @@ export default {
       newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       items: [
-        {key: 'PRIVATE',value: this.$t('news.composer.private')},
-        {key: 'SHARED',value: this.$t('news.composer.shared')},
+        {key: 'private',value: this.$t('news.composer.private')},
+        {key: 'shared',value: this.$t('news.composer.shared')},
       ],
       newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',
@@ -265,6 +256,7 @@ export default {
       savingDraft: false,
       isCurentUserRedactor: false,
       isCurentUserAuthor: false,
+      isCurentUserSpaceManager: false,
       saveDraft: '',
       draftSavingStatus: '',
       illustrationChanged: false,
@@ -322,7 +314,7 @@ export default {
     },
     draftWarningText() {
       return this.$t('news.drafts.warning.youAreEditingDraft').replace('{0}', this.news.draftUpdaterDisplayName).replace('{1}', this.formatDate(this.news.draftUpdateDate.time));
-    },
+    }
   },
   watch: {
     'news.title': function() {
@@ -358,10 +350,10 @@ export default {
 
     if (this.newsId) {
       this.$newsServices.getDraftVisibility(this.newsId).then(data => {
-        this.draftVisibility = data.drafttVisibility.toUpperCase();
+        this.draftVisibility = data.drafttVisibility;
       });
     } else {
-      this.draftVisibility = 'PRIVATE';
+      this.draftVisibility = 'private';
     }
 
     this.$newsServices.getSpaceById(this.spaceId).then(space => {
@@ -395,6 +387,7 @@ export default {
       this.$newsServices.isCurentUserRedactorOrAuthor(this.currentSpace.id, this.newsId).then(data => {
         this.isCurentUserRedactor = data.isRedactor ;
         this.isCurentUserAuthor = data.isAuthor ;
+        this.isCurentUserSpaceManager = data.isSpaceManager ;
       });
     });
     

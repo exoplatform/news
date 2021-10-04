@@ -489,8 +489,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Update the current draft visibility", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Check the current user status (redactor, author of news)"),
+  @ApiOperation(value = "Update the current draft visibility", httpMethod = "PUT", response = Response.class, notes = "Update the news draft visibility(shared or private).")
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Set the new status of current draft"),
                           @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
                           @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
                           @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") })
@@ -519,7 +519,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Path("currentUserStatus/{spaceId}/{newsId}")
   @RolesAllowed("users")
-  @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Check if current user is redactor on given space or author of news.")
+  @ApiOperation(value = "Get the current user status(author or redactor)", httpMethod = "GET", response = Response.class, notes = "Check if current user is redactor on given space or author of news.")
   @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Check the current user status (redactor, author of news)"),
                           @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
                           @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
@@ -541,9 +541,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
       JSONObject jsonObject = new JSONObject();
       boolean isRedactor = spaceService.isRedactor(space, authenticatedUser);
+      boolean isSpaceManager = spaceService.isManager(space, authenticatedUser);
       boolean isAuthor = newsService.isNewsAuthor(newsId, authenticatedUser);
       jsonObject.put("isRedactor", isRedactor);
       jsonObject.put("isAuthor", isAuthor);
+      jsonObject.put("isSpaceManager", isSpaceManager);
       return Response.ok().entity(jsonObject.toString()).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the user is redactor of space or author of news ", e);
@@ -554,7 +556,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Path("getDraftVisibility/{newsId}")
   @RolesAllowed("users")
-  @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "Get the draft visibility")
+  @ApiOperation(value = "Get the draft visibility", httpMethod = "GET", response = Response.class, notes = "Get the draft visibility")
   @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Draft visibility"),
                           @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
                           @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
@@ -574,7 +576,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       jsonObject.put("drafttVisibility", draftVisibility);
       return Response.ok().entity(jsonObject.toString()).build();
     } catch (Exception e) {
-      LOG.error("Error when checking if the user is redactor of space ", e);
+      LOG.error("Error when getting the draft visibility ", e);
       return Response.serverError().build();
     }
   }

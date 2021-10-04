@@ -84,7 +84,7 @@ public class NewsQueryBuilder {
               }
             }
             sqlQuery.append(")");
-            sqlQuery.append(" AND exo:draftVisibilityStatus = 'SHARED')");
+            sqlQuery.append(" AND exo:draftVisibilityStatus = 'shared')");
           }
         } else if (filter.isScheduledNews()) {
           List<Space> allowedScheduledNewsSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());

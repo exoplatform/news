@@ -30,12 +30,51 @@
               :disabled="!isCurentUserAuthor"
               :items="items"
               item-value="key"
-              item-text="value"
+              label="text"
+              item-text="text"
+              hide-selected
               class="selectMenuClass mr-7"
+              color="black"
+              item-color="black"
               attach
               solo
               dense
-              @change="updateDraftVisibility()" />
+              @change="updateDraftVisibility()">
+              <template v-slot:selection="{ item }">
+                <v-icon
+                  v-if="item.value === 'private'"
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-lock
+                </v-icon>
+                <v-icon
+                  v-else
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-account-edit
+                </v-icon>
+                {{ item.text }}
+              </template>
+              <template slot="item" slot-scope="{ item }">
+                <v-icon
+                  v-if="item.value === 'private'"
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-lock
+                </v-icon>
+                <v-icon
+                  v-else
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-account-edit
+                </v-icon>
+                {{ item.text }}
+              </template>
+            </v-select>
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -244,8 +283,8 @@ export default {
       newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
       items: [
-        {key: 'private',value: this.$t('news.composer.private')},
-        {key: 'shared',value: this.$t('news.composer.shared')},
+        {key: 'private',value: 'private', text: this.$t('news.composer.private'), align: 'center', sortable: false},
+        {key: 'shared',value: 'shared', text: this.$t('news.composer.shared'), align: 'center', sortable: false},
       ],
       newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',

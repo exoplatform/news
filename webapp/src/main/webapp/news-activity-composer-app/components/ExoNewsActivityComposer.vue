@@ -28,10 +28,13 @@
             <v-img src="/news/images/news.png" />
           </v-avatar>
           <div class="d-flex flex-grow-1 flex-column my-auto align-left">
-            <span class="flex-row text-truncate subtitle-1">{{ newsFormTitle }}</span>
+            <div>
+              <span class="flex-row text-truncate subtitle-1">{{ newsFormTitle }}</span>
+              <span v-if="isMobile && editMode && draftSavingStatus" class="caption">({{ draftSavingStatus }})</span>
+            </div>
             <span v-if="spaceDisplayName" class="flex-row subtitle-2 text-capitalize text-truncate text-light-color spaceName">{{ spaceDisplayName }}</span>
           </div>
-          <div class="d-flex d-flex flex-grow-0">
+          <div class="d-flex d-flex flex-grow-0 my-auto">
             <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
             <v-btn
               v-show="!editMode"
@@ -43,7 +46,7 @@
               @click="newsActions">
               {{ $t("news.composer.post") }}
             </v-btn>
-            <div v-show="editMode">
+            <div v-if="!isMobile && editMode">
               <div class="d-flex flex-row me-2">
                 <v-btn
                   id="newsEdit"
@@ -64,6 +67,15 @@
                   {{ $t("news.composer.btn.cancel") }}
                 </v-btn>
               </div>
+            </div>
+            <div v-else-if="isMobile && editMode" class="d-flex flex-row me-2">
+              <v-btn
+                id="newsEdit"
+                :disabled="updateDisabled"
+                class="btn btn-primary"
+                @click.prevent="updateNews">
+                {{ $t("news.edit.update") }}
+              </v-btn>
             </div>
           </div>
         </div>
@@ -475,18 +487,17 @@ export default {
       CKEDITOR.instances['newsContent'].setData(message);
     },
     displayFormTitle: function() {
-      if (!this.editMode) {
-        this.$newsServices.getSpaceById(this.spaceId).then(space => {
-          if (this.isMobile) {
-            this.newsFormTitle = `${this.$t('news.composer.mobile.createNews')}`;
-            this.spaceDisplayName = space.displayName;
-          } else {
-            this.newsFormTitle = this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
-          }
-        });
-      } else {
-        this.newsFormTitle = this.$t('news.edit.editNews');
-      }
+      this.$newsServices.getSpaceById(this.spaceId).then(space => {
+        if (this.isMobile && !this.editMode) {
+          this.newsFormTitle = `${this.$t('news.composer.mobile.createNews')}`;
+          this.spaceDisplayName = space.displayName;
+        } else if (!this.isMobile && !this.editMode) {
+          this.newsFormTitle = this.newsFormTitle = this.$t('news.composer.createNews').replace('{0}', space.displayName);
+        } else {
+          this.newsFormTitle = this.$t('news.edit.editNews');
+          this.spaceDisplayName = space.displayName;
+        }
+      });
     },
 
     initNewsComposerData: function(newsId) {

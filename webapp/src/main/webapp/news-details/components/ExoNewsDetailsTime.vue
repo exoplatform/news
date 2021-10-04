@@ -21,7 +21,11 @@
         :value="scheduleDate"
         :format="dateTimeFormat" />
     </template>
-    <div v-else-if="updatedDate" class="flex-column my-auto">{{ updatedDate }}</div>
+    <template v-else-if="updatedDate" class="flex-column my-auto">
+      <date-format
+        :value="updatedDate"
+        :format="dateFormat" />
+    </template>
     <div v-if="notSameUpdater" class="ms-1 flex-column me-1 my-auto"> {{ $t('news.activity.by') }}</div>
     <div v-if="notSameUpdater" class="flex-column my-auto">
       <a :href="updaterProfileURL">{{ updaterFullName }}</a>

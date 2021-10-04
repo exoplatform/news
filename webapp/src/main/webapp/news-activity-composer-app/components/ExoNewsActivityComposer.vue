@@ -396,7 +396,7 @@ export default {
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
-        removePlugins: 'image,confirmBeforeReload,maximize,resize',
+        removePlugins: 'image,confirmBeforeReload,maximize,resize,embedsemantic',
         allowedContent: true,
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,

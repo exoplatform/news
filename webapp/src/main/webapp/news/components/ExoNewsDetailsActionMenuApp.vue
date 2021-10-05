@@ -1,12 +1,13 @@
 <template>
   <v-menu
     v-model="actionMenu"
+    attach
     eager
     bottom
     left
     offset-y
     min-width="108px"
-    class="px-0 text-right mx-2">
+    class="px-0 mx-2">
     <template #activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
@@ -74,9 +75,13 @@ export default {
   data: () => ({
     actionMenu: null,
   }),
-  mounted() {
-    $('#UIPortalApplication').parent().click(() => {
-      this.actionMenu = false;
+  created() {
+    $(document).mousedown(() => {
+      if (this.actionMenu) {
+        window.setTimeout(() => {
+          this.actionMenu = false;
+        }, 200);
+      }
     });
   },
 };

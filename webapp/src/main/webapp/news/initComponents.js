@@ -6,6 +6,7 @@ import NewsFilterSpaceItem from './components/NewsFilterSpaceItem.vue';
 import NewsFilterSpaceList from './components/NewsFilterSpaceList.vue';
 import NewsFilterSpaceSearch from './components/NewsFilterSpaceSearch.vue';
 import ExoNewsDetailsActionMenuApp from './components/ExoNewsDetailsActionMenuApp.vue';
+import NewsAppItem from './components/NewsAppItem.vue';
 
 const components = {
   'news-app': NewsApp,
@@ -16,6 +17,7 @@ const components = {
   'news-filter-space-list': NewsFilterSpaceList,
   'news-filter-space-search': NewsFilterSpaceSearch,
   'exo-news-details-action-menu-app': ExoNewsDetailsActionMenuApp,
+  'news-app-item': NewsAppItem,
 };
 
 for (const key in components) {

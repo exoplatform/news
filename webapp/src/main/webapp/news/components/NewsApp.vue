@@ -4,11 +4,9 @@
       color="white"
       flat
       dense>
-      <v-row>
+      <div class="flex d-flex flex-row">
         <v-spacer />
-        <v-col
-          cols="2"
-          sm="4"
+        <div
           class="d-flex flex-row justify-end my-auto flex-nowrap">
           <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'">
             <div class="inputNewsSearchWrapper">
@@ -21,9 +19,8 @@
               </v-scale-transition>
             </div>
           </div>
-        </v-col>
-        <v-col
-          cols="2"
+        </div>
+        <div
           class="d-flex flex-row justify-end my-auto flex-nowrap">
           <select
             v-model="newsFilter"
@@ -37,7 +34,7 @@
           </select>
           <v-btn
             icon
-            class="primary--text ms-2"
+            class="d-flex flex-row justify-end my-auto flex-nowrap primary--text ms-2"
             @click="$root.$emit('news-space-selector-drawer-open')">
             <template v-if="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1')">
               <i class="uiIcon uiIcon24x24 settingsIcon primary--text mb-1"></i>
@@ -47,8 +44,8 @@
               <i class="uiIcon uiIcon24x24 settingsIcon text-color"></i>
             </template>
           </v-btn>
-        </v-col>
-      </v-row>
+        </div>
+      </div>
     </v-toolbar>
     <div class="newsAppFilterOptions">
       <news-filter-space-drawer
@@ -67,110 +64,14 @@
       v-if="newsList.length"
       id="newsListItems"
       class="newsListItems">
-      <div
-        v-for="(news,index) in newsList"
+      <news-app-item
+        v-for="news in newsList"
         :key="news.newsId"
-        class="newsItem">
-        <a
-          :href="news.url"
-          :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
-          class="newsSmallIllustration"
-          :target="news.target"></a>
-        <div class="newsItemContent">
-          <div class="newsItemContentHeader">
-            <h3>
-              <a :href="news.url" :target="news.target">{{ news.title }} </a>
-            </h3>
-            <news-spaces-shared-in
-              v-if="news.activities && news.activities.split(';')[1]"
-              :news-id="news.newsId"
-              :activities="news.activities" />
-            <exo-news-details-action-menu-app
-              v-if="!news.schedulePostDate"
-              :news="news"
-              :show-edit-button="news.canEdit && !isDraftsFilter"
-              :show-delete-button="news.canDelete"
-              :show-share-button="showShareButton && !isDraftsFilter"
-              :show-resume-button="news.draft && isDraftsFilter"
-              @delete="deleteConfirmDialog(index)"
-              @edit="editLink(news)" />
-            <exo-confirm-dialog
-              ref="deleteConfirmDialog"
-              :message="$t('news.message.confirmDeleteNews')"
-              :title="$t('news.title.confirmDeleteNews')"
-              :ok-label="$t('news.button.ok')"
-              :cancel-label="$t('news.button.cancel')"
-              @ok="deleteNews(news)" />
-          </div>
-          <div class="newsInfo">
-            <div class="newsOwner">
-              <a :href="news.authorProfileURL">
-                <img :src="news.authorAvatarUrl">
-                <span>{{ news.authorFullName }}</span>
-              </a>
-              <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
-              <span v-if="!news.hiddenSpace" class="newsSpace">
-                <a :href="news.spaceUrl" class="newsSpaceName">
-                  <img :src="news.spaceAvatarUrl">
-                  <span>{{ news.spaceDisplayName }}</span>
-                </a>
-              </span>
-            </div>
-            <div class="newsDate">
-              <i class="uiIconClock"></i>
-              <span v-if="news && news.schedulePostDate">
-                <date-format
-                  :value="news.schedulePostDate"
-                  :format="dateFormat"
-                  class="newsTime" />
-                -
-                <date-format
-                  :value="news.schedulePostDate"
-                  :format="dateTimeFormat"
-                  class="newsTime" />
-              </span>
-              <span v-else>{{ news.updatedDate }}</span>
-            </div>
-            <div class="newsViews" v-if="!news.draft && !news.scheduled">
-              <i class="uiIconWatch"></i>
-              <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
-            </div>
-          </div>
-          <div class="newsItemContentDetails">
-            <a :href="news.url" :target="news.target">
-              <p class="newsSummary" v-sanitized-html="news.newsText"></p>
-            </a>
-            <div class="newsActions" v-if="!news.draft">
-              <exo-news-archive
-                v-if="news.canArchive"
-                :news-id="news.newsId"
-                :news-archived="news.archived"
-                :news-title="news.title"
-                :pinned="news.pinned"
-                @refresh-news-list="fetchNews(false)" />
-            </div>
-            <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
-            <!--begin -->
-            <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-              <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-                <div class="popupHeader clearfix">
-                  <a class="uiIconClose pull-right" title="Close"></a>
-                  <span class="PopupTitle popupTitle"></span>
-                </div>
-                <div class="PopupContent popupContent">
-                  <ul class="singleMessage popupMessage resizable">
-                    <li>
-                      <span class="confirmationIcon contentMessage"></span>
-                    </li>
-                  </ul>
-                  <div class="uiAction uiActionBorder"></div>
-                </div>
-              </div>
-            </div>
-            <!-- end -->
-          </div>
-        </div>
-      </div>
+        :news="news"
+        :news-filter="newsFilter"
+        @update-news-list="updateNewsList"
+        @delete-news="deleteNews"
+        class="newsItem" />
     </div>
     <div v-if="newsList.length === 0 && !loadingNews" class="articleNotFound">
       <span class="iconNotFound"></span>
@@ -402,6 +303,20 @@ export default {
           this.initialized = true;
         });
     },
+    deleteNews(news) {
+      const deleteDelay = 6;
+      const redirectionTime = 6100;
+      this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
+        .then(() => {
+          this.$root.$emit('confirm-news-deletion', news);
+        });
+      setTimeout(() => {
+        const deletedNews = localStorage.getItem('deletedNews');
+        if (deletedNews != null) {
+          this.fetchNews(false);
+        }
+      }, redirectionTime);
+    },
     loadMore: function() {
       this.fetchNews();
     },
@@ -420,27 +335,6 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
-    editLink(news) {
-      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${news.spaceId}&newsId=${news.newsId}&activityId=${news.activityId}`;
-      window.open(editUrl, '_blank');
-    },
-    deleteConfirmDialog(index) {
-      this.$refs.deleteConfirmDialog[index].open();
-    },
-    deleteNews(news) {
-      const deleteDelay = 6;
-      const redirectionTime = 6100;
-      this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
-        .then(() => {
-          this.$root.$emit('confirm-news-deletion', news);
-        });
-      setTimeout(() => {
-        const deletedNews = localStorage.getItem('deletedNews');
-        if (deletedNews != null) {
-          this.fetchNews(false);
-        }
-      }, redirectionTime);
-    }
   },
 };
 </script>

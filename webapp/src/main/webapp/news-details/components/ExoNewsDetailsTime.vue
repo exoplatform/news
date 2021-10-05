@@ -75,9 +75,6 @@ export default {
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
     },
-    showUpdateInfo() {
-      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
-    },
     postModeLabel() {
       return this.publicationState === 'staged' && this.updatedDate ? this.$t('news.details.scheduled') :this.$t('news.activity.lastUpdated');
     },

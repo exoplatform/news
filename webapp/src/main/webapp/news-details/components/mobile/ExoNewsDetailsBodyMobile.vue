@@ -34,7 +34,7 @@
       <span v-html="newsSummary"></span>
     </div>
     <v-divider class="mx-4" />
-    <div class="d-flex flex-row pa-4">
+    <div class="d-flex flex-row pa-4 newsBody">
       <span v-html="newsBody"></span>
     </div>
   </div>

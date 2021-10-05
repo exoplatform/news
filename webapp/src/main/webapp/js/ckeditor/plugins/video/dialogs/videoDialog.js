@@ -41,7 +41,7 @@ CKEDITOR.dialog.add( 'videoDialog', function( editor ) {
         onLoad: function() {
           const parentElement = this.getElement();
 
-          parentElement.addClass('videoDialog').addClass('uiPopup');
+          parentElement.addClass('videoDialog').addClass('uiPopupNews');
           parentElement.removeClass('cke_reset_all');
           parentElement.findOne('.cke_dialog_title').$.className += ' popupHeader';
           parentElement.findOne('.cke_dialog_close_button').$.className = 'uiIconClose cke_dialog_close_button';
@@ -52,7 +52,8 @@ CKEDITOR.dialog.add( 'videoDialog', function( editor ) {
           parentElement.findOne('.videoURL').$.placeholder = editor.lang.video.dialogURLInputPlaceholder;
 
           const backgroundMask = document.querySelector('.cke_dialog_background_cover');
-          backgroundMask.classList.add('uiPopupWrapper');
+          backgroundMask.classList.remove('uiPopupWrapper');
+          backgroundMask.classList.add('uiPopupWrapperNews');
           backgroundMask.style.backgroundColor = '';
           backgroundMask.style.opacity = '';
         },

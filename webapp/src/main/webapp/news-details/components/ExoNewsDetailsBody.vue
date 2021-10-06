@@ -50,15 +50,15 @@
                   </template>
                   <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
-                <div v-if="showUpdateInfo" class="newsUpdater">
-                  <div v-if="publicationState !== 'staged'">
+                <div class="newsUpdater">
+                  <div v-if="publicationState !== 'staged' && showUpdateInfo">
                     <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
                   </div>
-                  <div v-else>
+                  <div v-else-if="publicationState === 'staged'">
                     <span class="newsInformationLabel">{{ $t('news.details.scheduled') }} </span>
                   </div>
                   <div>
-                    <template v-if="publicationState !== 'staged' && updatedDate">
+                    <template v-if="publicationState !== 'staged' && updatedDate && showUpdateInfo">
                       <date-format
                         :value="updatedDate"
                         :format="dateFormat"
@@ -150,7 +150,7 @@ export default {
       return this.news && this.news.title;
     },
     showUpdateInfo() {
-      return this.updatedDate || (this.news && this.news.updatedDate && this.news.updatedDate  !== 'null');
+      return this.news && this.news.updateDate && this.news.updateDate !== 'null' && this.news.publicationDate && this.news.publicationDate!== 'null' && this.news.updateDate.time > this.news.publicationDate.time;
     },
     authorFullName() {
       return this.news && (this.news.authorFullName || this.news.authorDisplayName);

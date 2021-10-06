@@ -78,25 +78,6 @@
             :pinned="news.pinned"
             @refresh-news-list="$emit('update-news-list', false)" />
         </div>
-        <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
-        <!--begin -->
-        <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
-          <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">
-            <div class="popupHeader clearfix">
-              <a class="uiIconClose pull-right" title="Close"></a>
-              <span class="PopupTitle popupTitle"></span>
-            </div>
-            <div class="PopupContent popupContent">
-              <ul class="singleMessage popupMessage resizable">
-                <li>
-                  <span class="confirmationIcon contentMessage"></span>
-                </li>
-              </ul>
-              <div class="uiAction uiActionBorder"></div>
-            </div>
-          </div>
-        </div>
-        <!-- end -->
       </div>
     </div>
   </div>

@@ -212,8 +212,12 @@ export function canUserCreateNews(spaceId) {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then((resp) => resp.json()).then(resp => {
-    return resp;
+  }).then((resp) => {
+    if (resp && resp.ok || resp.status === 401) {
+      return resp.ok ? resp.json() : resp.status;
+    } else {
+      throw new Error('Response code indicates a server error', resp);
+    }
   });
 }
 
@@ -223,8 +227,12 @@ export function canScheduleNews(spaceId) {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then((resp) => resp.json()).then(resp => {
-    return resp;
+  }).then((resp) => {
+    if (resp && resp.ok || resp.status === 401) {
+      return resp.ok ? resp.json() : resp.status;
+    } else {
+      throw new Error('Response code indicates a server error', resp);
+    }
   });
 }
 

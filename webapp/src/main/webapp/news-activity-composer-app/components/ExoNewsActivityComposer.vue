@@ -152,20 +152,11 @@
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
     </div>
-    
-    <div v-show="!canCreatNews && !loading" class="newsComposer">
-      <div id="form_msg_error" class="alert alert-error">
-        <span data-dismiss="alert">
-          <i class="uiIconColorError pull-left"></i>
-        </span>
-        <div class="msg_error">
-          <div>
-            <span class="msg_permission_denied">{{ $t("news.permission.denied") }}</span>
-          </div>
-          <div>
-            <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
-          </div>
-        </div>
+
+    <div v-show="(!canCreatNews && !loading) || unAuthorizedAccess" class="newsComposer">
+      <div class="articleNotFound">
+        <i class="iconNotFound"></i>
+        <h3>{{ $t('news.details.restricted') }}</h3>
       </div>
     </div>
   </v-app>
@@ -221,6 +212,7 @@ export default {
       },
       SMARTPHONE_LANDSCAPE_WIDTH: 768,
       titleMaxLength: 150,
+      UNAUTHORIZED_CODE: 401,
       summaryMaxLength: 1000,
       autoSaveDelay: 1000,
       newsFormTitle: '',
@@ -252,6 +244,7 @@ export default {
         minute: '2-digit',
       },
       canScheduleNews: false,
+      unAuthorizedAccess: false,
       scheduleMode: '',
       switchView: false,
       spaceDisplayName: '',
@@ -329,8 +322,12 @@ export default {
       this.spaceURL = this.currentSpace.prettyName;
       this.displayFormTitle();
 
-      this.$newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
-        this.canCreatNews = canCreateNews;
+      this.$newsServices.canUserCreateNews(this.currentSpace.id).then(resp => {
+        if (resp === this.UNAUTHORIZED_CODE) {
+          this.unAuthorizedAccess = true;
+        } else {
+          this.canCreatNews = resp;
+        }
         this.$nextTick(() => {
           if (this.canCreatNews) {
             if (this.newsId) {
@@ -349,8 +346,12 @@ export default {
           this.loading = false;
         });
       });
-      this.$newsServices.canScheduleNews(this.currentSpace.id).then(canScheduleNews => {
-        this.canScheduleNews = canScheduleNews;
+      this.$newsServices.canScheduleNews(this.currentSpace.id).then(resp => {
+        if (resp === this.UNAUTHORIZED_CODE) {
+          this.unAuthorizedAccess = true;
+        } else {
+          this.canScheduleNews = resp;
+        }
       });
     });
     

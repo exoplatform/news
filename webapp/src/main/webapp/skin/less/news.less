@@ -555,6 +555,19 @@
 
 }
 .newsComposer {
+  .badge {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    margin-top: 10px;
+    padding: 1px;
+    border-radius: 50%;
+    font-size: 10px;
+    text-align: center;
+    background: @primaryColorDefault;
+    color: @baseBackgroundDefault;
+  }
   display: flex;
   position: fixed;
   width: 100%;
@@ -3888,6 +3901,29 @@ p.caption-title:after {
       textarea#newsSummary {
         text-align: left;
       }
+    }
+  }
+  .newsContent {
+    .newsAttachments {
+      width: 80%;
+      display: flex;
+      flex-flow: row wrap;
+      margin: 0 auto;
+      padding-bottom: 20px;
+    }
+    .newsAttachment {
+      width: 30vw;
+      padding: 10px;
+      margin: 0px;
+      border: 1px transparent solid;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .newsAttachmentsTitle {
+      margin: 0 auto;
+      color: @headingColor;
+      text-align: left ~'; /** orientation=lt */ ';
+      text-align: right ~'; /** orientation=rt */ ';
     }
   }
 }

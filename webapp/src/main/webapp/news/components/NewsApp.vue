@@ -24,7 +24,7 @@
           class="d-flex flex-row justify-end my-auto flex-nowrap">
           <select
             v-model="newsFilter"
-            class="width-auto my-auto ms-4 subtitle-1 ignore-vuetify-classes d-none d-sm-inline">
+            class="width-auto my-auto ms-4 subtitle-1 ignore-vuetify-classes">
             <option value="all">{{ $t('news.app.filter.all') }}</option>
             <option value="pinned">{{ $t('news.app.filter.pinned') }}</option>
             <option value="myPosted">{{ $t('news.app.filter.myPosted') }}</option>

@@ -36,13 +36,11 @@
               <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.description') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
+                  v-model="hiddenActivity"
                   inset
                   dense
-                  value
-                  input-value="true"
-                  disabled
                   class="my-0 ms-3" />
-                <label class="my-auto">
+                <label class="publishSectionOption my-auto">
                   {{ $t('news.composer.stepper.postOnStream.option') }}
                 </label>
               </div>
@@ -80,12 +78,16 @@
                 </label>
               </div>
               <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div v-if="allowPublishTargeting" class="d-flex flex-row selectTarget ms-2">
+              <div
+                v-if="allowPublishTargeting && publish"
+                class="d-flex flex-row selectTarget ms-2"
+                @click.stop>
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
                   v-model="selectedTargets"
                   :items="targets"
+                  :menu-props="{ bottom: true, offsetY: true}"
                   :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
@@ -93,7 +95,21 @@
                   hide-no-data
                   multiple
                   dense
-                  outlined />
+                  outlined>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip
+                      v-if="index === 0"
+                      close
+                      @click:close="removeTarget(item)">
+                      <span>{{ item.name }}</span>
+                    </v-chip>
+                    <span
+                      v-if="index === 1"
+                      class="grey--text text-caption">
+                      (+{{ targets.length - 1 }} others)
+                    </span>
+                  </template>
+                </v-select>
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -164,15 +180,17 @@
                 </v-radio>
                 <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
               </v-radio-group>
-              <v-btn
-                :disabled="disabled"
-                class="btn mt-4 px-0 mb-4"
-                @click="previousStep">
-                <v-icon size="18" class="me-2">
-                  {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
-                </v-icon>
-                {{ $t('news.composer.stepper.back') }}
-              </v-btn>
+              <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
+                <v-btn
+                  :disabled="disabled"
+                  class="btn"
+                  @click="previousStep">
+                  <v-icon size="18" class="me-2">
+                    {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
+                  </v-icon>
+                  {{ $t('news.composer.stepper.back') }}
+                </v-btn>
+              </v-card-actions>
             </div>
           </v-stepper-content>
         </v-stepper>
@@ -237,6 +255,7 @@ export default {
       { id: 2, name: 'Homepage widget'}
     ],
     allowPublishTargeting: false,
+    hiddenActivity: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -288,7 +307,7 @@ export default {
     disabled() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
+      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish || this.stepper<3;
     },
     disableTargetOption() {
       return this.selectedTargets && this.selectedTargets.length === 0;
@@ -314,11 +333,9 @@ export default {
       }
       this.openDrawer();
     });
-    $(document).mousedown(() => {
+    $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
-        window.setTimeout(() => {
-          this.$refs.chooseTargets.isMenuActive = false;
-        }, 200);
+        this.$refs.chooseTargets.blur();
       }
     });
   },
@@ -356,11 +373,15 @@ export default {
         });
     },
     postArticle() {
-      this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
+      if (this.stepper === 3) {
+        this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.hiddenActivity);
+      }
     },
     closeDrawer() {
+      if (this.news) {
+        this.publish = this.news.pinned;
+      }
       this.stepper = 0;
-      this.publish = this.news.pinned;
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
     },
@@ -370,6 +391,10 @@ export default {
     nextStep() {
       this.stepper++;
     },
+    removeTarget(item) {
+      this.targets.splice(this.targets.indexOf(item), 1);
+      this.targets = [...this.targets];
+    }
   }
 };
 </script>

@@ -525,6 +525,7 @@ export default {
             this.news.updater = fetchedNode.updater;
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
+            this.news.hiddenActivity = fetchedNode.hiddenActivity;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -592,7 +593,8 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish) {
+    postNews: function (schedulePostDate, postArticleMode, publish, hiddenActivity) {
+      this.news.hiddenActivity = hiddenActivity;
       this.news.pinned = publish;
       this.doPostNews(schedulePostDate);
     },
@@ -625,6 +627,7 @@ export default {
         publicationState: 'published',
         schedulePostDate: null,
         timeZoneId: null,
+        hiddenActivity: this.news.hiddenActivity,
       };
 
       if (schedulePostDate != null){

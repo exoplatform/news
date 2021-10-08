@@ -92,6 +92,8 @@ public class News {
   private String               schedulePostDate;
 
   private String               timeZoneId;
+  
+  private boolean              hiddenActivity;
 
   public String getId() {
     return id;
@@ -411,5 +413,13 @@ public class News {
 
   public void setUpdaterFullName(String updaterFullName) {
     this.updaterFullName = updaterFullName;
+  }
+
+  public boolean isHiddenActivity() {
+    return hiddenActivity;
+  }
+
+  public void setHiddenActivity(boolean hiddenActivity) {
+    this.hiddenActivity = hiddenActivity;
   }
 }

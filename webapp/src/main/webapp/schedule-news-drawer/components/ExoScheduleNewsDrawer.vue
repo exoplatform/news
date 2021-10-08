@@ -32,31 +32,33 @@
             {{ $t('news.composer.stepper.postStream') }}
           </v-stepper-step>
           <v-stepper-content step="1" class="ps-4 pe-6 my-0">
-            <span class="grey--text">{{ $t('news.composer.stepper.chooseStream') }}</span>
-            <div class="d-flex flex-wrap pt-2 ms-1">
-              <v-switch
-                inset
-                dense
-                value
-                input-value="true"
-                disabled
-                class="float-left my-0" />
-              <label class="my-auto float-left">
-                {{ $t('news.composer.stepper.postActivityStream') }}
-              </label>
+            <div class="d-flex flex-column pt-2">
+              <div class="d-flex flex-row grey--text ms-2 chooseSpaceStream">{{ $t('news.composer.stepper.chooseStream') }}</div>
+              <div class="d-flex flex-row">
+                <v-switch
+                  inset
+                  dense
+                  value
+                  input-value="true"
+                  disabled
+                  class="my-0 ms-3" />
+                <label class="my-auto">
+                  {{ $t('news.composer.stepper.postActivityStream') }}
+                </label>
+              </div>
+              <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
+                <v-spacer />
+                <v-btn
+                  class="btn btn-primary me-4"
+                  outlined
+                  @click="nextStep">
+                  {{ $t('news.composer.stepper.continue') }}
+                  <v-icon size="18" class="ms-2">
+                    {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
+                  </v-icon>
+                </v-btn>
+              </v-card-actions>
             </div>
-            <v-card-actions class="px-0">
-              <v-spacer />
-              <v-btn
-                class="btn btn-primary me-4"
-                outlined
-                @click="nextStep">
-                {{ $t('news.composer.stepper.continue') }}
-                <v-icon size="18" class="ms-2">
-                  {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
-                </v-icon>
-              </v-btn>
-            </v-card-actions>
           </v-stepper-content>
           <v-stepper-step
             :complete="stepper > 2"
@@ -65,50 +67,52 @@
             {{ $t('news.composer.stepper.publishSection') }}
           </v-stepper-step>
           <v-stepper-content step="2" class="ps-4 pe-6 my-0">
-            <div class="d-flex flex-wrap pt-2">
-              <span class="grey--text">{{ $t('news.composer.stepper.publishDedicatedSection') }}</span>
-              <v-switch
-                v-model="publish"
-                inset
-                dense
-                class="float-left my-0 ms-4" />
-              <label class="my-auto float-left">
-                {{ $t('news.details.header.menu.publish') }}
-              </label>
+            <div class="d-flex flex-column pt-2">
+              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.publishDedicatedSection') }}</div>
+              <div class="d-flex flex-row">
+                <v-switch
+                  v-model="publish"
+                  inset
+                  dense
+                  class="my-0 ms-3" />
+                <label class="my-auto">
+                  {{ $t('news.details.header.menu.publish') }}
+                </label>
+              </div>
+              <div v-if="allowTargetingPublish" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget') }}</div>
+              <div v-if="allowTargetingPublish" class="d-flex flex-row selectTarget ms-2">
+                <v-select
+                  id="selectTarget"
+                  ref="selectTarget"
+                  :items="items"
+                  :placeholder="$t('news.composer.stepper.chooseTarget')"
+                  item-text="name"
+                  item-value="id"
+                  chips
+                  hide-no-data
+                  multiple
+                  dense
+                  outlined />
+              </div>
+              <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
+                <v-btn class="btn" @click="previousStep">
+                  <v-icon size="18" class="me-2">
+                    {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
+                  </v-icon>
+                  {{ $t('news.composer.stepper.back') }}
+                </v-btn>
+                <v-spacer />
+                <v-btn
+                  class="btn btn-primary me-4"
+                  outlined
+                  @click="nextStep">
+                  {{ $t('news.composer.stepper.continue') }}
+                  <v-icon size="18" class="ms-2">
+                    {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
+                  </v-icon>
+                </v-btn>
+              </v-card-actions>
             </div>
-            <div v-if="allowTargetingPublish" class="selectTarget">
-              <span class="grey--text">{{ $t('news.composer.stepper.selectedTarget') }}</span>
-              <v-select
-                id="selectTarget"
-                ref="selectTarget"
-                :items="items"
-                :placeholder="$t('news.composer.stepper.chooseTarget')"
-                item-text="name"
-                item-value="id"
-                chips
-                hide-no-data
-                multiple
-                dense
-                outlined />
-            </div>
-            <v-card-actions class="mt-4 px-0">
-              <v-btn class="btn" @click="previousStep">
-                <v-icon size="18" class="me-2">
-                  {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
-                </v-icon>
-                {{ $t('news.composer.stepper.back') }}
-              </v-btn>
-              <v-spacer />
-              <v-btn
-                class="btn btn-primary me-4"
-                outlined
-                @click="nextStep">
-                {{ $t('news.composer.stepper.continue') }}
-                <v-icon size="18" class="ms-2">
-                  {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
-                </v-icon>
-              </v-btn>
-            </v-card-actions>
           </v-stepper-content>
           <v-stepper-step
             :complete="stepper > 3"

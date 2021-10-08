@@ -49,13 +49,13 @@
   </component>
 
   <component>
-    <key>ScheduleNewsFeatureProperties</key>
+    <key>TargetingNewsFeatureProperties</key>
     <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
     <init-params>
       <properties-param>
-        <name>ScheduleNewsFeatureProperties</name>
-        <description>News schedule Feature enablement flag</description>
-        <property name="exo.feature.news.postLater.enabled" value="${exo.feature.news.postLater.enabled:false}" />
+        <name>TargetingNewsFeatureProperties</name>
+        <description>News targeting Feature enablement flag</description>
+        <property name="exo.feature.news.targetingPublish.enabled" value="${exo.feature.news.targetingPublish.enabled:false}" />
       </properties-param>
     </init-params>
   </component>

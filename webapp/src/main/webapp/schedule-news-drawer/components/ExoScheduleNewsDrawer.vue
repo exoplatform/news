@@ -76,22 +76,20 @@
                 {{ $t('news.details.header.menu.publish') }}
               </label>
             </div>
-            <div>
-              <div class="selectTarget">
-                <span class="grey--text">{{ $t('news.composer.stepper.selectedTarget') }}</span>
-                <v-select
-                  id="selectTarget"
-                  ref="selectTarget"
-                  :items="items"
-                  :placeholder="$t('news.composer.stepper.chooseTarget')"
-                  item-text="name"
-                  item-value="id"
-                  chips
-                  hide-no-data
-                  multiple
-                  dense
-                  outlined />
-              </div>
+            <div v-if="allowTargetingPublish" class="selectTarget">
+              <span class="grey--text">{{ $t('news.composer.stepper.selectedTarget') }}</span>
+              <v-select
+                id="selectTarget"
+                ref="selectTarget"
+                :items="items"
+                :placeholder="$t('news.composer.stepper.chooseTarget')"
+                item-text="name"
+                item-value="id"
+                chips
+                hide-no-data
+                multiple
+                dense
+                outlined />
             </div>
             <v-card-actions class="mt-4 px-0">
               <v-btn class="btn" @click="previousStep">
@@ -230,6 +228,7 @@ export default {
       { id: 1, name: 'Snapshot Slider'},
       { id: 2, name: 'Homepage widget'}
     ],
+    allowTargetingPublish: false,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -285,6 +284,8 @@ export default {
     },
   },
   created() {
+    this.$featureService.isFeatureEnabled('news.targetingPublish')
+      .then(enabled => this.allowTargetingPublish = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });

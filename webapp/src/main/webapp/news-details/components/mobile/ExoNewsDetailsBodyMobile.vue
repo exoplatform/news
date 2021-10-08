@@ -4,7 +4,7 @@
       {{ newsTitle }}
     </div>
     <div class="d-flex flex-row pa-2 ms-2">
-      <div v-if="news" class="flex-column">
+      <div v-if="news" class="flex-column exoUserClass">
         <exo-user-avatar
           :username="newsAuthor"
           :fullname="authorFullName"

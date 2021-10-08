@@ -19,13 +19,12 @@
     </v-app-bar-nav-icon>
     <v-spacer />
     <v-btn
-      v-if="publicationState !== 'staged'"
+      v-if="publicationState !== 'staged' && showEditButton"
       class="newsDetailsMenuBtn my-2"
       fab
       dark
       x-small>
       <exo-news-details-action-menu
-        v-if="showEditButton"
         :news="news"
         :show-edit-button="showEditButton"
         :show-delete-button="showDeleteButton"

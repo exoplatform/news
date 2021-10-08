@@ -4,7 +4,7 @@
       {{ newsTitle }}
     </div>
     <div class="d-flex flex-row pa-2 ms-2">
-      <div v-if="news" class="flex-column">
+      <div v-if="news" class="flex-column newsAuthor">
         <exo-user-avatar
           :username="newsAuthor"
           :fullname="authorFullName"
@@ -19,13 +19,15 @@
       </v-icon>
       <div class="flex-column">
       </div>
-      <div v-if="space" class="flex-column">
+      <v-list-item-title v-if="space" class="font-weight-bold body-2 mb-0">
         <exo-space-avatar
           :space="space"
           :size="32"
           :labels="labels"
-          class="align-center my-auto text-truncate flex-grow-0 flex" />
-      </div>
+          class="align-center my-auto text-truncate flex-grow-0 flex"
+          bold-title
+          link-style />
+      </v-list-item-title>
     </div>
     <div class="d-flex flex-row caption text-light-color">
       <exo-news-details-time :news="news" />

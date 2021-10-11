@@ -21,6 +21,7 @@
       </template>
       <template slot="content">
         <v-stepper
+          v-if="editScheduledNews !== 'editScheduledNews'"
           v-model="stepper"
           vertical
           flat
@@ -78,20 +79,20 @@
                 </label>
               </div>
               <div v-if="allowTargetingPublish" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget') }}</div>
-              <div v-if="allowTargetingPublish" class="d-flex flex-row selectTarget ms-2">
-                <v-select
-                  id="selectTarget"
-                  ref="selectTarget"
-                  :items="items"
-                  :placeholder="$t('news.composer.stepper.chooseTarget')"
-                  item-text="name"
-                  item-value="id"
-                  chips
-                  hide-no-data
-                  multiple
-                  dense
-                  outlined />
-              </div>
+              <v-select
+                v-if="allowTargetingPublish"
+                id="selectTarget"
+                ref="selectTarget"
+                :items="items"
+                :placeholder="$t('news.composer.stepper.chooseTarget')"
+                item-text="name"
+                item-value="id"
+                chips
+                hide-no-data
+                multiple
+                dense
+                outlined
+                class="d-flex flex-row selectTarget ms-2" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -173,6 +174,95 @@
             </div>
           </v-stepper-content>
         </v-stepper>
+        <div v-else class="d-flex flex-column flex-grow-1 schedulingMode ma-auto pa-auto">
+          <v-radio-group v-model="schedulingMode">
+            <v-radio
+              class="d-flex flex-row scheduleRadio"
+              value="editScheduling">
+              <span slot="label" class="postModeText">Edit Scheduling</span>
+            </v-radio>
+            <div v-if="schedulingMode === 'editScheduling'" class="d-flex flex-row">
+              <v-divider
+                class="d-flex flex-column flex-grow-1 ms-3"
+                inset
+                vertical />
+              <div class="d-flex flex-column flex-grow-1">
+                <div class="d-flex flex-row ms-5 my-2 subtitle-2 font-weight-bold">Post on the stream</div>
+                <div class="d-flex flex-row ms-3 mb-2">
+                  <v-switch
+                    v-model="hiddenActivity"
+                    inset
+                    dense
+                    class="my-0 ms-3" />
+                  <label class="my-auto">
+                    {{ $t('news.composer.stepper.postActivityStream') }}
+                  </label>
+                </div>
+                <div class="d-flex flex-row ms-5 my-2 subtitle-2 font-weight-bold">Publish in a dedicated section</div>
+                <div class="d-flex flex-row ms-3 mb-2">
+                  <v-switch
+                    v-model="publish"
+                    inset
+                    dense
+                    class="my-0 ms-3" />
+                  <label class="my-auto">
+                    {{ $t('news.details.header.menu.publish') }}
+                  </label>
+                </div>
+                <div v-if="allowTargetingPublish" class="d-flex flex-row ms-2">
+                  <v-select
+                    id="selectTarget"
+                    ref="selectTarget"
+                    :items="items"
+                    :placeholder="$t('news.composer.stepper.chooseTarget')"
+                    item-text="name"
+                    item-value="id"
+                    chips
+                    hide-no-data
+                    multiple
+                    dense
+                    outlined
+                    class="selectTarget" />
+                </div>
+                <v-radio-group v-model="postArticleMode" class="d-flex flex-row ms-2">
+                  <v-radio
+                    value="immediate">
+                    <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
+                  </v-radio>
+                  <v-radio
+                    value="later"
+                    class="mt-4">
+                    <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
+                  </v-radio>
+                  <div v-if="showPostLaterMessage">
+                    <div class="d-flex flex-row grey--text mt-4 my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
+                    <div class="d-flex flex-row">
+                      <slot name="postDate"></slot>
+                      <date-picker
+                        v-model="postDate"
+                        :min-value="minimumPostDate"
+                        :attach="false"
+                        :top="true"
+                        class="scheduleDatePicker d-flex flex-column flex-grow-0 my-auto" />
+                      <div class="d-flex flex-column flex-grow-0">
+                        <slot name="postDateDateTime"></slot>
+                        <time-picker
+                          v-model="postDateTime"
+                          :min="minimumPostDateTime"
+                          class="my-0" />
+                      </div>
+                    </div>
+                  </div>
+                </v-radio-group>
+              </div>
+            </div>
+            <v-radio
+              value="cancelScheduling"
+              class="d-flex flex-row my-2 scheduleRadio">
+              <span slot="label" class="postModeText">Cancel Scheduling</span>
+            </v-radio>
+          </v-radio-group>
+        </div>
       </template>
       <template slot="footer">
         <div v-if="editScheduledNews !== 'editScheduledNews'" class="d-flex justify-end">
@@ -234,6 +324,7 @@ export default {
     ],
     allowTargetingPublish: false,
     hiddenActivity: true,
+    schedulingMode: 'editScheduling',
   }),
   watch: {
     postDate(newVal, oldVal) {

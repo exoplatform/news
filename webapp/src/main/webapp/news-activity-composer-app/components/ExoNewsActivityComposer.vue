@@ -36,6 +36,82 @@
           </div>
           <div class="d-flex d-flex flex-grow-0 my-auto">
             <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
+            <div v-if="canUpdateNewVisibilty">
+              <v-select
+                ref="selectVisibility"
+                v-model="news.draftVisible"
+                v-if="isNewsAuthor"
+                :items="items"
+                item-value="value"
+                label="text"
+                item-text="text"
+                hide-selected
+                class="selectMenuClass mr-7"
+                color="black"
+                item-color="black"
+                attach
+                solo
+                dense
+                @change="updateDraftVisibility()">
+                <template v-slot:selection="{ item }">
+                  <v-icon
+                    v-if="!item.value"
+                    size="16"
+                    color="black"
+                    class="mr-3 mb-1">
+                    mdi-lock
+                  </v-icon>
+                  <v-icon
+                    v-else
+                    size="16"
+                    color="black"
+                    class="mr-3 mb-1">
+                    mdi-account-edit
+                  </v-icon>
+                  {{ item.text }}
+                </template>
+                <template slot="item" slot-scope="{ item }">
+                  <v-icon
+                    v-if="!item.value"
+                    size="16"
+                    color="black"
+                    class="mr-3 mb-1">
+                    mdi-lock
+                  </v-icon>
+                  <v-icon
+                    v-else
+                    size="16"
+                    color="black"
+                    class="mr-3 mb-1">
+                    mdi-account-edit
+                  </v-icon>
+                  {{ item.text }}
+                </template>
+              </v-select>
+              <div v-else>
+                <v-icon
+                  v-if="!this.news.draftVisible"
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-lock
+                </v-icon>
+                <v-icon
+                  v-else
+                  size="16"
+                  color="black"
+                  class="mr-3 mb-1">
+                  mdi-account-edit
+                </v-icon>
+                <input
+                  id="newsDraftVisible"
+                  class="DraftVisibleInput pa-0 mt-2"
+                  v-model="newsLabel"
+                  disabled
+                  type="text">
+              </div>
+            </div>
+
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -151,6 +227,7 @@
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
+      <exo-news-notification-alerts name="event-form" />
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -196,6 +273,7 @@ export default {
       news: {
         id: '',
         activityId: '',
+        author: '',
         title: '',
         body: '',
         summary: '',
@@ -204,6 +282,7 @@ export default {
         spaceId: '',
         pinned: false,
         archived: false,
+        draftVisible: false,
       },
       originalNews: {
         id: '',
@@ -251,6 +330,10 @@ export default {
         hour: '2-digit',
         minute: '2-digit',
       },
+      items: [
+        {key: 'private',value: false, text: this.$t('news.composer.private'), align: 'center', sortable: false},
+        {key: 'shared',value: true, text: this.$t('news.composer.shared'), align: 'center', sortable: false},
+      ],
       canScheduleNews: false,
       scheduleMode: '',
       switchView: false,
@@ -291,12 +374,24 @@ export default {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
+    canUpdateNewVisibilty() {
+      return !this.editMode && this.news.id !== '' && this.currentSpace && this.currentSpace.redactorsCount > 0;
+    },
+    isNewsAuthor() {
+      return this.news.author === eXo.env.portal.userName;
+    },
+    newsLabel() {
+      return  this.news.draftVisible ?  this.$t('news.composer.shared') : this.$t('news.composer.private');
+    },
   },
   watch: {
     'news.title': function() {
       if (this.news.title !== this.originalNews.title) {
         this.autoSave();
       } },
+    'news.draftVisible': function() {
+      this.autoSave();
+    },
     'news.summary': function() {
       if (this.news.summary !== this.originalNews.summary) {
         this.autoSave();
@@ -338,6 +433,7 @@ export default {
             } else {
               this.initCKEditor();
               this.setToolBarEffect();
+              this.news.draftVisible = false;
               const message = localStorage.getItem('exo-activity-composer-message');
               if (message) {
                 this.initCKEditorData(message);
@@ -525,6 +621,8 @@ export default {
             this.news.updater = fetchedNode.updater;
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
+            this.news.author = fetchedNode.author;
+            this.news.draftVisible = fetchedNode.draftVisible;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -621,6 +719,7 @@ export default {
         author: eXo.env.portal.userName,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
+        draftVisible: this.news.draftVisible,
         spaceId: this.spaceId,
         publicationState: 'published',
         schedulePostDate: null,
@@ -667,6 +766,7 @@ export default {
         author: eXo.env.portal.userName,
         attachments: [],
         pinned: false,
+        draftVisible: this.news.draftVisible,
         spaceId: this.spaceId,
         publicationState: ''
       };
@@ -713,6 +813,7 @@ export default {
         this.$newsServices.saveNews(news).then((createdNews) => {
           this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
           this.news.id = createdNews.id;
+          this.news.author = createdNews.author;
           this.savingDraft = false;
           this.$emit('draftCreated');
         });
@@ -803,7 +904,8 @@ export default {
         body: this.getBody() ? newsBody : this.news.body,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
-        publicationState: publicationState
+        publicationState: publicationState,
+        draftVisible: this.draftVisible
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;
@@ -897,6 +999,9 @@ export default {
     },
     getString(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+    },
+    updateDraftVisibility(){
+      this.$root.$emit('update-draft-visibility', this.news.draftVisible);
     },
     changeView() {
       const elementNewTop = document.getElementById('newsTop');

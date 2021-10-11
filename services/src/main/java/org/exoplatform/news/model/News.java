@@ -75,6 +75,8 @@ public class News {
 
   private String               authorAvatarUrl;
 
+  private boolean              draftVisible;
+
   private boolean              canEdit;
 
   private boolean              canDelete;
@@ -355,6 +357,14 @@ public class News {
 
   public void setCanEdit(boolean canEdit) {
     this.canEdit = canEdit;
+  }
+
+  public boolean isDraftVisible() {
+    return draftVisible;
+  }
+
+  public void setDraftVisible(boolean draftVisible) {
+    this.draftVisible = draftVisible;
   }
 
   public boolean isCanDelete() {

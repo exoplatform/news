@@ -614,6 +614,23 @@
     width: 100%;
     z-index: 10;
     background-color: #FFFFFF;
+
+    .selectMenuClass{
+      width: 110px;
+      padding-top: 5px;
+      .v-menu__content{
+        top: 40px!important;
+      }
+      .v-input__control{
+        .v-input__slot {
+          box-shadow: none!important;
+        }
+      }
+    }
+    .DraftVisibleInput{
+      max-width: 80px;
+      color: @grayDark;
+    }
     .newsFormButtons {
       display: inline-flex;
       flex-wrap: wrap;

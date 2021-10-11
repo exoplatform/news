@@ -44,6 +44,21 @@ export default {
         });
       }
     });
+    this.$root.$on('update-draft-visibility', status => {
+      if (status) {
+        const message = this.$t('news.composer.alert.share.draft.success');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'info',
+        });
+      } else {
+        const message = this.$t('news.composer.alert.unshare.draft.success');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'info',
+        });
+      }
+    });
     this.$root.$on('activity-shared', (activityId, spaces) => {
       if (activityId && spaces && spaces.length > 0) {
         const spacesList = spaces.map(space => space.displayName);

@@ -29,11 +29,11 @@
             :complete="stepper > 1"
             step="1"
             class="ma-0">
-            {{ $t('news.composer.stepper.postStream') }}
+            {{ $t('news.composer.stepper.postStream.title') }}
           </v-stepper-step>
           <v-stepper-content step="1" class="ps-4 pe-6 my-0">
             <div class="d-flex flex-column pt-2">
-              <div class="d-flex flex-row grey--text ms-2 chooseSpaceStream">{{ $t('news.composer.stepper.chooseStream') }}</div>
+              <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.option') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
                   inset
@@ -43,7 +43,7 @@
                   disabled
                   class="my-0 ms-3" />
                 <label class="my-auto">
-                  {{ $t('news.composer.stepper.postActivityStream') }}
+                  {{ $t('news.composer.stepper.postOnStream.description') }}
                 </label>
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
@@ -64,11 +64,11 @@
             :complete="stepper > 2"
             step="2"
             class="ma-0">
-            {{ $t('news.composer.stepper.publishSection') }}
+            {{ $t('news.composer.stepper.publishSection.title') }}
           </v-stepper-step>
           <v-stepper-content step="2" class="ps-4 pe-6 my-0">
             <div class="d-flex flex-column pt-2">
-              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.publishDedicatedSection') }}</div>
+              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.publishSection.description') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
@@ -79,13 +79,13 @@
                   {{ $t('news.details.header.menu.publish') }}
                 </label>
               </div>
-              <div v-if="allowTargetingPublish" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget') }}</div>
-              <div v-if="allowTargetingPublish" class="d-flex flex-row selectTarget ms-2">
+              <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
+              <div v-if="allowPublishTargeting" class="d-flex flex-row selectTarget ms-2">
                 <v-select
-                  id="selectTarget"
-                  ref="selectTarget"
+                  id="chooseTargets"
+                  ref="chooseTargets"
                   :items="items"
-                  :placeholder="$t('news.composer.stepper.chooseTarget')"
+                  :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
                   chips
@@ -232,7 +232,7 @@ export default {
       { id: 1, name: 'Snapshot Slider'},
       { id: 2, name: 'Homepage widget'}
     ],
-    allowTargetingPublish: false,
+    allowPublishTargeting: false,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -288,8 +288,8 @@ export default {
     },
   },
   created() {
-    this.$featureService.isFeatureEnabled('news.targetingPublish')
-      .then(enabled => this.allowTargetingPublish = enabled);
+    this.$featureService.isFeatureEnabled('news.publishTargeting')
+      .then(enabled => this.allowPublishTargeting = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
@@ -308,9 +308,9 @@ export default {
       this.openDrawer();
     });
     $(document).mousedown(() => {
-      if (this.$refs.selectTarget && this.$refs.selectTarget.isMenuActive) {
+      if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         window.setTimeout(() => {
-          this.$refs.selectTarget.isMenuActive = false;
+          this.$refs.chooseTargets.isMenuActive = false;
         }, 200);
       }
     });

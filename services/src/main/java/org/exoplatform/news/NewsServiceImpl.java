@@ -97,6 +97,10 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_ADMINISTRATORS_GROUP   = "/platform/administrators";
 
+  public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE              = "mix:draftVisibility";
+
+  public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP         = "exo:draftVisible";
+
   public static final String       MIX_NEWS_MODIFIERS              = "mix:newsModifiers";
 
   public static final String       MIX_NEWS_MODIFIERS_PROP         = "exo:newsModifiersIds";
@@ -358,6 +362,10 @@ public class NewsServiceImpl implements NewsService {
         attachIllustration(newsNode, news.getUploadId());
       } else if ("".equals(news.getUploadId())) {
         removeIllustration(newsNode);
+      }
+      //draft visible
+      if (newsNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
+        newsNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
       }
 
       // attachments
@@ -713,6 +721,11 @@ public class NewsServiceImpl implements NewsService {
     if (originalNode.hasProperty("exo:spaceId")) {
       news.setSpaceId(node.getProperty("exo:spaceId").getString());
     }
+    if (originalNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
+      news.setDraftVisible(Boolean.valueOf(node.getProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP).getString()));
+    } else {
+      news.setDraftVisible(false);
+    }
     news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     news.setCanPublish(canPublishNews());
@@ -960,6 +973,10 @@ public class NewsServiceImpl implements NewsService {
     newsDraftNode.setProperty("exo:pinned", false);
     newsDraftNode.setProperty("exo:archived", false);
     newsDraftNode.setProperty("exo:spaceId", news.getSpaceId());
+    if (newsDraftNode.canAddMixin(NEWS_DRAFT_VISIBILITY_MIXIN_TYPE) && !newsDraftNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
+      newsDraftNode.addMixin(NEWS_DRAFT_VISIBILITY_MIXIN_TYPE);
+    }
+    newsDraftNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
 
     Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
     String lifecycleName = wCMPublicationService.getWebpagePublicationPlugins()

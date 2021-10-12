@@ -458,6 +458,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setAttachments(updatedNews.getAttachments());
       news.setPublicationState(updatedNews.getPublicationState());
       news.setUpdaterFullName(updatedNews.getUpdaterFullName());
+      news.setDraftVisible(updatedNews.isDraftVisible());
 
       if (updatedNews.isPinned() != news.isPinned()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();

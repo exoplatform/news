@@ -77,13 +77,14 @@
                   {{ $t('news.composer.publishSection.option') }}
                 </label>
               </div>
-              <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div v-if="allowPublishTargeting" class="d-flex flex-row selectTarget ms-2">
+              <div v-if="allowPublishTargeting && publish" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
+              <div v-if="allowPublishTargeting && publish" class="d-flex flex-row selectTarget ms-2">
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
                   v-model="selectedTargets"
                   :items="targets"
+                  :menu-props="{ bottom: true, offsetY: true}"
                   :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
@@ -91,7 +92,21 @@
                   hide-no-data
                   multiple
                   dense
-                  outlined />
+                  outlined>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip
+                      v-if="index === 0"
+                      close
+                      @click:close="removeTarget(item)">
+                      <span>{{ item.name }}</span>
+                    </v-chip>
+                    <span
+                      v-if="index === 1"
+                      class="grey--text text-caption">
+                      (+{{ targets.length - 1 }} others)
+                    </span>
+                  </template>
+                </v-select>
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -315,13 +330,6 @@ export default {
       }
       this.openDrawer();
     });
-    $(document).mousedown(() => {
-      if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
-        window.setTimeout(() => {
-          this.$refs.chooseTargets.isMenuActive = false;
-        }, 200);
-      }
-    });
   },
   methods: {
     openDrawer() {
@@ -373,6 +381,10 @@ export default {
     nextStep() {
       this.stepper++;
     },
+    removeTarget(item) {
+      this.targets.splice(this.targets.indexOf(item), 1);
+      this.targets = [...this.targets];
+    }
   }
 };
 </script>

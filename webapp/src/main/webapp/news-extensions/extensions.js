@@ -53,6 +53,7 @@ const newsActivityTypeExtensionOptions = {
   },
   canEdit: () => false,
   canShare: () => true,
+  disableButtons: (activity) => activity && activity.type === 'news' && activity.news.hiddenActivity === true,
   hideOnDelete: true,
   supportsThumbnail: true,
   windowTitlePrefixKey: 'news.window.title',
@@ -106,6 +107,12 @@ export function initExtensions() {
   extensionRegistry.registerExtension('activity', 'type', {
     type: 'news',
     options: newsActivityTypeExtensionOptions,
+  });
+
+  extensionRegistry.registerComponent('ActivityFooter', 'activity-footer-action', {
+    id: 'react',
+    vueComponent: Vue.options.components['exo-news-lock-reaction'],
+    rank: 0,
   });
 
 }

@@ -35,7 +35,7 @@
                 </div>
               </div>
               <div id="informationNews" class="newsInformation">
-                <div class="newsAuthor">
+                <div class="newsPosted">
                   <a :href="authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ authorFullName }} </a>
                   <span v-if="!hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
                   <div v-if="!hiddenSpace" class="newsSpace">

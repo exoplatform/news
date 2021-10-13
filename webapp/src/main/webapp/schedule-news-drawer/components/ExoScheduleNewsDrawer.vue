@@ -33,7 +33,7 @@
           </v-stepper-step>
           <v-stepper-content step="1" class="ps-4 pe-6 my-0">
             <div class="d-flex flex-column pt-2">
-              <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.option') }}</div>
+              <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.description') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
                   inset
@@ -43,7 +43,7 @@
                   disabled
                   class="my-0 ms-3" />
                 <label class="my-auto">
-                  {{ $t('news.composer.stepper.postOnStream.description') }}
+                  {{ $t('news.composer.stepper.postOnStream.option') }}
                 </label>
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
@@ -76,7 +76,7 @@
                   dense
                   class="my-0 ms-3" />
                 <label class="my-auto">
-                  {{ $t('news.details.header.menu.publish') }}
+                  {{ $t('news.composer.publishSection.option') }}
                 </label>
               </div>
               <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
@@ -118,7 +118,7 @@
             :complete="stepper > 3"
             step="3"
             class="ma-0">
-            {{ $t('news.composer.schedule') }}
+            {{ $t('news.composer.stepper.schedule.title') }}
           </v-stepper-step>
           <v-stepper-content step="3" class="ps-4 pe-6 my-0">
             <div class="scheduleNews">

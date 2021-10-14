@@ -72,10 +72,11 @@
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
+                  :disabled="!allowPublishTargeting"
                   inset
                   dense
                   class="my-0 ms-3" />
-                <label class="my-auto">
+                <label class="publishSectionOption my-auto">
                   {{ $t('news.composer.publishSection.option') }}
                 </label>
               </div>
@@ -84,7 +85,8 @@
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
-                  :items="items"
+                  v-model="selectedTargets"
+                  :items="targets"
                   :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
@@ -105,6 +107,7 @@
                 <v-btn
                   class="btn btn-primary me-4"
                   outlined
+                  :disabled="disableTargetOption"
                   @click="nextStep">
                   {{ $t('news.composer.stepper.continue') }}
                   <v-icon size="18" class="ms-2">
@@ -121,6 +124,7 @@
             {{ $t('news.composer.stepper.schedule.title') }}
           </v-stepper-step>
           <v-stepper-content step="3" class="ps-4 pe-6 my-0">
+            <div class="ms-3 grey--text">{{ $t('news.composer.stepper.postedOrPublish.description') }}</div>
             <div class="scheduleNews">
               <v-radio-group v-model="postArticleMode" class="ms-2">
                 <v-radio
@@ -217,6 +221,7 @@ export default {
   },
   data: () => ({
     stepper: 0,
+    selectedTargets: [],
     drawer: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
@@ -227,7 +232,7 @@ export default {
     canPublishNews: false,
     publish: false,
     news: null,
-    items: [
+    targets: [
       { id: 0, name: 'Latest news'},
       { id: 1, name: 'Snapshot Slider'},
       { id: 2, name: 'Homepage widget'}
@@ -285,6 +290,9 @@ export default {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
       return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
+    },
+    disableTargetOption() {
+      return this.selectedTargets && this.selectedTargets.length === 0;
     },
   },
   created() {

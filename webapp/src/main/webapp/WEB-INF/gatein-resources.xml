@@ -319,6 +319,10 @@
     <depends>
       <module>vuetify</module>
     </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
   </module>
 
 </gatein-resources>

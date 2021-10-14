@@ -11,6 +11,7 @@
       show-overlay
       body-classes="hide-scroll decrease-z-index-more"
       right
+      @opened="stepper = 1"
       @closed="closeDrawer">
       <template v-if="editScheduledNews !== 'editScheduledNews'" slot="title">
         {{ $t('news.composer.postArticle') }}
@@ -19,68 +20,163 @@
         {{ $t('news.composer.editArticle') }}
       </template>
       <template slot="content">
-        <div v-if="canPublishNews" class="d-flex flex-column mt-4 ms-3">
-          <div class="d-flex flex-row">
-            <span class="text-subtitle-1 grey--text postModeText">{{ $t('news.composer.modularity.publish') }}</span>
-            <v-divider
-              inset
-              class="my-auto me-4 ms-3" />
-          </div>
-          <div class="d-flex flex-row">
-            <v-checkbox
-              v-model="publish">
-              <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
-            </v-checkbox>
-          </div>
-          <div class="d-flex flex-row grey--text ms-8">
-            {{ $t('news.composer.user.publish.info') }}
-          </div>
-        </div>
-        <div class="d-flex flex-column mt-4 ms-3">
-          <div class="d-flex flex-row">
-            <span class="text-subtitle-1 grey--text postModeText">{{ $t('news.composer.modularity.post') }}</span>
-            <v-divider
-              inset
-              class="my-auto me-4 ms-3" />
-          </div>
-          <div class="d-flex flex-row">
-            <v-radio-group v-model="postArticleMode">
-              <v-radio
-                value="immediate">
-                <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
-              </v-radio>
-              <v-radio
-                value="later"
-                class="mt-4">
-                <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
-              </v-radio>
-              <div v-if="showPostLaterMessage" class="mt-4">
-                <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
-                <div class="d-flex flex-row flex-grow-1">
-                  <slot name="postDate"></slot>
-                  <date-picker
-                    v-model="postDate"
-                    :min-value="minimumPostDate"
-                    class="scheduleDatePicker flex-grow-1 my-auto" />
-                  <div class="d-flex flex-row flex-grow-0">
-                    <slot name="postDateDateTime"></slot>
-                    <time-picker
-                      v-model="postDateTime"
-                      :min="minimumPostDateTime"
-                      class="me-2" />
+        <v-stepper
+          v-model="stepper"
+          vertical
+          flat
+          class="ma-0 py-0 me-4">
+          <v-stepper-step
+            :complete="stepper > 1"
+            step="1"
+            class="ma-0">
+            {{ $t('news.composer.stepper.postStream.title') }}
+          </v-stepper-step>
+          <v-stepper-content step="1" class="ps-4 pe-6 my-0">
+            <div class="d-flex flex-column pt-2">
+              <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.description') }}</div>
+              <div class="d-flex flex-row">
+                <v-switch
+                  inset
+                  dense
+                  value
+                  input-value="true"
+                  disabled
+                  class="my-0 ms-3" />
+                <label class="my-auto">
+                  {{ $t('news.composer.stepper.postOnStream.option') }}
+                </label>
+              </div>
+              <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
+                <v-spacer />
+                <v-btn
+                  class="btn btn-primary me-4"
+                  outlined
+                  @click="nextStep">
+                  {{ $t('news.composer.stepper.continue') }}
+                  <v-icon size="18" class="ms-2">
+                    {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
+                  </v-icon>
+                </v-btn>
+              </v-card-actions>
+            </div>
+          </v-stepper-content>
+          <v-stepper-step
+            :complete="stepper > 2"
+            step="2"
+            class="ma-0">
+            {{ $t('news.composer.stepper.publishSection.title') }}
+          </v-stepper-step>
+          <v-stepper-content step="2" class="ps-4 pe-6 my-0">
+            <div class="d-flex flex-column pt-2">
+              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.publishSection.description') }}</div>
+              <div class="d-flex flex-row">
+                <v-switch
+                  v-model="publish"
+                  :disabled="!allowPublishTargeting"
+                  inset
+                  dense
+                  class="my-0 ms-3" />
+                <label class="publishSectionOption my-auto">
+                  {{ $t('news.composer.publishSection.option') }}
+                </label>
+              </div>
+              <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
+              <div v-if="allowPublishTargeting" class="d-flex flex-row selectTarget ms-2">
+                <v-select
+                  id="chooseTargets"
+                  ref="chooseTargets"
+                  v-model="selectedTargets"
+                  :items="targets"
+                  :placeholder="$t('news.composer.stepper.chooseTarget.option')"
+                  item-text="name"
+                  item-value="id"
+                  chips
+                  hide-no-data
+                  multiple
+                  dense
+                  outlined />
+              </div>
+              <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
+                <v-btn class="btn" @click="previousStep">
+                  <v-icon size="18" class="me-2">
+                    {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
+                  </v-icon>
+                  {{ $t('news.composer.stepper.back') }}
+                </v-btn>
+                <v-spacer />
+                <v-btn
+                  class="btn btn-primary me-4"
+                  outlined
+                  :disabled="disableTargetOption"
+                  @click="nextStep">
+                  {{ $t('news.composer.stepper.continue') }}
+                  <v-icon size="18" class="ms-2">
+                    {{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}
+                  </v-icon>
+                </v-btn>
+              </v-card-actions>
+            </div>
+          </v-stepper-content>
+          <v-stepper-step
+            :complete="stepper > 3"
+            step="3"
+            class="ma-0">
+            {{ $t('news.composer.stepper.schedule.title') }}
+          </v-stepper-step>
+          <v-stepper-content step="3" class="ps-4 pe-6 my-0">
+            <div class="ms-3 grey--text">{{ $t('news.composer.stepper.postedOrPublish.description') }}</div>
+            <div class="scheduleNews">
+              <v-radio-group v-model="postArticleMode" class="ms-2">
+                <v-radio
+                  value="immediate">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
+                </v-radio>
+                <v-radio
+                  value="later"
+                  class="mt-4">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
+                </v-radio>
+                <div v-if="showPostLaterMessage" class="mt-4">
+                  <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
+                  <div class="d-flex flex-column flex-grow-1">
+                    <slot name="postDate"></slot>
+                    <div class="d-flex flex-row flex-grow-1">
+                      <date-picker
+                        v-model="postDate"
+                        :min-value="minimumPostDate"
+                        :attach="false"
+                        :top="true"
+                        class="scheduleDatePicker flex-grow-0 my-auto" />
+                      <div class="flex-grow-0">
+                        <slot name="postDateDateTime"></slot>
+                        <time-picker
+                          v-model="postDateTime"
+                          :min="minimumPostDateTime"
+                          class="my-0" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <v-radio
-                v-if="allowNotPost"
-                value="notPost"
-                class="postModeText mt-4">
-                <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
-              </v-radio>
-              <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
-            </v-radio-group>
-          </div>
-        </div>
+                <v-radio
+                  v-if="allowNotPost"
+                  value="notPost"
+                  class="postModeText mt-4">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
+                </v-radio>
+                <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
+              </v-radio-group>
+              <v-btn
+                :disabled="disabled"
+                class="btn mt-4 px-0 mb-4"
+                @click="previousStep">
+                <v-icon size="18" class="me-2">
+                  {{ $vuetify.rtl && 'fa-caret-right' || 'fa-caret-left' }}
+                </v-icon>
+                {{ $t('news.composer.stepper.back') }}
+              </v-btn>
+            </div>
+          </v-stepper-content>
+        </v-stepper>
       </template>
       <template slot="footer">
         <div v-if="editScheduledNews !== 'editScheduledNews'" class="d-flex justify-end">
@@ -124,6 +220,8 @@ export default {
     },
   },
   data: () => ({
+    stepper: 0,
+    selectedTargets: [],
     drawer: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
@@ -134,6 +232,12 @@ export default {
     canPublishNews: false,
     publish: false,
     news: null,
+    targets: [
+      { id: 0, name: 'Latest news'},
+      { id: 1, name: 'Snapshot Slider'},
+      { id: 2, name: 'Homepage widget'}
+    ],
+    allowPublishTargeting: false,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -186,9 +290,14 @@ export default {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
       return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
-    }
+    },
+    disableTargetOption() {
+      return this.selectedTargets && this.selectedTargets.length === 0;
+    },
   },
   created() {
+    this.$featureService.isFeatureEnabled('news.publishTargeting')
+      .then(enabled => this.allowPublishTargeting = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
@@ -205,6 +314,13 @@ export default {
         this.postArticleMode = 'immediate';
       }
       this.openDrawer();
+    });
+    $(document).mousedown(() => {
+      if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
+        window.setTimeout(() => {
+          this.$refs.chooseTargets.isMenuActive = false;
+        }, 200);
+      }
     });
   },
   methods: {
@@ -244,9 +360,16 @@ export default {
       this.$emit('post-article', this.postArticleMode !=='later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish);
     },
     closeDrawer() {
+      this.stepper = 0;
       this.publish = this.news.pinned;
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
+    },
+    previousStep() {
+      this.stepper--;
+    },
+    nextStep() {
+      this.stepper++;
     },
   }
 };

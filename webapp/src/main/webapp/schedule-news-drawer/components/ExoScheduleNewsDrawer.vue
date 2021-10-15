@@ -72,7 +72,6 @@
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
-                  :disabled="!allowPublishTargeting"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -107,7 +106,7 @@
                 <v-btn
                   class="btn btn-primary me-4"
                   outlined
-                  :disabled="disableTargetOption"
+                  :disabled="allowPublishTargeting && disableTargetOption"
                   @click="nextStep">
                   {{ $t('news.composer.stepper.continue') }}
                   <v-icon size="18" class="ms-2">

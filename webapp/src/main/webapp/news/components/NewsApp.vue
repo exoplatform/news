@@ -1,5 +1,5 @@
 <template>
-  <v-app class="newsApp">
+  <v-app class="newsApp" role="main">
     <v-toolbar
       color="white"
       flat

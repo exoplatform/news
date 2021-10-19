@@ -40,7 +40,7 @@
                   inset
                   dense
                   class="my-0 ms-3" />
-                <label class="my-auto">
+                <label class="publishSectionOption my-auto">
                   {{ $t('news.composer.stepper.postOnStream.option') }}
                 </label>
               </div>
@@ -78,7 +78,10 @@
                 </label>
               </div>
               <div v-if="allowPublishTargeting && publish" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div v-if="allowPublishTargeting && publish" class="d-flex flex-row selectTarget ms-2">
+              <div
+                v-if="allowPublishTargeting && publish"
+                class="d-flex flex-row selectTarget ms-2"
+                @click.stop>
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
@@ -330,6 +333,11 @@ export default {
       }
       this.openDrawer();
     });
+    $(document).click(() => {
+      if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
+        this.$refs.chooseTargets.blur();
+      }
+    });
   },
   methods: {
     openDrawer() {
@@ -370,8 +378,10 @@ export default {
       }
     },
     closeDrawer() {
+      if (this.news) {
+        this.publish = this.news.pinned;
+      }
       this.stepper = 0;
-      this.publish = this.news.pinned;
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
     },

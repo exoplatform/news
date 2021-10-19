@@ -75,7 +75,7 @@
                         :format="dateTimeFormat"
                         class="newsInformationValue newsUpdatedDate ml-1 me-1" />
                     </template>
-                    <div v-else-if="updatedDate" class="newsInformationValue newsUpdatedDate">{{ updatedDate }}</div>
+                    <div v-else-if="news && news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
                     <div v-if="notSameUpdater">
                       <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
                       <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>

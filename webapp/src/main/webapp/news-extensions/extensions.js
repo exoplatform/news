@@ -53,7 +53,7 @@ const newsActivityTypeExtensionOptions = {
   },
   canEdit: () => false,
   canShare: () => true,
-  disableButtons: (activity) => activity && activity.type === 'news' && activity.news.hiddenActivity === true,
+  disableButtons: (activity) => activity && activity.type === 'news' && activity.templateParams && activity.templateParams.isHiddenActivity === 'true',
   hideOnDelete: true,
   supportsThumbnail: true,
   windowTitlePrefixKey: 'news.window.title',

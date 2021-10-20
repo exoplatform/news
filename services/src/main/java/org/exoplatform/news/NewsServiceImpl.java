@@ -1198,6 +1198,9 @@ public class NewsServiceImpl implements NewsService {
     if (spaceService.isManager(currentSpace, authenticatedUser)) {
       return true;
     }
+    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible()) {
+      return true;
+    }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
     return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }

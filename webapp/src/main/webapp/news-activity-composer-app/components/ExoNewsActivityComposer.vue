@@ -88,27 +88,26 @@
                   {{ item.text }}
                 </template>
               </v-select>
-              <div v-else>
+              <div v-else class="d-flex mr-5 mt-1">
                 <v-icon
                   v-if="!this.news.draftVisible"
                   size="16"
                   color="black"
-                  class="mr-3 mb-1">
+                  class="mr-2">
                   mdi-lock
                 </v-icon>
                 <v-icon
                   v-else
                   size="16"
                   color="black"
-                  class="mr-3 mb-1">
+                  class="mr-2">
                   mdi-account-edit
                 </v-icon>
-                <input
-                  id="newsDraftVisible"
-                  class="DraftVisibleInput pa-0 mt-2"
-                  v-model="newsLabel"
+                <div
+                  id="newsDraftVisible1"
+                  class="font-weight-bold pa-0 mt-1"
                   disabled
-                  type="text">
+                  v-text="newsLabel"></div>
               </div>
             </div>
 

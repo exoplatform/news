@@ -88,27 +88,26 @@
                   {{ item.text }}
                 </template>
               </v-select>
-              <div v-else>
+              <div v-else class="d-flex mr-5 mt-1">
                 <v-icon
                   v-if="!this.news.draftVisible"
                   size="16"
                   color="black"
-                  class="mr-3 mb-1">
+                  class="mr-2">
                   mdi-lock
                 </v-icon>
                 <v-icon
                   v-else
                   size="16"
                   color="black"
-                  class="mr-3 mb-1">
+                  class="mr-2">
                   mdi-account-edit
                 </v-icon>
-                <input
-                  id="newsDraftVisible"
-                  class="DraftVisibleInput pa-0 mt-2"
-                  v-model="newsLabel"
+                <div
+                  id="newsDraftVisible1"
+                  class="font-weight-bold pa-0 mt-1"
                   disabled
-                  type="text">
+                  v-text="newsLabel"></div>
               </div>
             </div>
 
@@ -623,6 +622,7 @@ export default {
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
+            this.news.hiddenActivity = fetchedNode.hiddenActivity;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -690,7 +690,8 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish) {
+    postNews: function (schedulePostDate, postArticleMode, publish, hiddenActivity) {
+      this.news.hiddenActivity = hiddenActivity;
       this.news.pinned = publish;
       this.doPostNews(schedulePostDate);
     },
@@ -724,6 +725,7 @@ export default {
         publicationState: 'published',
         schedulePostDate: null,
         timeZoneId: null,
+        hiddenActivity: this.news.hiddenActivity,
       };
 
       if (schedulePostDate != null){

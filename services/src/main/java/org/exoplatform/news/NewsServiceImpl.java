@@ -726,7 +726,6 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setDraftVisible(false);
     }
-    news.setCanEdit(canEditNews(news, getCurrentUserId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     news.setCanPublish(canPublishNews());
     StringBuilder newsUrl = new StringBuilder("");
@@ -761,6 +760,7 @@ public class NewsServiceImpl implements NewsService {
         news.setUrl(newsUrl.toString());
       }
     }
+    news.setCanEdit(canEditNews(news, getCurrentUserId()));
     if (node.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
       news.setSchedulePostDate(node.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).getString());
     }
@@ -1091,7 +1091,7 @@ public class NewsServiceImpl implements NewsService {
     News news = getNewsById(newsId, editMode);
     if (editMode) {
       if (!canEditNews(news, authenticatedUser)) {
-        throw new IllegalAccessException("User " + authenticatedUser + " is not authorized to view News");
+        throw new IllegalAccessException("User " + authenticatedUser + " is not authorized to edit News");
       }
     } else if (!canViewNews(news, authenticatedUser)) {
       throw new IllegalAccessException("User " + authenticatedUser + " is not authorized to view News");

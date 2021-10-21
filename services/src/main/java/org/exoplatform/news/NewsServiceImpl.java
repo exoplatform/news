@@ -726,7 +726,7 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setDraftVisible(false);
     }
-    news.setCanEdit(canEditNews(news.getAuthor(),news.getSpaceId()));
+    news.setCanEdit(canEditNews(news, getCurrentUserId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     news.setCanPublish(canPublishNews());
     StringBuilder newsUrl = new StringBuilder("");
@@ -1086,26 +1086,6 @@ public class NewsServiceImpl implements NewsService {
     return nodePath;
   }
 
-  /**
-   * Return a boolean that indicates if the current user can edit the news or
-   * not
-   * 
-   * @param posterId the poster id of the news
-   * @param spaceId the space id of the news
-   * @return if the news can be edited
-   */
-  public boolean canEditNews(String posterId, String spaceId) {
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
-    if (currentIdentity == null) {
-      return false;
-    }
-    String authenticatedUser = currentIdentity.getUserId();
-    Space currentSpace = spaceService.getSpaceById(spaceId);
-    return authenticatedUser.equals(posterId) || spaceService.isSuperManager(authenticatedUser)
-        || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-        || spaceService.isManager(currentSpace, currentIdentity.getUserId());
-  }
-
   @Override
   public News getNewsById(String newsId, String authenticatedUser, boolean editMode) throws IllegalAccessException {
     News news = getNewsById(newsId, editMode);
@@ -1198,7 +1178,7 @@ public class NewsServiceImpl implements NewsService {
     if (spaceService.isManager(currentSpace, authenticatedUser)) {
       return true;
     }
-    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible()) {
+    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
       return true;
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);

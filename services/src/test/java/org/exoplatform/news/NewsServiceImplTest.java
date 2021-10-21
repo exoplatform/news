@@ -541,6 +541,28 @@ public class NewsServiceImplTest {
   }
 
   @Test
+  public void shouldCanEditNewsWhenIsRedactorAndSharedDraft() throws Exception {
+    NewsService newsService = buildNewsService();
+    String spaceId = "space1";
+    String username = "mary";
+
+    News news = new News();
+    news.setSpaceId(spaceId);
+    news.setAuthor("john");
+    news.setDraftVisible(true);
+
+    Space space = new Space();
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+    when(spaceService.isRedactor(space, username)).thenReturn(true);
+
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    assertTrue(newsService.canEditNews(news, username));
+  }
+
+  @Test
   public void shouldCanEditNewsWhenIsSpaceManager() throws Exception {
     NewsService newsService = buildNewsService();
     String spaceId = "space1";
@@ -2340,234 +2362,6 @@ public class NewsServiceImplTest {
     verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 1);
     verify(newsNode, times(1)).setProperty("exo:viewers", "root");
     verify(newsNode, times(1)).save();
-  }
-
-  @Test
-  public void shouldAuthorizeTheCurrentUserToEditNewsWhenCurrentUserIsTheNewsPoster() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "member");
-    MembershipEntry membershipentry1 = new MembershipEntry("space1", "member");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    memberships.add(membershipentry1);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("user", "space1");
-
-    // Then
-    assertEquals(true, canEditNews);
-
-  }
-
-  @Test
-  public void shouldAuthorizeTheCurrentUserToEditNewsWhenCurrentUserIsSuperManager() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "*");
-    MembershipEntry membershipentry1 = new MembershipEntry("space1", "*");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    memberships.add(membershipentry1);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(true);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("david", "space1");
-
-    // Then
-    assertEquals(true, canEditNews);
-
-  }
-
-  @Test
-  public void shouldAuthorizeTheCurrentUserToEditNewsWhenCurrentUserIsPublisher() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-    MembershipEntry membershipentry1 = new MembershipEntry("space1", "member");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    memberships.add(membershipentry1);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("david", "space1");
-
-    // Then
-    assertEquals(true, canEditNews);
-
-  }
-
-  @Test
-  public void shouldAuthorizeTheCurrentUserToEditNewsWhenCurrentUserIsSpaceManger() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "member");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(spaceService.isManager(currentSpace, "user")).thenReturn(true);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("david", "space1");
-
-    // Then
-    assertEquals(true, canEditNews);
-
-  }
-
-  @Test
-  public void shouldNotAuthorizeTheCurrentUserToEditNews() {
-    // Given
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    Space currentSpace = mock(Space.class);
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "member");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity.setMemberships(memberships);
-    ConversationState state = new ConversationState(currentIdentity);
-    ConversationState.setCurrent(state);
-    when(spaceService.getSpaceById("space1")).thenReturn(currentSpace);
-    when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(spaceService.isManager(currentSpace, "user")).thenReturn(false);
-    when(currentSpace.getGroupId()).thenReturn("space1");
-
-    // When
-    boolean canEditNews = newsService.canEditNews("david", "space1");
-
-    // Then
-    assertEquals(false, canEditNews);
-
   }
 
   @Test

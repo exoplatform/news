@@ -78,12 +78,16 @@
                 </label>
               </div>
               <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div v-if="allowPublishTargeting && publish" class="d-flex flex-row selectTarget ms-2">
+              <div
+                v-if="allowPublishTargeting && publish"
+                class="d-flex flex-row selectTarget ms-2"
+                @click.stop>
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
                   v-model="selectedTargets"
                   :items="targets"
+                  :menu-props="{ bottom: true, offsetY: true}"
                   :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
@@ -91,7 +95,21 @@
                   hide-no-data
                   multiple
                   dense
-                  outlined />
+                  outlined>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip
+                      v-if="index === 0"
+                      close
+                      @click:close="removeTarget(item)">
+                      <span>{{ item.name }}</span>
+                    </v-chip>
+                    <span
+                      v-if="index === 1"
+                      class="grey--text text-caption">
+                      (+{{ targets.length - 1 }} {{ $t('news.composer.stepper.chooseTarget.others') }})
+                    </span>
+                  </template>
+                </v-select>
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -164,7 +182,6 @@
               </v-radio-group>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn
-                  :disabled="disabled"
                   class="btn"
                   @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -315,11 +332,9 @@ export default {
       }
       this.openDrawer();
     });
-    $(document).mousedown(() => {
+    $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
-        window.setTimeout(() => {
-          this.$refs.chooseTargets.isMenuActive = false;
-        }, 200);
+        this.$refs.chooseTargets.blur();
       }
     });
   },
@@ -352,6 +367,7 @@ export default {
         .then(news => {
           if (news) {
             this.news = news;
+            this.hiddenActivity = !news.hiddenActivity;
             this.schedulePostDate = news.schedulePostDate;
           }
         });
@@ -375,6 +391,10 @@ export default {
     nextStep() {
       this.stepper++;
     },
+    removeTarget(item) {
+      this.targets.splice(this.targets.indexOf(item), 1);
+      this.targets = [...this.targets];
+    }
   }
 };
 </script>

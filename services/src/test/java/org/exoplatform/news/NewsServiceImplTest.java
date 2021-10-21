@@ -300,12 +300,17 @@ public class NewsServiceImplTest {
     currentIdentity.setMemberships(memberships);
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setId("2");
+    activity.isHidden(false);
+    activityManager.saveActivityNoReturn(activity);
     Property actProperty = mock(Property.class);
     when(actProperty.getString()).thenReturn("1:2;1:3");
     when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
     when(space.getVisibility()).thenReturn("private");
     when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
     when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
+    when(activityManager.getActivity("2")).thenReturn(activity);
 
     // When
     News news = newsService.getNewsById("1", false);
@@ -1823,10 +1828,15 @@ public class NewsServiceImplTest {
     Property prop = mock(Property.class);
     when(prop.getString()).thenReturn("");
     when(newsNode.getProperty("publication:currentState")).thenReturn(prop);
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setId("1");
+    activity.isHidden(false);
+    activityManager.saveActivityNoReturn(activity);
 
     when(newsNode.hasProperty("exo:activities")).thenReturn(true);
     when(newsNode.getProperty("exo:activities")).thenReturn(exoActivitiesProperty);
     when(exoActivitiesProperty.getString()).thenReturn("1:1;2:2;2:3");
+    when(activityManager.getActivity("1")).thenReturn(activity);
 
     // When
     newsService.deleteNews("1", "root", false);
@@ -2671,6 +2681,7 @@ public class NewsServiceImplTest {
     news.setAuthor("root");
     news.setSpaceId("1");
     news.setId("id123");
+    news.setHiddenActivity(true);
     Identity poster = new Identity("root");
     Identity spaceIdentity = new Identity("1");
     spaceIdentity.setRemoteId("space1");

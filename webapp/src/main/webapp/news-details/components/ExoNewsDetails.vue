@@ -171,8 +171,9 @@ export default {
         }
       }, redirectionTime);
     },
-    postNews(schedulePostDate, postArticleMode, publish) {
+    postNews(schedulePostDate, postArticleMode, publish, hiddenActivity) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
+      this.news.hiddenActivity = hiddenActivity;
       this.news.pinned = publish;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;

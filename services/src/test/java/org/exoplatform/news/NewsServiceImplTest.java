@@ -2705,9 +2705,8 @@ public class NewsServiceImplTest {
     assertEquals("space1", identityCaptorValue.getRemoteId());
     ExoSocialActivity activityCaptorValue = activityCaptor.getValue();
     assertEquals("news", activityCaptorValue.getType());
-    assertEquals(2, activityCaptorValue.getTemplateParams().size());
+    assertEquals(1, activityCaptorValue.getTemplateParams().size());
     assertEquals("id123", activityCaptorValue.getTemplateParams().get("newsId"));
-    assertEquals("true", activityCaptorValue.getTemplateParams().get("isHiddenActivity"));
   }
 
   @Test

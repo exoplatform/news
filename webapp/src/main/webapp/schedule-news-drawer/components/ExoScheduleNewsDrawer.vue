@@ -289,7 +289,7 @@ export default {
     disabled() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish || this.stepper<3;
+      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish || this.stepper < 3;
     },
     disableTargetOption() {
       return this.selectedTargets && this.selectedTargets.length === 0;

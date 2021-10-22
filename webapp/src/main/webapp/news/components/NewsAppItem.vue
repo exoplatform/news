@@ -41,8 +41,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           @edit="editLink(news)" />
         <exo-confirm-dialog
           ref="deleteConfirmDialog"
-          :message="$t('news.message.confirmDeleteNews')"
-          :title="$t('news.title.confirmDeleteNews')"
+          :message="confirmDeleteNewsDialogMessage"
+          :title="confirmDeleteNewsDialogTitle"
           :ok-label="$t('news.button.ok')"
           :cancel-label="$t('news.button.cancel')"
           @ok="$emit('delete-news',news)" />
@@ -133,6 +133,12 @@ export default {
   computed: {
     isDraftsFilter() {
       return this.newsFilter === 'drafts';
+    },
+    confirmDeleteNewsDialogMessage() {
+      return this.isDraftsFilter ? this.$t('news.message.confirmDeleteDraftNews') : this.$t('news.message.confirmDeleteNews');
+    },
+    confirmDeleteNewsDialogTitle() {
+      return this.isDraftsFilter ? this.$t('news.title.confirmDeleteDraftNews') : this.$t('news.title.confirmDeleteNews');
     },
   },
   methods: {

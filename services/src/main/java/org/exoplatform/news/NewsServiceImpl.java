@@ -639,6 +639,7 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
 
     Node node = session.getNodeByUUID(newsId);
+    News news = convertNodeToNews(node, false);
     if (node.hasProperty("exo:activities")) {
       String newActivities = node.getProperty("exo:activities").getString();
       if (StringUtils.isNotEmpty(newActivities)) {
@@ -661,7 +662,7 @@ public class NewsServiceImpl implements NewsService {
                 .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
-    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, convertNodeToNews(node, false));
+    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, news);
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();
@@ -739,7 +740,9 @@ public class NewsServiceImpl implements NewsService {
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
         ExoSocialActivity activity = activityManager.getActivity(newsActivityId);
-        news.setHiddenActivity(activity.isHidden());
+        if (activity != null) {
+          news.setHiddenActivity(activity.isHidden());
+        }
         news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {

@@ -32,14 +32,14 @@ export default {
   },
   created() {
     this.$root.$on('news-notification-alert', alert => this.alerts.push(alert));
-    this.$root.$on('confirm-news-deletion', news => {
+    this.$root.$on('confirm-news-deletion', (news, isDraftsFilter) => {
       if (news && news.newsId) {
         const clickMessage = this.$t('news.details.undoDelete');
-        const message = this.$t('news.details.deleteSuccess');
+        const message = isDraftsFilter ? this.$t('news.details.deleteDraftSuccess') : this.$t('news.details.deleteSuccess');
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'success',
-          click: () => this.undoDeleteNews(news.newsId),
+          click: () => this.undoDeleteNews(news.newsId, isDraftsFilter),
           clickMessage,
         });
       }
@@ -93,12 +93,12 @@ export default {
       this.alerts.splice(index, 1);
       this.$forceUpdate();
     },
-    undoDeleteNews(newsId, alert) {
+    undoDeleteNews(newsId, alert, isDraftsFilter) {
       return this.$newsServices.undoDeleteNews(newsId)
         .then(() => {
           this.deleteAlert(alert);
           this.addAlert({
-            message: this.$t('news.details.deleteCanceled'),
+            message: isDraftsFilter ? this.$t('news.details.deleteDraftCanceled') : this.$t('news.details.deleteCanceled'),
             type: 'success',
           });
         });

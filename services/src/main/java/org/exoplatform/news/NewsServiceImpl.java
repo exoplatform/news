@@ -736,7 +736,6 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setHiddenActivity(false);
     }
-    news.setCanEdit(canEditNews(news, news.getSpaceId()));
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     news.setCanPublish(canPublishNews());
     StringBuilder newsUrl = new StringBuilder("");
@@ -1225,6 +1224,18 @@ public class NewsServiceImpl implements NewsService {
             currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
+  /**
+   * Return a boolean that indicates if the current user can post/unpost the news
+   * activity on the stream
+   *
+   * @return if the news activity can be posted or not on the stream
+   */
+  public boolean canChooseTargets(String authenticatedUser) {
+    org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
+    return authenticatedSecurityIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*")
+        || authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, "*");
+  }
+
   public News scheduleNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -1239,6 +1250,11 @@ public class NewsServiceImpl implements NewsService {
       if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
+      if (scheduledNewsNode.canAddMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE)
+          && !scheduledNewsNode.hasProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP)) {
+        scheduledNewsNode.addMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE);
+      }
+      scheduledNewsNode.setProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP, String.valueOf(news.isHiddenActivity()));
       String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
         ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
@@ -1250,11 +1266,6 @@ public class NewsServiceImpl implements NewsService {
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.setProperty("exo:pinned", news.isPinned());
-        if (scheduledNewsNode.canAddMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE)
-            && !scheduledNewsNode.hasProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP)) {
-          scheduledNewsNode.addMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE);
-        }
-        scheduledNewsNode.setProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP, String.valueOf(news.isHiddenActivity()));
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }

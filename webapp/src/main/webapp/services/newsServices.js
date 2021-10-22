@@ -254,3 +254,14 @@ export function canPublishNews() {
     return resp;
   });
 }
+
+export function canChooseTargets() {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canChooseTargets`, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  }).then((resp) => resp.json()).then(resp => {
+    return resp;
+  });
+}

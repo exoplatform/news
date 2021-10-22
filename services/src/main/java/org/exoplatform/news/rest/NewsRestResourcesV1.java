@@ -838,6 +838,26 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
   }
 
+  @GET
+  @Path("canChooseTargets")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RolesAllowed("users")
+  @ApiOperation(value = "check if the current user can choose a target to display section", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can select a target to display section", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to choose a target is returned"),
+          @ApiResponse(code = 401, message = "User not authorized to choose a target")})
+  public Response canChooseTargets(@Context HttpServletRequest request) {
+    try {
+      String authenticatedUser = request.getRemoteUser();
+      if (StringUtils.isBlank(authenticatedUser)) {
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      return Response.ok(String.valueOf(newsService.canChooseTargets(authenticatedUser))).build();
+    } catch (Exception e) {
+      LOG.error("Error when checking if the authenticated user can choose a target to display section", e);
+      return Response.serverError().build();
+    }
+  }
+
   private NewsFilter buildFilter(List<String> spaces, String filter, String text, String author, int limit, int offset) {
     NewsFilter newsFilter = new NewsFilter();
 

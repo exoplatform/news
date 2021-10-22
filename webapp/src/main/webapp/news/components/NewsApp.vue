@@ -308,7 +308,7 @@ export default {
       const redirectionTime = 6100;
       this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
         .then(() => {
-          this.$root.$emit('confirm-news-deletion', news);
+          this.$root.$emit('confirm-news-deletion', news, this.isDraftsFilter);
         });
       setTimeout(() => {
         const deletedNews = localStorage.getItem('deletedNews');

@@ -616,7 +616,6 @@
     background-color: #FFFFFF;
 
     .selectMenuClass{
-      width: 160px;
       padding-top: 5px;
       .v-menu__content{
         top: 40px!important;
@@ -624,6 +623,14 @@
       .v-input__control{
         .v-input__slot {
           box-shadow: none!important;
+          .v-select__slot {
+            .v-select__selections {
+              max-width: 280px;
+              input {
+                max-width: 10px;
+              }
+            }
+          }
         }
       }
     }
@@ -3436,7 +3443,7 @@
 }
 @media screen and (max-width: 1025px) {
   #newsActivityComposer #newsForm .dropZone img {
-    height: 80px;
+    height: 250px;
   }
 
   .latestNewsContent {

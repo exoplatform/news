@@ -96,6 +96,22 @@
                   multiple
                   dense
                   outlined>
+                  <template v-slot:prepend-item>
+                    <v-list-item
+                      ripple
+                      @click.stop="toggle">
+                      <v-list-item-action>
+                        <v-icon :color="selectedTargets.length > 0 ? 'primary' : ''">
+                          {{ selectionIcon }}
+                        </v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ selectTargetLabel }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
                   <template v-slot:selection="{ item, index }">
                     <v-chip
                       v-if="index === 0"
@@ -110,6 +126,9 @@
                     </span>
                   </template>
                 </v-select>
+              </div>
+              <div v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
+                {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -311,6 +330,23 @@ export default {
     disableTargetOption() {
       return this.selectedTargets && this.selectedTargets.length === 0;
     },
+    showTargetInformation() {
+      return this.disableTargetOption && this.allowPublishTargeting && this.publish;
+    },
+    selectAllTargets() {
+      return this.selectedTargets.length === this.targets.length;
+    },
+    selectSomeTarget() {
+      return this.selectedTargets.length > 0 && !this.selectAllTargets;
+    },
+    selectionIcon() {
+      if (this.selectAllTargets) {return 'mdi-close-box';}
+      if (this.selectSomeTarget) {return 'mdi-minus-box';}
+      return 'mdi-checkbox-blank-outline';
+    },
+    selectTargetLabel() {
+      return this.selectAllTargets ? this.$t('news.composer.stepper.chooseTarget.deselectAllTargets') : this.$t('news.composer.stepper.chooseTarget.selectAllTargets');
+    }
   },
   created() {
     this.$featureService.isFeatureEnabled('news.publishTargeting')
@@ -392,9 +428,18 @@ export default {
       this.stepper++;
     },
     removeTarget(item) {
-      this.targets.splice(this.targets.indexOf(item), 1);
-      this.targets = [...this.targets];
-    }
+      this.selectedTargets.splice(this.selectedTargets.indexOf(item), 1);
+      this.selectedTargets = [...this.selectedTargets];
+    },
+    toggle () {
+      this.$nextTick(() => {
+        if (this.selectAllTargets) {
+          this.selectedTargets = [];
+        } else {
+          this.selectedTargets = this.targets.slice();
+        }
+      });
+    },
   }
 };
 </script>

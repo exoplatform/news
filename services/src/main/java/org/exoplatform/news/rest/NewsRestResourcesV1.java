@@ -307,7 +307,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
     } catch (IllegalAccessException e) {
       LOG.warn("User {} attempt to access unauthorized news with id {}", authenticatedUser, id);
-      return Response.status(Response.Status.NOT_FOUND).build();
+      return Response.status(Response.Status.UNAUTHORIZED).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
       return Response.serverError().build();

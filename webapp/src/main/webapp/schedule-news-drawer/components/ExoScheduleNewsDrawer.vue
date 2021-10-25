@@ -79,58 +79,13 @@
                 </label>
               </div>
               <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div
+              <exo-news-targets-selector
                 v-if="allowPublishTargeting && publish"
-                class="d-flex flex-row selectTarget ms-2"
-                @click.stop>
-                <v-select
-                  id="chooseTargets"
-                  ref="chooseTargets"
-                  v-model="selectedTargets"
-                  :items="targets"
-                  :menu-props="{ bottom: true, offsetY: true}"
-                  :placeholder="$t('news.composer.stepper.chooseTarget.option')"
-                  item-text="name"
-                  item-value="id"
-                  chips
-                  hide-no-data
-                  multiple
-                  dense
-                  outlined>
-                  <template v-slot:prepend-item>
-                    <v-list-item
-                      ripple
-                      @click.stop="toggleTargetsSelection">
-                      <v-list-item-action>
-                        <v-icon :color="selectedTargets.length > 0 ? 'primary' : ''">
-                          {{ selectionIcon }}
-                        </v-icon>
-                      </v-list-item-action>
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          {{ selectTargetLabel }}
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </template>
-                  <template v-slot:selection="{ item, index }">
-                    <v-chip
-                      v-if="index === 0"
-                      close
-                      @click:close="removeTarget(item)">
-                      <span>{{ item.name }}</span>
-                    </v-chip>
-                    <span
-                      v-if="index === 1"
-                      class="grey--text text-caption">
-                      (+{{ selectedTargets.length - 1 }} {{ $t('news.composer.stepper.chooseTarget.others') }})
-                    </span>
-                  </template>
-                </v-select>
-              </div>
-              <div v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
-                * {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
-              </div>
+                id="chooseTargets"
+                ref="chooseTargets"
+                :news="news"
+                :publish="publish"
+                :allow-publish-targeting="allowPublishTargeting" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -304,7 +259,6 @@ export default {
   },
   data: () => ({
     stepper: 0,
-    selectedTargets: [],
     drawer: false,
     postArticleMode: 'later',
     postDateTime: '8:00',
@@ -315,11 +269,6 @@ export default {
     canPublishNews: false,
     publish: false,
     news: null,
-    targets: [
-      { id: 0, name: 'Latest news'},
-      { id: 1, name: 'Snapshot Slider'},
-      { id: 2, name: 'Homepage widget'}
-    ],
     allowPublishTargeting: false,
     isActivityPosted: true,
   }),
@@ -385,23 +334,6 @@ export default {
     disableTargetOption() {
       return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
     },
-    showTargetInformation() {
-      return this.disableTargetOption && this.allowPublishTargeting && this.publish;
-    },
-    selectAllTargets() {
-      return this.selectedTargets.length === this.targets.length;
-    },
-    selectSomeTarget() {
-      return this.selectedTargets.length > 0 && !this.selectAllTargets;
-    },
-    selectionIcon() {
-      if (this.selectAllTargets) {return 'mdi-close-box';}
-      if (this.selectSomeTarget) {return 'mdi-minus-box';}
-      return 'mdi-checkbox-blank-outline';
-    },
-    selectTargetLabel() {
-      return this.selectAllTargets ? this.$t('news.composer.stepper.chooseTarget.deselectAllTargets') : this.$t('news.composer.stepper.chooseTarget.selectAllTargets');
-    }
   },
   created() {
     this.$featureService.isFeatureEnabled('news.publishTargeting')
@@ -422,11 +354,6 @@ export default {
         this.postArticleMode = 'immediate';
       }
       this.openDrawer();
-    });
-    $(document).click(() => {
-      if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
-        this.$refs.chooseTargets.blur();
-      }
     });
   },
   methods: {
@@ -479,19 +406,6 @@ export default {
     },
     nextStep() {
       this.stepper++;
-    },
-    removeTarget(item) {
-      this.selectedTargets.splice(this.selectedTargets.indexOf(item), 1);
-      this.selectedTargets = [...this.selectedTargets];
-    },
-    toggleTargetsSelection() {
-      this.$nextTick(() => {
-        if (this.selectAllTargets) {
-          this.selectedTargets = [];
-        } else {
-          this.selectedTargets = this.targets.slice();
-        }
-      });
     },
   }
 };

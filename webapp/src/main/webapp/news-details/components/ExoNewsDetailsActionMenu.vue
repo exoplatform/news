@@ -39,20 +39,13 @@
             {{ $t('news.details.header.menu.delete') }}
           </v-list-item-title>
         </v-list-item>
-        <v-list-item v-if="isMobile && showPublishButton" @click="confirmAction">
+        <v-list-item v-if="showPublishButton" @click="$root.$emit('open-edit-publishing-drawer')">
           <v-list-item-title>
             {{ publishLabel }}
           </v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
-    <exo-confirm-dialog
-      ref="publishConfirmDialog"
-      :title="confirmDialogTitle"
-      :message="confirmDialogMessage"
-      :ok-label="$t('news.publish.btn.confirm')"
-      :cancel-label="$t('news.publish.btn.cancel')"
-      @ok="updatePublishedField" />
   </div>
 </template>
 
@@ -106,80 +99,26 @@ export default {
     showPublishMessage: false,
     publishMessage: '',
     publishSuccess: true,
+    canPublishNews: null,
   }),
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
-    confirmDialogTitle() {
-      return this.newsPublished && this.$t('news.unpublish.action') || this.$t('news.publish.action');
-    },
-    confirmDialogMessage() {
-      return this.newsPublished && this.$t('news.unpublish.confirm', {0: this.news.title}) || this.$t('news.publish.confirm');
-    },
     publishLabel() {
       return this.newsPublished ? this.$t('news.details.header.menu.unpublish'): this.$t('news.details.header.menu.publish');
     },
+  },
+  created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
   },
   mounted() {
     $('#UIPortalApplication').parent().click(() => {
       this.actionMenu = false;
     });
   },
-  methods: {
-    confirmAction() {
-      this.$refs.publishConfirmDialog.open();
-    },
-    updatePublishedField() {
-      const publishMessageTime = 5000;
-      const context = this;
-      let updatedNews = null;
-      if (this.newsPublished === false) {
-        updatedNews = {
-          pinned: true,
-        };
-      } else {
-        updatedNews = {
-          pinned: false,
-        };
-      }
-      fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/${this.news.newsId}`,{
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        method: 'PATCH',
-        body: JSON.stringify(updatedNews)
-      }).then (function() {
-        context.showPublishMessage = true;
-        if (context.newsPublished === false) {
-          context.publishMessage = context.$t('news.publish.success');
-          // eslint-disable-next-line vue/no-mutating-props
-          context.newsPublished = true;
-        } else {
-          context.publishMessage = context.$t('news.unpublish.success');
-          // eslint-disable-next-line vue/no-mutating-props
-          context.newsPublished = false;
-        }
-        setTimeout(function () {
-          context.showPublishMessage = false;
-        }, publishMessageTime);
-      })
-        .catch (function() {
-          context.showPublishMessage = true;
-          context.publishSuccess = false;
-          if (context.newsPublished === false) {
-            context.publishMessage = context.$t('news.publish.error');
-          } else {
-            context.publishMessage = context.$t('news.unpublish.error');
-          }
-          setTimeout(function () {
-            context.publishSuccess = true;
-            context.showPublishMessage = false;
-          }, publishMessageTime);
-        });
-    },
-  }
 };
 </script>
 

@@ -205,6 +205,9 @@
       <module>newsSnackbarComponent</module>
     </depends>
     <depends>
+      <module>newsTargetSelectorComponent</module>
+    </depends>
+    <depends>
       <module>commons-editor</module>
       <as>editor</as>
     </depends>
@@ -269,6 +272,21 @@
   </module>
 
   <module>
+    <name>newsTargetSelectorComponent</name>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsTargetSelectorComponent.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+  </module>
+
+  <module>
     <name>NewsSearchCard</name>
     <script>
       <minify>false</minify>
@@ -306,6 +324,9 @@
     </depends>
     <depends>
       <module>newsSnackbarComponent</module>
+    </depends>
+    <depends>
+      <module>newsTargetSelectorComponent</module>
     </depends>
     <depends>
       <module>vue</module>

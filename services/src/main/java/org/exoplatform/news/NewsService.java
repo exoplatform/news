@@ -80,6 +80,8 @@ public interface NewsService {
 
   void deleteNews(String id, String currentUser, boolean isDraft) throws Exception;
 
+  void updateNewsActivity(News news, boolean post);
+
   /**
    * @param news {@link News} to check
    * @param authenticatedUser authenticated username

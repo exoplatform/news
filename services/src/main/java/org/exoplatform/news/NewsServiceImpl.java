@@ -101,9 +101,9 @@ public class NewsServiceImpl implements NewsService {
 
   public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP      = "exo:draftVisible";
 
-  public static final String       NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE = "mix:activityVisibility";
+  public static final String       NEWS_ACTIVITY_POSTING_MIXIN_TYPE = "mix:newsActivityPosting";
 
-  public static final String       NEWS_ACTIVITY_HIDDEN_MIXIN_PROP     = "exo:isHiddenActivity";
+  public static final String       NEWS_ACTIVITY_POSTED_MIXIN_PROP     = "exo:newsActivityPosted";
 
   public static final String       MIX_NEWS_MODIFIERS                  = "mix:newsModifiers";
 
@@ -731,10 +731,10 @@ public class NewsServiceImpl implements NewsService {
     } else {
       news.setDraftVisible(false);
     }
-    if (originalNode.hasProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP)) {
-      news.setHiddenActivity(Boolean.valueOf(node.getProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP).getString()));
+    if (originalNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
+      news.setActivityPosted(Boolean.valueOf(node.getProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP).getString()));
     } else {
-      news.setHiddenActivity(false);
+      news.setActivityPosted(false);
     }
     news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
     news.setCanPublish(canPublishNews());
@@ -749,7 +749,7 @@ public class NewsServiceImpl implements NewsService {
         String newsActivityId = activities[0].split(":")[1];
         ExoSocialActivity activity = activityManager.getActivity(newsActivityId);
         if (activity != null) {
-          news.setHiddenActivity(activity.isHidden());
+          news.setActivityPosted(activity.isHidden());
         }
         news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
@@ -850,7 +850,7 @@ public class NewsServiceImpl implements NewsService {
     activity.setBody("");
     activity.setType("news");
     activity.setUserId(poster.getId());
-    activity.isHidden(news.isHiddenActivity());
+    activity.isHidden(news.isActivityPosted());
     Map<String, String> templateParams = new HashMap<>();
     templateParams.put("newsId", news.getId());
     activity.setTemplateParams(templateParams);
@@ -1224,18 +1224,6 @@ public class NewsServiceImpl implements NewsService {
             currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
-  /**
-   * Return a boolean that indicates if the current user can post/unpost the news
-   * activity on the stream
-   *
-   * @return if the news activity can be posted or not on the stream
-   */
-  public boolean canChooseTargets(String authenticatedUser) {
-    org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
-    return authenticatedSecurityIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*")
-        || authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, "*");
-  }
-
   public News scheduleNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -1250,11 +1238,11 @@ public class NewsServiceImpl implements NewsService {
       if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
-      if (scheduledNewsNode.canAddMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE)
-          && !scheduledNewsNode.hasProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP)) {
-        scheduledNewsNode.addMixin(NEWS_ACTIVITY_VISIBILITY_MIXIN_TYPE);
+      if (scheduledNewsNode.canAddMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE)
+          && !scheduledNewsNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
+        scheduledNewsNode.addMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE);
       }
-      scheduledNewsNode.setProperty(NEWS_ACTIVITY_HIDDEN_MIXIN_PROP, String.valueOf(news.isHiddenActivity()));
+      scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isActivityPosted()));
       String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
         ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());

@@ -116,6 +116,4 @@ public interface NewsService {
 
   News createNews(News news, Session session) throws Exception;
 
-  public boolean canChooseTargets(String authenticatedUser);
-
 }

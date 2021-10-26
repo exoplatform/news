@@ -63,9 +63,9 @@
       </propertyDefinition>
     </propertyDefinitions>
   </nodeType>
-  <nodeType name="mix:activityVisibility" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="mix:newsActivityPosting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
     <propertyDefinitions>
-      <propertyDefinition name="exo:isHiddenActivity" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+      <propertyDefinition name="exo:newsActivityPosted" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints/>
       </propertyDefinition>
     </propertyDefinitions>

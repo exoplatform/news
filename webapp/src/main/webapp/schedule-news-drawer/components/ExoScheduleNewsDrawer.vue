@@ -21,7 +21,7 @@
       </template>
       <template slot="content">
         <v-stepper
-          v-if="canChooseTargets"
+          v-if="canPublishNews"
           v-model="stepper"
           vertical
           flat
@@ -37,7 +37,7 @@
               <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.description') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
-                  v-model="hiddenActivity"
+                  v-model="isActivityPosted"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -338,8 +338,7 @@ export default {
       { id: 2, name: 'Homepage widget'}
     ],
     allowPublishTargeting: false,
-    hiddenActivity: true,
-    canChooseTargets: false,
+    isActivityPosted: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -389,13 +388,13 @@ export default {
       return this.news && this.news.pinned;
     },
     visibilityActivity() {
-      return this.news && this.news.hiddenActivity;
+      return this.news && this.news.isActivityPosted;
     },
     disabled() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      if (this.canChooseTargets) {
-        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish && this.visibilityActivity === !this.hiddenActivity || this.stepper < 3;
+      if (this.canPublishNews) {
+        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish && this.visibilityActivity === !this.isActivityPosted || this.stepper < 3;
       } else {
         return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
       }
@@ -426,9 +425,6 @@ export default {
       .then(enabled => this.allowPublishTargeting = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
-    });
-    this.$newsServices.canChooseTargets().then(canChooseTargets => {
-      this.canChooseTargets = canChooseTargets;
     });
     if (this.newsId) {
       this.initializeDate();
@@ -479,13 +475,13 @@ export default {
         .then(news => {
           if (news) {
             this.news = news;
-            this.hiddenActivity = !news.hiddenActivity;
+            this.isActivityPosted = !news.isActivityPosted;
             this.schedulePostDate = news.schedulePostDate;
           }
         });
     },
     postArticle() {
-      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.hiddenActivity);
+      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted);
     },
     closeDrawer() {
       if (this.news) {

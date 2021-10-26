@@ -2448,58 +2448,6 @@ public class NewsServiceImplTest {
 
   }
 
-  @PrepareForTest(NewsUtils.class)
-  @Test
-  public void shouldCheckAbilityToChooseTargets() throws IllegalAccessException {
-    // user can't choose targets
-    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-                                                      sessionProviderService,
-                                                      nodeHierarchyCreator,
-                                                      dataDistributionManager,
-                                                      spaceService,
-                                                      activityManager,
-                                                      identityManager,
-                                                      uploadService,
-                                                      imageProcessor,
-                                                      linkManager,
-                                                      publicationServiceImpl,
-                                                      publicationManagerImpl,
-                                                      wcmPublicationServiceImpl,
-                                                      newsSearchConnector,
-                                                      newsAttachmentsService,
-                                                      indexingService,
-                                                      newsESSearchConnector,
-                                                      userACL);
-
-    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
-    PowerMockito.mockStatic(NewsUtils.class);
-    PowerMockito.when(NewsUtils.getUserIdentity("user")).thenReturn(currentIdentity);
-
-    // When
-    boolean canChooseTargets = newsService.canChooseTargets("user");
-
-    // Then
-    assertFalse(canChooseTargets);
-
-    // user can choose targets
-    org.exoplatform.services.security.Identity currentIdentity1 = new org.exoplatform.services.security.Identity("user1");
-    PowerMockito.mockStatic(NewsUtils.class);
-    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-    memberships.add(membershipentry);
-    currentIdentity1.setMemberships(memberships);
-    PowerMockito.when(NewsUtils.getUserIdentity("user1")).thenReturn(currentIdentity1);
-
-    // When
-    canChooseTargets = newsService.canChooseTargets("user1");
-
-    // Then
-    assertTrue(canChooseTargets);
-
-  }
-
   @Test
   public void shouldPostNewsActivity() throws Exception {
     // Given
@@ -2527,7 +2475,7 @@ public class NewsServiceImplTest {
     news.setAuthor("root");
     news.setSpaceId("1");
     news.setId("id123");
-    news.setHiddenActivity(true);
+    news.setActivityPosted(true);
     Identity poster = new Identity("root");
     Identity spaceIdentity = new Identity("1");
     spaceIdentity.setRemoteId("space1");

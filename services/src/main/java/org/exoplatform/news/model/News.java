@@ -95,7 +95,7 @@ public class News {
 
   private String               timeZoneId;
 
-  private boolean              isActivityPosted;
+  private boolean              activityPosted;
 
   public String getId() {
     return id;
@@ -426,10 +426,10 @@ public class News {
   }
 
   public boolean isActivityPosted() {
-    return isActivityPosted;
+    return activityPosted;
   }
 
   public void setActivityPosted(boolean activityPosted) {
-    isActivityPosted = activityPosted;
+    this.activityPosted = activityPosted;
   }
 }

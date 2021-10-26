@@ -129,7 +129,7 @@
                 </v-select>
               </div>
               <div v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
-                {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
+                * {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -214,23 +214,6 @@
           </v-stepper-content>
         </v-stepper>
         <div v-else>
-          <div v-if="canPublishNews" class="d-flex flex-column mt-4 ms-3">
-            <div class="d-flex flex-row">
-              <span class="text-subtitle-1 grey--text postModeText">{{ $t('news.composer.modularity.publish') }}</span>
-              <v-divider
-                inset
-                class="my-auto me-4 ms-3" />
-            </div>
-            <div class="d-flex flex-row">
-              <v-checkbox
-                v-model="publish">
-                <span slot="label" class="postModeText">{{ $t('news.composer.user.publish') }}</span>
-              </v-checkbox>
-            </div>
-            <div class="d-flex flex-row grey--text ms-8">
-              {{ $t('news.composer.user.publish.info') }}
-            </div>
-          </div>
           <div class="d-flex flex-column mt-4 ms-3">
             <div class="d-flex flex-row">
               <span class="text-subtitle-1 grey--text postModeText">{{ $t('news.composer.modularity.post') }}</span>
@@ -388,7 +371,7 @@ export default {
       return this.news && this.news.pinned;
     },
     visibilityActivity() {
-      return this.news && this.news.isActivityPosted;
+      return this.news && this.news.activityPosted;
     },
     disabled() {
       const postDate = new Date(this.postDate);
@@ -475,7 +458,7 @@ export default {
         .then(news => {
           if (news) {
             this.news = news;
-            this.isActivityPosted = !news.isActivityPosted;
+            this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
           }
         });

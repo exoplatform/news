@@ -83,39 +83,39 @@ import org.exoplatform.upload.UploadService;
  */
 public class NewsServiceImpl implements NewsService {
 
-  public static final String[]     SHARE_NEWS_PERMISSIONS              = new String[] { PermissionType.READ };
+  public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
 
-  public static final String       NEWS_NODES_FOLDER                   = "News";
+  public static final String       NEWS_NODES_FOLDER                = "News";
 
-  public static final String       PINNED_NEWS_NODES_FOLDER            = "Pinned";
+  public static final String       PINNED_NEWS_NODES_FOLDER         = "Pinned";
 
-  public static final String       APPLICATION_DATA_PATH               = "/Application Data";
+  public static final String       APPLICATION_DATA_PATH            = "/Application Data";
 
-  private static final String      PUBLISHER_MEMBERSHIP_NAME           = "publisher";
+  private static final String      PUBLISHER_MEMBERSHIP_NAME        = "publisher";
 
-  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP     = "/platform/web-contributors";
+  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP  = "/platform/web-contributors";
 
-  private final static String      PLATFORM_ADMINISTRATORS_GROUP       = "/platform/administrators";
+  private final static String      PLATFORM_ADMINISTRATORS_GROUP    = "/platform/administrators";
 
-  public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE    = "mix:draftVisibility";
+  public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
 
-  public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP      = "exo:draftVisible";
+  public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP   = "exo:draftVisible";
 
   public static final String       NEWS_ACTIVITY_POSTING_MIXIN_TYPE = "mix:newsActivityPosting";
 
-  public static final String       NEWS_ACTIVITY_POSTED_MIXIN_PROP     = "exo:newsActivityPosted";
+  public static final String       NEWS_ACTIVITY_POSTED_MIXIN_PROP  = "exo:newsActivityPosted";
 
-  public static final String       MIX_NEWS_MODIFIERS                  = "mix:newsModifiers";
+  public static final String       MIX_NEWS_MODIFIERS               = "mix:newsModifiers";
 
-  public static final String       MIX_NEWS_MODIFIERS_PROP             = "exo:newsModifiersIds";
+  public static final String       MIX_NEWS_MODIFIERS_PROP          = "exo:newsModifiersIds";
 
-  private static final Pattern     MENTION_PATTERN                     = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+  private static final Pattern     MENTION_PATTERN                  = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
-  private static final String      HTML_AT_SYMBOL_PATTERN              = "@";
+  private static final String      HTML_AT_SYMBOL_PATTERN           = "@";
 
-  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN      = "&#64;";
+  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN   = "&#64;";
 
-  private static final String      LAST_PUBLISHER                      = "publication:lastUser";
+  private static final String      LAST_PUBLISHER                   = "publication:lastUser";
 
   private RepositoryService        repositoryService;
 
@@ -370,6 +370,11 @@ public class NewsServiceImpl implements NewsService {
       //draft visible
       if (newsNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
         newsNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
+      }
+
+      //news activity
+      if (newsNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
+        newsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
       }
 
       // attachments
@@ -993,6 +998,12 @@ public class NewsServiceImpl implements NewsService {
     }
     newsDraftNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
 
+    if (newsDraftNode.canAddMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE)
+        && !newsDraftNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
+      newsDraftNode.addMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE);
+    }
+    newsDraftNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isActivityPosted()));
+
     Lifecycle lifecycle = publicationManager.getLifecycle("newsLifecycle");
     String lifecycleName = wCMPublicationService.getWebpagePublicationPlugins()
                                                 .get(lifecycle.getPublicationPlugin())
@@ -1238,11 +1249,6 @@ public class NewsServiceImpl implements NewsService {
       if (scheduledNewsNode == null) {
         throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + news.getId());
       }
-      if (scheduledNewsNode.canAddMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE)
-          && !scheduledNewsNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
-        scheduledNewsNode.addMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE);
-      }
-      scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isActivityPosted()));
       String schedulePostDate = news.getSchedulePostDate();
       if (schedulePostDate != null) {
         ZoneId userTimeZone = StringUtils.isBlank(news.getTimeZoneId()) ? ZoneOffset.UTC : ZoneId.of(news.getTimeZoneId());
@@ -1254,6 +1260,7 @@ public class NewsServiceImpl implements NewsService {
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.setProperty("exo:pinned", news.isPinned());
+        scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, news.isActivityPosted());
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
       }

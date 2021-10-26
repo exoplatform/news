@@ -173,7 +173,7 @@ export default {
     },
     postNews(schedulePostDate, postArticleMode, publish, isActivityPosted) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
-      this.news.isActivityPosted = isActivityPosted;
+      this.news.activityPosted = isActivityPosted;
       this.news.pinned = publish;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;

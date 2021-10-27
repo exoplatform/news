@@ -511,7 +511,7 @@ export default {
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
           { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
         );
       }

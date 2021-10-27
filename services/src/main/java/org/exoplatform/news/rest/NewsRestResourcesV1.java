@@ -436,6 +436,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       @ApiResponse(code = 500, message = "Internal server error") })
   public Response updateNews(@Context HttpServletRequest request,
                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
+                             @ApiParam(value = "Post news", required = false) @QueryParam("post") boolean post,
                              @ApiParam(value = "News", required = true) News updatedNews) {
 
     if (updatedNews == null) {
@@ -477,6 +478,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
 
       news = newsService.updateNews(news);
+
+      newsService.updateNewsActivity(news, post);
 
       return Response.ok(news).build();
     } catch (Exception e) {

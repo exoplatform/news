@@ -1183,6 +1183,15 @@ public class NewsServiceImpl implements NewsService {
     return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
+  @Override
+  public void updateNewsActivity(News news, boolean post) {
+    ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+    if(post) {
+      activity.setUpdated(System.currentTimeMillis());
+    }
+    activityManager.updateActivity(activity, true);
+  }
+
   /**
    * Return a boolean that indicates if the current user can publish the news or not
    * 

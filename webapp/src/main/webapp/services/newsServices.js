@@ -103,8 +103,8 @@ export function importFileFromUrl(url) {
   });
 }
 
-export function updateNews(news) {
-  return fetch(`${newsConstants.NEWS_API}/${news.id}`, {
+export function updateNews(news, post) {
+  return fetch(`${newsConstants.NEWS_API}/${news.id}?post=${post}`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -112,17 +112,6 @@ export function updateNews(news) {
     method: 'PUT',
     body: JSON.stringify(news)
   }).then(resp => resp.json());
-}
-
-export function updateAndPostNewsActivity(activity) {
-  return fetch(`${newsConstants.SOCIAL_ACTIVITY_API}/${activity.id}`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include',
-    method: 'PUT',
-    body: JSON.stringify(activity)
-  });
 }
 
 export function clickOnEditButton(id) {

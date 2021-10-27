@@ -127,7 +127,7 @@
                   id="newsEdit"
                   :disabled="updateDisabled"
                   class="btn btn-primary"
-                  @click.prevent="updateNews">
+                  @click.prevent="updateNews(false)">
                   {{ $t("news.edit.update") }}
                 </v-btn>
                 <v-btn
@@ -135,7 +135,7 @@
                   :disabled="news.archived ? true: updateDisabled"
                   :class="[news.archived ? 'unauthorizedPublish' : '']"
                   class="btn ms-2 me-2"
-                  @click.prevent="updateAndPostNews">
+                  @click.prevent="updateNews(true)">
                   {{ $t("news.edit.update.post") }}
                 </v-btn>
                 <v-btn class="btn me-2" @click="goBack">
@@ -148,7 +148,7 @@
                 id="newsEdit"
                 :disabled="updateDisabled"
                 class="btn btn-primary"
-                @click.prevent="updateNews">
+                @click.prevent="updateNews(false)">
                 {{ $t("news.edit.update") }}
               </v-btn>
             </div>
@@ -675,7 +675,7 @@ export default {
         this.draftSavingStatus = this.$t('news.composer.draft.savingDraftStatus');
         Vue.nextTick(() => {
           if (this.activityId) {
-            this.doUpdateNews('draft');
+            this.doUpdateNews('draft', false);
           } else {
             this.saveNewsDraft();
           }
@@ -792,7 +792,7 @@ export default {
       if (this.news.id) {
         if (this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
           news.id = this.news.id;
-          this.$newsServices.updateNews(news)
+          this.$newsServices.updateNews(news, false)
             .then((updatedNews) => {
               if (this.news.body !== updatedNews.body) {
                 // Images URLs may have been updated in body to transform temporary URLs to permanent URLs.
@@ -861,43 +861,17 @@ export default {
       CKEDITOR.instances['newsContent'].setData('');
       this.news.illustration = [];
     },
-    updateNews: function () {
-      this.confirmAndUpdateNews().then(() => {
+    updateNews: function (post) {
+      this.confirmAndUpdateNews(post).then(() => {
         window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
       }).catch (function() {
         window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
       });
     },
-    updateAndPostNews: function () {
-      if (!this.news.archived) {
-        const self = this;
-        this.confirmAndUpdateNews().then(() => {
-          if (self.activityId)
-          {
-            const activity = {
-              id: self.activityId,
-              title: '',
-              body: '',
-              type: 'news',
-              templateParams: {
-                newsId: self.news.id,
-              },
-              updateDate: new Date().getTime()
-            };
-
-            return this.$newsServices.updateAndPostNewsActivity(activity);
-          }
-        }).then(() => {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
-        }).catch (function() {
-          window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
-        });
-      }
+    confirmAndUpdateNews: function(post) {
+      return this.doUpdateNews('published', post);
     },
-    confirmAndUpdateNews: function() {
-      return this.doUpdateNews('published');
-    },
-    doUpdateNews: function (publicationState) {
+    doUpdateNews: function (publicationState, post) {
       const newsBody = this.replaceImagesURLs(this.getBody());
       const updatedNews = {
         id: this.news.id,
@@ -916,7 +890,7 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return this.$newsServices.updateNews(updatedNews).then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+      return this.$newsServices.updateNews(updatedNews, post).then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
     },
     goBack() {
       if ( history.length > 1) {

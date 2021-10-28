@@ -123,7 +123,7 @@
                     <span
                       v-if="index === 1"
                       class="grey--text text-caption">
-                      (+{{ targets.length - 1 }} {{ $t('news.composer.stepper.chooseTarget.others') }})
+                      (+{{ selectedTargets.length - 1 }} {{ $t('news.composer.stepper.chooseTarget.others') }})
                     </span>
                   </template>
                 </v-select>

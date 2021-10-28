@@ -29,6 +29,8 @@ public class News {
 
   private String               draftUpdaterDisplayName;
 
+  private String               draftUpdaterUserName;
+
   private String               uploadId;
 
   private byte[]               illustration;
@@ -167,6 +169,14 @@ public class News {
 
   public void setDraftUpdaterDisplayName(String draftUpdaterDisplayName) {
     this.draftUpdaterDisplayName = draftUpdaterDisplayName;
+  }
+
+  public String getDraftUpdaterUserName() {
+    return draftUpdaterUserName;
+  }
+
+  public void setDraftUpdaterUserName(String draftUpdaterUserName) {
+    this.draftUpdaterUserName = draftUpdaterUserName;
   }
 
   public String getUploadId() {

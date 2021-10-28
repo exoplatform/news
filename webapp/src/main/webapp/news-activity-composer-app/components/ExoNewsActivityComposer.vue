@@ -193,7 +193,7 @@
             </textarea>
           </div>
           <v-alert
-            v-if="news.publicationState === 'draft' && activityId"
+            v-if="news.draftUpdaterDisplayName !== currentUser && news.publicationState === 'draft' && activityId"
             dismissible
             border="left"
             elevation="2"
@@ -322,6 +322,7 @@ export default {
       loading: true,
       currentSpace: {},
       spaceURL: null,
+      currentUser: eXo.env.portal.userName,
       fullDateFormat: {
         year: 'numeric',
         month: 'short',
@@ -377,7 +378,7 @@ export default {
       return !this.editMode && this.news.id !== '' && this.currentSpace && this.currentSpace.redactorsCount > 0;
     },
     isNewsAuthor() {
-      return this.news.author === eXo.env.portal.userName;
+      return this.news.author === this.currentUser;
     },
     newsLabel() {
       return  this.news.draftVisible ?  this.$t('news.composer.shared') : this.$t('news.composer.private');
@@ -622,6 +623,7 @@ export default {
             this.news.activityId = fetchedNode.activityId;
             this.news.updater = fetchedNode.updater;
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
+            this.news.draftUpdaterUserName = fetchedNode.draftUpdaterUserName;
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
@@ -720,7 +722,7 @@ export default {
         title: this.news.title,
         summary: this.news.summary,
         body: this.getBody() ? newsBody : this.news.body,
-        author: eXo.env.portal.userName,
+        author: this.currentUser,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         draftVisible: this.news.draftVisible,
@@ -768,7 +770,7 @@ export default {
         title: this.news.title,
         summary: this.news.summary,
         body: this.replaceImagesURLs(this.news.body),
-        author: eXo.env.portal.userName,
+        author: this.currentUser,
         attachments: [],
         pinned: false,
         draftVisible: this.news.draftVisible,

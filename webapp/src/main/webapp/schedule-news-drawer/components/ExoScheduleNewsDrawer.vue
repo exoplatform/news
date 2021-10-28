@@ -21,6 +21,7 @@
       </template>
       <template slot="content">
         <v-stepper
+          v-if="canPublishNews"
           v-model="stepper"
           vertical
           flat
@@ -36,7 +37,7 @@
               <div class="d-flex flex-row grey--text ms-2 postOnStreamOption">{{ $t('news.composer.stepper.postOnStream.description') }}</div>
               <div class="d-flex flex-row">
                 <v-switch
-                  v-model="hiddenActivity"
+                  v-model="isActivityPosted"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -78,12 +79,16 @@
                 </label>
               </div>
               <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
-              <div v-if="allowPublishTargeting && publish" class="d-flex flex-row selectTarget ms-2">
+              <div
+                v-if="allowPublishTargeting && publish"
+                class="d-flex flex-row selectTarget ms-2"
+                @click.stop>
                 <v-select
                   id="chooseTargets"
                   ref="chooseTargets"
                   v-model="selectedTargets"
                   :items="targets"
+                  :menu-props="{ bottom: true, offsetY: true}"
                   :placeholder="$t('news.composer.stepper.chooseTarget.option')"
                   item-text="name"
                   item-value="id"
@@ -91,7 +96,40 @@
                   hide-no-data
                   multiple
                   dense
-                  outlined />
+                  outlined>
+                  <template v-slot:prepend-item>
+                    <v-list-item
+                      ripple
+                      @click.stop="toggleTargetsSelection">
+                      <v-list-item-action>
+                        <v-icon :color="selectedTargets.length > 0 ? 'primary' : ''">
+                          {{ selectionIcon }}
+                        </v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ selectTargetLabel }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip
+                      v-if="index === 0"
+                      close
+                      @click:close="removeTarget(item)">
+                      <span>{{ item.name }}</span>
+                    </v-chip>
+                    <span
+                      v-if="index === 1"
+                      class="grey--text text-caption">
+                      (+{{ selectedTargets.length - 1 }} {{ $t('news.composer.stepper.chooseTarget.others') }})
+                    </span>
+                  </template>
+                </v-select>
+              </div>
+              <div v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
+                * {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
               </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -104,7 +142,7 @@
                 <v-btn
                   class="btn btn-primary me-4"
                   outlined
-                  :disabled="allowPublishTargeting && disableTargetOption"
+                  :disabled="disableTargetOption"
                   @click="nextStep">
                   {{ $t('news.composer.stepper.continue') }}
                   <v-icon size="18" class="ms-2">
@@ -164,7 +202,6 @@
               </v-radio-group>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn
-                  :disabled="disabled"
                   class="btn"
                   @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -176,6 +213,53 @@
             </div>
           </v-stepper-content>
         </v-stepper>
+        <div v-else>
+          <div class="d-flex flex-column mt-4 ms-3">
+            <div class="d-flex flex-row">
+              <span class="text-subtitle-1 grey--text postModeText">{{ $t('news.composer.modularity.post') }}</span>
+              <v-divider
+                inset
+                class="my-auto me-4 ms-3" />
+            </div>
+            <div class="d-flex flex-row">
+              <v-radio-group v-model="postArticleMode">
+                <v-radio
+                  value="immediate">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.postImmediately') }}</span>
+                </v-radio>
+                <v-radio
+                  value="later"
+                  class="mt-4">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.postLater') }}</span>
+                </v-radio>
+                <div v-if="showPostLaterMessage" class="mt-4">
+                  <div class="grey--text my-4 scheduleInfoCursor">{{ $t('news.composer.choosePostDate') }}</div>
+                  <div class="d-flex flex-row flex-grow-1">
+                    <slot name="postDate"></slot>
+                    <date-picker
+                      v-model="postDate"
+                      :min-value="minimumPostDate"
+                      class="scheduleDatePicker flex-grow-1 my-auto" />
+                    <div class="d-flex flex-row flex-grow-0">
+                      <slot name="postDateDateTime"></slot>
+                      <time-picker
+                        v-model="postDateTime"
+                        :min="minimumPostDateTime"
+                        class="me-2" />
+                    </div>
+                  </div>
+                </div>
+                <v-radio
+                  v-if="allowNotPost"
+                  value="notPost"
+                  class="postModeText mt-4">
+                  <span slot="label" class="postModeText">{{ $t('news.composer.cancelPost') }}</span>
+                </v-radio>
+                <div v-if="showDontPostMessage" class="grey--text my-4 ms-4 scheduleInfoCursor">{{ $t('news.composer.chooseNotPost') }}</div>
+              </v-radio-group>
+            </div>
+          </div>
+        </div>
       </template>
       <template slot="footer">
         <div v-if="editScheduledNews !== 'editScheduledNews'" class="d-flex justify-end">
@@ -237,7 +321,7 @@ export default {
       { id: 2, name: 'Homepage widget'}
     ],
     allowPublishTargeting: false,
-    hiddenActivity: true,
+    isActivityPosted: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -286,14 +370,38 @@ export default {
     selected() {
       return this.news && this.news.pinned;
     },
+    visibilityActivity() {
+      return this.news && this.news.activityPosted;
+    },
     disabled() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish || this.stepper < 3;
+      if (this.canPublishNews) {
+        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish && this.visibilityActivity === !this.isActivityPosted || this.stepper < 3;
+      } else {
+        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
+      }
     },
     disableTargetOption() {
-      return this.selectedTargets && this.selectedTargets.length === 0;
+      return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
     },
+    showTargetInformation() {
+      return this.disableTargetOption && this.allowPublishTargeting && this.publish;
+    },
+    selectAllTargets() {
+      return this.selectedTargets.length === this.targets.length;
+    },
+    selectSomeTarget() {
+      return this.selectedTargets.length > 0 && !this.selectAllTargets;
+    },
+    selectionIcon() {
+      if (this.selectAllTargets) {return 'mdi-close-box';}
+      if (this.selectSomeTarget) {return 'mdi-minus-box';}
+      return 'mdi-checkbox-blank-outline';
+    },
+    selectTargetLabel() {
+      return this.selectAllTargets ? this.$t('news.composer.stepper.chooseTarget.deselectAllTargets') : this.$t('news.composer.stepper.chooseTarget.selectAllTargets');
+    }
   },
   created() {
     this.$featureService.isFeatureEnabled('news.publishTargeting')
@@ -315,11 +423,9 @@ export default {
       }
       this.openDrawer();
     });
-    $(document).mousedown(() => {
+    $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
-        window.setTimeout(() => {
-          this.$refs.chooseTargets.isMenuActive = false;
-        }, 200);
+        this.$refs.chooseTargets.blur();
       }
     });
   },
@@ -352,14 +458,13 @@ export default {
         .then(news => {
           if (news) {
             this.news = news;
+            this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
           }
         });
     },
     postArticle() {
-      if (this.stepper === 3) {
-        this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.hiddenActivity);
-      }
+      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted);
     },
     closeDrawer() {
       if (this.news) {
@@ -374,6 +479,19 @@ export default {
     },
     nextStep() {
       this.stepper++;
+    },
+    removeTarget(item) {
+      this.selectedTargets.splice(this.selectedTargets.indexOf(item), 1);
+      this.selectedTargets = [...this.selectedTargets];
+    },
+    toggleTargetsSelection() {
+      this.$nextTick(() => {
+        if (this.selectAllTargets) {
+          this.selectedTargets = [];
+        } else {
+          this.selectedTargets = this.targets.slice();
+        }
+      });
     },
   }
 };

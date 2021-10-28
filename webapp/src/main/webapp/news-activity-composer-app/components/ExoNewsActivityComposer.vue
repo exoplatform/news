@@ -495,6 +495,7 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
+      const mobile = this.isMobile;
       const newsToolbar = [];
       if (this.isMobile) {
         newsToolbar.push(
@@ -511,7 +512,7 @@ export default {
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
           { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
         );
       }
@@ -537,17 +538,19 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
-            const numerotationGroupButton = document.getElementById('cke_14');
-            const attachMediaButton = document.getElementById('cke_18');
-            const attachFileButton = document.getElementById('cke_22');
-            numerotationGroupButton.style.borderRight = 'none';
-            attachMediaButton.style.display = 'none';
-            attachFileButton.style.display = 'none';
-            const spanBadge = document.createElement('span');
-            spanBadge.setAttribute('class','badge');
-            spanBadge.setAttribute('id','badge');
-            spanBadge.innerHTML = '0';
-            attachFileButton.appendChild(spanBadge);
+            if (mobile) {
+              const numerotationGroupButton = document.getElementById('cke_14');
+              const attachMediaButton = document.getElementById('cke_18');
+              const attachFileButton = document.getElementById('cke_22');
+              numerotationGroupButton.style.borderRight = 'none';
+              attachMediaButton.style.display = 'none';
+              attachFileButton.style.display = 'none';
+              const spanBadge = document.createElement('span');
+              spanBadge.setAttribute('class','badge');
+              spanBadge.setAttribute('id','badge');
+              spanBadge.innerHTML = '0';
+              attachFileButton.appendChild(spanBadge);
+            }
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -622,7 +625,7 @@ export default {
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
-            this.news.hiddenActivity = fetchedNode.hiddenActivity;
+            this.news.activityPosted = fetchedNode.activityPosted;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -690,8 +693,8 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish, hiddenActivity) {
-      this.news.hiddenActivity = hiddenActivity;
+    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted) {
+      this.news.activityPosted = isActivityPosted;
       this.news.pinned = publish;
       this.doPostNews(schedulePostDate);
     },
@@ -725,7 +728,7 @@ export default {
         publicationState: 'published',
         schedulePostDate: null,
         timeZoneId: null,
-        hiddenActivity: this.news.hiddenActivity,
+        activityPosted: this.news.activityPosted,
       };
 
       if (schedulePostDate != null){

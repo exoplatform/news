@@ -893,7 +893,12 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return this.$newsServices.updateNews(updatedNews, post).then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+      return this.$newsServices.updateNews(updatedNews, post).then((createdNews) => {
+        if (this.news.body !== createdNews.body) {
+          this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, createdNews.body);
+        }
+      }).then(() => this.$emit('draftUpdated'))
+        .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
     },
     goBack() {
       if ( history.length > 1) {

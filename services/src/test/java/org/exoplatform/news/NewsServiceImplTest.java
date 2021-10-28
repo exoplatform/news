@@ -2475,7 +2475,7 @@ public class NewsServiceImplTest {
     news.setAuthor("root");
     news.setSpaceId("1");
     news.setId("id123");
-    news.setHiddenActivity(true);
+    news.setActivityPosted(true);
     Identity poster = new Identity("root");
     Identity spaceIdentity = new Identity("1");
     spaceIdentity.setRemoteId("space1");

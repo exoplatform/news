@@ -625,7 +625,7 @@ export default {
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
-            this.news.hiddenActivity = fetchedNode.hiddenActivity;
+            this.news.activityPosted = fetchedNode.activityPosted;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -693,8 +693,8 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish, hiddenActivity) {
-      this.news.hiddenActivity = hiddenActivity;
+    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted) {
+      this.news.activityPosted = isActivityPosted;
       this.news.pinned = publish;
       this.doPostNews(schedulePostDate);
     },
@@ -728,7 +728,7 @@ export default {
         publicationState: 'published',
         schedulePostDate: null,
         timeZoneId: null,
-        hiddenActivity: this.news.hiddenActivity,
+        activityPosted: this.news.activityPosted,
       };
 
       if (schedulePostDate != null){

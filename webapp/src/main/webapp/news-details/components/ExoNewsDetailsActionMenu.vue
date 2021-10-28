@@ -41,7 +41,7 @@
         </v-list-item>
         <v-list-item v-if="showPublishButton" @click="$root.$emit('open-edit-publishing-drawer')">
           <v-list-item-title>
-            {{ publishLabel }}
+            {{ $t('news.details.header.menu.publish') }}
           </v-list-item-title>
         </v-list-item>
       </v-list>
@@ -104,9 +104,6 @@ export default {
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
-    },
-    publishLabel() {
-      return this.newsPublished ? this.$t('news.details.header.menu.unpublish'): this.$t('news.details.header.menu.publish');
     },
   },
   created() {

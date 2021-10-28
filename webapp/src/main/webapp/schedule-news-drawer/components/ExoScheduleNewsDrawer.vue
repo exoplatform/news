@@ -85,7 +85,8 @@
                 ref="chooseTargets"
                 :news="news"
                 :publish="publish"
-                :allow-publish-targeting="allowPublishTargeting" />
+                :allow-publish-targeting="allowPublishTargeting"
+                @selected-targets="getSelectedTargets" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -271,6 +272,7 @@ export default {
     news: null,
     allowPublishTargeting: false,
     isActivityPosted: true,
+    selectedTargets: [],
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -332,7 +334,7 @@ export default {
       }
     },
     disableTargetOption() {
-      return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
+      return this.publish ? this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 : false;
     },
   },
   created() {
@@ -358,6 +360,9 @@ export default {
   },
   methods: {
     openDrawer() {
+      if (this.newsId) {
+        this.initializeDate();
+      }
       if (this.$refs.postNewsDrawer) {
         if (this.editScheduledNews ==='editScheduledNews') {
           this.disabled = true;
@@ -406,6 +411,9 @@ export default {
     },
     nextStep() {
       this.stepper++;
+    },
+    getSelectedTargets(event) {
+      this.selectedTargets = event;
     },
   }
 };

@@ -13,7 +13,7 @@
       right
       @closed="closeDrawer">
       <template slot="title">
-        {{ $t('news.composer.editArticle') }}
+        {{ $t('news.details.editPublishing.title') }}
       </template>
       <template slot="content">
         <div>
@@ -92,24 +92,49 @@ export default {
     allowPublishTargeting: false,
     isActivityPosted: true,
     editingNews: false,
+    disabled: false,
   }),
   watch: {
     selected() {
       this.publish = this.selected;
     },
+    isActivityPosted() {
+      if (this.isHiddenActivity === !this.isActivityPosted && !this.publish) {
+        this.disabled = true;
+      } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    },
+    publish() {
+      if (this.publish !== this.selected && !this.publish) {
+        this.disabled = false;
+      } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+        this.disabled = true;
+      } else {
+        this.disabled = false;
+      }
+    },
+    selectedTargets(newVal, oldVal) {
+      if (newVal.length === 0) {
+        this.disabled = true;
+      } else if (newVal !== oldVal) {
+        this.disabled = false;
+      } else {
+        this.disabled = true;
+      }
+    }
   },
   computed: {
     selected() {
       return this.news && this.news.pinned;
     },
-    disabled() {
-      return (this.news && this.news.activityPosted ) === !this.isActivityPosted && this.disableTargetOption || this.showTargetInformation;
+    isHiddenActivity() {
+      return this.news && this.news.activityPosted;
     },
     disableTargetOption() {
-      if (this.publish) {
-        return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
-      }
-      return this.selected === this.publish;
+      return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
     },
     showTargetInformation() {
       return this.disableTargetOption && this.allowPublishTargeting && this.publish;
@@ -143,6 +168,9 @@ export default {
   },
   methods: {
     openDrawer() {
+      if (this.news) {
+        this.publish = this.news.pinned;
+      }
       if (this.$refs.postNewsDrawer) {
         this.disabled = true;
         this.publish = this.news.pinned;
@@ -166,9 +194,6 @@ export default {
       });
     },
     closeDrawer() {
-      if (this.news) {
-        this.publish = this.news.pinned;
-      }
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
     },

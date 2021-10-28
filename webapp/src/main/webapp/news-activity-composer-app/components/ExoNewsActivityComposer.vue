@@ -893,7 +893,7 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return this.$newsServices.updateNews(updatedNews).then((createdNews) => {
+      return this.$newsServices.updateNews(updatedNews, post).then((createdNews) => {
         if (this.news.body !== createdNews.body) {
           this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, createdNews.body);
         }

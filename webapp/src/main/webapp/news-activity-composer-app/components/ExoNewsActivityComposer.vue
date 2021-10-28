@@ -193,7 +193,7 @@
             </textarea>
           </div>
           <v-alert
-            v-if="this.news.draftUpdaterDisplayName !== this.currentUser && this.news.publicationState === 'draft' && this.activityId"
+            v-if="news.draftUpdaterDisplayName !== currentUser && news.publicationState === 'draft' && activityId"
             dismissible
             border="left"
             elevation="2"

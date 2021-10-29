@@ -225,7 +225,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news);
     return news;
   }
 
@@ -516,7 +516,7 @@ public class NewsServiceImpl implements NewsService {
 
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
-    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
+    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, getCurrentUserId(), news);
     sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
   }
 
@@ -1218,7 +1218,9 @@ public class NewsServiceImpl implements NewsService {
     if(post) {
       activity.setUpdated(System.currentTimeMillis());
     }
-    activityManager.updateActivity(activity, true);
+    if(activity != null) {
+      activityManager.updateActivity(activity, true);
+    }
   }
 
   /**

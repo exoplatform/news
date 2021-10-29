@@ -48,12 +48,14 @@ public class NewsGamificationIntegrationListener extends Listener<String, News> 
         ruleTitle = GAMIFICATION_PUBLISH_NEWS_ARTICLE_RULE_TITLE;
       }
       try {
-        Map<String, String> gamificationMap = new HashMap<>();
-        gamificationMap.put("ruleTitle", ruleTitle);
-        gamificationMap.put("object", news.getUrl());
-        gamificationMap.put("senderId", news.getAuthor()); // matches the gamification's earner id
-        gamificationMap.put("receiverId", news.getAuthor());
-        listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gamificationMap, news.getId());
+        if (StringUtils.equals(event.getSource(), news.getId())) {
+          Map<String, String> gamificationMap = new HashMap<>();
+          gamificationMap.put("ruleTitle", ruleTitle);
+          gamificationMap.put("object", news.getUrl());
+          gamificationMap.put("senderId", news.getAuthor()); // matches the gamification's earner id
+          gamificationMap.put("receiverId", news.getAuthor());
+          listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gamificationMap, news.getId());
+        }
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");
       }

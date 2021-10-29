@@ -203,8 +203,6 @@ export default {
           if (!this.news) {
             this.news = news;
           }
-          // TODO news.newsId should be converted to use news.id
-          // to correspond to retruned object by REST
           if (!this.news.newsId) {
             this.news.newsId = newsId;
           }

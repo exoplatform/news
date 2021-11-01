@@ -95,8 +95,6 @@ public class NewsServiceImpl implements NewsService {
 
   private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP  = "/platform/web-contributors";
 
-  private final static String      PLATFORM_ADMINISTRATORS_GROUP    = "/platform/administrators";
-
   public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
 
   public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP   = "exo:draftVisible";
@@ -1235,8 +1233,7 @@ public class NewsServiceImpl implements NewsService {
     if (currentIdentity == null) {
       return false;
     }
-    return  currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*") ||
-            currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   public News scheduleNews(News news) throws Exception {

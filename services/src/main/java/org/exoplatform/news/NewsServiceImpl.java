@@ -832,6 +832,7 @@ public class NewsServiceImpl implements NewsService {
 
     Identity draftUpdaterIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getDraftUpdater(), true);
     if (draftUpdaterIdentity != null && draftUpdaterIdentity.getProfile() != null) {
+      news.setDraftUpdaterUserName(draftUpdaterIdentity.getRemoteId());
       news.setDraftUpdaterDisplayName(draftUpdaterIdentity.getProfile().getFullName());
     }
 

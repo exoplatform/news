@@ -193,7 +193,7 @@
             </textarea>
           </div>
           <v-alert
-            v-if="news.publicationState === 'draft' && activityId"
+            v-if="news.draftUpdaterDisplayName !== currentUser && news.publicationState === 'draft' && activityId"
             dismissible
             border="left"
             elevation="2"
@@ -322,6 +322,7 @@ export default {
       loading: true,
       currentSpace: {},
       spaceURL: null,
+      currentUser: eXo.env.portal.userName,
       fullDateFormat: {
         year: 'numeric',
         month: 'short',
@@ -377,7 +378,7 @@ export default {
       return !this.editMode && this.news.id !== '' && this.currentSpace && this.currentSpace.redactorsCount > 0;
     },
     isNewsAuthor() {
-      return this.news.author === eXo.env.portal.userName;
+      return this.news.author === this.currentUser;
     },
     newsLabel() {
       return  this.news.draftVisible ?  this.$t('news.composer.shared') : this.$t('news.composer.private');
@@ -495,6 +496,7 @@ export default {
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
+      const mobile = this.isMobile;
       const newsToolbar = [];
       if (this.isMobile) {
         newsToolbar.push(
@@ -511,7 +513,7 @@ export default {
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
           { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
         );
       }
@@ -537,17 +539,19 @@ export default {
         },
         on: {
           instanceReady: function(evt) {
-            const numerotationGroupButton = document.getElementById('cke_14');
-            const attachMediaButton = document.getElementById('cke_18');
-            const attachFileButton = document.getElementById('cke_22');
-            numerotationGroupButton.style.borderRight = 'none';
-            attachMediaButton.style.display = 'none';
-            attachFileButton.style.display = 'none';
-            const spanBadge = document.createElement('span');
-            spanBadge.setAttribute('class','badge');
-            spanBadge.setAttribute('id','badge');
-            spanBadge.innerHTML = '0';
-            attachFileButton.appendChild(spanBadge);
+            if (mobile) {
+              const numerotationGroupButton = document.getElementById('cke_14');
+              const attachMediaButton = document.getElementById('cke_18');
+              const attachFileButton = document.getElementById('cke_22');
+              numerotationGroupButton.style.borderRight = 'none';
+              attachMediaButton.style.display = 'none';
+              attachFileButton.style.display = 'none';
+              const spanBadge = document.createElement('span');
+              spanBadge.setAttribute('class','badge');
+              spanBadge.setAttribute('id','badge');
+              spanBadge.innerHTML = '0';
+              attachFileButton.appendChild(spanBadge);
+            }
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
               .find('.atwho-inserted')
@@ -619,6 +623,7 @@ export default {
             this.news.activityId = fetchedNode.activityId;
             this.news.updater = fetchedNode.updater;
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
+            this.news.draftUpdaterUserName = fetchedNode.draftUpdaterUserName;
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
@@ -717,7 +722,7 @@ export default {
         title: this.news.title,
         summary: this.news.summary,
         body: this.getBody() ? newsBody : this.news.body,
-        author: eXo.env.portal.userName,
+        author: this.currentUser,
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         draftVisible: this.news.draftVisible,
@@ -765,7 +770,7 @@ export default {
         title: this.news.title,
         summary: this.news.summary,
         body: this.replaceImagesURLs(this.news.body),
-        author: eXo.env.portal.userName,
+        author: this.currentUser,
         attachments: [],
         pinned: false,
         draftVisible: this.news.draftVisible,
@@ -890,7 +895,12 @@ export default {
         updatedNews.uploadId = '';
       }
 
-      return this.$newsServices.updateNews(updatedNews, post).then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+      return this.$newsServices.updateNews(updatedNews, post).then((createdNews) => {
+        if (this.news.body !== createdNews.body) {
+          this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, createdNews.body);
+        }
+      }).then(() => this.$emit('draftUpdated'))
+        .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
     },
     goBack() {
       if ( history.length > 1) {

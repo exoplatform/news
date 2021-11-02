@@ -566,9 +566,9 @@ export default {
         on: {
           instanceReady: function(evt) {
             if (mobile) {
-              const numerotationGroupButton = document.getElementById('cke_14');
-              const attachMediaButton = document.getElementById('cke_18');
-              const attachFileButton = document.getElementById('cke_22');
+              const numerotationGroupButton = document.getElementById('cke_16');
+              const attachMediaButton = document.getElementById('cke_20');
+              const attachFileButton = document.getElementById('cke_23');
               numerotationGroupButton.style.borderRight = 'none';
               attachMediaButton.style.display = 'none';
               attachFileButton.style.display = 'none';
@@ -1028,11 +1028,11 @@ export default {
       const elementNewTop = document.getElementById('newsTop');
       elementNewTop.classList.remove('greyComposerEffect');
       elementNewTop.classList.add('darkComposerEffect');
-      const switchViewButton = document.getElementById('cke_7');
-      const fontStyleGroupButton = document.getElementById('cke_9');
-      const numerotationGroupButton = document.getElementById('cke_14');
-      const attachMediaButton = document.getElementById('cke_18');
-      const attachFileButton = document.getElementById('cke_22');
+      const switchViewButton = document.getElementById('cke_9');
+      const fontStyleGroupButton = document.getElementById('cke_11');
+      const numerotationGroupButton = document.getElementById('cke_16');
+      const attachMediaButton = document.getElementById('cke_20');
+      const attachFileButton = document.getElementById('cke_23');
       numerotationGroupButton.style.borderRight = 'none';
       attachMediaButton.style.display = 'none';
       if (!this.switchView) {

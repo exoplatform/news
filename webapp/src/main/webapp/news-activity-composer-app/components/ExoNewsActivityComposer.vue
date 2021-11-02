@@ -88,7 +88,7 @@
                   {{ item.text }}
                 </template>
               </v-select>
-              <div v-else-if="canUpdateNewVisibilty && !isMobile" class="d-flex mr-5 mt-1">
+              <div v-else class="d-flex mr-5 mt-1">
                 <v-icon
                   v-if="!this.news.draftVisible"
                   size="16"

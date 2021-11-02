@@ -2,12 +2,11 @@
   <v-dialog
     ref="dialog"
     v-model="dialog"
-    :persistent="persistent"
-    :width="width"
+    class="pa-2"
     content-class="uiPopup">
     <v-card class="elevation-12">
       <div class="ClearFix">
-        <span class="subtitle-1 pl-2 pt-2 font-weight-bold PopupTitle popupTitle text-truncate"> {{ $t('news.composer.visibility.mobile.title') }}</span>
+        <span class="subtitle-1 pa-3 font-weight-bold PopupTitle popupTitle text-truncate"> {{ $t('news.composer.visibility.mobile.title') }}</span>
       </div>
       <v-radio-group class="mt-2" v-model="visibility">
         <v-radio
@@ -28,12 +27,6 @@ export default {
       type: Array,
       default: function() {
         return null;
-      },
-    },
-    width: {
-      type: String,
-      default: function() {
-        return '200px!important';
       },
     },
   },

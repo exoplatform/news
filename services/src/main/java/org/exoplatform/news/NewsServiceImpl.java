@@ -374,7 +374,7 @@ public class NewsServiceImpl implements NewsService {
 
       //news activity
       if (newsNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
-        newsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
+        newsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isActivityPosted()));
       }
 
       // attachments
@@ -1218,7 +1218,8 @@ public class NewsServiceImpl implements NewsService {
     if(post) {
       activity.setUpdated(System.currentTimeMillis());
     }
-    if(activity != null) {
+    activity.isHidden(news.isActivityPosted());
+    if (activity != null) {
       activityManager.updateActivity(activity, true);
     }
   }

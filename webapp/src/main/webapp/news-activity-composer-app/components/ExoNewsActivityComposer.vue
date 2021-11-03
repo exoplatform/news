@@ -846,6 +846,9 @@ export default {
         this.$newsServices.saveNews(news).then((createdNews) => {
           this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus');
           this.news.id = createdNews.id;
+          if (!this.newsId) {
+            this.newsId = createdNews.id;
+          }
           this.news.author = createdNews.author;
           this.savingDraft = false;
           this.$emit('draftCreated');

@@ -289,6 +289,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
+      if (!editMode) {
+        newsService.markAsRead(news, authenticatedUser);
+      }
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {
         News filteredNews = new News();
         Set<Space> spacesList = new HashSet<>();

@@ -7,6 +7,7 @@ let config = {
   // can use multiple entry
   entry: {
     newsSnackbarComponent :'./src/main/webapp/components/snackbar/main.js',
+    newsTargetSelectorComponent :'./src/main/webapp/components/targetSelector/main.js',
     newsActivityComposer :'./src/main/webapp/news-activity-composer-app/main.js',
     newsDetails :'./src/main/webapp/news-details/main.js',
     latestNews:'./src/main/webapp/latest-news/main.js',

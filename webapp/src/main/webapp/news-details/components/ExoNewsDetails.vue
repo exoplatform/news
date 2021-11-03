@@ -32,6 +32,9 @@
       :news="news"
       :news-id="newsId"
       :space="currentSpace" />
+    <exo-news-edit-publishing-drawer
+      :news="news"
+      @refresh-news="getNewsById(newsId)" />
     <exo-news-notification-alerts />
   </div>
 </template>
@@ -95,24 +98,7 @@ export default {
     this.$root.$on('delete-news', this.deleteConfirmDialog);
     this.$root.$on('edit-news', this.editLink);
     if (!this.news || !this.news.spaceId) {
-      this.$newsServices.getNewsById(this.newsId)
-        .then(news => {
-          this.spaceId = news.spaceId;
-          this.getSpaceById(this.spaceId);
-          if (!this.news) {
-            this.news = news;
-          }
-          // TODO news.newsId should be converted to use news.id
-          // to correspond to retruned object by REST
-          if (!this.news.newsId) {
-            this.news.newsId = this.newsId;
-          }
-          return this.$nextTick();
-        })
-        .finally(() => {
-          document.title = this.$t('news.window.title', {0: this.news.title});
-          this.$root.$emit('application-loaded');
-        });
+      this.getNewsById(this.newsId);
     } else {
       this.spaceId = this.news.spaceId;
       this.getSpaceById(this.spaceId );
@@ -209,6 +195,24 @@ export default {
         });
       }
     },
+    getNewsById(newsId) {
+      this.$newsServices.getNewsById(newsId)
+        .then(news => {
+          this.spaceId = news.spaceId;
+          this.getSpaceById(this.spaceId);
+          if (!this.news) {
+            this.news = news;
+          }
+          if (!this.news.newsId) {
+            this.news.newsId = newsId;
+          }
+          return this.$nextTick();
+        })
+        .finally(() => {
+          document.title = this.$t('news.window.title', {0: this.news.title});
+          this.$root.$emit('application-loaded');
+        });
+    }
   }
 };
 </script>

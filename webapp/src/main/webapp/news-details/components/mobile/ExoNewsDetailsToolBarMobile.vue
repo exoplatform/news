@@ -25,11 +25,12 @@
       dark
       x-small>
       <exo-news-details-action-menu
+        v-if="showEditButton && publicationState !== 'staged'"
         :news="news"
         :show-edit-button="showEditButton"
         :show-delete-button="showDeleteButton"
         :show-publish-button="showPublishButton"
-        :news-published="news.pinned" />
+        :news-published="newsPublished" />
     </v-btn>
     <v-btn
       v-if="publicationState === 'staged'"
@@ -73,6 +74,9 @@ export default {
     publicationState() {
       return this.news && this.news.publicationState;
     },
+    newsPublished() {
+      return this.news && this.news.pinned;
+    }
   },
 };
 </script>

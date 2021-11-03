@@ -10,14 +10,10 @@
     <exo-news-details-action-menu
       v-if="showEditButton && publicationState !== 'staged'"
       :news="news"
+      :news-published="newsPublished"
       :show-edit-button="showEditButton"
-      :show-delete-button="showDeleteButton" />
-    <exo-news-publish
-      v-if="showPublishButton && publicationState !== 'staged'"
-      :news-id="news.newsId"
-      :news-published="news.pinned"
-      :news-archived="archivedNews"
-      :news-title="newsTitle" />
+      :show-delete-button="showDeleteButton"
+      :show-publish-button="showPublishButton" />
   </div>
 </template>
 
@@ -83,6 +79,9 @@ export default {
     },
     newsTitle() {
       return this.news && this.news.title;
+    },
+    newsPublished() {
+      return this.news && this.news.pinned;
     }
   },
 };

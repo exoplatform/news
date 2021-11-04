@@ -36,7 +36,7 @@
           </div>
           <div class="d-flex d-flex flex-grow-0 my-auto">
             <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
-            <div v-if="canUpdateNewVisibilty">
+            <div v-if="canUpdateNewVisibilty && !isMobile">
               <v-select
                 ref="selectVisibility"
                 v-model="news.draftVisible"
@@ -110,7 +110,29 @@
                   v-text="newsLabel"></div>
               </div>
             </div>
-
+            <div v-if="canUpdateNewVisibilty && isMobile" class="d-flex mr-2 mt-1">
+              <v-btn
+                primary
+                icon
+                text
+                :disabled="!isNewsAuthor"
+                @click="$root.$emit('open-draft-visibility', news.draftVisible)">
+                <v-icon
+                  v-if="!this.news.draftVisible"
+                  size="20"
+                  color="black"
+                  class="mr-1">
+                  mdi-lock
+                </v-icon>
+                <v-icon
+                  v-else
+                  size="20"
+                  color="black"
+                  class="mr-1">
+                  mdi-account-edit
+                </v-icon>
+              </v-btn>
+            </div>
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -227,6 +249,9 @@
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
       <exo-news-notification-alerts name="event-form" />
+      <exo-news-draft-visibility-mobile
+        ref="selectVisibilityDialog"
+        :items="items" />
     </div>
     
     <div v-show="!canCreatNews && !loading" class="newsComposer">
@@ -474,6 +499,7 @@ export default {
     document.addEventListener('attach-file-plugins', () => {
       this.openApp();
     });
+    this.$root.$on('update-visibility', this.updateVisibility);
   },
   methods: {
     initCKEditor: function() {
@@ -991,6 +1017,12 @@ export default {
     },
     updateDraftVisibility(){
       this.$root.$emit('update-draft-visibility', this.news.draftVisible);
+    },
+    updateVisibility(visibility){
+      if (visibility !== this.news.draftVisible) {
+        this.news.draftVisible = visibility;
+        this.updateDraftVisibility();
+      }
     },
     changeView() {
       const elementNewTop = document.getElementById('newsTop');

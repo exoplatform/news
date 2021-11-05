@@ -115,6 +115,8 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String      LAST_PUBLISHER                   = "publication:lastUser";
 
+  private static final String      USER_SYSTEM                      = "__system";
+
   private RepositoryService        repositoryService;
 
   private SessionProviderService   sessionProviderService;
@@ -223,7 +225,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
     return news;
   }
 
@@ -239,6 +241,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
     return news;
   }
 
@@ -860,9 +863,14 @@ public class NewsServiceImpl implements NewsService {
     activity.setTemplateParams(templateParams);
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
-
     updateNewsActivities(activity, news, session);
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, getCurrentUserId(), news);
+    String username = null;
+    if (StringUtils.equals(session.getUserID(), USER_SYSTEM)) {
+      username = news.getAuthor();
+    } else {
+      username = getCurrentUserId();
+    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, username, news);
   }
 
   private String getNodeRelativePath(Calendar now) {

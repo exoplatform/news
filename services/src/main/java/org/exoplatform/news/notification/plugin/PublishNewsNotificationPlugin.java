@@ -56,7 +56,8 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
 
     return NotificationInfo.instance()
                            .setFrom(currentUserName)
-                           .setSendAll(true)
+                           .setSendAllInternals(true)
+                           .exclude(currentUserName)
                            .with(NotificationConstants.CONTENT_TITLE, contentTitle)
                            .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
                            .with(NotificationConstants.CURRENT_USER, currentUserFullName)

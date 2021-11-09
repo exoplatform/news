@@ -1221,11 +1221,13 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void updateNewsActivity(News news, boolean post) {
     ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
-    if(post) {
-      activity.setUpdated(System.currentTimeMillis());
+    if(activity != null) {
+      if (post) {
+        activity.setUpdated(System.currentTimeMillis());
+      }
+      activity.isHidden(news.isActivityPosted());
+      activityManager.updateActivity(activity, true);
     }
-    activity.isHidden(news.isActivityPosted());
-    activityManager.updateActivity(activity, true);
   }
 
   /**

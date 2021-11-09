@@ -864,13 +864,13 @@ public class NewsServiceImpl implements NewsService {
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
     updateNewsActivities(activity, news, session);
-    String username = null;
+    String newsPoster = null;
     if (StringUtils.equals(session.getUserID(), USER_SYSTEM)) {
-      username = news.getAuthor();
+      newsPoster = news.getAuthor();
     } else {
-      username = getCurrentUserId();
+      newsPoster = getCurrentUserId();
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, username, news);
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, newsPoster, news);
   }
 
   private String getNodeRelativePath(Calendar now) {

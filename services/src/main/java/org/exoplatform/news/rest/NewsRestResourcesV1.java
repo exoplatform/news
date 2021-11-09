@@ -480,9 +480,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
       news = newsService.updateNews(news);
 
-      if (StringUtils.isNotBlank(news.getActivityId())) {
-        newsService.updateNewsActivity(news, post);
-      }
+      newsService.updateNewsActivity(news, post);
 
       return Response.ok(news).build();
     } catch (Exception e) {

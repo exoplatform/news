@@ -28,6 +28,7 @@
   <import>war:/conf/news/notification/configuration.xml</import>
   <import>war:/conf/news/dynamic-container-configuration.xml</import>
   <import>war:/conf/news/search-configuration.xml</import>
+  <import>war:/conf/news/metadata-plugins-configuration.xml</import>
   <import>war:/conf/news/gamification-configuration.xml</import>
   <import>war:/conf/news/news-publication-configuration.xml</import>
   <import>war:/conf/news/activity-listener-configuration.xml</import>

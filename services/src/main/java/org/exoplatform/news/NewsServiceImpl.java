@@ -517,7 +517,7 @@ public class NewsServiceImpl implements NewsService {
 
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
-    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
+    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
   }
 

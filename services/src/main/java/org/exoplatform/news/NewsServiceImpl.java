@@ -115,6 +115,8 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String      LAST_PUBLISHER                   = "publication:lastUser";
 
+  private static final String      USER_SYSTEM                      = "__system";
+
   private RepositoryService        repositoryService;
 
   private SessionProviderService   sessionProviderService;
@@ -223,7 +225,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getId(), news.getAuthor());
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
     return news;
   }
 
@@ -239,6 +241,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPinned()) {
       pinNews(news.getId());
     }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
     return news;
   }
 
@@ -514,7 +517,7 @@ public class NewsServiceImpl implements NewsService {
 
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
-    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), getCurrentUserId());
+    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
   }
 
@@ -860,9 +863,14 @@ public class NewsServiceImpl implements NewsService {
     activity.setTemplateParams(templateParams);
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
-
     updateNewsActivities(activity, news, session);
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, getCurrentUserId(), news);
+    String newsPoster = null;
+    if (StringUtils.equals(session.getUserID(), USER_SYSTEM)) {
+      newsPoster = news.getAuthor();
+    } else {
+      newsPoster = getCurrentUserId();
+    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, newsPoster, news);
   }
 
   private String getNodeRelativePath(Calendar now) {
@@ -1213,11 +1221,13 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void updateNewsActivity(News news, boolean post) {
     ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
-    if(post) {
-      activity.setUpdated(System.currentTimeMillis());
+    if(activity != null) {
+      if (post) {
+        activity.setUpdated(System.currentTimeMillis());
+      }
+      activity.isHidden(news.isActivityPosted());
+      activityManager.updateActivity(activity, true);
     }
-    activity.isHidden(news.isActivityPosted());
-    activityManager.updateActivity(activity, true);
   }
 
   /**

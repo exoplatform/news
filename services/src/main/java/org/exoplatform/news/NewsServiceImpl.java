@@ -780,11 +780,10 @@ public class NewsServiceImpl implements NewsService {
         news.setUrl(newsUrl.toString());
       }
     }
-    news.setCanEdit(canEditNews(news, getCurrentUserId()));
     if (node.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
       news.setSchedulePostDate(node.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).getString());
     }
-
+    news.setCanEdit(canEditNews(news, getCurrentUserId()));
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } else {
@@ -1211,7 +1210,8 @@ public class NewsServiceImpl implements NewsService {
     if (spaceService.isManager(currentSpace, authenticatedUser)) {
       return true;
     }
-    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
+    if (spaceService.isRedactor(currentSpace, authenticatedUser) && (news.isDraftVisible() || news.getSchedulePostDate() != null)
+        && news.getActivities() == null) {
       return true;
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);

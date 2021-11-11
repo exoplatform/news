@@ -349,9 +349,7 @@ export default {
     postArticleMode() {
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      if (this.postArticleMode === 'immediate') {
-        this.disabled = false;
-      } else if (this.postArticleMode === 'later'){
+      if (this.postArticleMode === 'later') {
         this.disabled = postDate.getTime() === scheduleDate.getTime();
       } else {
         this.disabled = false;

@@ -753,10 +753,6 @@ public class NewsServiceImpl implements NewsService {
         org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];
-        ExoSocialActivity activity = activityManager.getActivity(newsActivityId);
-        if (activity != null) {
-          news.setActivityPosted(activity.isHidden());
-        }
         news.setActivityId(newsActivityId);
         Space newsPostedInSpace = spaceService.getSpaceById(activities[0].split(":")[0]);
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {

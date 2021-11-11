@@ -300,6 +300,63 @@ export default {
     selected() {
       this.publish = this.selected;
     },
+    publish() {
+      if (this.editScheduledNews ==='editScheduledNews') {
+        if (this.publish === this.selected && !this.publish) {
+          this.disabled = true;
+        } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+          this.disabled = true;
+        } else {
+          this.disabled = false;
+        }
+      } else {
+        this.disabled = true;
+      }
+    },
+    selectedTargets(newVal, oldVal) {
+      if (this.editScheduledNews ==='editScheduledNews' && this.publish) {
+        if (newVal.length === 0) {
+          this.disabled = true;
+        } else if (newVal.length !== oldVal.length) {
+          this.disabled = false;
+        } else {
+          this.disabled = true;
+        }
+      } else {
+        this.disabled = true;
+      }
+    },
+    isActivityPosted() {
+      if (this.editScheduledNews ==='editScheduledNews') {
+        if (this.visibilityActivity === !this.isActivityPosted) {
+          this.disabled = true;
+        } else {
+          this.disabled = false;
+        }
+      } else {
+        this.disabled = true;
+      }
+    },
+    stepper() {
+      if ((this.stepper === 1 || this.stepper === 2) && this.editScheduledNews !=='editScheduledNews') {
+        this.disabled = true;
+      } else if ((this.stepper === 2) && this.editScheduledNews !=='editScheduledNews'){
+        this.disabled = (this.visibilityActivity === !this.isActivityPosted) || this.selected === this.publish;
+      } else if (this.stepper === 3 && this.editScheduledNews !=='editScheduledNews') {
+        this.disabled = false;
+      }
+    },
+    postArticleMode() {
+      const postDate = new Date(this.postDate);
+      const scheduleDate = new Date(this.schedulePostDate);
+      if (this.postArticleMode === 'immediate') {
+        this.disabled = false;
+      } else if (this.postArticleMode === 'later'){
+        this.disabled = postDate.getTime() === scheduleDate.getTime();
+      } else {
+        this.disabled = false;
+      }
+    }
   },
   computed: {
     saveButtonLabel() {
@@ -324,20 +381,12 @@ export default {
     visibilityActivity() {
       return this.news && this.news.activityPosted;
     },
-    disabled() {
-      const postDate = new Date(this.postDate);
-      const scheduleDate = new Date(this.schedulePostDate);
-      if (this.canPublishNews) {
-        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish && this.visibilityActivity === !this.isActivityPosted || this.stepper < 3;
-      } else {
-        return (this.postArticleMode === 'immediate' ? false : this.postArticleMode === 'later' && postDate.getTime() === scheduleDate.getTime()) && this.selected === this.publish;
-      }
-    },
     disableTargetOption() {
       return this.publish ? this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 : false;
     },
   },
   created() {
+    this.disabled = true;
     this.$featureService.isFeatureEnabled('news.publishTargeting')
       .then(enabled => this.allowPublishTargeting = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -365,7 +414,6 @@ export default {
       }
       if (this.$refs.postNewsDrawer) {
         if (this.editScheduledNews ==='editScheduledNews') {
-          this.disabled = true;
           this.postDateTime = new Date(this.schedulePostDate);
           this.postDate = this.postDateTime;
           this.postDateTime.setHours(new Date(this.schedulePostDate).getHours());

@@ -186,11 +186,10 @@ export default {
     openDrawer() {
       if (this.news) {
         this.publish = this.news.pinned;
+        this.isActivityPosted = !this.news.activityPosted;
       }
       if (this.$refs.postNewsDrawer) {
         this.disabled = true;
-        this.publish = this.news.pinned;
-        this.isActivityPosted = !this.news.activityPosted;
         this.$refs.postNewsDrawer.open();
       }
     },

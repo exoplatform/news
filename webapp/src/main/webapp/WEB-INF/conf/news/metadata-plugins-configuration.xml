@@ -53,10 +53,13 @@
       <type>org.exoplatform.social.metadata.MetadataInitPlugin</type>
       <init-params>
         <object-param>
-          <name>metadataType</name>
+          <name>metadata</name>
           <object type="org.exoplatform.social.metadata.model.Metadata">
             <field name="type">
               <object type="org.exoplatform.social.metadata.model.MetadataType">
+                <field name="id">
+                  <int>4</int>
+                </field>
                 <field name="name">
                   <string>newsTarget</string>
                 </field>
@@ -75,10 +78,13 @@
       <type>org.exoplatform.social.metadata.MetadataInitPlugin</type>
       <init-params>
         <object-param>
-          <name>metadataType</name>
+          <name>metadata</name>
           <object type="org.exoplatform.social.metadata.model.Metadata">
             <field name="type">
               <object type="org.exoplatform.social.metadata.model.MetadataType">
+                <field name="id">
+                  <int>4</int>
+                </field>
                 <field name="name">
                   <string>newsTarget</string>
                 </field>

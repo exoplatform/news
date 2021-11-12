@@ -115,18 +115,14 @@ export default {
       this.publish = this.selected;
     },
     isActivityPosted() {
-      if (this.isHiddenActivity === !this.isActivityPosted && !this.publish) {
-        this.disabled = true;
-      } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+      if ((this.isHiddenActivity === !this.isActivityPosted && !this.publish) ||(this.publish && this.selectedTargets && this.selectedTargets.length === 0)) {
         this.disabled = true;
       } else {
         this.disabled = false;
       }
     },
     publish() {
-      if (this.publish !== this.selected && !this.publish) {
-        this.disabled = false;
-      } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+      if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
         this.disabled = true;
       } else {
         this.disabled = false;
@@ -186,11 +182,10 @@ export default {
     openDrawer() {
       if (this.news) {
         this.publish = this.news.pinned;
+        this.isActivityPosted = !this.news.activityPosted;
       }
       if (this.$refs.postNewsDrawer) {
         this.disabled = true;
-        this.publish = this.news.pinned;
-        this.isActivityPosted = !this.news.activityPosted;
         this.$refs.postNewsDrawer.open();
       }
     },

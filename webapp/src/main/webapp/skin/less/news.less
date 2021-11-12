@@ -87,6 +87,32 @@
       color: @greyColorLighten1Default;
     }
   }
+  .news-list-view-app {
+    .list-view-card {
+      height: 100%;
+    }
+    .news-empty-listView {
+      .listViewTitle {
+        color: @blackColorDefault;
+      }
+      .uiNoNewsIcon {
+        color: #6d7d9821;
+        font-size: 60px;
+        font-style: normal;
+        font-weight: normal;
+        &:before {
+          font-family: 'PLF-FONT-ICONS';
+          content: "\e62a" !important;
+        }
+      }
+    }
+    #newsSettingsDrawer {
+      .listViewLabel {
+        cursor: default;
+        color: @textColorDefault;
+      }
+    }
+  }
 }
 
 .v-alert i {
@@ -3439,6 +3465,13 @@
   .newsDetails-description .newsDetails .fullDetailsBody .video{
     width: 100%;
     height: 100px;
+  }
+}
+@media (min-width: 1024px) {
+  .VuetifyApp .news-list-view-app {
+    .news-empty-listView {
+      margin-top: 90px;
+    }
   }
 }
 @media screen and (max-width: 1025px) {

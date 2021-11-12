@@ -179,6 +179,35 @@
     </module>
   </portlet>
 
+  <portlet>
+    <name>NewsListView</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/newsListView.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>jquery</module>
+        <as>$</as>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+    </module>
+  </portlet>
+
   <module>
     <name>newsDetails</name>
     <script>

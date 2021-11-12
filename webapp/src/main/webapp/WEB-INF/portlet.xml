@@ -96,4 +96,27 @@
         </portlet-info>
     </portlet>
 
+    <portlet>
+      <portlet-name>NewsListView</portlet-name>
+      <display-name xml:lang="EN">News List View</display-name>
+      <portlet-class>org.exoplatform.news.portlet.NewsListViewPortlet</portlet-class>
+      <init-param>
+        <name>portlet-view-dispatched-file-path</name>
+        <value>/WEB-INF/jsp/newsListView.jsp</value>
+      </init-param>
+      <init-param>
+        <name>preload.resource.bundles</name>
+        <value>locale.portlet.news.News</value>
+      </init-param>
+      <supports>
+        <mime-type>text/html</mime-type>
+        <portlet-mode>edit</portlet-mode>
+      </supports>
+      <supported-locale>en</supported-locale>
+      <portlet-info>
+        <title>News List View</title>
+        <keywords>News List View</keywords>
+      </portlet-info>
+    </portlet>
+
 </portlet-app>

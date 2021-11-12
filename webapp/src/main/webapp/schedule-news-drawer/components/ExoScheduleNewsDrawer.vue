@@ -302,9 +302,7 @@ export default {
     },
     publish() {
       if (this.editScheduledNews ==='editScheduledNews') {
-        if (this.publish === this.selected && !this.publish) {
-          this.disabled = true;
-        } else if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+        if ((this.publish === this.selected && !this.publish) || (this.publish && this.selectedTargets && this.selectedTargets.length === 0) ) {
           this.disabled = true;
         } else {
           this.disabled = false;
@@ -315,9 +313,7 @@ export default {
     },
     selectedTargets(newVal, oldVal) {
       if (this.editScheduledNews ==='editScheduledNews' && this.publish) {
-        if (newVal.length === 0) {
-          this.disabled = true;
-        } else if (newVal.length !== oldVal.length) {
+        if (newVal.length !== oldVal.length) {
           this.disabled = false;
         } else {
           this.disabled = true;

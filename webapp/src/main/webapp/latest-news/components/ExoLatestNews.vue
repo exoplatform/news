@@ -116,7 +116,7 @@
             </div>
           </v-layout>
 
-          <v-carousel 
+          <v-carousel
             v-if="newsInfo.length !== 0"
             :height="250"
             class="d-sm-none carousel-news"

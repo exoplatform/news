@@ -25,61 +25,6 @@
         xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
         xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
-
-  <!-- Deploy template for pinned news Viewer Portlet -->
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.cms.views.ApplicationTemplateManagerService</target-component>
-    <component-plugin>
-      <name>clv.templates.plugin</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.cms.views.PortletTemplatePlugin</type>
-      <description>This plugin is used to import views templates for pinned news</description>
-      <init-params>
-        <value-param>
-          <name>portletName</name>
-          <value>content-list-viewer</value>
-        </value-param>
-        <value-param>
-          <name>portlet.template.path</name>
-          <value>war:/conf/news/application-templates/content-list-viewer</value>
-        </value-param>
-
-        <object-param>
-          <name>Latest News CLV template</name>
-          <description>Latest News CLV template</description>
-          <object type="org.exoplatform.services.cms.views.PortletTemplatePlugin$PortletTemplateConfig">
-            <field name="title">
-              <string>Latest News</string>
-            </field>
-            <field name="templateName">
-              <string>LatestNews.gtmpl</string>
-            </field>
-            <field name="category">
-              <string>list</string>
-            </field>
-          </object>
-        </object-param>
-		
-        <object-param>
-          <name>News Slider CLV template</name>
-          <description>News Slider CLV template</description>
-          <object type="org.exoplatform.services.cms.views.PortletTemplatePlugin$PortletTemplateConfig">
-            <field name="title">
-              <string>News Slider</string>
-            </field>
-            <field name="templateName">
-              <string>NewsSlider.gtmpl</string>
-            </field>
-            <field name="category">
-              <string>list</string>
-            </field>
-          </object>
-        </object-param>
-
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
   <external-component-plugins>
     <target-component>org.exoplatform.services.cms.templates.TemplateService</target-component>
     <component-plugin>

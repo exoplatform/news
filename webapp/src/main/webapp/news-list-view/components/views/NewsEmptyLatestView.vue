@@ -15,5 +15,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <news-empty-latest-view />
+  <v-flex class="d-flex news-empty-listView">
+    <div class="ma-auto py-5 d-flex flex-column align-center">
+      <i class="uiNoNewsIcon"></i>
+      <span class="title listViewTitle mt-5">
+        {{ $t('news.latest.noNews') }}
+      </span>
+    </div>
+  </v-flex>
 </template>

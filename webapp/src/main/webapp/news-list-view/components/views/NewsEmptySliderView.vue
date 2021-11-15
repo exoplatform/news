@@ -15,53 +15,37 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="d-flex flex-row pa-4">
-    <div class="d-flex flex-column flex-grow-1 body-1 text-truncate text-uppercase grey--text my-auto">{{ headerLabel }}</div>
-    <div class="d-flex flex-column">
-      <v-btn
-        v-if="canPublishNews"
-        depressed
-        small
-        class="caption text-uppercase grey--text my-auto me-2">
-        {{ $t('news.published.seeAll') }}
-      </v-btn>
+  <div class="noNewsSlideContent">
+    <v-btn
+      v-if="canPublishNews"
+      icon
+      @click="openDrawer"
+      class="me-4 float-right">
+      <v-icon>mdi-cog</v-icon>
+    </v-btn>
+    <div class="noNewsImage">
+      <div class="bookImage"></div>
     </div>
-    <div class="d-flex flex-column justify-end my-auto">
-      <v-btn
-        icon
-        @click="openDrawer">
-        <v-icon>mdi-cog</v-icon>
-      </v-btn>
+    <div class="NewsSliderText">
+      <div class="noNewsMsg">{{ $t('news.slider.yourArticleTitleGoesHere') }}</div>
     </div>
     <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
 export default {
-  props: {
-    hover: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data: () => ({
     canPublishNews: false,
-    news: null,
   }),
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
   },
-  computed: {
-    headerLabel() {
-      return this.news ? this.$t('news.latest.header'): this.$t('news.latest.header.post');
-    }
-  },
   methods: {
     openDrawer() {
       this.$refs.settingsDrawer.open();
     },
-  },
+  }
 };
 </script>

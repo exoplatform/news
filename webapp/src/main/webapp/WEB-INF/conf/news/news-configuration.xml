@@ -23,6 +23,11 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
+    <key>org.exoplatform.news.storage.NewsStorage</key>
+    <type>org.exoplatform.news.storage.jcr.JcrNewsStorage</type>
+  </component>
+  
+  <component>
     <key>org.exoplatform.news.NewsService</key>
     <type>org.exoplatform.news.NewsServiceImpl</type>
   </component>

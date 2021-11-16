@@ -1,4 +1,4 @@
-package org.exoplatform.news;
+package org.exoplatform.news.utils;
 
 import java.util.*;
 import java.util.regex.Matcher;

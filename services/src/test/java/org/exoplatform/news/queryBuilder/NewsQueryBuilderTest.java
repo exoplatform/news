@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.space.model.Space;

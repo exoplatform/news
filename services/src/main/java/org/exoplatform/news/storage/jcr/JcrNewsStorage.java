@@ -47,7 +47,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.news.storage.NewsStorage;
-import org.exoplatform.news.NewsUtils;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;

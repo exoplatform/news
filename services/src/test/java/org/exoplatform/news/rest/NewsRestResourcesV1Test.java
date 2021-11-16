@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.model.NewsAttachment;
+import org.exoplatform.news.service.NewsService;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +25,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.NewsAttachmentsService;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;

@@ -22,16 +22,15 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.news.NewsAttachmentsService;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.search.NewsESSearchResult;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -114,18 +113,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
     String authenticatedUser = request.getRemoteUser();
     Space space = spaceService.getSpaceById(news.getSpaceId());
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       if (!canCreateNews(authenticatedUser, space)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      News createdNews;
-      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
-        createdNews = newsService.createNews(news);
-      } else if(news.getSchedulePostDate() != null){
-        createdNews = newsService.cancelScheduleNews(news);
-      } else {
-        createdNews = newsService.createNewsDraft(news);
-      }
+      News createdNews = newsService.createNews(news, currentIdentity);
 
       return Response.ok(createdNews).build();
     } catch (Exception e) {
@@ -472,9 +465,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }
         news.setPinned(updatedNews.isPinned());
         if (news.isPinned()) {
-          newsService.pinNews(id);
+          newsService.publishNews(id);
         } else {
-          newsService.unpinNews(id);
+          newsService.unpublishNews(id);
         }
       }
 
@@ -599,9 +592,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
         news.setPinned(updatedNews.isPinned());
         if (news.isPinned()) {
-          newsService.pinNews(id);
+          newsService.publishNews(id);
         } else {
-          newsService.unpinNews(id);
+          newsService.unpublishNews(id);
         }
       }
 

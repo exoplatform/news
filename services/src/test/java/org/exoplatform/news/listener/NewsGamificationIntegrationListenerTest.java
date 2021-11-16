@@ -5,9 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;

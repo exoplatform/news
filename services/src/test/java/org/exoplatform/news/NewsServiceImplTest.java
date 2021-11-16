@@ -43,6 +43,8 @@ import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
+import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.service.impl.NewsServiceImpl;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.documents.TrashService;
 import org.exoplatform.services.cms.link.LinkManager;

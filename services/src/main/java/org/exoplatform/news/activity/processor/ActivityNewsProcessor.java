@@ -3,8 +3,8 @@ package org.exoplatform.news.activity.processor;
 import java.util.HashMap;
 
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.social.core.BaseActivityProcessorPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 

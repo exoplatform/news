@@ -1,8 +1,8 @@
 package org.exoplatform.news.listener;
 
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;

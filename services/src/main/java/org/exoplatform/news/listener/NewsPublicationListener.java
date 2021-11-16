@@ -17,18 +17,12 @@
 package org.exoplatform.news.listener;
 
 import javax.jcr.Node;
-import javax.jcr.Session;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.container.ExoContainer;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.cms.CmsService;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationConstant;
@@ -40,36 +34,19 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
 
   private NewsService            newsService;
 
-  private SessionProviderService sessionProviderService;
-
   public NewsPublicationListener() {
     newsService = WCMCoreUtils.getService(NewsService.class);
-    sessionProviderService = WCMCoreUtils.getService(SessionProviderService.class);
   }
 
   public void onEvent(Event<CmsService, Node> event) throws Exception {
     if (AuthoringPublicationConstant.POST_CHANGE_STATE_EVENT.equals(event.getEventName())) {
-      ExoContainer container = PortalContainer.getInstance();
-      RepositoryService repositoryService = container.getComponentInstanceOfType(RepositoryService.class);
-      SessionProvider systemProvider = sessionProviderService.getSystemSessionProvider(null);
-      Session session = systemProvider.getSession(
-                                                  repositoryService.getCurrentRepository()
-                                                                   .getConfiguration()
-                                                                   .getDefaultWorkspaceName(),
-                                                  repositoryService.getCurrentRepository());
       Node targetNode = event.getData();
       if (targetNode.isNodeType("exo:news") && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
                                                          .getString()
                                                          .equals(PublicationDefaultStates.PUBLISHED)) {
-        News news = newsService.convertNodeToNews(targetNode, false);
+        News news = newsService.getNewsById(targetNode.getUUID(), false);
         if (StringUtils.isEmpty(news.getActivities())) {
-          try {
-            newsService.createNews(news, session);
-          } finally {
-            if (session != null) {
-              session.logout();
-            }
-          }
+          newsService.createNews(news, null);//FIXME Not working for now we should treat the case when current user is system
         }
       }
     }

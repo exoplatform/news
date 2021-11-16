@@ -111,16 +111,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    String authenticatedUser = request.getRemoteUser();
-    Space space = spaceService.getSpaceById(news.getSpaceId());
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      if (!canCreateNews(authenticatedUser, space)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
       News createdNews = newsService.createNews(news, currentIdentity);
 
       return Response.ok(createdNews).build();
+    } catch (IllegalAccessException e) {
+      LOG.warn("User '{}' is not autorized to create news", currentIdentity.getUserId(), e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when creating the news " + news.getTitle(), e);
       return Response.serverError().build();
@@ -768,11 +766,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
 
       String authenticatedUser = request.getRemoteUser();
+      org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
 
       if (StringUtils.isBlank(authenticatedUser) || !canViewNews(authenticatedUser, space)) {
         return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-      return Response.ok(String.valueOf(canCreateNews(authenticatedUser, space))).build();
+      return Response.ok(String.valueOf(newsService.canCreateNews(space, currentIdentity))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can create a news", e);
       return Response.serverError().build();
@@ -881,13 +880,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     newsFilter.setOffset(offset);
 
     return newsFilter;
-  }
-  
-  private boolean canCreateNews(String authenticatedUser, Space space) throws Exception {
-    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-    return space != null && 
-          (spaceService.isSuperManager(authenticatedUser) || spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser) ||
-          spaceService.isMember(space, authenticatedUser) && (ArrayUtils.isEmpty(space.getRedactors()) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)));
   }
   
   private boolean canViewNews(String authenticatedUser, Space space) throws Exception {

@@ -1,9 +1,11 @@
-package org.exoplatform.news;
+package org.exoplatform.news.storage.jcr;
 
 import static org.mockito.Mockito.*;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
+import org.exoplatform.news.storage.jcr.JcrNewsAttachmentsStorage;
 import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.access.PermissionType;
@@ -42,7 +44,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NewsAttachmentsServiceImplTest {
+public class JcrNewsAttachmentsStorageTest {
 
   @Mock
   RepositoryService       repositoryService;
@@ -80,7 +82,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldGetAttachmentWhenItExists() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
                                                                                    repositoryService,
                                                                                    nodeHierarchyCreator,
                                                                                    dataDistributionManager,
@@ -122,7 +124,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldNotGetAttachmentWhenItDoesNotExist() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -148,7 +150,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldNotGetAttachmentWhenItHasNoResourceNode() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -182,7 +184,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldGetAttachmentsOfANewsWhenThereAre() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -227,7 +229,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldGetNoAttachmentsOfANewsWhenThereAreNot() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -262,7 +264,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldGetAttachmentStreamWhenAttachmentExists() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -297,7 +299,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldNotGetAttachmentStreamWhenAttachmentDoesNotExist() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -325,7 +327,7 @@ public class NewsAttachmentsServiceImplTest {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -348,9 +350,9 @@ public class NewsAttachmentsServiceImplTest {
     lenient().when(node.getSession()).thenReturn(session);
     Node spaceDocumentsFolderNode = mock(Node.class);
     lenient().when(session.getItem(anyString())).thenReturn(spaceDocumentsFolderNode);
-    lenient().when(spaceDocumentsFolderNode.hasNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(true);
+    lenient().when(spaceDocumentsFolderNode.hasNode(eq(JcrNewsAttachmentsStorage.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(true);
     Node spaceNewsRootNode = mock(Node.class);
-    lenient().when(spaceDocumentsFolderNode.getNode(eq(NewsAttachmentsServiceImpl.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(spaceNewsRootNode);
+    lenient().when(spaceDocumentsFolderNode.getNode(eq(JcrNewsAttachmentsStorage.NEWS_ATTACHMENTS_NODES_FOLDER))).thenReturn(spaceNewsRootNode);
     Node newsAttachmentsFolderNode = mock(Node.class);
     lenient().when(dataDistributionType.getOrCreateDataNode(any(), anyString())).thenReturn(newsAttachmentsFolderNode);
     Node newsAttachmentsNode = mock(Node.class);
@@ -376,7 +378,7 @@ public class NewsAttachmentsServiceImplTest {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -411,7 +413,7 @@ public class NewsAttachmentsServiceImplTest {
     // Given
     DataDistributionType dataDistributionType = mock(DataDistributionType.class);
     lenient().when(dataDistributionManager.getDataDistributionType(eq(DataDistributionMode.NONE))).thenReturn(dataDistributionType);
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -440,7 +442,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldMakeAttachmentsPublic() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -492,7 +494,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldUnmakeAttachmentsPublic() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,
@@ -541,7 +543,7 @@ public class NewsAttachmentsServiceImplTest {
   @Test
   public void shouldUpdateAttachments() throws Exception {
     // Given
-    NewsAttachmentsService newsAttachmentsService = new NewsAttachmentsServiceImpl(sessionProviderService,
+    NewsAttachmentsStorage newsAttachmentsService = new JcrNewsAttachmentsStorage(sessionProviderService,
             repositoryService,
             nodeHierarchyCreator,
             dataDistributionManager,

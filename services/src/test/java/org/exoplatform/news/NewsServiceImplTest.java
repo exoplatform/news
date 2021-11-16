@@ -45,6 +45,7 @@ import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.service.impl.NewsServiceImpl;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.documents.TrashService;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -143,7 +144,7 @@ public class NewsServiceImplTest {
   NewsSearchConnector        newsSearchConnector;
 
   @Mock
-  NewsAttachmentsService     newsAttachmentsService;
+  NewsAttachmentsStorage     newsAttachmentsService;
   
   @Mock
   IndexingService indexingService;

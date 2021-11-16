@@ -21,12 +21,12 @@ import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -55,7 +55,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private NewsService            newsService;
 
-  private NewsAttachmentsService newsAttachmentsService;
+  private NewsAttachmentsStorage newsAttachmentsService;
 
   private SpaceService           spaceService;
 
@@ -72,7 +72,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   }
 
   public NewsRestResourcesV1(NewsService newsService,
-                             NewsAttachmentsService newsAttachmentsService,
+                             NewsAttachmentsStorage newsAttachmentsService,
                              SpaceService spaceService,
                              IdentityManager identityManager,
                              PortalContainer container) {

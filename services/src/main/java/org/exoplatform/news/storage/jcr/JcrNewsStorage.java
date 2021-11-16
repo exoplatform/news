@@ -45,7 +45,7 @@ import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
-import org.exoplatform.news.NewsAttachmentsService;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.news.storage.NewsStorage;
 import org.exoplatform.news.NewsUtils;
 import org.exoplatform.services.cms.BasePath;
@@ -126,7 +126,7 @@ public class JcrNewsStorage implements NewsStorage {
   
   private LinkManager              linkManager;
 
-  private NewsAttachmentsService   newsAttachmentsService;
+  private NewsAttachmentsStorage   newsAttachmentsService;
   
   private NodeHierarchyCreator     nodeHierarchyCreator;
   
@@ -156,7 +156,7 @@ public class JcrNewsStorage implements NewsStorage {
                          HTMLUploadImageProcessor imageProcessor,
                          PublicationService publicationService,
                          PublicationManager publicationManager,
-                         NewsAttachmentsService newsAttachmentsService,
+                         NewsAttachmentsStorage newsAttachmentsService,
                          IdentityManager identityManager,
                          LinkManager linkManager,
                          NewsSearchConnector newsSearchConnector,

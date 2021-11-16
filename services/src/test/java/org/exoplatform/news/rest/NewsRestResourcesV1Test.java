@@ -15,6 +15,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.news.NewsAttachmentsService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
@@ -42,7 +42,7 @@ public class NewsRestResourcesV1Test {
   NewsService            newsService;
 
   @Mock
-  NewsAttachmentsService newsAttachmentsService;
+  NewsAttachmentsStorage newsAttachmentsService;
 
   @Mock
   SpaceService           spaceService;

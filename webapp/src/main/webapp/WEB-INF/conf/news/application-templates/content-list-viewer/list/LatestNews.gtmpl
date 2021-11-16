@@ -6,10 +6,9 @@
   import org.exoplatform.wcm.webui.Utils;
   import org.exoplatform.social.core.space.model.Space;
   import org.exoplatform.social.core.space.spi.SpaceService;
-  import org.exoplatform.services.security.ConversationState;
   import org.exoplatform.commons.utils.CommonsUtils;
   import org.exoplatform.container.PortalContainer;
-  import org.exoplatform.news.NewsService;
+  import org.exoplatform.news.service.NewsService;
   import org.exoplatform.portal.webui.util.Util;
   import groovy.json.JsonOutput;
   import org.htmlcleaner.HtmlCleaner;
@@ -32,7 +31,7 @@
     if(Utils.isViewable(node) && (sliderSpaceId == null || !node.hasProperty("exo:spaceId") || !node.getProperty("exo:spaceId").getString().equals(sliderSpaceId))) {
       nodes.add(node);
 
-      def news = newsService.convertNodeToNews(node, false);
+      def news = newsService.getNewsById(node.getUUID(), false);
       def body = new HtmlCleaner().clean(news.getBody()).getText();
       if( body != null ){
         news.setBody(body.toString());

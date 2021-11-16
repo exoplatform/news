@@ -10,7 +10,8 @@
   import org.exoplatform.commons.utils.CommonsUtils;
   import org.exoplatform.social.webui.Utils;
   import org.exoplatform.social.core.manager.IdentityManager;
-  import org.exoplatform.news.NewsService;
+  import org.exoplatform.news.service.NewsService;
+  
 
   import javax.jcr.RepositoryException;
 
@@ -59,7 +60,7 @@
 
   def newsNode = uicomponent.getNode();
 
-  def news = newsService.convertNodeToNews(newsNode, false);
+  def news = newsService.getNewsById(newsNode.getUUID(), false);
 
   if(news.archived && !news.canArchive) {
 
@@ -117,8 +118,8 @@
     def newsBody = news.body.replaceAll("`", "\\\\`");
     def newsAttachments = news.attachments;
 
-    def showEditButton = newsService.canEditNews(news.author, news.spaceId);
-    def showPinInput = newsService.canPublishNews();
+    def showEditButton = news.canEdit;
+    def showPinInput = news.canPublish;
     def hiddenSpace = news.hiddenSpace;
 
     def params = """ {

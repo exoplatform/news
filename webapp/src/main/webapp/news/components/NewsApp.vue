@@ -305,7 +305,7 @@ export default {
     },
     deleteNews(news) {
       const deleteDelay = 6;
-      const redirectionTime = 6100;
+      const redirectionTime = 8100;
       this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', news, this.isDraftsFilter);

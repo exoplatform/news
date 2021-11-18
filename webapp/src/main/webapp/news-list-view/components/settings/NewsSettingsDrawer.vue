@@ -16,10 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <exo-drawer
-    ref="drawer"
+    ref="newsSettingsDrawer"
     id="newsSettingsDrawer"
     right
-    disable-pull-to-refresh>
+    disable-pull-to-refresh
+    @closed="close">
     <template slot="title">
       {{ $t('news.list.settings.title') }}
     </template>
@@ -154,16 +155,16 @@ export default {
   watch: {
     saving() {
       if (this.saving) {
-        this.$refs.drawer.startLoading();
+        this.$refs.newsSettingsDrawer.startLoading();
       } else {
-        this.$refs.drawer.endLoading();
+        this.$refs.newsSettingsDrawer.endLoading();
       }
     },
     initializing() {
       if (this.initializing) {
-        this.$refs.drawer.startLoading();
+        this.$refs.newsSettingsDrawer.startLoading();
       } else {
-        this.$refs.drawer.endLoading();
+        this.$refs.newsSettingsDrawer.endLoading();
       }
     },
   },
@@ -182,15 +183,17 @@ export default {
     open() {
       this.init();
       this.reset();
-      this.$refs.drawer.open();
+      const overlayElement = document.getElementById('drawers-overlay');
+      overlayElement.style.display = 'block';
+      this.$refs.newsSettingsDrawer.open();
     },
     close() {
       const overlayElement = document.getElementById('drawers-overlay');
       overlayElement.style.display = 'none';
-      this.$refs.drawer.close();
+      this.$refs.newsSettingsDrawer.close();
     },
     reset() {
-      this.viewTemplate = this.$root.viewTemplate || 'NewsLatest';
+      this.viewTemplate = this.$root.viewTemplate;
       this.viewExtensions = this.$root.viewExtensions;
       this.newsTarget = this.$root.newsTarget || 'snapshotLatestNews';
       this.newsHeader = this.$root.header;

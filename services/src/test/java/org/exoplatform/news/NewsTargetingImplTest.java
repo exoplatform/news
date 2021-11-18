@@ -31,21 +31,21 @@ public class NewsTargetingImplTest {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService);
     MetadataType metadataType = new MetadataType(4, "newsTarget");
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("label", "slider");
-    HashMap<String, String> latestNewsProperties = new HashMap<>();
-    latestNewsProperties.put("label", "latest");
     List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();
-    sliderNews.setName("slider news");
+    sliderNews.setName("sliderNews");
     sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
     sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
     newsTargets.add(sliderNews);
 
     Metadata newsTarget2 = new Metadata();
-    newsTarget2.setName("latest news");
+    newsTarget2.setName("latestNews");
     newsTarget2.setCreatedDate(200);
+    HashMap<String, String> latestNewsProperties = new HashMap<>();
+    latestNewsProperties.put("label", "latest news");
     newsTarget2.setProperties(latestNewsProperties);
     newsTarget2.setId(2);
     newsTargets.add(newsTarget2);
@@ -57,10 +57,10 @@ public class NewsTargetingImplTest {
     // Then
     assertNotNull(newsTargetingEntities);
     assertEquals(2, newsTargetingEntities.size());
-    assertEquals("slider news", newsTargetingEntities.get(0).getName());
-    assertEquals("latest news", newsTargetingEntities.get(1).getName());
-    assertEquals("slider", newsTargetingEntities.get(0).getLabel());
-    assertEquals("latest", newsTargetingEntities.get(1).getLabel());
+    assertEquals("sliderNews", newsTargetingEntities.get(0).getName());
+    assertEquals("latestNews", newsTargetingEntities.get(1).getName());
+    assertEquals("slider news", newsTargetingEntities.get(0).getLabel());
+    assertEquals("latest news", newsTargetingEntities.get(1).getLabel());
   }
 
 }

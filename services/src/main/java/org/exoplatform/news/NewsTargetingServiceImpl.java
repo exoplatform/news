@@ -41,7 +41,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   @Override
   public  List<NewsTargetingEntity> getTargets() {
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(),  LIMIT);
-    return targets.stream().map(t -> toEntity(t)).collect(Collectors.toList());
+    return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();

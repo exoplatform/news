@@ -115,14 +115,14 @@ export default {
       this.publish = this.selected;
     },
     isActivityPosted() {
-      if ((this.isHiddenActivity === !this.isActivityPosted && !this.publish) ||(this.publish && this.selectedTargets && this.selectedTargets.length === 0)) {
+      if (this.isHiddenActivity === !this.isActivityPosted && (this.publish === this.selected || (this.allowPublishTargeting && this.publish && this.selectedTargets && this.selectedTargets.length === 0))) {
         this.disabled = true;
       } else {
         this.disabled = false;
       }
     },
     publish() {
-      if (this.publish && this.selectedTargets && this.selectedTargets.length === 0) {
+      if ((!this.allowPublishTargeting && this.publish === this.selected && this.isHiddenActivity === !this.isActivityPosted) || (this.isHiddenActivity === !this.isActivityPosted && this.allowPublishTargeting && (this.publish === this.selected || (this.publish && this.selectedTargets && this.selectedTargets.length === 0)))) {
         this.disabled = true;
       } else {
         this.disabled = false;

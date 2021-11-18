@@ -334,11 +334,11 @@ export default {
       }
     },
     stepper() {
-      if ((this.stepper === 1 || this.stepper === 2) && this.editScheduledNews !=='editScheduledNews') {
+      if (this.canPublishNews && (this.stepper === 1 || this.stepper === 2) && this.editScheduledNews !=='editScheduledNews') {
         this.disabled = true;
-      } else if ((this.stepper === 2) && this.editScheduledNews !=='editScheduledNews'){
+      } else if (this.canPublishNews && (this.stepper === 2) && this.editScheduledNews !=='editScheduledNews'){
         this.disabled = (this.visibilityActivity === !this.isActivityPosted) || this.selected === this.publish;
-      } else if (this.stepper === 3 && this.editScheduledNews !=='editScheduledNews') {
+      } else if (this.canPublishNews && this.stepper === 3 && this.editScheduledNews !=='editScheduledNews') {
         this.disabled = false;
       }
     },

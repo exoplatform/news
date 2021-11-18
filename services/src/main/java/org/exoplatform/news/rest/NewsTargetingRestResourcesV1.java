@@ -20,8 +20,10 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -29,10 +31,12 @@ import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.*;
 import org.exoplatform.common.http.HTTPStatus;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.social.core.metadata.storage.MetadataStorage;
 
 @Path("v1/news/targeting")
 @Api(tags = "v1/news/targeting", value = "v1/news/targeting")
@@ -75,6 +79,28 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer {
       return Response.ok(referencedTargets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news referenced targets", e);
+      return Response.serverError().build();
+    }
+  }
+
+  @DELETE
+  @Path("{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Delete news", httpMethod = "DELETE", response = Response.class, notes = "This deletes the news", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = 200, message = "News deleted"),
+      @ApiResponse(code = 400, message = "Invalid query input"),
+      @ApiResponse(code = 401, message = "User not authorized to delete the news"),
+      @ApiResponse(code = 500, message = "Internal server error") })
+  public Response deleteNews(@Context
+  HttpServletRequest request, @PathParam("id")
+  long id) {
+    try {
+      MetadataStorage metadataStorage = CommonsUtils.getService(MetadataStorage.class);
+      metadataStorage.deleteMetadataById(id);
+      return Response.ok().build();
+    } catch (Exception e) {
+      LOG.error("Error when deleting the news with id " + id, e);
       return Response.serverError().build();
     }
   }

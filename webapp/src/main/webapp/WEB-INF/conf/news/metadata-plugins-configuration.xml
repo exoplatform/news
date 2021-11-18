@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2003-2011 eXo Platform SAS.
+    Copyright (C) 2003-2021 eXo Platform SAS.
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -68,6 +68,14 @@
             <field name="name">
               <string>snapshotSliderNews</string>
             </field>
+            <field name="properties">
+              <map type="java.util.HashMap">
+                <entry>
+                  <key><string>label</string></key>
+                  <value><string>Snapshot slider news</string></value>
+                </entry>
+              </map>
+            </field>
           </object>
         </object-param>
       </init-params>
@@ -92,6 +100,14 @@
             </field>
             <field name="name">
               <string>snapshotLatestNews</string>
+            </field>
+            <field name="properties">
+              <map type="java.util.HashMap">
+                <entry>
+                  <key><string>label</string></key>
+                  <value><string>Snapshot latest news</string></value>
+                </entry>
+              </map>
             </field>
           </object>
         </object-param>

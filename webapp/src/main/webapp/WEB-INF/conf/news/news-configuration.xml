@@ -37,6 +37,15 @@
   </component>
 
   <component>
+    <type>org.exoplatform.news.rest.NewsTargetingRestResourcesV1</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.news.NewsTargetingService</key>
+    <type>org.exoplatform.news.NewsTargetingServiceImpl</type>
+  </component>
+
+  <component>
     <key>org.exoplatform.news.connector.NewsSearchConnector</key>
     <type>org.exoplatform.news.connector.NewsSearchConnector</type>
     <init-params>

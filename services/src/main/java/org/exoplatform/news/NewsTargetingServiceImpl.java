@@ -46,7 +46,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
-    newsTargetingEntity.setLabel(metadata.getProperties().get(LABEL));
+    if(metadata.getProperties() != null) {
+      newsTargetingEntity.setLabel(metadata.getProperties().get(LABEL));
+    }
     return newsTargetingEntity;
   }
 }

@@ -16,6 +16,8 @@
   import org.exoplatform.news.model.News;
   import org.htmlcleaner.HtmlCleaner;
   import org.apache.commons.lang.StringUtils;
+  import org.exoplatform.services.security.ConversationState;
+  import org.exoplatform.services.security.Identity;
 
   SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
   NewsService newsService = CommonsUtils.getService(NewsService.class);
@@ -26,12 +28,13 @@
   def seeAll = _ctx.appRes("news.published.seeAll");
   Space sliderSpace = spaceService.getSpaceByPrettyName(sliderSpacePrettyName);
   String sliderSpaceId = sliderSpace != null ? sliderSpace.getId() : null;
+  Identity currentIdentity = ConversationState.getCurrent().getIdentity();
   for (int i=0 ; i < currentPageData.size(); i++) {
     def node = currentPageData.get(i);
     if(Utils.isViewable(node) && (sliderSpaceId == null || !node.hasProperty("exo:spaceId") || !node.getProperty("exo:spaceId").getString().equals(sliderSpaceId))) {
       nodes.add(node);
 
-      def news = newsService.getNewsById(node.getUUID(), false);
+      def news = newsService.getNewsById(node.getUUID(), currentIdentity, false);
       def body = new HtmlCleaner().clean(news.getBody()).getText();
       if( body != null ){
         news.setBody(body.toString());

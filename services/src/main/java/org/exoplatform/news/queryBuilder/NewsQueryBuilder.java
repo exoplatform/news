@@ -32,6 +32,7 @@ public class NewsQueryBuilder {
    */
   public StringBuilder buildQuery(NewsFilter filter) throws Exception {
     StringBuilder sqlQuery = new StringBuilder("SELECT * FROM exo:news WHERE ");
+    //TODO Check if can be retrieved from higher layer
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     boolean isPublisher = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
     String username = currentIdentity.getUserId();

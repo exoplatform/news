@@ -433,6 +433,7 @@ public class JcrNewsStorage implements NewsStorage {
       if(StringUtils.isNotEmpty(strActivities)) {
         String[] activities = strActivities.split(";");
         StringBuilder memberSpaceActivities = new StringBuilder();
+        //TODO Check if can be retrieved from higher layer 
         org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
         String currentUsername = currentIdentity == null ? null : currentIdentity.getUserId();
         String newsActivityId = activities[0].split(":")[1];

@@ -23,10 +23,11 @@
   import java.util.Comparator;
 
   import groovy.json.JsonOutput;
+  import org.exoplatform.services.security.ConversationState;
 
   public String getProfileFullName(String userName) {
     String profileFullName = "";
-    Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
+    org.exoplatform.social.core.identity.model.Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
     if(identity != null && identity.getProfile() != null) {
       profileFullName = identity.getProfile().getFullName();
     }
@@ -59,8 +60,10 @@
   def pcontext = Util.getPortalRequestContext();
 
   def newsNode = uicomponent.getNode();
+  
+  def currentIdentity = ConversationState.getCurrent().getIdentity();
 
-  def news = newsService.getNewsById(newsNode.getUUID(), false);
+  def news = newsService.getNewsById(newsNode.getUUID(), currentIdentity, false);
 
   if(news.archived && !news.canArchive) {
 

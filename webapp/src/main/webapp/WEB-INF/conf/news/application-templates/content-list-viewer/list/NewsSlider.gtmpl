@@ -44,7 +44,7 @@ Identity currentIdentity = ConversationState.getCurrent().getIdentity();
 					def newsActivityId =  viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[1];
 					Space newsPostedInSpace = spaceService.getSpaceById( viewNode.getProperty("exo:activities").getString().split(";")[0].split(":")[0]);
 					def portalName = PortalContainer.getCurrentPortalContainerName();
-					def news = newsService.getNewsById(viewNode.getUUID(), false);
+					def news = newsService.getNewsById(viewNode.getUUID(), currentIdentity, false);
 					def portalOwner = CommonsUtils.getCurrentPortalOwner();
 					def currentUsername = currentIdentity.getUserId();
 					if (spaceService.isMember(newsPostedInSpace, currentUsername)) {

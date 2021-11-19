@@ -30,7 +30,6 @@ import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -49,25 +48,27 @@ import org.exoplatform.upload.UploadService;
  */
 public class NewsServiceImpl implements NewsService {
 
-  private static final String      PUBLISHER_MEMBERSHIP_NAME        = "publisher";
+  private static final String   PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
-  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP  = "/platform/web-contributors";
+  private final static String   PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private SpaceService             spaceService;
+  private static final String   NEWS_ID                         = "newsId";
 
-  private ActivityManager          activityManager;
+  private SpaceService          spaceService;
 
-  private IdentityManager          identityManager;
+  private ActivityManager       activityManager;
 
-  private NewsESSearchConnector    newsESSearchConnector;
-  
-  private IndexingService          indexingService;
+  private IdentityManager       identityManager;
 
-  private NewsStorage              newsStorage;
-  
-  private UserACL                  userACL;
+  private NewsESSearchConnector newsESSearchConnector;
 
-  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
+  private IndexingService       indexingService;
+
+  private NewsStorage           newsStorage;
+
+  private UserACL               userACL;
+
+  private static final Log      LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(SpaceService spaceService,
                          ActivityManager activityManager,
@@ -94,13 +95,13 @@ public class NewsServiceImpl implements NewsService {
     Space space = spaceService.getSpaceById(news.getSpaceId());
     try {
       if (!canCreateNews(space, currentIdentity)) {
-        throw new IllegalArgumentException("Not authorized");
+        throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news");
       }
       News createdNews;
       if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
-        createdNews = postNews(news);
+        createdNews = postNews(news, currentIdentity.getUserId());
       } else if(news.getSchedulePostDate() != null){
-        createdNews = unScheduleNews(news);
+        createdNews = unScheduleNews(news, currentIdentity);
       } else {
         createdNews = newsStorage.createNews(news);
       }
@@ -109,21 +110,6 @@ public class NewsServiceImpl implements NewsService {
       LOG.error("Error when creating the news " + news.getTitle(), e);
       return null;
     }
-  }
-  
-  public News postNews(News news) throws Exception {
-    if (StringUtils.isEmpty(news.getId())) {
-      news = newsStorage.createNews(news);
-    } else {
-      postNewsActivity(news);
-      updateNews(news);
-      sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
-    }
-    if (news.isPublished()) {
-      publishNews(news.getId());
-    }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
-    return news;
   }
   
   /**
@@ -138,14 +124,25 @@ public class NewsServiceImpl implements NewsService {
             || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)));
   }
   
-
   /**
    * {@inheritDoc}
    */
   @Override
-  public News updateNews(News news) throws Exception {
+  public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
     
+    if (!canEditNews(news, updater)) {  
+      throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
+    }
     Set<String> previousMentions = NewsUtils.processMentions(news.getBody());
+    if (publish != news.isPublished() && news.isCanPublish()) {
+      news.setPublished(publish);
+      if (news.isPublished()) {
+        publishNews(news.getId(), updater);
+      } else {
+        unpublishNews(news.getId());
+      }
+    }
+    
     newsStorage.updateNews(news);
     
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
@@ -158,56 +155,84 @@ public class NewsServiceImpl implements NewsService {
             newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
           });
         }
-        sendNotification(newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
+        sendNotification(updater, newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
       }
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     }
-    NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, getCurrentUserId(), news);
+    if (post != null) {
+      updateNewsActivity(news, post);
+    }
+    NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news);
     return news;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public void deleteNews(String newsId, String currentUser, boolean isDraft) throws Exception {
-    News news = newsStorage.getNewsById(newsId, false);
-    newsStorage.deleteNews(newsId, currentUser, isDraft);
-    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, news);
+  public void deleteNews(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft) throws Exception {
+    News news = getNewsById(newsId, currentIdentity, false);
+    if (!news.isCanDelete()) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");
+    }
+    
+    newsStorage.deleteNews(newsId, isDraft);
+    indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+    NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);
   }
   
   /**
    * {@inheritDoc}
    */
   @Override
-  public News getNewsById(String newsId, boolean editMode) {
+  public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
     try {
-      News news = newsStorage.getNewsById(newsId, editMode);
-      news.setCanEdit(canEditNews(news, getCurrentUserId()));
-      news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
-      news.setCanPublish(canPublishNews());
-      news.setCanArchive(canArchiveNews(news.getAuthor()));
+      News news = getNewsById(newsId, editMode);
+      if (editMode) {
+        if (!canEditNews(news, currentIdentity.getUserId())) {
+          throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
+        }
+      } else if (!canViewNews(news, currentIdentity.getUserId())) {
+        throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to view News");
+      }
+      news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
+      news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
+      news.setCanPublish(canPublishNews(currentIdentity));
+      news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
       return news;
     } catch (Exception e) {
       throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
     }
   }
-
+  
   /**
    * {@inheritDoc}
    */
   @Override
-  public List<News> getNews(NewsFilter newsFilter) throws Exception {
+  public News getNewsById(String newsId, boolean editMode) throws Exception {
+    try {
+      News news = newsStorage.getNewsById(newsId, editMode);
+      return news;
+    } catch (Exception e) {
+      throw new Exception("An error occurred while retrieving news with id " + newsId, e);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<News> getNews(NewsFilter newsFilter, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
     List<News> newsList = newsStorage.getNews(newsFilter);
     newsList.stream().forEach(news -> {
-      news.setCanEdit(canEditNews(news, getCurrentUserId()));
-      news.setCanDelete(canDeleteNews(news.getAuthor(),news.getSpaceId()));
-      news.setCanPublish(canPublishNews());
-      news.setCanArchive(canArchiveNews(news.getAuthor()));
+      news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
+      news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
+      news.setCanPublish(canPublishNews(currentIdentity));
+      news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
     });
     return newsList;
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -220,10 +245,100 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
+  public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
+    return newsStorage.searchNews(filter, lang);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public News getNewsByActivityId(String activityId, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException,
+                                                                               ObjectNotFoundException {
+    ExoSocialActivity activity = activityManager.getActivity(activityId);
+    if (activity == null) {
+      throw new ObjectNotFoundException("Activity with id " + activityId + " wasn't found");
+    }
+    org.exoplatform.services.security.Identity viewerIdentity = NewsUtils.getUserIdentity(currentIdentity.getUserId());
+    if (!activityManager.isActivityViewable(activity, viewerIdentity)) {
+      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " isn't allowed to access activity with id " + activityId);
+    }
+    Map<String, String> templateParams = activity.getTemplateParams();
+    if (templateParams == null || !activity.getTemplateParams().containsKey(NEWS_ID)) {
+      throw new ObjectNotFoundException("Activity with id " + activityId + " isn't of type news nor a shared news");
+    }
+    String newsId = templateParams.get(NEWS_ID);
+    if (StringUtils.isBlank(newsId)) {
+      String originalActivityId = templateParams.get("originalActivityId");
+      if (StringUtils.isNotBlank(originalActivityId)) {
+        Identity sharedActivityPosterIdentity = identityManager.getIdentity(activity.getPosterId());
+        if (sharedActivityPosterIdentity == null) {
+          throw new IllegalAccessException("Shared Activity '" + activityId + "' Poster " + activity.getPosterId()
+              + " isn't found");
+        }
+        return getNewsByActivityId(originalActivityId, NewsUtils.getUserIdentity(sharedActivityPosterIdentity.getRemoteId()));
+      }
+      throw new ObjectNotFoundException("Activity with id " + activityId + " isn't of type news nor a shared news");
+    }
+    return getNewsById(newsId, currentIdentity, false);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public News scheduleNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
+    Space space = news.getSpaceId() == null ? null : spaceService.getSpaceById(news.getSpaceId());
+    if (!canScheduleNews(space, currentIdentity)) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
+    }
+    return newsStorage.scheduleNews(news);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public News unScheduleNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
+    Space space = news.getSpaceId() == null ? null : spaceService.getSpaceById(news.getSpaceId());
+    if (!canScheduleNews(space, currentIdentity)) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to unschedule news");
+    }
+    return newsStorage.unScheduleNews(news);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<NewsESSearchResult> search(Identity currentIdentity, String term, int offset, int limit) {
+    return newsESSearchConnector.search(currentIdentity, term, offset, limit);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public News postNews(News news, String poster) throws Exception {
+    postNewsActivity(news);
+    updateNews(news, poster, null, news.isPublished());
+    sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    if (news.isPublished()) {
+      publishNews(news.getId(), poster);
+    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
+    return news;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void markAsRead(News news, String userId) throws Exception {
     newsStorage.markAsRead(news, userId);
-    //if(!newsStorage.isCurrentUserInNewsViewers()) {//FIXME not working for now
-      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, getCurrentUserId(), news);
+    //FIXME not working for now, to be tested
+    //if(!newsStorage.isCurrentUserInNewsViewers()) {
+      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, userId, news);
     //}
   }
 
@@ -231,11 +346,11 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void publishNews(String newsId) throws Exception {
+  public void publishNews(String newsId, String publisher) throws Exception {
     News news = getNewsById(newsId, false);
     newsStorage.publishNews(news);
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
-    sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
   }
 
   /**
@@ -256,7 +371,7 @@ public class NewsServiceImpl implements NewsService {
     }
     newsStorage.shareNews(news, space, userIdentity, sharedActivityId);
     if (sharedActivityId != null) {
-      NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, getCurrentUserId(), news);
+      NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, userIdentity.getRemoteId(), news);
     }
   }
 
@@ -279,14 +394,11 @@ public class NewsServiceImpl implements NewsService {
     activity.setUserId(poster.getId());
     activity.isHidden(news.isActivityPosted());
     Map<String, String> templateParams = new HashMap<>();
-    templateParams.put("newsId", news.getId());
+    templateParams.put(NEWS_ID, news.getId());
     activity.setTemplateParams(templateParams);
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
     newsStorage.updateNewsActivities(activity.getId(), news);
-    String newsPoster = news.getAuthor();
-    //TODO to be checked for analytics
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, newsPoster, news);
   }
   
   /**
@@ -298,61 +410,8 @@ public class NewsServiceImpl implements NewsService {
   }
   
   /**
-   * Search news by term
-   *
-   * @param term
-   * @param offset
-   * @param limit
-   * @return News Search Result
+   * {@inheritDoc}
    */
-  public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit) {
-    return newsESSearchConnector.search(currentUser,term, offset, limit);
-  }
-  
-  @Override
-  public News getNewsById(String newsId, String authenticatedUser, boolean editMode) throws IllegalAccessException {
-    News news = getNewsById(newsId, editMode);
-    if (editMode) {
-      if (!canEditNews(news, authenticatedUser)) {
-        throw new IllegalAccessException("User " + authenticatedUser + " is not authorized to edit News");
-      }
-    } else if (!canViewNews(news, authenticatedUser)) {
-      throw new IllegalAccessException("User " + authenticatedUser + " is not authorized to view News");
-    }
-    return news;
-  }
-
-  @Override
-  public News getNewsByActivityId(String activityId, String authenticatedUser) throws IllegalAccessException,
-                                                                               ObjectNotFoundException {
-    ExoSocialActivity activity = activityManager.getActivity(activityId);
-    if (activity == null) {
-      throw new ObjectNotFoundException("Activity with id " + activityId + " wasn't found");
-    }
-    org.exoplatform.services.security.Identity viewerIdentity = NewsUtils.getUserIdentity(authenticatedUser);
-    if (!activityManager.isActivityViewable(activity, viewerIdentity)) {
-      throw new IllegalAccessException("User " + authenticatedUser + " isn't allowed to access activity with id " + activityId);
-    }
-    Map<String, String> templateParams = activity.getTemplateParams();
-    if (templateParams == null) {
-      throw new ObjectNotFoundException("Activity with id " + activityId + " isn't of type news nor a shared news");
-    }
-    String newsId = templateParams.get("newsId");
-    if (StringUtils.isBlank(newsId)) {
-      String originalActivityId = templateParams.get("originalActivityId");
-      if (StringUtils.isNotBlank(originalActivityId)) {
-        Identity sharedActivityPosterIdentity = identityManager.getIdentity(activity.getPosterId());
-        if (sharedActivityPosterIdentity == null) {
-          throw new IllegalAccessException("Shared Activity '" + activityId + "' Poster " + activity.getPosterId()
-              + " isn't found");
-        }
-        return getNewsByActivityId(originalActivityId, sharedActivityPosterIdentity.getRemoteId());
-      }
-      throw new ObjectNotFoundException("Activity with id " + activityId + " isn't of type news nor a shared news");
-    }
-    return getNewsById(newsId, authenticatedUser, false);
-  }
-
   @Override
   public boolean canViewNews(News news, String username) {
     try {
@@ -381,51 +440,44 @@ public class NewsServiceImpl implements NewsService {
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void updateNewsActivity(News news, boolean post) {
-    ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
-    if(activity != null) {
-      if (post) {
-        activity.setUpdated(System.currentTimeMillis());
-      }
-      activity.isHidden(news.isActivityPosted());
-      activityManager.updateActivity(activity, true);
-    }
-  }
-
-  public News scheduleNews(News news) throws Exception {
-    return newsStorage.scheduleNews(news);
-  }
-
-  public News unScheduleNews(News news) throws Exception {
-    return newsStorage.unScheduleNews(news);
-  }
-  
-  /**
-   * Search news with the given text
-   * 
-   * @param filter news filter
-   * @param lang language
-   * @throws Exception when error
-   */
-  public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
-    return newsStorage.searchNews(filter, lang);
-  }
-
-  /**
-   * Unarchive a news
-   *
-   * @param newsId The id of the news to be unarchived
-   * @throws Exception when error
-   */
   public void unarchiveNews(String newsId) throws Exception {
     newsStorage.unarchiveNews(newsId);
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean canScheduleNews(Space space, org.exoplatform.services.security.Identity currentIdentity) {
+    return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+  
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {
+    return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor) {
+    return currentIdentity != null && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+        || currentIdentity.getUserId().equals(newsAuthor));
+  }
 
-  public void sendNotification(News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+  public void sendNotification(String currentUserId, News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String newsId = news.getId();
     String contentAuthor = news.getAuthor();
-    String currentUser = getCurrentUserId() != null ? getCurrentUserId() : contentAuthor;
+    String currentUser = currentUserId != null ? currentUserId : contentAuthor;
     String activities = news.getActivities();
     String contentTitle = news.getTitle();
     String contentBody = news.getBody();
@@ -485,17 +537,18 @@ public class NewsServiceImpl implements NewsService {
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }
   
-  private String getCurrentUserId() {
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
-    return currentIdentity != null ? currentIdentity.getUserId() : null;
+  private void updateNewsActivity(News news, boolean post) {
+    ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+    if(activity != null) {
+      if (post) {
+        activity.setUpdated(System.currentTimeMillis());
+      }
+      activity.isHidden(news.isActivityPosted());
+      activityManager.updateActivity(activity, true);
+    }
   }
   
-  private org.exoplatform.services.security.Identity getCurrentIdentity() {
-    ConversationState conversationState = ConversationState.getCurrent();
-    return conversationState != null ? conversationState.getIdentity() : null;
-  }
-  
-  public boolean canEditNews(News news, String authenticatedUser) {
+  private boolean canEditNews(News news, String authenticatedUser) {
     String spaceId = news.getSpaceId();
     Space space = spaceId == null ? null : spaceService.getSpaceById(spaceId);
     if (space == null) {
@@ -514,16 +567,14 @@ public class NewsServiceImpl implements NewsService {
     if (spaceService.isManager(currentSpace, authenticatedUser)) {
       return true;
     }
-    if (spaceService.isRedactor(currentSpace, authenticatedUser) && (news.isDraftVisible() || news.getSchedulePostDate() != null)
-        && news.getActivities() == null) {
+    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
       return true;
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
     return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
   
-  public boolean canDeleteNews(String posterId, String spaceId) {
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
+  private boolean canDeleteNews(org.exoplatform.services.security.Identity currentIdentity, String posterId, String spaceId) {
     if (currentIdentity == null) {
       return false;
     }
@@ -531,20 +582,5 @@ public class NewsServiceImpl implements NewsService {
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
         || spaceService.isManager(currentSpace, authenticatedUser);
-  }
-  
-  public boolean canPublishNews() {
-    // FIXME shouldn't use ConversationState in Service layer
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
-    if (currentIdentity == null) {
-      return false;
-    }
-    return currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
-  }
-  
-  public boolean canArchiveNews(String newsAuthor) {
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
-    return currentIdentity != null && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
-        || currentIdentity.getUserId().equals(newsAuthor));
   }
 }

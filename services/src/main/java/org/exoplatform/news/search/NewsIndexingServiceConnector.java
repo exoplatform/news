@@ -87,6 +87,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     }
     LOG.debug("Index document for news id={}", id);
     News news = null;
+    //TODO to be tested and removed
     SessionProvider systemProvider = SessionProvider.createSystemProvider();
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
     sessionProviderService.setSessionProvider(null, systemProvider);

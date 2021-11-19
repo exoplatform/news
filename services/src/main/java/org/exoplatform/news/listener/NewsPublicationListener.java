@@ -46,7 +46,7 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
                                                          .equals(PublicationDefaultStates.PUBLISHED)) {
         News news = newsService.getNewsById(targetNode.getUUID(), false);
         if (StringUtils.isEmpty(news.getActivities())) {
-          newsService.createNews(news, null);//FIXME Not working for now we should treat the case when current user is system
+          newsService.postNews(news, news.getAuthor());
         }
       }
     }

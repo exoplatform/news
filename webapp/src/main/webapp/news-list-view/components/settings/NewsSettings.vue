@@ -22,7 +22,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-if="canPublishNews"
         depressed
         small
-        class="caption text-uppercase grey--text my-auto me-2">
+        class="caption text-uppercase grey--text my-auto me-2"
+        @click="seeAllNews">
         {{ $t('news.published.seeAll') }}
       </v-btn>
     </div>
@@ -62,6 +63,9 @@ export default {
     openDrawer() {
       this.$refs.settingsDrawer.open();
     },
+    seeAllNews() {
+      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
+    }
   },
 };
 </script>

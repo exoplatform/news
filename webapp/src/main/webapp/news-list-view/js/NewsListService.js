@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {newsConstants} from '../../js/newsConstants.js';
+
 export function getNewsList(newsTarget, limit) { // eslint-disable-line no-unused-vars
   // TODO
   return Promise.resolve([]);
 }
 
-export function getNewsTarget() { // eslint-disable-line no-unused-vars
-  // TODO
-  return Promise.resolve(['snapshotSliderNews', 'snapshotLatestNews']);
+export function getNewsTarget() {
+  return fetch(`${newsConstants.NEWS_API}/targeting`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    }
+  });
 }
 
 export function saveSettings(saveSettingsURL ,settings) {

@@ -134,18 +134,14 @@ export default {
       return [];
     },
     checkAlphanumeric() {
-      if (this.nameNewsList.length && !this.nameNewsList.trim().match(/^[\w\-\s]+$/)) {
+      if (this.nameNewsList && !this.nameNewsList.trim().match(/^[\w\-\s]+$/) && this.nameNewsList.length > 0) {
         return this.$t('news.list.settings.name.errorMessage');
       } else {
         return '';
       }
     },
     disabled() {
-      if (this.checkAlphanumeric === '' && (this.nameNewsList && this.nameNewsList.length > 0)) {
-        return false;
-      } else {
-        return true;
-      }
+      return this.checkAlphanumeric !== '' || (this.nameNewsList && this.nameNewsList.length === 0);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
@@ -204,9 +200,9 @@ export default {
         this.initializing = true;
         this.$newsListService.getNewsTarget()
           .then(newsTargets => {
-            this.newsTargets = newsTargets.map(name => ({
-              name,
-              label: this.getLabel(`news.list.settings.newsTarget.${name}`, name),
+            this.newsTargets = newsTargets.map(newsTarget => ({
+              name: newsTarget.name,
+              label: newsTarget.label,
             }));
             this.initialized = true;
           })

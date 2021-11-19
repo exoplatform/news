@@ -118,7 +118,7 @@ public interface NewsService {
   /**
    * Publish a news
    *
-   * @param newsId The id of the news to be pinned
+   * @param newsId The id of the news to be published
    * @throws Exception when error
    */
   void publishNews(String newsId) throws Exception;

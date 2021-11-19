@@ -54,7 +54,7 @@ public class NewsQueryBuilder {
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
           sqlQuery.append("CONTAINS(.,'").append(filter.getSearchText()).append("') AND ");
         }
-        if (filter.isPinnedNews()) {
+        if (filter.isPublishedNews()) {
           sqlQuery.append("exo:pinned = 'true' AND ");
         }
 

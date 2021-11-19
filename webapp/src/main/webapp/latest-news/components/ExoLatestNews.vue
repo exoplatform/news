@@ -25,7 +25,7 @@
                 depressed
                 small
                 class="caption text-uppercase grey--text d-sm-flex"
-                @click="openAllNewsPinned(url)">
+                @click="openAllNewsPublished(url)">
                 {{ seeAll }}
               </v-btn>
             </v-flex>
@@ -209,7 +209,8 @@ export default {
       if (url !== null){
         window.location.href =url;
       }
-    },openAllNewsPinned(url){
+    },
+    openAllNewsPublished(url){
       if (url !== null){
         window.location.href =url;
       }

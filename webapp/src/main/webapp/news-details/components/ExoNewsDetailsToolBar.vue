@@ -81,7 +81,7 @@ export default {
       return this.news && this.news.title;
     },
     newsPublished() {
-      return this.news && this.news.pinned;
+      return this.news && this.news.published;
     }
   },
 };

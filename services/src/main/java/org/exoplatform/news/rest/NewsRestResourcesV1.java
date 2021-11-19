@@ -68,7 +68,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private Map<String, String>    newsToDeleteQueue = new HashMap<>();
 
   private enum FilterType {
-    PINNED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
+    PUBLISHED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
   }
 
   public NewsRestResourcesV1(NewsService newsService,
@@ -159,7 +159,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get news list", httpMethod = "GET", response = Response.class, notes = "This gets the list of news with the given search text, of the given author, in the given space or spaces, with the given publication state, with the given pinned state if the authenticated user is a member of the spaces or a super manager.")
+  @ApiOperation(value = "Get news list", httpMethod = "GET", response = Response.class, notes = "This gets the list of news with the given search text, of the given author, in the given space or spaces, with the given publication state, with the given published state if the authenticated user is a member of the spaces or a super manager.")
   @ApiResponses(value = { @ApiResponse(code = 200, message = "News list returned"),
       @ApiResponse(code = 401, message = "User not authorized to get the news list"),
       @ApiResponse(code = 404, message = "News list not found"), @ApiResponse(code = 500, message = "Internal server error") })
@@ -453,16 +453,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setDraftVisible(updatedNews.isDraftVisible());
       news.setActivityPosted(updatedNews.isActivityPosted());
 
-      if (updatedNews.isPinned() != news.isPinned()) {
+      if (updatedNews.isPublished() != news.isPublished()) {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
+        boolean canPublishOrUnpublishNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
                 currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*");
 
-        if (!canPinOrUnpinNews) {
+        if (!canPublishOrUnpublishNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        news.setPinned(updatedNews.isPinned());
-        if (news.isPinned()) {
+        news.setPublished(updatedNews.isPublished());
+        if (news.isPublished()) {
           newsService.publishNews(id);
         } else {
           newsService.unpublishNews(id);
@@ -495,7 +495,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-      if (!news.isPinned()) {
+      if (!news.isPublished()) {
         Space space = spaceService.getSpaceById(news.getSpaceId());
         if (space == null) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -580,16 +580,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
 
-      if (updatedNews.isPinned() != news.isPinned()) {
-        boolean canPinOrUnpinNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
+      if (updatedNews.isPublished() != news.isPublished()) {
+        boolean canPublishOrUnpublishNews = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) ||
                 currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, "*");
 
-        if (!canPinOrUnpinNews) {
+        if (!canPublishOrUnpublishNews) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        news.setPinned(updatedNews.isPinned());
-        if (news.isPinned()) {
+        news.setPublished(updatedNews.isPublished());
+        if (news.isPublished()) {
           newsService.publishNews(id);
         } else {
           newsService.unpublishNews(id);
@@ -838,8 +838,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     if (StringUtils.isNotEmpty(filter)) {
       FilterType filterType = FilterType.valueOf(filter.toUpperCase());
       switch (filterType) {
-        case PINNED: {
-          newsFilter.setPinnedNews(true);
+        case PUBLISHED: {
+          newsFilter.setPublishedNews(true);
           break;
         }
 

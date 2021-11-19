@@ -118,8 +118,6 @@
     def newsBody = news.body.replaceAll("`", "\\\\`");
     def newsAttachments = news.attachments;
 
-    def showEditButton = news.canEdit;
-    def showPinInput = news.canPublish;
     def hiddenSpace = news.hiddenSpace;
 
     def params = """ {
@@ -128,7 +126,7 @@
       news: {
         title: "${newsTitle}",
         summary: `${newsSummary}`,
-        pinned: ${news.pinned},
+        published: ${news.published},
         body: `${newsBody}`,
         illustrationURL: '${illustrationURL}',
         attachments: ${JsonOutput.toJson(newsAttachments)},
@@ -141,6 +139,8 @@
         newsId: '${news.id}',
         archived: ${news.archived},
         canArchive: ${news.canArchive},
+        canEdit: ${news.canEdit},
+        canPublish: ${news.canPublish},
         profileAvatarURL: '${ownerAvatar}',
         spaceDisplayName: "${spaceName}",
         spaceUrl:'${news.spaceUrl}',
@@ -150,8 +150,6 @@
         hiddenSpace: ${news.hiddenSpace},
         isSpaceMember: ${news.isSpaceMember},
       },
-      showEditButton: $showEditButton,
-      showPinInput: $showPinInput,
     } """
     def notAuthorizedUserLabel = "";
     if( hiddenSpace ){
@@ -169,7 +167,7 @@
 %>
 
   <div>
-    <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+    <!-- The following bloc is needed in order to display the publish confirmation popup when acceding to news details from news app -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
       <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">

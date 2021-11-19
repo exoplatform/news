@@ -140,7 +140,7 @@ export default {
   },
   computed: {
     selected() {
-      return this.news && this.news.pinned;
+      return this.news && this.news.published;
     },
     isHiddenActivity() {
       return this.news && this.news.activityPosted;
@@ -181,7 +181,7 @@ export default {
   methods: {
     openDrawer() {
       if (this.news) {
-        this.publish = this.news.pinned;
+        this.publish = this.news.published;
         this.isActivityPosted = !this.news.activityPosted;
       }
       if (this.$refs.postNewsDrawer) {
@@ -194,7 +194,7 @@ export default {
     },
     updateNews() {
       this.editingNews = true;
-      this.news.pinned = this.publish;
+      this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;

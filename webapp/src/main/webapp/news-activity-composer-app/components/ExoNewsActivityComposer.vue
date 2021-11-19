@@ -313,7 +313,7 @@ export default {
         illustration: [],
         attachments: [],
         spaceId: '',
-        pinned: false,
+        published: false,
         archived: false,
         draftVisible: false,
       },
@@ -326,7 +326,7 @@ export default {
         illustration: [],
         attachments: [],
         spaceId: '',
-        pinned: false,
+        published: false,
       },
       file: {
         src: ''
@@ -395,7 +395,7 @@ export default {
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.getString(this.news.body) === this.getString(this.originalNews.body)
-                 && this.news.pinned === this.originalNews.pinned
+                 && this.news.published === this.originalNews.published
                  && this.news.publicationState !== 'draft') {
         return true;
       }
@@ -651,7 +651,7 @@ export default {
             this.news.title = fetchedNode.title;
             this.news.summary = fetchedNode.summary;
             this.news.body = fetchedNode.body;
-            this.news.pinned = fetchedNode.pinned;
+            this.news.published = fetchedNode.published;
             this.news.archived = fetchedNode.archived;
             this.news.spaceId = fetchedNode.spaceId;
             this.news.publicationState = fetchedNode.publicationState;
@@ -732,7 +732,7 @@ export default {
     },
     postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted) {
       this.news.activityPosted = isActivityPosted;
-      this.news.pinned = publish;
+      this.news.published = publish;
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {
@@ -759,7 +759,7 @@ export default {
         body: this.getBody() ? newsBody : this.news.body,
         author: this.currentUser,
         attachments: this.news.attachments,
-        pinned: this.news.pinned,
+        published: this.news.published,
         draftVisible: this.news.draftVisible,
         spaceId: this.spaceId,
         publicationState: 'published',
@@ -807,7 +807,7 @@ export default {
         body: this.replaceImagesURLs(this.news.body),
         author: this.currentUser,
         attachments: [],
-        pinned: false,
+        published: false,
         draftVisible: this.news.draftVisible,
         spaceId: this.spaceId,
         publicationState: ''
@@ -900,7 +900,7 @@ export default {
       this.news.title = '';
       this.news.summary = '';
       this.news.body = '';
-      this.news.pinned = false;
+      this.news.published = false;
       CKEDITOR.instances['newsContent'].setData('');
       this.news.illustration = [];
     },
@@ -922,7 +922,7 @@ export default {
         summary: this.news.summary != null ? this.news.summary : '',
         body: this.getBody() ? newsBody : this.news.body,
         attachments: this.news.attachments,
-        pinned: this.news.pinned,
+        published: this.news.published,
         publicationState: publicationState,
         draftVisible: this.draftVisible,
         activityPosted: this.news.activityPosted,

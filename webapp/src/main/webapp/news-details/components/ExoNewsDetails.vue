@@ -120,12 +120,6 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
-    if (this.showPinInput) {
-      const pinButton = this.$root.$el.querySelector('#pinNewsActivity');
-      if (pinButton) {
-        pinButton.style.display = '';
-      }
-    }
   },
   methods: {
     getSpaceById(spaceId) {
@@ -160,7 +154,7 @@ export default {
     postNews(schedulePostDate, postArticleMode, publish, isActivityPosted) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
       this.news.activityPosted = isActivityPosted;
-      this.news.pinned = publish;
+      this.news.published = publish;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

@@ -119,7 +119,7 @@ public class NewsServiceImpl implements NewsService {
       updateNews(news);
       sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
     }
-    if (news.isPinned()) {
+    if (news.isPublished()) {
       publishNews(news.getId());
     }
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);
@@ -362,7 +362,7 @@ public class NewsServiceImpl implements NewsService {
         LOG.warn("Can't find space with id {} when checking access on news with id {}", spaceId, news.getId());
         return false;
       }
-      if (!news.isPinned()
+      if (!news.isPublished()
           && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
           && !(spaceService.isSuperManager(username)
               || spaceService.isMember(space, username))) {

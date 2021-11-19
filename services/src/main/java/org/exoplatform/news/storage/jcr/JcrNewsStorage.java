@@ -112,7 +112,7 @@ public class JcrNewsStorage implements NewsStorage {
   
   public static final String       NEWS_NODES_FOLDER                = "News";
   
-  public static final String       PINNED_NEWS_NODES_FOLDER         = "Pinned";
+  public static final String       PUBLISHED_NEWS_NODES_FOLDER         = "Pinned";
   
   public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
   
@@ -409,7 +409,7 @@ public class JcrNewsStorage implements NewsStorage {
       news.setPublicationState(node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString());
     }
     if (originalNode.hasProperty("exo:pinned")) {
-      news.setPinned(originalNode.getProperty("exo:pinned").getBoolean());
+      news.setPublished(originalNode.getProperty("exo:pinned").getBoolean());
     }
     if (originalNode.hasProperty("exo:archived")) {
       news.setArchived(originalNode.getProperty("exo:archived").getBoolean());
@@ -686,7 +686,7 @@ public class JcrNewsStorage implements NewsStorage {
         startPublishedDate.setTime(format.parse(schedulePostDate));
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
-        scheduledNewsNode.setProperty("exo:pinned", news.isPinned());
+        scheduledNewsNode.setProperty("exo:pinned", news.isPublished());
         scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, news.isActivityPosted());
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());
@@ -750,9 +750,9 @@ public class JcrNewsStorage implements NewsStorage {
   }
   
   /**
-   * Get the root folder for pinned news
+   * Get the root folder for published news
    *
-   * @return the pinned folder node
+   * @return the published folder node
    * @throws Exception when error
    */
   private Node getPublishedNewsFolder(Session session) throws Exception {
@@ -764,14 +764,14 @@ public class JcrNewsStorage implements NewsStorage {
     } else {
       newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
     }
-    Node pinnedRootNode;
-    if (!newsRootNode.hasNode(PINNED_NEWS_NODES_FOLDER)) {
-      pinnedRootNode = newsRootNode.addNode(PINNED_NEWS_NODES_FOLDER, "nt:unstructured");
+    Node publishedRootNode;
+    if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
+      publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
       newsRootNode.save();
     } else {
-      pinnedRootNode = newsRootNode.getNode(PINNED_NEWS_NODES_FOLDER);
+      publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
     }
-    return pinnedRootNode;
+    return publishedRootNode;
   }
   
   private Node getSpaceNewsRootNode(String spaceId, Session session) throws RepositoryException {
@@ -947,12 +947,12 @@ public class JcrNewsStorage implements NewsStorage {
   }
   
   /**
-   * Get the root folder for pinned news
+   * Get the root folder for published news
    *
-   * @return the pinned folder node
+   * @return the published folder node
    * @throws Exception when error
    */
-  private Node getPinnedNewsFolder() throws Exception {
+  private Node getPublishedNewsFolder() throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
@@ -967,14 +967,14 @@ public class JcrNewsStorage implements NewsStorage {
     } else {
       newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
     }
-    Node pinnedRootNode;
-    if (!newsRootNode.hasNode(PINNED_NEWS_NODES_FOLDER)) {
-      pinnedRootNode = newsRootNode.addNode(PINNED_NEWS_NODES_FOLDER, "nt:unstructured");
+    Node publishedRootNode;
+    if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
+      publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
       newsRootNode.save();
     } else {
-      pinnedRootNode = newsRootNode.getNode(PINNED_NEWS_NODES_FOLDER);
+      publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
     }
-    return pinnedRootNode;
+    return publishedRootNode;
   }
   
   public void markAsRead(News news, String userId) throws Exception {
@@ -1040,22 +1040,22 @@ public class JcrNewsStorage implements NewsStorage {
 
     newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
 
-    // Remove pin symlink
-    Node pinnedRootNode = getPinnedNewsFolder();
-    if (pinnedRootNode == null) {
-      throw new Exception("Unable to find the root pinned folder: /Application Data/News/pinned");
+    // Remove publish symlink
+    Node publishedRootNode = getPublishedNewsFolder();
+    if (publishedRootNode == null) {
+      throw new Exception("Unable to find the root published folder: /Application Data/News/pinned");
     }
     Calendar newsCreationCalendar = Calendar.getInstance();
     newsCreationCalendar.setTime(news.getCreationDate());
-    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(pinnedRootNode, getNodeRelativePath(newsCreationCalendar));
+    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(publishedRootNode, getNodeRelativePath(newsCreationCalendar));
     if (newsFolderNode == null) {
-      throw new Exception("Unable to find the parent node of the current pinned node");
+      throw new Exception("Unable to find the parent node of the current published node");
     }
-    Node pinnedNode = newsFolderNode.getNode(newsNode.getName());
-    if (pinnedNode == null) {
-      throw new Exception("Unable to find the current pinned node");
+    Node publishedNode = newsFolderNode.getNode(newsNode.getName());
+    if (publishedNode == null) {
+      throw new Exception("Unable to find the current published node");
     }
-    pinnedNode.remove();
+    publishedNode.remove();
     newsFolderNode.save();
   }
   

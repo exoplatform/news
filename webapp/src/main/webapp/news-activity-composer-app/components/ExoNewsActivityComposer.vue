@@ -138,6 +138,7 @@
               id="newsPost"
               :loading="postingNews"
               :disabled="postDisabled || postingNews"
+              :aria-label="$t('news.composer.post')"
               elevation="0"
               class="btn btn-primary my-auto me-4"
               @click="newsActions">

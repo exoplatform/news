@@ -32,7 +32,7 @@ export function getNewsTarget() {
   });
 }
 
-export function saveSettings(saveSettingsURL ,settings) {
+export function saveSettings(saveSettingsURL, settings) {
   const formData = new FormData();
   if (settings) {
     Object.keys(settings).forEach(name => {

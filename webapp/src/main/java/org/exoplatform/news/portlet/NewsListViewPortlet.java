@@ -46,7 +46,7 @@ public class NewsListViewPortlet extends GenericDispatchedViewPortlet {
       }
       preferences.store();
     } else {
-      throw new PortletException("Illegal Access to attempt to store News List Potlet preferences for user "
+      throw new PortletException("Illegal Access to attempt to store News List Portlet preferences for user "
           + request.getRemoteUser());
     }
   }

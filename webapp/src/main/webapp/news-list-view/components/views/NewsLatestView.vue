@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </v-list-item-content>
                       </v-list-item>
                       <div class="flex d-flex flex-row body-2 white--text my-auto ms-4 mt-2">
-                        <div class="flex-column my-auto me-2">March 18</div>
+                        <div class="flex-column my-auto me-2 scheduleDateLatestNews">{{ newsInfo[0].schedulePostDate }}</div>
                         <div class="flex-column my-auto">
                           <v-icon
                             class="baseline-vertical-align white--text ms-6 me-2"
@@ -69,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                           </v-icon>
                         </div>
                         <div class="flex-column my-auto me-4">
-                          <span>25</span>
+                          <span>{{ likeSize }}</span>
                         </div>
                         <div class="flex-column my-auto">
                           <v-icon
@@ -79,7 +79,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                           </v-icon>
                         </div>
                         <div class="flex-column my-auto">
-                          <span>25</span>
+                          <span>{{ commentsSize }}</span>
                         </div>
                       </div>
                     </v-list>
@@ -122,26 +122,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
                           <div class="flex d-flex flex-row grey-color my-auto mt-1">
-                            <div class="flex-column subtitle-2 my-auto me-2">March 18</div>
+                            <div class="flex-column subtitle-2 my-auto me-2 scheduleDateLatestNews"> {{ item.schedulePostDate }}</div>
                             <div class="flex-column my-auto">
                               <v-icon
-                                  class="baseline-vertical-align grey-color ms-6 me-2"
-                                  size="14">
+                                class="baseline-vertical-align grey-color ms-6 me-2"
+                                size="14">
                                 fa-thumbs-up
                               </v-icon>
                             </div>
                             <div class="flex-column subtitle-2 my-auto me-4">
-                              <span>25</span>
+                              <span>{{ likeSize }}</span>
                             </div>
                             <div class="flex-column my-auto">
                               <v-icon
-                                  class="baseline-vertical-align mx-auto me-2 grey-color"
-                                  size="14">
+                                class="baseline-vertical-align mx-auto me-2 grey-color"
+                                size="14">
                                 fa-comment
                               </v-icon>
                             </div>
                             <div class="flex-column subtitle-2 my-auto">
-                              <span>25</span>
+                              <span>{{ commentsSize }}</span>
                             </div>
                           </div>
                         </v-list-item-content>
@@ -217,10 +217,14 @@ export default {
   data: ()=> ({
     initialized: false,
     newsInfo: null,
-    limit: 5,
+    limit: 0,
+    commentsSize: 0,
+    likeSize: 0,
   }),
   created() {
     this.getNewsList();
+    this.retrieveComments();
+    this.getActivityById();
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
@@ -228,7 +232,6 @@ export default {
   methods: {
     getNewsList() {
       if (!this.initialized) {
-        this.initializing = true;
         this.$newsListService.getNewsList(this.newsTarget, this.limit)
           .then(newsList => {
             this.newsInfo = newsList;
@@ -240,8 +243,16 @@ export default {
               }
             }
           })
-          .finally(() => this.initializing = false);
+          .finally(() => this.initialized = false);
       }
+    },
+    getActivityById() {
+      this.loading = true;
+      this.likeSize = 5;
+    },
+    retrieveComments() {
+      this.loading = true;
+      this.commentsSize = 3;
     },
     openNews(url){
       if (url !== null){

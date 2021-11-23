@@ -27,16 +27,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.*;
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.news.NewsTargetingService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 @Path("v1/news/targeting")
 @Api(tags = "v1/news/targeting", value = "v1/news/targeting")
@@ -62,6 +58,23 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer {
       return Response.ok(targets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news targets", e);
+      return Response.serverError().build();
+    }
+  }
+
+  @Path("referenced")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Get all news targets by a giving property", httpMethod = "GET", response = Response.class, produces = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
+      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
+  public Response getReferencedTargets(@Context HttpServletRequest request) {
+    try {
+      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets();
+      return Response.ok(referencedTargets).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news referenced targets", e);
       return Response.serverError().build();
     }
   }

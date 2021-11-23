@@ -198,7 +198,7 @@ export default {
     init() {
       if (!this.initialized) {
         this.initializing = true;
-        this.$newsListService.getNewsTarget()
+        this.$newsTargetingService.getNewsTarget()
           .then(newsTargets => {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,

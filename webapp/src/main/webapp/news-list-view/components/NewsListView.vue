@@ -42,9 +42,9 @@ export default {
       type: Array,
       default: null,
     },
-    limit: {
-      type: Number,
-      default: () => 0,
+    header: {
+      type: String,
+      default: null,
     },
   },
   data: () => ({
@@ -55,6 +55,7 @@ export default {
     hover: false,
     loading: false,
     hasMore: false,
+    limit: 10,
   }),
   computed: {
     selectedViewExtension() {
@@ -77,7 +78,7 @@ export default {
         viewExtension: this.selectedViewExtension,
         newsTarget: this.newsTarget,
         newsList: this.newsList,
-        limit: this.limit,
+        header: this.header,
         hasMore: this.hasMore,
       };
     },

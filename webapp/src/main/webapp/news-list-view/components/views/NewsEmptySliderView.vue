@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       v-if="canPublishNews"
       icon
       @click="openDrawer"
-      class="me-4 float-right">
+      class="mt-2 me-4 float-right">
       <v-icon>mdi-cog</v-icon>
     </v-btn>
     <div class="noNewsImage">

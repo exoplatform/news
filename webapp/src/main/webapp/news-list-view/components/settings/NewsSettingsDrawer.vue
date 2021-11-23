@@ -33,9 +33,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
           <div class="d-flex flex-row">
             <v-text-field
-              v-model="nameNewsList"
+              v-model="newsHeader"
               type="string"
-              name="nameNewsList"
+              name="newsHeader"
               :placeholder="$t('news.list.settings.namePlaceholder')"
               :error-messages="checkAlphanumeric"
               maxlength="100"
@@ -104,7 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :loading="saving"
           class="btn btn-primary"
           @click="save">
-          {{ $t('news.button.ok') }}
+          {{ $t('news.list.settings.drawer.save') }}
         </v-btn>
       </div>
     </template>
@@ -121,7 +121,7 @@ export default {
     viewExtensions: {},
     newsTarget: null,
     limit: 5,
-    nameNewsList: '',
+    newsHeader: '',
   }),
   computed: {
     viewTemplates() {
@@ -134,14 +134,14 @@ export default {
       return [];
     },
     checkAlphanumeric() {
-      if (this.nameNewsList && !this.nameNewsList.trim().match(/^[\w\-\s]+$/) && this.nameNewsList.length > 0) {
+      if (this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0) {
         return this.$t('news.list.settings.name.errorMessage');
       } else {
         return '';
       }
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.nameNewsList && this.nameNewsList.length === 0);
+      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
@@ -193,7 +193,7 @@ export default {
       this.viewTemplate = this.$root.viewTemplate || 'NewsLatest';
       this.viewExtensions = this.$root.viewExtensions;
       this.newsTarget = this.$root.newsTarget || 'snapshotLatestNews';
-      this.limit = this.$root.limit;
+      this.newsHeader = this.$root.header;
     },
     init() {
       if (!this.initialized) {
@@ -214,12 +214,12 @@ export default {
       this.$newsListService.saveSettings(this.$root.saveSettingsURL ,{
         viewTemplate: this.viewTemplate,
         newsTarget: this.newsTarget,
-        limit: this.limit,
+        header: this.newsHeader,
       })
         .then(() => {
           this.$root.viewTemplate = this.viewTemplate;
           this.$root.newsTarget = this.newsTarget;
-          this.$root.limit = this.limit;
+          this.$root.header = this.newsHeader;
           this.close();
         })
         .finally(() => {

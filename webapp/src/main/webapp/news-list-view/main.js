@@ -54,7 +54,7 @@ export function init(params) {
   const viewTemplate = params.viewTemplate;
   const saveSettingsURL = params.saveSettingsURL;
   const newsTarget = params.newsTarget;
-  const limit = params.limit;
+  const header = params.header;
 
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
     // init Vue app when locale resources are ready
@@ -63,13 +63,13 @@ export function init(params) {
         saveSettingsURL,
         viewTemplate,
         newsTarget,
-        limit,
+        header,
       },
       template: `<news-list-view
                   id="${appId}"
                   :view-template="viewTemplate"
                   :news-target="newsTarget"
-                  :limit="limit" />`,
+                  :header="header" />`,
       vuetify: Vue.prototype.vuetifyOptions,
       i18n,
     }, `#${appId}`, `News List View - ${viewTemplate}`);

@@ -17,7 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <div class="d-flex flex-row pa-4">
     <div class="d-flex flex-column flex-grow-1 body-1 text-truncate text-uppercase grey--text my-auto">{{ headerLabel }}</div>
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column me-2">
+      <v-btn
+        icon
+        @click="openDrawer">
+        <v-icon>mdi-cog</v-icon>
+      </v-btn>
+    </div>
+    <div class="d-flex flex-column justify-end my-auto">
       <v-btn
         v-if="canPublishNews"
         depressed
@@ -25,13 +32,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         class="caption text-uppercase grey--text my-auto me-2"
         @click="seeAllNews">
         {{ $t('news.published.seeAll') }}
-      </v-btn>
-    </div>
-    <div class="d-flex flex-column justify-end my-auto">
-      <v-btn
-        icon
-        @click="openDrawer">
-        <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>
     <news-settings-drawer ref="settingsDrawer" />

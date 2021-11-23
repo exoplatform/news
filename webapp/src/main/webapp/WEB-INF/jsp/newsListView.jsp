@@ -27,10 +27,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String appId = "news-list-view-" + generatedId;
     String[] viewTemplateParams = (String[]) request.getAttribute("viewTemplate");
     String[] newsTargetParams = (String[]) request.getAttribute("newsTarget");
-    String[] limitParams = (String[]) request.getAttribute("limit");
+    String[] headerParams = (String[]) request.getAttribute("header");
     String viewTemplate = viewTemplateParams == null || viewTemplateParams.length == 0 ? "": viewTemplateParams[0];
     String newsTarget = newsTargetParams == null || newsTargetParams.length == 0 ? "": newsTargetParams[0];
-    String limit = limitParams == null || limitParams.length == 0 ? "10": limitParams[0];
+    String header = headerParams == null || headerParams.length == 0 ? "": headerParams[0];
 
     NewsService newsService = ExoContainerContext.getService(NewsService.class);
     if (!newsService.canPublishNews()) {
@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         saveSettingsURL: <%= saveSettingsURL == null ? null : "'" + saveSettingsURL + "'" %>,
         viewTemplate: <%= viewTemplate == null ? null : "'" + viewTemplate + "'" %>,
         newsTarget: <%= newsTarget == null ? null : "'" + newsTarget + "'" %>,
-        limit: <%=limit%>,
+        header: <%= header == null ? null : "'" + header + "'" %>,
       }));
     </script>
   </div>

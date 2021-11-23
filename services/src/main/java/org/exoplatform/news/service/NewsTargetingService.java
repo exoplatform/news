@@ -33,4 +33,11 @@ public interface NewsTargetingService {
    */
   List<NewsTargetingEntity> getTargets();
 
+  /**
+   * Gets  referenced targets
+   *
+   * @return {@link List} of referenced targets
+   */
+  List<NewsTargetingEntity> getReferencedTargets();
+
 }

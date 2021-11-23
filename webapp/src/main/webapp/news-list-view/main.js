@@ -19,16 +19,23 @@ import './extensions.js';
 
 import * as newsListService from './js/NewsListService.js';
 import * as  newsServices from '../services/newsServices';
+import * as newsTargetingService from '../services/newsTargetingService.js';
 
-if (!Vue.prototype.$newsListService) {
-  window.Object.defineProperty(Vue.prototype, '$newsListService', {
-    value: newsListService,
+if (!Vue.prototype.$newsTargetingService) {
+  window.Object.defineProperty(Vue.prototype, '$newsTargetingService', {
+    value: newsTargetingService,
   });
 }
 
 if (!Vue.prototype.$newsServices) {
   window.Object.defineProperty(Vue.prototype, '$newsServices', {
     value: newsServices,
+  });
+}
+
+if (!Vue.prototype.$newsListService) {
+  window.Object.defineProperty(Vue.prototype, '$newsListService', {
+    value: newsListService,
   });
 }
 

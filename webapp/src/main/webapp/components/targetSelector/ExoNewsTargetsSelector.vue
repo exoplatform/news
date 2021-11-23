@@ -23,11 +23,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         id="chooseTargets"
         ref="chooseTargets"
         v-model="selectedTargets"
-        :items="targets"
+        :items="referencedTargets"
         :menu-props="{ bottom: true, offsetY: true}"
         :placeholder="$t('news.composer.stepper.chooseTarget.option')"
-        item-text="name"
-        item-value="id"
+        item-text="label"
+        item-value="name"
         chips
         hide-no-data
         multiple
@@ -55,7 +55,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             v-if="index === 0"
             close
             @click:close="removeTarget(item)">
-            <span>{{ item.name }}</span>
+            <span>{{ item.label }}</span>
           </v-chip>
           <span
             v-if="index === 1"
@@ -90,11 +90,7 @@ export default {
   },
   data: () =>({
     selectedTargets: [],
-    targets: [
-      { id: 0, name: 'Latest news'},
-      { id: 1, name: 'Snapshot Slider'},
-      { id: 2, name: 'Homepage widget'}
-    ],
+    referencedTargets: [],
   }),
   computed: {
     disableTargetOption() {
@@ -104,7 +100,7 @@ export default {
       return this.disableTargetOption && this.allowPublishTargeting && this.publish;
     },
     selectAllTargets() {
-      return this.selectedTargets.length === this.targets.length;
+      return this.selectedTargets.length === this.referencedTargets.length;
     },
     selectSomeTarget() {
       return this.selectedTargets.length > 0 && !this.selectAllTargets;
@@ -124,6 +120,7 @@ export default {
         this.$refs.chooseTargets.blur();
       }
     });
+    this.getReferencedTargets();
   },
   methods: {
     removeTarget(item) {
@@ -136,7 +133,7 @@ export default {
         if (this.selectAllTargets) {
           this.selectedTargets = [];
         } else {
-          this.selectedTargets = this.targets.slice();
+          this.selectedTargets = this.referencedTargets.slice();
         }
         this.$emit('selected-targets', this.selectedTargets);
       });
@@ -147,7 +144,11 @@ export default {
         selectedTargets.push(this.targets[item]);
       }
       this.$emit('selected-targets', selectedTargets);
-    }
+    },
+    getReferencedTargets() {
+      this.$newsTargetingService.getReferencedTargets()
+        .then(referencedTargets => this.referencedTargets = referencedTargets);
+    },
   }
 };
 </script>

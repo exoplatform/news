@@ -14,29 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {newsConstants} from '../js/newsConstants.js';
 
-export function getNewsList(newsTarget, limit) { // eslint-disable-line no-unused-vars
-  // TODO
-  return Promise.resolve([]);
+export function getAllTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    }
+  });
 }
 
-export function saveSettings(saveSettingsURL, settings) {
-  const formData = new FormData();
-  if (settings) {
-    Object.keys(settings).forEach(name => {
-      formData.append(name, settings[name]);
-    });
-  }
-  return fetch(saveSettingsURL, {
-    method: 'POST',
+export function getReferencedTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams(formData).toString(),
-  }).then(resp => {
-    if (!resp || !resp.ok) {
-      throw new Error('Response code indicates a server error', resp);
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
     }
   });
 }

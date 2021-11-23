@@ -64,4 +64,29 @@ public class NewsTargetingImplTest {
     assertEquals("latest news", newsTargetingEntities.get(1).getLabel());
   }
 
+
+  @Test
+  public void shouldReturnReferencedTargets() {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService);
+    List<Metadata> newsTargets = new LinkedList<>();
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("referenced", "true");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+    newsTargets.add(sliderNews);
+
+    // When
+    when(metadataService.getMetadatasByProperty("referenced","true", 100)).thenReturn(newsTargets);
+    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getReferencedTargets();
+
+    // Then
+    assertNotNull(newsTargetingEntities);
+    assertEquals(1, newsTargetingEntities.size());
+    assertEquals("sliderNews", newsTargetingEntities.get(0).getName());
+  }
+
 }

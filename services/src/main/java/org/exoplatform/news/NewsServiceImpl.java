@@ -673,6 +673,7 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentUser, news);
+    indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();

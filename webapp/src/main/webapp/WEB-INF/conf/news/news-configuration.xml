@@ -31,6 +31,11 @@
     <key>org.exoplatform.news.service.NewsService</key>
     <type>org.exoplatform.news.service.impl.NewsServiceImpl</type>
   </component>
+  
+  <component>
+    <key>org.exoplatform.news.service.NewsTargetingService</key>
+    <type>org.exoplatform.news.service.impl.NewsTargetingServiceImpl</type>
+  </component>
 
   <component>
     <key>org.exoplatform.news.storage.NewsAttachmentsStorage</key>
@@ -43,11 +48,6 @@
 
   <component>
     <type>org.exoplatform.news.rest.NewsTargetingRestResourcesV1</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.news.NewsTargetingService</key>
-    <type>org.exoplatform.news.NewsTargetingServiceImpl</type>
   </component>
 
   <component>

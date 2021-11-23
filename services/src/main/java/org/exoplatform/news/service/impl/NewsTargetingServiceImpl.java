@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.news;
+package org.exoplatform.news.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.Metadata;
 

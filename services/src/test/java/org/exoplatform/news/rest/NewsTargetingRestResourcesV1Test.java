@@ -1,6 +1,6 @@
 package org.exoplatform.news.rest;
 
-import org.exoplatform.news.NewsTargetingService;
+import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.junit.Before;
 import org.junit.Test;

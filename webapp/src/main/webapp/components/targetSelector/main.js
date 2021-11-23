@@ -15,6 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import ExoNewsTargetsSelector from './ExoNewsTargetsSelector.vue';
+import * as newsTargetingService from '../../services/newsTargetingService.js';
+
+if (!Vue.prototype.$newsTargetingService) {
+  window.Object.defineProperty(Vue.prototype, '$newsTargetingService', {
+    value: newsTargetingService,
+  });
+}
 
 const components = {
   'exo-news-targets-selector': ExoNewsTargetsSelector,

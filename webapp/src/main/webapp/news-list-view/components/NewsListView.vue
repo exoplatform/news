@@ -19,9 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <v-hover v-slot="{ hover }">
       <v-card flat class="list-view-card">
         <v-card-text class="pa-0">
-          <news-settings
-            v-if="$root.saveSettingsURL && viewTemplate === 'NewsLatest'"
-            :hover="hover" />
+          <news-settings v-if="$root.saveSettingsURL && viewTemplate === 'NewsLatest'" :hover="hover" />
           <extension-registry-component
             v-if="selectedViewExtension"
             element-class="news-list-view"

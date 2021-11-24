@@ -378,6 +378,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       // Set spaces to search news in
       if (StringUtils.isNotEmpty(spaces)) {
         for (String spaceId : spaces.split(",")) {
+          Space space = spaceService.getSpaceById(spaceId);
+          if (space == null || (!spaceService.isSuperManager(authenticatedUser) && !spaceService.isMember(space, authenticatedUser))) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+          }
           spacesList.add(spaceId);
         }
       }

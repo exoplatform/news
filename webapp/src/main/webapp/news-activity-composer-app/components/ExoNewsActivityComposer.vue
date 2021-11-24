@@ -915,7 +915,8 @@ export default {
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         publicationState: publicationState,
-        draftVisible: this.draftVisible
+        draftVisible: this.draftVisible,
+        activityPosted: this.news.activityPosted,
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;

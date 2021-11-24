@@ -630,6 +630,7 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
 
     Node node = session.getNodeByUUID(newsId);
+    News news = convertNodeToNews(node, false);
     if (node.hasProperty("exo:activities")) {
       String newActivities = node.getProperty("exo:activities").getString();
       if (StringUtils.isNotEmpty(newActivities)) {
@@ -652,6 +653,7 @@ public class NewsServiceImpl implements NewsService {
                 .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
+    indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();

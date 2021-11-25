@@ -152,14 +152,23 @@
                   @click.prevent="updateNews(false)">
                   {{ $t("news.edit.update") }}
                 </v-btn>
-                <v-btn
-                  id="newsUpdateAndPost"
-                  :disabled="news.archived ? true: updateDisabled"
-                  :class="[news.archived ? 'unauthorizedPublish' : '']"
-                  class="btn ms-2 me-2"
-                  @click.prevent="updateNews(true)">
-                  {{ $t("news.edit.update.post") }}
-                </v-btn>
+                <v-tooltip bottom :disabled="!disableUpdatePostButton">
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-on="on">
+                      <v-btn
+                        id="newsUpdateAndPost"
+                        :disabled="disableUpdatePostButton"
+                        :class="[news.archived ? 'unauthorizedPublish' : '']"
+                        class="btn ms-2 me-2"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click.prevent="updateNews(true)">
+                        {{ $t("news.edit.update.post") }}
+                      </v-btn>
+                    </span>
+                  </template>
+                  <span>{{ $t("news.edit.disable.update.postButton") }}</span>
+                </v-tooltip>
                 <v-btn class="btn me-2" @click="goBack">
                   {{ $t("news.composer.btn.cancel") }}
                 </v-btn>
@@ -363,6 +372,7 @@ export default {
       scheduleMode: '',
       switchView: false,
       spaceDisplayName: '',
+      disableUpdatePostButton: true,
     };
   },
   computed: {
@@ -413,18 +423,36 @@ export default {
     'news.title': function() {
       if (this.news.title !== this.originalNews.title) {
         this.autoSave();
-      } },
+      }
+      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
+        this.disableUpdatePostButton = true;
+      } else {
+        this.disableUpdatePostButton = false;
+      }
+    },
     'news.draftVisible': function() {
       this.autoSave();
     },
     'news.summary': function() {
       if (this.news.summary !== this.originalNews.summary) {
         this.autoSave();
-      } },
+      }
+      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
+        this.disableUpdatePostButton = true;
+      } else {
+        this.disableUpdatePostButton = false;
+      }
+    },
     'news.body': function() {
       if (this.getContent(this.news.body) !== this.getContent(this.originalNews.body)) {
         this.autoSave();
-      } },
+      }
+      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
+        this.disableUpdatePostButton = true;
+      } else {
+        this.disableUpdatePostButton = false;
+      }
+    },
     'news.attachments': function() {
       if (this.initDone && this.news.attachments !== this.originalNews.attachments) {
         this.attachmentsChanged = true;

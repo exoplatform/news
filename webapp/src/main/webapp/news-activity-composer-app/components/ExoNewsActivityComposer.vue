@@ -152,14 +152,23 @@
                   @click.prevent="updateNews(false)">
                   {{ $t("news.edit.update") }}
                 </v-btn>
-                <v-btn
-                  id="newsUpdateAndPost"
-                  :disabled="news.archived ? true: updateDisabled"
-                  :class="[news.archived ? 'unauthorizedPublish' : '']"
-                  class="btn ms-2 me-2"
-                  @click.prevent="updateNews(true)">
-                  {{ $t("news.edit.update.post") }}
-                </v-btn>
+                <v-tooltip bottom :disabled="!news.activityPosted">
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-on="on">
+                      <v-btn
+                        id="newsUpdateAndPost"
+                        :disabled="news.archived || news.activityPosted ? true: updateDisabled"
+                        :class="[news.archived ? 'unauthorizedPublish' : '']"
+                        class="btn ms-2 me-2"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click.prevent="updateNews(true)">
+                        {{ $t("news.edit.update.post") }}
+                      </v-btn>
+                    </span>
+                  </template>
+                  <span>{{ $t("news.edit.disable.update.postButton") }}</span>
+                </v-tooltip>
                 <v-btn class="btn me-2" @click="goBack">
                   {{ $t("news.composer.btn.cancel") }}
                 </v-btn>
@@ -915,7 +924,8 @@ export default {
         attachments: this.news.attachments,
         pinned: this.news.pinned,
         publicationState: publicationState,
-        draftVisible: this.draftVisible
+        draftVisible: this.draftVisible,
+        activityPosted: this.news.activityPosted,
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;

@@ -152,12 +152,12 @@
                   @click.prevent="updateNews(false)">
                   {{ $t("news.edit.update") }}
                 </v-btn>
-                <v-tooltip bottom :disabled="!disableUpdatePostButton">
+                <v-tooltip bottom :disabled="!news.activityPosted">
                   <template v-slot:activator="{ on, attrs }">
                     <span v-on="on">
                       <v-btn
                         id="newsUpdateAndPost"
-                        :disabled="disableUpdatePostButton"
+                        :disabled="news.archived || news.activityPosted ? true: updateDisabled"
                         :class="[news.archived ? 'unauthorizedPublish' : '']"
                         class="btn ms-2 me-2"
                         v-bind="attrs"
@@ -372,7 +372,6 @@ export default {
       scheduleMode: '',
       switchView: false,
       spaceDisplayName: '',
-      disableUpdatePostButton: true,
     };
   },
   computed: {
@@ -423,36 +422,18 @@ export default {
     'news.title': function() {
       if (this.news.title !== this.originalNews.title) {
         this.autoSave();
-      }
-      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
-        this.disableUpdatePostButton = true;
-      } else {
-        this.disableUpdatePostButton = false;
-      }
-    },
+      } },
     'news.draftVisible': function() {
       this.autoSave();
     },
     'news.summary': function() {
       if (this.news.summary !== this.originalNews.summary) {
         this.autoSave();
-      }
-      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
-        this.disableUpdatePostButton = true;
-      } else {
-        this.disableUpdatePostButton = false;
-      }
-    },
+      } },
     'news.body': function() {
       if (this.getContent(this.news.body) !== this.getContent(this.originalNews.body)) {
         this.autoSave();
-      }
-      if ((this.news && this.news.archived) || (this.news && this.news.activityPosted) || this.updateDisabled) {
-        this.disableUpdatePostButton = true;
-      } else {
-        this.disableUpdatePostButton = false;
-      }
-    },
+      } },
     'news.attachments': function() {
       if (this.initDone && this.news.attachments !== this.originalNews.attachments) {
         this.attachmentsChanged = true;

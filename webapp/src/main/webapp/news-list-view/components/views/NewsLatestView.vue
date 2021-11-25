@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </v-list-item-content>
                       </v-list-item>
                       <div class="flex d-flex flex-row body-2 white--text my-auto ms-4 mt-2">
-                        <div class="flex-column my-auto me-2 scheduleDateLatestNews">{{ newsInfo[0].schedulePostDate }}</div>
+                        <div class="flex-column my-auto me-2">{{ newsInfo[0].schedulePostDate }}</div>
                         <div class="flex-column my-auto">
                           <v-icon
                             class="baseline-vertical-align white--text ms-6 me-2"
@@ -113,34 +113,34 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <v-list-item-content class="pt-0 pl-3">
                           <v-list-item-title
-                            class="subtitle-2 font-weight-bold text-capitalize rightTitle mb-1"
+                            class="subtitle-2 font-weight-bold text-capitalize newsRightTitle mb-1"
                             style="margin-bottom: 0px"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.title" />
                           <v-list-item-subtitle
-                            class="font-weight-bold rightBody"
+                            class="font-weight-bold newsRightBody"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
-                          <div class="flex d-flex flex-row grey-color my-auto mt-1">
+                          <div class="flex d-flex flex-row my-auto mt-1">
                             <div class="flex-column subtitle-2 my-auto me-2 scheduleDateLatestNews"> {{ item.schedulePostDate }}</div>
                             <div class="flex-column my-auto">
                               <v-icon
-                                class="baseline-vertical-align grey-color ms-6 me-2"
+                                class="likeIconStyle baseline-vertical-align ms-6 me-2"
                                 size="14">
                                 fa-thumbs-up
                               </v-icon>
                             </div>
                             <div class="flex-column subtitle-2 my-auto me-4">
-                              <span>{{ likeSize }}</span>
+                              <span class="counterStyle">{{ likeSize }}</span>
                             </div>
                             <div class="flex-column my-auto">
                               <v-icon
-                                class="baseline-vertical-align mx-auto me-2 grey-color"
+                                class="commentIconStyle baseline-vertical-align mx-auto me-2"
                                 size="14">
                                 fa-comment
                               </v-icon>
                             </div>
-                            <div class="flex-column subtitle-2 my-auto">
+                            <div class="counterStyle flex-column subtitle-2 my-auto">
                               <span>{{ commentsSize }}</span>
                             </div>
                           </div>
@@ -238,7 +238,6 @@ export default {
             this.initialized = true;
             for (let i=0; i<this.newsInfo.length; i++) {
               if (this.newsInfo[i].illustrationURL === null) {
-                // eslint-disable-next-line vue/no-mutating-props
                 this.newsInfo[i].illustrationURL = '/news/images/news.png';
               }
             }

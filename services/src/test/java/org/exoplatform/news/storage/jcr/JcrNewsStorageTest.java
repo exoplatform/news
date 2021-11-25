@@ -1,4 +1,4 @@
-package org.exoplatform.news;
+package org.exoplatform.news.storage.jcr;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -46,6 +46,7 @@ import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.service.impl.NewsServiceImpl;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
+import org.exoplatform.news.storage.jcr.JcrNewsStorage;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.documents.TrashService;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -81,250 +82,251 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
 
-//@RunWith(PowerMockRunner.class)
-//@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-//@PrepareForTest(CommonsUtils.class)
-public class NewsServiceImplTest {
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
+@PrepareForTest(CommonsUtils.class)
+public class JcrNewsStorageTest {
 
-//  @Mock
-//  RepositoryService          repositoryService;
-//
-//  @Mock
-//  SessionProviderService     sessionProviderService;
-//
-//  @Mock
-//  ManageableRepository       repository;
-//
-//  @Mock
-//  RepositoryEntry            repositoryEntry;
-//
-//  @Mock
-//  SessionProvider            sessionProvider;
-//
-//  @Mock
-//  Session                    session;
-//
-//  @Mock
-//  NodeHierarchyCreator       nodeHierarchyCreator;
-//
-//  @Mock
-//  DataDistributionManager    dataDistributionManager;
-//
-//  @Mock
-//  SpaceService               spaceService;
-//
-//  @Mock
-//  ActivityManager            activityManager;
-//
-//  @Mock
-//  IdentityManager            identityManager;
-//
-//  @Mock
-//  UploadService              uploadService;
-//
-//  @Mock
-//  LinkManager                linkManager;
-//
-//  @Mock
-//  WCMPublicationServiceImpl  wcmPublicationServiceImpl;
-//
-//  @Mock
-//  PublicationManagerImpl     publicationManagerImpl;
-//
-//  @Mock
-//  PublicationServiceImpl     publicationServiceImpl;
-//
-//  @Mock
-//  AuthoringPublicationPlugin authoringPublicationPlugin;
-//
-//  @Mock
-//  HTMLUploadImageProcessor imageProcessor;
-//
-//  @Mock
-//  NewsSearchConnector        newsSearchConnector;
-//
-//  @Mock
-//  NewsAttachmentsStorage     newsAttachmentsService;
-//  
-//  @Mock
-//  IndexingService indexingService;
-//  
-//  @Mock
-//  NewsESSearchConnector    newsESSearchConnector;
-//  
-//  @Mock
-//  UserACL                    userACL;
-//
-//  @Rule
-//  public ExpectedException   exceptionRule = ExpectedException.none();
-//
-//  @Test
-//  public void shouldGetNodeWhenNewsExists() throws Exception {
-//    NewsService newsService = buildNewsService();
-//    Node node = mock(Node.class);
-//    Property property = mock(Property.class);
-//    when(property.getString()).thenReturn("");
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
-//    Workspace workSpace = mock(Workspace.class);
-//    when(session.getWorkspace()).thenReturn(workSpace);
-//    when(node.getSession()).thenReturn(session);
-//    when(node.getProperty(nullable(String.class))).thenReturn(property);
-//    when(property.getDate()).thenReturn(Calendar.getInstance());
-//    when(property.getLong()).thenReturn((long) 10);
-//    Space space = mock(Space.class);
-//    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
-//    when(space.getGroupId()).thenReturn("/spaces/space1");
-//    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
-//    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-//    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-//    memberships.add(membershipentry);
-//    currentIdentity.setMemberships(memberships);
-//    ConversationState state = new ConversationState(currentIdentity);
-//    ConversationState.setCurrent(state);
-//    when(spaceService.isSuperManager("user")).thenReturn(false);
-//    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
-//    when(space.getVisibility()).thenReturn("private");
-//    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
-//
-//    // When
-//    News news = newsService.getNewsById("1", false);
-//
-//    // Then
-//    assertNotNull(news);
-//  }
-//
-//  @Test
-//  public void shouldGetNullWhenNewsDoesNotExist() throws Exception {
-//    // Given
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    NewsService newsService = buildNewsService();
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
-//
-//    // When
-//    News news = newsService.getNewsById("1", false);
-//
-//    // Then
-//    assertNull(news);
-//  }
-//
-//  @PrepareForTest({ PortalContainer.class, CommonsUtils.class })
-//  @Test
-//  public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
-//    // Given
-//    NewsService newsService = buildNewsService();
-//    Node node = mock(Node.class);
-//    Property property = mock(Property.class);
-//    when(property.getString()).thenReturn("");
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
-//    Workspace workSpace = mock(Workspace.class);
-//    when(session.getWorkspace()).thenReturn(workSpace);
-//    when(node.getSession()).thenReturn(session);
-//    when(node.hasProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(true);
-//    when(node.getProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(property);
-//    Calendar calendarUpdated = Calendar.getInstance();
-//    calendarUpdated.set(2019, 11, 20, 12, 00);
-//    Property updatedProperty = mock(Property.class);
-//    when(updatedProperty.getDate()).thenReturn(calendarUpdated);
-//    when(node.hasProperty(eq("exo:dateModified"))).thenReturn(true);
-//    when(node.getProperty(eq("exo:dateModified"))).thenReturn(updatedProperty);
-//    when(node.isNodeType(eq("mix:versionable"))).thenReturn(true);
-//    VersionHistory versionHistory = mock(VersionHistory.class);
-//    when(node.getVersionHistory()).thenReturn(versionHistory);
-//    Version version1 = mock(Version.class);
-//    when(version1.getUUID()).thenReturn("1");
-//    when(version1.getName()).thenReturn("1");
-//    when(version1.getSession()).thenReturn(session);
-//    Property version1AuthorProperty = mock(Property.class);
-//    when(version1AuthorProperty.getString()).thenReturn("john");
-//    when(version1.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
-//    when(version1.getProperty(eq("exo:lastModifier"))).thenReturn(version1AuthorProperty);
-//    Calendar calendar1 = Calendar.getInstance();
-//    calendar1.set(2019, 11, 20, 10, 00);
-//    Property version1CreatedProperty = mock(Property.class);
-//    when(version1CreatedProperty.getDate()).thenReturn(calendar1);
-//    when(version1.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
-//    when(version1.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version1CreatedProperty);
-//    when(version1.getContainingHistory()).thenReturn(mock(VersionHistory.class));
-//    Version version2 = mock(Version.class);
-//    when(version2.getUUID()).thenReturn("2");
-//    when(version2.getName()).thenReturn("2");
-//    when(version2.getSession()).thenReturn(session);
-//    Property version2AuthorProperty = mock(Property.class);
-//    when(version2AuthorProperty.getString()).thenReturn("mary");
-//    when(version2.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
-//    when(version2.getProperty(eq("exo:lastModifier"))).thenReturn(version2AuthorProperty);
-//    Calendar calendar2 = Calendar.getInstance();
-//    Property version2CreatedProperty = mock(Property.class);
-//    when(version2CreatedProperty.getDate()).thenReturn(calendar2);
-//    when(version2.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
-//    when(version2.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version2CreatedProperty);
-//    calendar2.set(2019, 11, 20, 11, 00);
-//    when(version2.getCreated()).thenReturn(calendar2);
-//    when(version2.getContainingHistory()).thenReturn(mock(VersionHistory.class));
-//    VersionIterator versionIterator = mock(VersionIterator.class);
-//    when(versionIterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false)
-//            .thenReturn(true).thenReturn(true).thenReturn(false)
-//            .thenReturn(true).thenReturn(true).thenReturn(false);
-//    when(versionIterator.nextVersion()).thenReturn(version1).thenReturn(version2)
-//            .thenReturn(version1).thenReturn(version2)
-//            .thenReturn(version1).thenReturn(version2);
-//    when(versionHistory.getAllVersions()).thenReturn(versionIterator);
-//    when(versionHistory.getRootVersion()).thenReturn(mock(Version.class));
-//    when(property.getDate()).thenReturn(Calendar.getInstance());
-//    when(property.getLong()).thenReturn((long) 10);
-//    Space space = mock(Space.class);
-//    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
-//    when(space.getGroupId()).thenReturn("/spaces/space1");
-//    PowerMockito.mockStatic(CommonsUtils.class);
-//    PowerMockito.mockStatic(PortalContainer.class);
-//    when(CommonsUtils.getCurrentPortalOwner()).thenReturn("intranet");
-//    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
-//    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
-//    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
-//    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
-//    memberships.add(membershipentry);
-//    currentIdentity.setMemberships(memberships);
-//    ConversationState state = new ConversationState(currentIdentity);
-//    ConversationState.setCurrent(state);
-//    ExoSocialActivity activity = new ExoSocialActivityImpl();
-//    activity.setId("2");
-//    activity.isHidden(false);
-//    activityManager.saveActivityNoReturn(activity);
-//    Property actProperty = mock(Property.class);
-//    when(actProperty.getString()).thenReturn("1:2;1:3");
-//    when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
-//    when(space.getVisibility()).thenReturn("private");
-//    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
-//    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
-//    when(activityManager.getActivity("2")).thenReturn(activity);
-//
-//    // When
-//    News news = newsService.getNewsById("1", false);
-//
-//    // Then
-//    assertNotNull(news);
-//    assertEquals(calendar1.getTime(), news.getPublicationDate());
-//    assertEquals(calendar2.getTime(), news.getUpdateDate());
-//    assertEquals("mary", news.getUpdater());
-//  }
-//
+  @Mock
+  RepositoryService          repositoryService;
+
+  @Mock
+  SessionProviderService     sessionProviderService;
+
+  @Mock
+  ManageableRepository       repository;
+
+  @Mock
+  RepositoryEntry            repositoryEntry;
+
+  @Mock
+  SessionProvider            sessionProvider;
+
+  @Mock
+  Session                    session;
+
+  @Mock
+  NodeHierarchyCreator       nodeHierarchyCreator;
+
+  @Mock
+  DataDistributionManager    dataDistributionManager;
+
+  @Mock
+  SpaceService               spaceService;
+
+  @Mock
+  ActivityManager            activityManager;
+
+  @Mock
+  IdentityManager            identityManager;
+
+  @Mock
+  UploadService              uploadService;
+
+  @Mock
+  LinkManager                linkManager;
+
+  @Mock
+  WCMPublicationServiceImpl  wcmPublicationServiceImpl;
+
+  @Mock
+  PublicationManagerImpl     publicationManagerImpl;
+
+  @Mock
+  PublicationServiceImpl     publicationServiceImpl;
+
+  @Mock
+  AuthoringPublicationPlugin authoringPublicationPlugin;
+
+  @Mock
+  HTMLUploadImageProcessor imageProcessor;
+
+  @Mock
+  NewsSearchConnector        newsSearchConnector;
+
+  @Mock
+  NewsAttachmentsStorage     newsAttachmentsService;
+  
+  @Mock
+  IndexingService indexingService;
+  
+  @Mock
+  NewsESSearchConnector    newsESSearchConnector;
+  
+  @Mock
+  UserACL                    userACL;
+
+  @Rule
+  public ExpectedException   exceptionRule = ExpectedException.none();
+
+  @Test
+  public void shouldGetNodeWhenNewsExists() throws Exception {
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    Node node = mock(Node.class);
+    Property property = mock(Property.class);
+    when(property.getString()).thenReturn("");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(node.getSession()).thenReturn(session);
+    when(node.getProperty(nullable(String.class))).thenReturn(property);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getLong()).thenReturn((long) 10);
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("test");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    when(spaceService.isSuperManager("user")).thenReturn(false);
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
+    when(space.getVisibility()).thenReturn("private");
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
+
+    // When
+    News news = jcrNewsStorage.getNewsById("1", false);
+
+    // Then
+    assertNotNull(news);
+  }
+
+  @Test
+  public void shouldGetNullWhenNewsDoesNotExist() throws Exception {
+    // Given
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(null);
+
+    // When
+    News news = jcrNewsStorage.getNewsById("1", false);
+
+    // Then
+    assertNull(news);
+  }
+
+  @PrepareForTest({ PortalContainer.class, CommonsUtils.class })
+  @Test
+  public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
+    // Given
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    Node node = mock(Node.class);
+    Property property = mock(Property.class);
+    when(property.getString()).thenReturn("");
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
+    Workspace workSpace = mock(Workspace.class);
+    when(session.getWorkspace()).thenReturn(workSpace);
+    when(node.getSession()).thenReturn(session);
+    when(node.hasProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(true);
+    when(node.getProperty(AdditionalMatchers.not(eq("exo:dateModified")))).thenReturn(property);
+    Calendar calendarUpdated = Calendar.getInstance();
+    calendarUpdated.set(2019, 11, 20, 12, 00);
+    Property updatedProperty = mock(Property.class);
+    when(updatedProperty.getDate()).thenReturn(calendarUpdated);
+    when(node.hasProperty(eq("exo:dateModified"))).thenReturn(true);
+    when(node.getProperty(eq("exo:dateModified"))).thenReturn(updatedProperty);
+    when(node.isNodeType(eq("mix:versionable"))).thenReturn(true);
+    VersionHistory versionHistory = mock(VersionHistory.class);
+    when(node.getVersionHistory()).thenReturn(versionHistory);
+    Version version1 = mock(Version.class);
+    when(version1.getUUID()).thenReturn("1");
+    when(version1.getName()).thenReturn("1");
+    when(version1.getSession()).thenReturn(session);
+    Property version1AuthorProperty = mock(Property.class);
+    when(version1AuthorProperty.getString()).thenReturn("john");
+    when(version1.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
+    when(version1.getProperty(eq("exo:lastModifier"))).thenReturn(version1AuthorProperty);
+    Calendar calendar1 = Calendar.getInstance();
+    calendar1.set(2019, 11, 20, 10, 00);
+    Property version1CreatedProperty = mock(Property.class);
+    when(version1CreatedProperty.getDate()).thenReturn(calendar1);
+    when(version1.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
+    when(version1.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version1CreatedProperty);
+    when(version1.getContainingHistory()).thenReturn(mock(VersionHistory.class));
+    Version version2 = mock(Version.class);
+    when(version2.getUUID()).thenReturn("2");
+    when(version2.getName()).thenReturn("2");
+    when(version2.getSession()).thenReturn(session);
+    Property version2AuthorProperty = mock(Property.class);
+    when(version2AuthorProperty.getString()).thenReturn("mary");
+    when(version2.hasProperty(eq("exo:lastModifier"))).thenReturn(true);
+    when(version2.getProperty(eq("exo:lastModifier"))).thenReturn(version2AuthorProperty);
+    Calendar calendar2 = Calendar.getInstance();
+    Property version2CreatedProperty = mock(Property.class);
+    when(version2CreatedProperty.getDate()).thenReturn(calendar2);
+    when(version2.hasProperty(eq("exo:lastModifiedDate"))).thenReturn(true);
+    when(version2.getProperty(eq("exo:lastModifiedDate"))).thenReturn(version2CreatedProperty);
+    calendar2.set(2019, 11, 20, 11, 00);
+    when(version2.getCreated()).thenReturn(calendar2);
+    when(version2.getContainingHistory()).thenReturn(mock(VersionHistory.class));
+    VersionIterator versionIterator = mock(VersionIterator.class);
+    when(versionIterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false)
+            .thenReturn(true).thenReturn(true).thenReturn(false)
+            .thenReturn(true).thenReturn(true).thenReturn(false);
+    when(versionIterator.nextVersion()).thenReturn(version1).thenReturn(version2)
+            .thenReturn(version1).thenReturn(version2)
+            .thenReturn(version1).thenReturn(version2);
+    when(versionHistory.getAllVersions()).thenReturn(versionIterator);
+    when(versionHistory.getRootVersion()).thenReturn(mock(Version.class));
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getLong()).thenReturn((long) 10);
+    Space space = mock(Space.class);
+    when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
+    when(space.getGroupId()).thenReturn("/spaces/space1");
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(PortalContainer.class);
+    when(CommonsUtils.getCurrentPortalOwner()).thenReturn("intranet");
+    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setId("2");
+    activity.isHidden(false);
+    activityManager.saveActivityNoReturn(activity);
+    Property actProperty = mock(Property.class);
+    when(actProperty.getString()).thenReturn("1:2;1:3");
+    when(node.getProperty(eq("exo:activities"))).thenReturn(actProperty);
+    when(space.getVisibility()).thenReturn("private");
+    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
+    when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
+    when(activityManager.getActivity("2")).thenReturn(activity);
+
+    // When
+    News news = jcrNewsStorage.getNewsById("1", false);
+
+    // Then
+    assertNotNull(news);
+    assertEquals(calendar1.getTime(), news.getPublicationDate());
+    assertEquals(calendar2.getTime(), news.getUpdateDate());
+    assertEquals("mary", news.getUpdater());
+  }
+
+//TODO to be moved with newsService tests
 //  @Test
 //  public void shouldCantViewNewsWhenSpaceIsNotFound() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -332,7 +334,6 @@ public class NewsServiceImplTest {
 //    news.setSpaceId("space1");
 //    assertFalse(newsService.canViewNews(news, "root"));
 //  }
-//
 //  @Test
 //  public void shouldCantViewPublishedNewsWhenNotSpaceMember() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -346,7 +347,6 @@ public class NewsServiceImplTest {
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
 //    assertFalse(newsService.canViewNews(news, "mary"));
 //  }
-//
 //  @Test
 //  public void shouldCanViewPublishedNewsWhenNotSpaceMember() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -356,12 +356,11 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
 //    assertTrue(newsService.canViewNews(news, "mary"));
 //  }
-//
 //  @Test
 //  public void shouldCanViewPublishedStagedNewsWhenNotSpaceMember() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -371,11 +370,10 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.STAGED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
 //    assertFalse(newsService.canViewNews(news, "mary"));
 //  }
-//
 //  @Test
 //  public void shouldCanViewNotPublishedAndPostedNewsWhenSuperManager() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -384,12 +382,11 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
 //    when(spaceService.isSuperManager(spaceId)).thenReturn(true);
 //    assertTrue(newsService.canViewNews(news, superUser));
 //  }
-//
 //  @Test
 //  public void shouldCantViewNotPublishedAndStagedNewsWhenSuperManager() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -398,13 +395,12 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.STAGED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(new Space());
 //    when(spaceService.isSuperManager(spaceId)).thenReturn(true);
 //    // FIXME How is this ? the super user can't see a staged news but can edit it !
 //    assertFalse(newsService.canViewNews(news, superUser));
 //  }
-//
 //  @Test
 //  public void shouldCantViewNotPublishedAndStagedNewsWhenIsMember() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -413,13 +409,12 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.STAGED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    Space space = new Space();
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
 //    when(spaceService.isMember(space, spaceId)).thenReturn(true);
 //    assertFalse(newsService.canViewNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanViewNotPublishedAndSpaceMember() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -428,13 +423,12 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.PUBLISHED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    Space space = new Space();
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
 //    when(spaceService.isMember(space, spaceId)).thenReturn(true);
 //    assertTrue(newsService.canViewNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanViewNotPublishedAndStagedNewsAndSpaceManager() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -457,13 +451,12 @@ public class NewsServiceImplTest {
 //    News news = new News();
 //    news.setSpaceId(spaceId);
 //    news.setPublicationState(PublicationDefaultStates.STAGED);
-//    news.setPinned(true);
+//    news.setPublished(true);
 //    Space space = new Space();
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
 //    when(spaceService.isRedactor(space, username)).thenReturn(true);
 //    assertTrue(newsService.canViewNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanViewNotPublishedAndStagedNewsAndIsAuthor() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -477,7 +470,6 @@ public class NewsServiceImplTest {
 //    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
 //    assertTrue(newsService.canViewNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanEditNewsWhenIsAuthor() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -497,7 +489,6 @@ public class NewsServiceImplTest {
 //
 //    assertTrue(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCantEditNewsWhenNoIdentity() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -513,7 +504,6 @@ public class NewsServiceImplTest {
 //
 //    assertFalse(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCantEditNewsWhenNoSpace() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -526,7 +516,6 @@ public class NewsServiceImplTest {
 //
 //    assertFalse(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanEditNewsWhenSuperSpacesManager() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -547,7 +536,6 @@ public class NewsServiceImplTest {
 //
 //    assertTrue(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanEditNewsWhenIsRedactorAndSharedDraft() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -569,7 +557,6 @@ public class NewsServiceImplTest {
 //
 //    assertTrue(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCanEditNewsWhenIsSpaceManager() throws Exception {
 //    NewsService newsService = buildNewsService();
@@ -589,7 +576,6 @@ public class NewsServiceImplTest {
 //    
 //    assertTrue(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCantEditNewsWhenIsSpaceMember() throws Exception {
@@ -617,7 +603,6 @@ public class NewsServiceImplTest {
 //
 //    assertFalse(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCantEditNewsWhenIsSpaceRedactor() throws Exception {
@@ -645,7 +630,6 @@ public class NewsServiceImplTest {
 //
 //    assertFalse(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCanEditNewsIsGeneralRedactor() throws Exception {
@@ -672,11 +656,10 @@ public class NewsServiceImplTest {
 //
 //    assertTrue(newsService.canEditNews(news, username));
 //  }
-//
 //  @Test
 //  public void shouldCantViewNewsWhenNotHavingAccess() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-//    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+//    when(newsService.getNewsById(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class), nullable(Boolean.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String newsId = "fakeId";
@@ -686,17 +669,16 @@ public class NewsServiceImplTest {
 //    when(newsService.canViewNews(news, username)).thenReturn(false);
 //
 //    try {
-//      newsService.getNewsById(newsId, username, false);
+//      newsService.getNewsById(newsId, false);
 //      fail("should throw an exception when user can't access news");
 //    } catch (IllegalAccessException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  public void shouldCanViewNewsWhenHavingAccess() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-//    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+//    when(newsService.getNewsById(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class), nullable(Boolean.class))).thenCallRealMethod();
 //    
 //    String username = "mary";
 //    String newsId = "fakeId";
@@ -705,13 +687,12 @@ public class NewsServiceImplTest {
 //    when(newsService.getNewsById(newsId, false)).thenReturn(news);
 //    when(newsService.canViewNews(news, username)).thenReturn(true);
 //
-//    assertEquals(news, newsService.getNewsById(newsId, username, false));
+//    assertEquals(news, newsService.getNewsById(newsId, false));
 //  }
-//
 //  @Test
 //  public void shouldCantEditNewsWhenNotHavingEditRignt() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-//    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+//    when(newsService.getNewsById(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class), nullable(Boolean.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String newsId = "fakeId";
@@ -722,17 +703,16 @@ public class NewsServiceImplTest {
 //    when(newsService.canEditNews(news, username)).thenReturn(false);
 //
 //    try {
-//      newsService.getNewsById(newsId, username, true);
+//      newsService.getNewsById(newsId, true);
 //      fail("should throw an exception when user can't edit news");
 //    } catch (IllegalAccessException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  public void shouldCanEditNewsWhenHavingEditRignt() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-//    when(newsService.getNewsById(nullable(String.class), nullable(String.class), nullable(Boolean.class))).thenCallRealMethod();
+//    when(newsService.getNewsById(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class), nullable(Boolean.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String newsId = "fakeId";
@@ -741,30 +721,29 @@ public class NewsServiceImplTest {
 //    when(newsService.getNewsById(newsId, true)).thenReturn(news);
 //    when(newsService.canEditNews(news, username)).thenReturn(true);
 //
-//    assertEquals(news, newsService.getNewsById(newsId, username, true));
+//    assertEquals(news, newsService.getNewsById(newsId, true));
 //  }
-//
 //  @Test
 //  public void shouldCantAccessNewsWhenActivityNotFound() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //
-//    String username = "mary";
+//    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("mary");
+//    ConversationState.setCurrent(new ConversationState(currentIdentity));
 //    try {
-//      newsService.getNewsByActivityId("1", username);
+//      newsService.getNewsByActivityId("1", currentIdentity);
 //      fail("should throw an exception when activity isn't found");
 //    } catch (ObjectNotFoundException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCantAccessNewsWhenInaccessibleActivity() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class),nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String activityId = "fakeId";
@@ -780,19 +759,18 @@ public class NewsServiceImplTest {
 //    when(activityManager.getActivity(activityId)).thenReturn(activity);
 //    when(activityManager.isActivityViewable(activity, identity)).thenReturn(false);
 //    try {
-//      newsService.getNewsByActivityId(activityId, username);
+//      newsService.getNewsByActivityId(activityId, identity);
 //      fail("should throw an exception when activity isn't accessible for user");
 //    } catch (IllegalAccessException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCantAccessNewsWhenActivityIsntOfTypeNews() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //    
 //    String username = "mary";
 //    String activityId = "fakeId";
@@ -808,19 +786,18 @@ public class NewsServiceImplTest {
 //    when(activityManager.getActivity(activityId)).thenReturn(activity);
 //    when(activityManager.isActivityViewable(activity, identity)).thenReturn(true);
 //    try {
-//      newsService.getNewsByActivityId(activityId, username);
+//      newsService.getNewsByActivityId(activityId, identity);
 //      fail("should throw an exception when activity isn't of type news");
 //    } catch (ObjectNotFoundException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCanAccessNewsWhenActivityIsOfTypeNews() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String activityId = "fakeActivityId";
@@ -843,18 +820,17 @@ public class NewsServiceImplTest {
 //    when(templateParams.get("newsId")).thenReturn(newsId);
 //
 //    News news = new News();
-//    when(newsService.getNewsById(newsId, username, false)).thenReturn(news);
+//    when(newsService.getNewsById(newsId, identity, false)).thenReturn(news);
 //
-//    assertEquals(news, newsService.getNewsByActivityId(activityId, username));
+//    assertEquals(news, newsService.getNewsByActivityId(activityId, identity));
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCanAccessNewsWhenSharedActivityIsOfTypeNews() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
 //    FieldUtils.writeField(newsService, "identityManager", identityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String posterId = "3";
@@ -899,18 +875,17 @@ public class NewsServiceImplTest {
 //    when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
 //
 //    News news = new News();
-//    when(newsService.getNewsById(newsId, poster, false)).thenReturn(news);
+//    when(newsService.getNewsById(newsId, posterSecurityIdentity, false)).thenReturn(news);
 //
-//    assertEquals(news, newsService.getNewsByActivityId(activityId, username));
+//    assertEquals(news, newsService.getNewsByActivityId(activityId, identity));
 //  }
-//
 //  @Test
 //  @PrepareForTest({ ExoContainerContext.class })
 //  public void shouldCantAccessNewsWhenSharedActivityIsntAccessibleForPoster() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
 //    FieldUtils.writeField(newsService, "activityManager", activityManager, true);
 //    FieldUtils.writeField(newsService, "identityManager", identityManager, true);
-//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(String.class))).thenCallRealMethod();
+//    when(newsService.getNewsByActivityId(nullable(String.class), nullable(org.exoplatform.services.security.Identity.class))).thenCallRealMethod();
 //
 //    String username = "mary";
 //    String posterId = "3";
@@ -955,16 +930,15 @@ public class NewsServiceImplTest {
 //    when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
 //
 //    News news = new News();
-//    when(newsService.getNewsById(newsId, poster, false)).thenReturn(news);
+//    when(newsService.getNewsById(newsId, posterSecurityIdentity, false)).thenReturn(news);
 //
 //    try {
-//      newsService.getNewsByActivityId(activityId, username);
+//      newsService.getNewsByActivityId(activityId, identity);
 //      fail("User shouldn't be able to access news when shared activity poster can't access the news anymore");
 //    } catch (IllegalAccessException e) {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  public void shouldCantShareNewsWhenNoAccess() throws Exception {
 //    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
@@ -986,7 +960,6 @@ public class NewsServiceImplTest {
 //      // Expected
 //    }
 //  }
-//
 //  @Test
 //  @PrepareForTest({ SessionProvider.class })
 //  public void shouldCantShareNewsWhenNotFound() throws Exception {
@@ -1012,189 +985,172 @@ public class NewsServiceImplTest {
 //      // Expected
 //    }
 //  }
-//
-//  @Test
-//  public void shouldSetPermissionForSharedSpaceWhenFound() throws Exception {
-//    NewsServiceImpl newsService = mock(NewsServiceImpl.class);
-//    doCallRealMethod().when(newsService).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
-//
-//    ExtendedNode newsNode = mock(ExtendedNode.class);
-//    when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
-//
-//    String newsId = "newsId";
-//    when(newsService.getNewsNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
-//
-//    String username = "mary";
-//    String spaceGroup = "spaceGroup";
-//
-//    News news = mock(News.class);
-//    Identity identity = mock(Identity.class);
-//    Space space = mock(Space.class);
-//
+
+  @Test
+  public void shouldSetPermissionForSharedSpaceWhenFound() throws Exception {
+    JcrNewsStorage jcrNewsStorage = mock(JcrNewsStorage.class);
+    doCallRealMethod().when(jcrNewsStorage).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
+
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
+
+    String newsId = "newsId";
+    when(jcrNewsStorage.getNewsNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
+
+    String username = "mary";
+    String spaceGroup = "spaceGroup";
+
+    News news = mock(News.class);
+    Identity identity = mock(Identity.class);
+    Space space = mock(Space.class);
+
 //    when(identity.getRemoteId()).thenReturn(username);
-//    when(space.getGroupId()).thenReturn(spaceGroup);
-//    when(news.getId()).thenReturn(newsId);
-//    when(newsService.canViewNews(news, username)).thenReturn(true);
-//
-//    newsService.shareNews(news, space, identity, "activityId");
-//    verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, NewsServiceImpl.SHARE_NEWS_PERMISSIONS);
-//  }
-//
-//  @PrepareForTest({ CommonsUtils.class })
-//  @Test
-//  public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
-//    NewsService newsService = buildNewsService();
-//    Node newsNode = mock(Node.class);
-//    Node illustrationNode = mock(Node.class);
-//    Property property = mock(Property.class);
-//    PowerMockito.mockStatic(CommonsUtils.class);
-//    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
-//    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
-//    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
-//    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
-//    when(property.getDate()).thenReturn(Calendar.getInstance());
-//    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
-//    when(newsNode.getName()).thenReturn("Updated title");
-//
-//    News news = new News();
-//    news.setTitle("Updated title");
-//    news.setSummary("Updated summary");
-//    news.setBody("Updated body");
-//    news.setUploadId(null);
-//    news.setViewsCount((long) 10);
-//
-//    // When
-//    newsService.updateNews(news);
-//
-//    // Then
-//    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
-//    verify(illustrationNode, times(0)).remove();
-//  }
-//
-//  @PrepareForTest({ CommonsUtils.class })
-//  @Test
-//  public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
-//    NewsService newsService = buildNewsService();
-//    Node newsNode = mock(Node.class);
-//    Node illustrationNode = mock(Node.class);
-//    Property property = mock(Property.class);
-//    PowerMockito.mockStatic(CommonsUtils.class);
-//    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
-//    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
-//    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
-//    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
-//    when(property.getDate()).thenReturn(Calendar.getInstance());
-//    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
-//    when(newsNode.getName()).thenReturn("Updated title");
-//
-//    News news = new News();
-//    news.setTitle("Updated title");
-//    news.setSummary("Updated summary");
-//    news.setBody("Updated body");
-//    news.setUploadId("");
-//    news.setViewsCount((long) 10);
-//
-//    // When
-//    newsService.updateNews(news);
-//
-//    // Then
-//    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
-//    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
-//    verify(illustrationNode, times(1)).remove();
-//  }
-//
-//  @Test
-//  public void shouldPublishNews() throws Exception {
-//    // Given
-//
-//    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-//    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-//
-//    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-//                                                      sessionProviderService,
-//                                                      nodeHierarchyCreator,
-//                                                      dataDistributionManager,
-//                                                      spaceService,
-//                                                      activityManager,
-//                                                      identityManager,
-//                                                      uploadService,
-//                                                      imageProcessor,
-//                                                      linkManager,
-//                                                      publicationServiceImpl,
-//                                                      publicationManagerImpl,
-//                                                      wcmPublicationServiceImpl,
-//                                                      newsSearchConnector,
-//                                                      newsAttachmentsService,
-//                                                      indexingService,
-//                                                      newsESSearchConnector,
-//                                                      userACL);
-//
-//    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-//    ExtendedNode newsNode = mock(ExtendedNode.class);
-//    Node publishedRootNode = mock(Node.class);
-//    Node newsFolderNode = mock(Node.class);
-//    Node applicationDataNode = mock(Node.class);
-//    Node newsRootNode = mock(Node.class);
-//
-//    News news = new News();
-//    news.setTitle("published title");
-//    news.setSummary("published summary");
-//    news.setBody("published body");
-//    news.setUploadId(null);
-//    String sDate1 = "22/08/2019";
-//    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-//    news.setCreationDate(date1);
-//    news.setPinned(true);
-//    news.setId("id123");
-//
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
-//    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
-//    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
-//    Mockito.doReturn(news).when(newsServiceSpy).getNewsById("id123", false);
-//    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
-//    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
-//    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
-//    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
-//    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
+    when(space.getGroupId()).thenReturn(spaceGroup);
+    when(news.getId()).thenReturn(newsId);
+    //when(newsService.canViewNews(news, username)).thenReturn(true);
+
+    jcrNewsStorage.shareNews(news, space, identity, "activityId");
+    verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+  }
+
+  @PrepareForTest({ CommonsUtils.class })
+  @Test
+  public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    Node newsNode = mock(Node.class);
+    Node illustrationNode = mock(Node.class);
+    Property property = mock(Property.class);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
+    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
+    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
+    when(newsNode.getName()).thenReturn("Updated title");
+
+    News news = new News();
+    news.setTitle("Updated title");
+    news.setSummary("Updated summary");
+    news.setBody("Updated body");
+    news.setUploadId(null);
+    news.setViewsCount((long) 10);
+
+    // When
+    jcrNewsStorage.updateNews(news);
+
+    // Then
+    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
+    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
+    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
+    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+    verify(illustrationNode, times(0)).remove();
+  }
+
+  @PrepareForTest({ CommonsUtils.class })
+  @Test
+  public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    Node newsNode = mock(Node.class);
+    Node illustrationNode = mock(Node.class);
+    Property property = mock(Property.class);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getProperty(nullable(String.class))).thenReturn(property);
+    when(newsNode.getNode(eq("illustration"))).thenReturn(illustrationNode);
+    when(newsNode.hasNode(eq("illustration"))).thenReturn(true);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
+    when(newsNode.getName()).thenReturn("Updated title");
+
+    News news = new News();
+    news.setTitle("Updated title");
+    news.setSummary("Updated summary");
+    news.setBody("Updated body");
+    news.setUploadId("");
+    news.setViewsCount((long) 10);
+
+    // When
+    jcrNewsStorage.updateNews(news);
+
+    // Then
+    verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
+    verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
+    verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
+    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+    verify(illustrationNode, times(1)).remove();
+  }
+
+  @Test
+  public void shouldPublishNews() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+
+    JcrNewsStorage jcrNewsStorageSpy = Mockito.spy(jcrNewsStorage);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node publishedRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("published title");
+    news.setSummary("published summary");
+    news.setBody("published body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPublished(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(jcrNewsStorageSpy).getNewsById("id123", false);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
+//TODO to be moved with newsService tests
 //    Mockito.doNothing()
-//           .when(newsServiceSpy)
+//           .when(jcrNewsStorageSpy)
 //           .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
-//
-//    // When
-//    newsServiceSpy.pinNews("id123");
-//
-//    // Then
-//    verify(newsNode, times(1)).save();
-//    verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(true));
-//    verify(newsNode, times(1)).addMixin(eq("exo:privilegeable"));
-//    verify(linkManager, times(1)).createLink(newsFolderNode, "exo:symlink", newsNode, null);
-//
-//  }
-//
+
+    // When
+    jcrNewsStorageSpy.publishNews(news);
+
+    // Then
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(true));
+    verify(newsNode, times(1)).addMixin(eq("exo:privilegeable"));
+    verify(linkManager, times(1)).createLink(newsFolderNode, "exo:symlink", newsNode, null);
+
+  }
+
 //  @Test
 //  public void shouldCreateNewsDraftAndPublishIt() throws Exception {
 //    // Given
@@ -3570,25 +3526,22 @@ public class NewsServiceImplTest {
 //    ConversationState.setCurrent(state);
 //  }
 //
-//  private NewsService buildNewsService() {
-//    NewsService newsService = new NewsServiceImpl(repositoryService,
-//                                                  sessionProviderService,
-//                                                  nodeHierarchyCreator,
-//                                                  dataDistributionManager,
-//                                                  spaceService,
-//                                                  activityManager,
-//                                                  identityManager,
-//                                                  uploadService,
-//                                                  imageProcessor,
-//                                                  linkManager,
-//                                                  publicationServiceImpl,
-//                                                  publicationManagerImpl,
-//                                                  wcmPublicationServiceImpl,
-//                                                  newsSearchConnector,
-//                                                  newsAttachmentsService,
-//                                                  indexingService,
-//                                                  newsESSearchConnector,
-//                                                  userACL);
-//    return newsService;
-//  }
+  private JcrNewsStorage buildJcrNewsStorage() {
+    JcrNewsStorage jcrNewsStorage = new JcrNewsStorage(repositoryService,
+                                                  sessionProviderService,
+                                                  nodeHierarchyCreator,
+                                                  dataDistributionManager,
+                                                  activityManager,
+                                                  spaceService,
+                                                  uploadService,
+                                                  imageProcessor,
+                                                  publicationServiceImpl,
+                                                  publicationManagerImpl,
+                                                  newsAttachmentsService,
+                                                  identityManager,
+                                                  linkManager,
+                                                  newsSearchConnector,
+                                                  wcmPublicationServiceImpl);
+    return jcrNewsStorage;
+  }
 }

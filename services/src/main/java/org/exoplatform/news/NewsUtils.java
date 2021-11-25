@@ -42,6 +42,8 @@ public class NewsUtils {
 
   public static final String UPDATE_NEWS       = "exo.news.updateArticle";
 
+  public static final String      NEWS_METADATA_OBJECT_TYPE        = "news";
+
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);

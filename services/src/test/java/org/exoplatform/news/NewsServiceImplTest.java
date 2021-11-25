@@ -14,6 +14,7 @@ import javax.jcr.version.*;
 
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
+import org.exoplatform.social.metadata.MetadataService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -142,15 +143,18 @@ public class NewsServiceImplTest {
 
   @Mock
   NewsAttachmentsService     newsAttachmentsService;
-  
+
   @Mock
-  IndexingService indexingService;
-  
+  IndexingService            indexingService;
+
   @Mock
-  NewsESSearchConnector    newsESSearchConnector;
-  
+  NewsESSearchConnector      newsESSearchConnector;
+
   @Mock
   UserACL                    userACL;
+
+  @Mock
+  MetadataService            metadataService;
 
   @Rule
   public ExpectedException   exceptionRule = ExpectedException.none();
@@ -1143,7 +1147,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -1214,7 +1219,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setTitle("new published news title");
     news.setSummary("new published news summary");
@@ -1301,7 +1307,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setTitle("new scheduled news title");
     news.setSummary("new scheduled news summary");
@@ -1371,7 +1378,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -1444,7 +1452,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     News news = new News();
@@ -1493,7 +1502,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
@@ -1531,7 +1541,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -1593,7 +1604,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -1655,7 +1667,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     NewsService newsServiceSpy = Mockito.spy(newsService);
     ExtendedNode newsNode = mock(ExtendedNode.class);
@@ -1724,7 +1737,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     Node newsFolderNode = mock(Node.class);
     Node newsRootNode = mock(Node.class);
     Node applicationDataNode = mock(Node.class);
@@ -1813,7 +1827,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -1896,7 +1911,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -1963,7 +1979,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     Node applicationDataNode = mock(Node.class);
     Node newsNode = mock(Node.class);
     newsNode.setProperty("id", "1");
@@ -2027,7 +2044,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2110,7 +2128,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2168,7 +2187,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setId("id123");
     news.setViewsCount((long) 5);
@@ -2218,7 +2238,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setId("id123");
     news.setViewsCount((long) 5);
@@ -2257,7 +2278,10 @@ public class NewsServiceImplTest {
                                                       wcmPublicationServiceImpl,
                                                       newsSearchConnector,
                                                       newsAttachmentsService,
-            indexingService, newsESSearchConnector, userACL);
+                                                      indexingService,
+                                                      newsESSearchConnector,
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setId("id123");
     news.setViewsCount((long) 5);
@@ -2304,7 +2328,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setId("id123");
     news.setViewsCount((long) 5);
@@ -2354,7 +2379,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setId("id123");
     Node newsNode = mock(Node.class);
@@ -2396,7 +2422,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("user");
     MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "member");
@@ -2436,7 +2463,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     setCurrentIdentity();
 
@@ -2470,7 +2498,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setAuthor("root");
     news.setSpaceId("1");
@@ -2525,7 +2554,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     News news = new News();
     news.setAuthor("root");
     news.setSpaceId("1");
@@ -2579,7 +2609,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -2706,7 +2737,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     News news = new News();
     news.setTitle("unpublished");
@@ -2746,7 +2778,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     News news = new News();
     news.setTitle("unpublished");
@@ -2808,7 +2841,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     News news = new News();
     news.setTitle("title");
@@ -2917,7 +2951,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -3002,7 +3037,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
     when(repository.getConfiguration()).thenReturn(repositoryEntry);
@@ -3050,7 +3086,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
 
@@ -3111,7 +3148,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
 
@@ -3164,7 +3202,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
 
@@ -3217,7 +3256,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
 
@@ -3465,7 +3505,10 @@ public class NewsServiceImplTest {
                                                           wcmPublicationServiceImpl,
                                                           newsSearchConnector,
                                                           newsAttachmentsService,
-            indexingService, newsESSearchConnector, userACL);
+                                                          indexingService,
+                                                          newsESSearchConnector,
+                                                          userACL,
+                                                          metadataService);
     Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Profile profile = posterIdentity.getProfile();
     profile.setUrl("/profile/john");
@@ -3502,7 +3545,8 @@ public class NewsServiceImplTest {
                                                           newsAttachmentsService,
                                                           indexingService,
                                                           newsESSearchConnector,
-                                                          userACL);
+                                                          userACL,
+                                                          metadataService);
     Identity posterIdentity = new Identity(OrganizationIdentityProvider.NAME, "john");
     Profile profile = posterIdentity.getProfile();
     profile.setUrl("/profile/john");
@@ -3535,7 +3579,8 @@ public class NewsServiceImplTest {
                                                       newsAttachmentsService,
                                                       indexingService,
                                                       newsESSearchConnector,
-                                                      userACL);
+                                                      userACL,
+                                                      metadataService);
   
     Node newsNode = mock(Node.class);
     when(newsNode.hasProperty(nullable(String.class))).thenReturn(true);
@@ -3585,7 +3630,8 @@ public class NewsServiceImplTest {
                                                   newsAttachmentsService,
                                                   indexingService,
                                                   newsESSearchConnector,
-                                                  userACL);
+                                                  userACL,
+                                                  metadataService);
     return newsService;
   }
 }

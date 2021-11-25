@@ -38,6 +38,11 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.processor.MetadataActivityProcessor;
+import org.exoplatform.social.core.search.DocumentWithMetadata;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataObject;
 
 public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnector {
 
@@ -51,14 +56,18 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
 
   private final ActivityManager activityManager;
 
+  private final MetadataService metadataService;
+
   public NewsIndexingServiceConnector(IdentityManager identityManager,
                                       InitParams initParams,
                                       NewsService newsService,
-                                      ActivityManager activityManager) {
+                                      ActivityManager activityManager,
+                                      MetadataService metadataService) {
     super(initParams);
     this.newsService = newsService;
     this.identityManager = identityManager;
     this.activityManager = activityManager;
+    this.metadataService = metadataService;
   }
 
   @Override
@@ -173,8 +182,20 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     if (news.getUpdateDate() != null) {
       fields.put("lastUpdatedTime", String.valueOf(news.getUpdateDate().getTime()));
     }
+    DocumentWithMetadata document = new DocumentWithMetadata();
+    document.setId(id);
+    document.setLastUpdatedDate(news.getUpdateDate());
+    document.setPermissions(Collections.singleton(ownerIdentityId));
+    document.setFields(fields);
+    addDocumentMetadata(document, news.getActivityId());
 
-    return new Document(id, null, news.getUpdateDate(), Collections.singleton(ownerIdentityId), fields);
+    return document;
+  }
+
+  private void addDocumentMetadata(DocumentWithMetadata document, String documentId) {
+    MetadataObject metadataObject = new MetadataObject(MetadataActivityProcessor.ACTIVITY_METADATA_OBJECT_TYPE, documentId);
+    List<MetadataItem> metadataItems = metadataService.getMetadataItemsByObject(metadataObject);
+    document.setMetadataItems(metadataItems);
   }
 
   private String htmlToText(String source) {

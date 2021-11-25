@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -77,8 +78,9 @@ public class NewsESSearchConnectorTest {
                                                                             activityStorage,
                                                                             client,
                                                                             getParams());
+    NewsFilter filter = new NewsFilter("term");
     try {
-      newsESSearchConnector.search(null, "term", 0, 10);
+      newsESSearchConnector.search(null, filter, 0, 10);
       fail("Should throw IllegalArgumentException: viewer identity is mandatory");
     } catch (IllegalArgumentException e) {
       // Expected
@@ -92,13 +94,13 @@ public class NewsESSearchConnectorTest {
       // Expected
     }
     try {
-      newsESSearchConnector.search(identity, "term", -1, 10);
+      newsESSearchConnector.search(identity, filter, -1, 10);
       fail("Should throw IllegalArgumentException: offset should be positive");
     } catch (IllegalArgumentException e) {
       // Expected
     }
     try {
-      newsESSearchConnector.search(identity, "term", 0, -1);
+      newsESSearchConnector.search(identity, filter, 0, -1);
       fail("Should throw IllegalArgumentException: limit should be positive");
     } catch (IllegalArgumentException e) {
       // Expected
@@ -113,6 +115,7 @@ public class NewsESSearchConnectorTest {
                                                                             client,
                                                                             getParams());
 
+    NewsFilter filter = new NewsFilter("term");
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
@@ -123,7 +126,7 @@ public class NewsESSearchConnectorTest {
                                           .replaceAll("@limit@", "10");
     lenient().when(client.sendRequest(eq(expectedESQuery), eq(ES_INDEX))).thenReturn("{}");
 
-    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "term", 0, 10);
+    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, filter, 0, 10);
     assertNotNull(result);
     assertEquals(0, result.size());
   }
@@ -136,6 +139,7 @@ public class NewsESSearchConnectorTest {
                                                                             client,
                                                                             getParams());
 
+    NewsFilter filter = new NewsFilter("term");
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
@@ -149,7 +153,7 @@ public class NewsESSearchConnectorTest {
     Identity rootIdentity = new Identity("organization", "root");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(rootIdentity);
 
-    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "term", 0, 10);
+    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, filter, 0, 10);
     assertNotNull(result);
     assertEquals(2, result.size());
 
@@ -168,6 +172,7 @@ public class NewsESSearchConnectorTest {
                                                                             client,
                                                                             getParams());
 
+    NewsFilter filter = new NewsFilter("john");
     HashSet<Long> permissions = new HashSet<>(Arrays.asList(10L, 20L, 30L));
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
@@ -183,7 +188,7 @@ public class NewsESSearchConnectorTest {
     Identity poster = new Identity(OrganizationIdentityProvider.NAME, "posterId");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "posterId")).thenReturn(poster);
 
-    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, "john", 0, 10);
+    List<NewsESSearchResult> result = newsESSearchConnector.search(identity, filter, 0, 10);
     assertNotNull(result);
     assertEquals(1, result.size());
 

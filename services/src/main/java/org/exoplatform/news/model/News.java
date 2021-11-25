@@ -6,6 +6,7 @@ import org.exoplatform.social.core.space.model.Space;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.exoplatform.social.metadata.model.MetadataItem;
 
 public class News {
 
@@ -98,6 +99,8 @@ public class News {
   private String               timeZoneId;
 
   private boolean              activityPosted;
+
+  private Map<String, List<MetadataItem>> metadatas;
 
   public String getId() {
     return id;
@@ -441,5 +444,13 @@ public class News {
 
   public void setActivityPosted(boolean activityPosted) {
     this.activityPosted = activityPosted;
+  }
+
+  public Map<String, List<MetadataItem>> getMetadatas() {
+    return metadatas;
+  }
+
+  public void setMetadatas(Map<String, List<MetadataItem>> metadatas) {
+    this.metadatas = metadatas;
   }
 }

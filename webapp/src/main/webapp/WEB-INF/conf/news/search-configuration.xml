@@ -70,6 +70,9 @@
             <field name="uiComponent">
               <string>news-search-card</string>
             </field>
+            <field name="favoritesEnabled">
+              <boolean>true</boolean>
+            </field>
           </object>
         </object-param>
       </init-params>

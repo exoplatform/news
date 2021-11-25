@@ -11,8 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.rest.entity.MetadataItemEntity;
 import org.picocontainer.Startable;
 
 import org.exoplatform.common.http.HTTPStatus;
@@ -240,9 +244,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                          @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,
                          @ApiParam(value = "Properties to expand", required = false) @QueryParam("expand") String expand,
                          @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam("offset") int offset,
-                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit) throws Exception {
+                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit,
+                         @ApiParam(value = "Favorites", required = false, defaultValue = "false") @QueryParam("favorites") boolean favorites) throws Exception {
 
-    if (StringUtils.isBlank(query)) {
+    if (StringUtils.isBlank(query) && !favorites) {
       return Response.status(Response.Status.BAD_REQUEST).entity("'query' parameter is mandatory").build();
     }
 
@@ -256,10 +261,17 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     if (limit < 0) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Limit must be positive").build();
     }
-    List<NewsESSearchResult> searchResults = newsService.search(currentUser, query, offset, limit);
+    NewsFilter filter = new NewsFilter(query, favorites);
+
+    List<NewsESSearchResult> searchResults = newsService.search(currentUser, filter, offset, limit);
     List<NewsSearchResultEntity> results = searchResults.stream().map(searchResult -> {
       NewsSearchResultEntity entity = new NewsSearchResultEntity(searchResult);
       entity.setPoster(EntityBuilder.buildEntityIdentity(searchResult.getPoster(), uriInfo.getPath(), "all"));
+      News news = newsService.getNewsById(entity.getId(), false);
+      Map<String, List<MetadataItemEntity>> newsMetadatasToPublish = retrieveMetadataItems(news, currentUser);
+      if (MapUtils.isNotEmpty(newsMetadatasToPublish)) {
+        entity.setMetadatas(newsMetadatasToPublish);
+      }
       return entity;
     }).collect(Collectors.toList());
 
@@ -301,6 +313,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           spacesList.add(space);
         }
         filteredNews.setSharedInSpacesList(spacesList);
+
         return Response.ok(filteredNews).build();
       } else {
         return Response.ok(news).build();
@@ -904,6 +917,45 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   private boolean canScheduleNews(String authenticatedUser, Space space) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     return spaceService.isManager(space, authenticatedUser) || spaceService.isRedactor(space, authenticatedUser) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+
+  public static Map<String, List<MetadataItemEntity>> retrieveMetadataItems(News news,
+                                                                            Identity authenticatedUser) {
+    Map<String, List<MetadataItem>> activityMetadatas = news.getMetadatas();
+    if (MapUtils.isEmpty(activityMetadatas)) {
+      return null;// NOSONAR
+    }
+    long authenticatedUserId = Long.parseLong(authenticatedUser.getId());
+    Map<String, List<MetadataItemEntity>> newsMetadatasToPublish = new HashMap<>();
+    Set<Map.Entry<String, List<MetadataItem>>> metadataEntries = activityMetadatas.entrySet();
+    for (Map.Entry<String, List<MetadataItem>> metadataEntry : metadataEntries) {
+      String metadataType = metadataEntry.getKey();
+      List<MetadataItem> metadataItems = metadataEntry.getValue();
+      if (MapUtils.isNotEmpty(activityMetadatas)) {
+        List<MetadataItemEntity> newsMetadataEntities =
+                                                          metadataItems.stream()
+                                                                       .filter(metadataItem -> metadataItem.getMetadata()
+                                                                                                           .getAudienceId() == 0
+                                                                           || metadataItem.getMetadata()
+                                                                                          .getAudienceId() == authenticatedUserId)
+                                                                       .map(metadataItem -> new MetadataItemEntity(metadataItem.getId(),
+                                                                                                                   metadataItem.getMetadata()
+                                                                                                                               .getName(),
+                                                                                                                   metadataItem.getObjectType(),
+                                                                                                                   metadataItem.getObjectId(),
+                                                                                                                   metadataItem.getParentObjectId(),
+                                                                                                                   metadataItem.getCreatorId(),
+                                                                                                                   metadataItem.getMetadata()
+                                                                                                                               .getAudienceId(),
+                                                                                                                   metadataItem.getProperties()))
+                                                                       .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(newsMetadataEntities)) {
+          newsMetadatasToPublish.put(metadataType, newsMetadataEntities);
+        }
+      }
+    }
+    return newsMetadatasToPublish;
   }
 
 }

@@ -74,6 +74,9 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataObject;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
@@ -153,7 +156,9 @@ public class NewsServiceImpl implements NewsService {
 
   private UserACL                  userACL;
 
-  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
+  private MetadataService          metadataService;
+
+  private static final Log         LOG                              = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(RepositoryService repositoryService,
                          SessionProviderService sessionProviderService,
@@ -172,7 +177,8 @@ public class NewsServiceImpl implements NewsService {
                          NewsAttachmentsService newsAttachmentsService,
                          IndexingService indexingService,
                          NewsESSearchConnector newsESSearchConnector,
-                         UserACL userACL) {
+                         UserACL userACL,
+                         MetadataService metadataService) {
     this.repositoryService = repositoryService;
     this.sessionProviderService = sessionProviderService;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
@@ -191,6 +197,7 @@ public class NewsServiceImpl implements NewsService {
     this.indexingService = indexingService;
     this.newsESSearchConnector = newsESSearchConnector;
     this.userACL = userACL;
+    this.metadataService = metadataService;
   }
 
   /**
@@ -831,6 +838,17 @@ public class NewsServiceImpl implements NewsService {
       news.setDraftUpdaterUserName(draftUpdaterIdentity.getRemoteId());
       news.setDraftUpdaterDisplayName(draftUpdaterIdentity.getProfile().getFullName());
     }
+    List<MetadataItem> metadataItems = metadataService.getMetadataItemsByObject(new MetadataObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE,
+                                                                                                   news.getId()));
+    Map<String, List<MetadataItem>> metadatas = new HashMap<>();
+    metadataItems.forEach(metadataItem -> {
+      String type = metadataItem.getMetadata().getType().getName();
+      if (metadatas.get(type) == null) {
+        metadatas.put(type, new ArrayList<>());
+      }
+      metadatas.get(type).add(metadataItem);
+    });
+    news.setMetadatas(metadatas);
 
     return news;
   }
@@ -1031,13 +1049,13 @@ public class NewsServiceImpl implements NewsService {
   /**
    * Search news by term
    *
-   * @param term
+   * @param filter
    * @param offset
    * @param limit
    * @return News Search Result
    */
-  public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit) {
-    return newsESSearchConnector.search(currentUser,term, offset, limit);
+  public List<NewsESSearchResult> search(Identity currentUser, NewsFilter filter, int offset, int limit) {
+    return newsESSearchConnector.search(currentUser, filter, offset, limit);
   }
   
   /**

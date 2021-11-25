@@ -9,7 +9,7 @@ public class NewsFilter {
   private boolean      archivedNews;
 
   private boolean      draftNews;
-  
+
   private boolean      scheduledNews;
 
   private String       searchText;
@@ -18,13 +18,24 @@ public class NewsFilter {
 
   private List<String> spaces;
 
-  private String author;
+  private String       author;
 
-  private int offset;
+  private int          offset;
 
-  private int limit;
+  private int          limit;
+
+  private boolean      favorites;
 
   public NewsFilter(){
+  }
+
+  public NewsFilter(String searchText){
+    this.searchText = searchText;
+  }
+
+  public NewsFilter(String searchText, boolean favorites){
+    this.searchText = searchText;
+    this.favorites = favorites;
   }
 
   public boolean isPinnedNews() {
@@ -105,5 +116,13 @@ public class NewsFilter {
 
   public void setLimit(int limit) {
     this.limit = limit;
+  }
+
+  public boolean isFavorites() {
+    return favorites;
+  }
+
+  public void setFavorites(boolean favorites) {
+    this.favorites = favorites;
   }
 }

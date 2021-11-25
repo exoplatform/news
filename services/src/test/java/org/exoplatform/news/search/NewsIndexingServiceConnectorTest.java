@@ -12,6 +12,7 @@ import org.exoplatform.social.core.activity.model.ActivityStreamImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.metadata.MetadataService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,9 +39,12 @@ public class NewsIndexingServiceConnectorTest {
   @Mock
   ActivityManager              activityManager;
 
+  @Mock
+  MetadataService              metadataService;
+
   @Test
   public void testGetAllIds() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager, metadataService);
     try {
       newsIndexingServiceConnector.getAllIds(0, 10);
       fail("getAllIds shouldn't be supported");
@@ -51,7 +55,8 @@ public class NewsIndexingServiceConnectorTest {
 
   @Test
   public void testCreate() {
-    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager, metadataService);
+    newsIndexingServiceConnector = new NewsIndexingServiceConnector(identityManager, getParams(), newsService, activityManager, metadataService);
 
     try {
       newsIndexingServiceConnector.create(null);

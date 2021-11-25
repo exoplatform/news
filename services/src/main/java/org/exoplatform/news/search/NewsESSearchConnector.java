@@ -21,16 +21,14 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.social.core.activity.filter.ActivitySearchFilter;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
-import org.exoplatform.social.metadata.tag.TagService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -91,7 +89,7 @@ public class NewsESSearchConnector {
     }
   }
 
-  public List<NewsESSearchResult> search(Identity viewerIdentity, String term, long offset, long limit) {
+  public List<NewsESSearchResult> search(Identity viewerIdentity, NewsFilter filter, long offset, long limit) {
     if (viewerIdentity == null) {
       throw new IllegalArgumentException("Viewer identity is mandatory");
     }
@@ -101,21 +99,26 @@ public class NewsESSearchConnector {
     if (limit < 0) {
       throw new IllegalArgumentException("Limit must be positive");
     }
-    if (StringUtils.isBlank(term)) {
+    if (filter == null) {
+      throw new IllegalArgumentException("Filter is mandatory");
+    }
+    if (StringUtils.isBlank(filter.getSearchText()) && !filter.isFavorites()) {
       throw new IllegalArgumentException("Filter term is mandatory");
     }
     Set<Long> streamFeedOwnerIds = activityStorage.getStreamFeedOwnerIds(viewerIdentity);
-    String esQuery = buildQueryStatement(viewerIdentity, streamFeedOwnerIds, term, offset, limit);
+    String esQuery = buildQueryStatement(viewerIdentity, streamFeedOwnerIds, filter, offset, limit);
     String jsonResponse = this.client.sendRequest(esQuery, this.index);
     return buildResult(jsonResponse);
   }
 
   private String buildQueryStatement(Identity viewerIdentity,
                                      Set<Long> streamFeedOwnerIds,
-                                     String term,
+                                     NewsFilter filter,
                                      long offset,
                                      long limit) {
-    term = removeSpecialCharacters(term);
+
+    String term = removeSpecialCharacters(filter.getSearchText());
+    term = StringUtils.isBlank(term) ? "*:*" : term;
     List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
       word = word.trim();
       if (word.length() > 5) {
@@ -123,9 +126,9 @@ public class NewsESSearchConnector {
       }
       return word;
     }).collect(Collectors.toList());
-    Map<String, List<String>> metadataFilters = buildMetadatasFilter(viewerIdentity);
+    Map<String, List<String>> metadataFilters = buildMetadatasFilter(filter, viewerIdentity);
     String metadataQuery = buildMetadatasQueryStatement(metadataFilters);
-    String termQuery = StringUtils.join(termsQuery, " AND ");
+    String termQuery = termsQuery.isEmpty() ? "*:*" : StringUtils.join(termsQuery, " AND ");
     return retrieveSearchQuery().replace("@term@", term)
                                 .replace("@term_query@", termQuery)
                                 .replace("@metadatas_query@", metadataQuery)
@@ -134,24 +137,25 @@ public class NewsESSearchConnector {
                                 .replace("@limit@", String.valueOf(limit));
   }
 
-
   private String buildMetadatasQueryStatement(Map<String, List<String>> metadataFilters) {
     StringBuilder metadataQuerySB = new StringBuilder();
     Set<Map.Entry<String, List<String>>> metadataFilterEntries = metadataFilters.entrySet();
     for (Map.Entry<String, List<String>> metadataFilterEntry : metadataFilterEntries) {
       metadataQuerySB.append("{\"terms\":{\"metadatas.")
-      .append(metadataFilterEntry.getKey())
-      .append(".metadataName.keyword")
-      .append("\": [\"")
-      .append(StringUtils.join(metadataFilterEntry.getValue(), "\",\""))
-      .append("\"]}},");
+                     .append(metadataFilterEntry.getKey())
+                     .append(".metadataName.keyword")
+                     .append("\": [\"")
+                     .append(StringUtils.join(metadataFilterEntry.getValue(), "\",\""))
+                     .append("\"]}},");
     }
     return metadataQuerySB.toString();
   }
 
-  private Map<String, List<String>> buildMetadatasFilter(Identity viewerIdentity) {
+  private Map<String, List<String>> buildMetadatasFilter(NewsFilter filter, Identity viewerIdentity) {
     Map<String, List<String>> metadataFilters = new HashMap<>();
-    metadataFilters.put(FavoriteService.METADATA_TYPE.getName(), Collections.singletonList(viewerIdentity.getId()));
+    if (filter.isFavorites()) {
+      metadataFilters.put(FavoriteService.METADATA_TYPE.getName(), Collections.singletonList(viewerIdentity.getId()));
+    }
     return metadataFilters;
   }
 

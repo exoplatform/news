@@ -108,7 +108,7 @@ public interface NewsService {
 
   public boolean canDeleteNews(String posterId, String spaceId);
 
-  public List<NewsESSearchResult> search(Identity currentUser, String term, int offset, int limit);
+  public List<NewsESSearchResult> search(Identity currentUser, NewsFilter filter, int offset, int limit);
 
   News scheduleNews(News news) throws Exception;
 

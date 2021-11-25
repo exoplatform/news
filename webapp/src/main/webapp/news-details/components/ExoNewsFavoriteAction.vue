@@ -15,6 +15,10 @@
 <script>
 export default {
   props: {
+    news: {
+      type: Object,
+      default: null,
+    },
     activityId: {
       type: Number,
       default: () => 0,
@@ -44,14 +48,23 @@ export default {
   methods: {
     removed() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyDeletedFavorite', {0: this.$t('news.label')}));
-      this.$emit('removed');
+      this.$favoriteService.removeFavorite('news', this.news.id)
+        .then(() => {
+          this.isFavorite = false;
+        })
+        .catch(() => this.$emit('remove-error'));
     },
     removeError() {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorDeletingFavorite', {0: this.$t('news.label')}), 'error');
     },
     added() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyAddedAsFavorite', {0: this.$t('news.label')}));
-      this.$emit('added');
+      this.$favoriteService.addFavorite('news', this.news.id)
+        .then(() => {
+          this.isFavorite = true;
+        })
+        .catch(() => this.$emit('add-error'));
+
     },
     addError() {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorAddingAsFavorite', {0: this.$t('news.label')}), 'error');

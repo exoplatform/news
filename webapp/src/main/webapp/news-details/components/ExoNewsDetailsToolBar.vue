@@ -16,6 +16,7 @@
       :show-delete-button="showDeleteButton"
       :show-publish-button="showPublishButton" />
     <exo-news-favorite-action
+      :news="news"
       :activity-id="activityId"
       class="mt-6 me-2 pull-right" />
   </div>

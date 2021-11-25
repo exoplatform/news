@@ -1,10 +1,12 @@
 package org.exoplatform.news.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.social.rest.entity.BaseEntity;
 import org.exoplatform.social.rest.entity.IdentityEntity;
+import org.exoplatform.social.rest.entity.MetadataItemEntity;
 
 public class NewsSearchResultEntity extends BaseEntity {
 
@@ -25,6 +27,8 @@ public class NewsSearchResultEntity extends BaseEntity {
   private long              postedTime;
 
   private long              lastUpdatedTime;
+
+  private Map<String, List<MetadataItemEntity>> metadatas;
 
   public NewsSearchResultEntity() {
   }
@@ -104,4 +108,11 @@ public class NewsSearchResultEntity extends BaseEntity {
     this.newsUrl = newsUrl;
   }
 
+  public void setMetadatas(Map<String, List<MetadataItemEntity>> metadatas) {
+    this.metadatas = metadatas;
+  }
+
+  public Map<String, List<MetadataItemEntity>> getMetadatas() {
+    return this.metadatas;
+  }
 }

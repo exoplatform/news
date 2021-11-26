@@ -146,7 +146,7 @@ export default {
       this.$emit('selected-targets', selectedTargets);
     },
     getReferencedTargets() {
-      this.$newsTargetingService.getReferencedTarget()
+      this.$newsTargetingService.getReferencedTargets()
         .then(referencedTargets => this.referencedTargets = referencedTargets);
     },
   }

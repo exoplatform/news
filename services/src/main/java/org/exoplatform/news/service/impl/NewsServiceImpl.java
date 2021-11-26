@@ -335,11 +335,10 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public void markAsRead(News news, String userId) throws Exception {
-    newsStorage.markAsRead(news, userId);
-    //FIXME not working for now, to be tested
-    //if(!newsStorage.isCurrentUserInNewsViewers()) {
+    if(!newsStorage.isCurrentUserInNewsViewers(news.getId(), userId)) {
+      newsStorage.markAsRead(news, userId);
       NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, userId, news);
-    //}
+    }
   }
 
   /**

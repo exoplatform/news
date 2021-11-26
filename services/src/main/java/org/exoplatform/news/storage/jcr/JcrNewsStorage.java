@@ -47,7 +47,6 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.news.storage.NewsStorage;
-import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -201,7 +200,8 @@ public class JcrNewsStorage implements NewsStorage {
     Calendar creationCalendar = Calendar.getInstance();
     if (news.getCreationDate() != null) {
       creationCalendar.setTime(news.getCreationDate());
-    } else {
+    } 
+    else {
       news.setCreationDate(creationCalendar.getTime());
     }
     String newsNodeName = !news.getTitle().equals("") ? news.getTitle() : "Untitled";
@@ -219,7 +219,8 @@ public class JcrNewsStorage implements NewsStorage {
     Calendar updateCalendar = Calendar.getInstance();
     if (news.getUpdateDate() != null) {
       updateCalendar.setTime(news.getUpdateDate());
-    } else {
+    } 
+    else {
       news.setUpdateDate(updateCalendar.getTime());
     }
     newsDraftNode.setProperty("exo:dateModified", updateCalendar);
@@ -382,7 +383,8 @@ public class JcrNewsStorage implements NewsStorage {
       String uuid = node.getProperty("jcr:frozenUuid").getString();
       originalNode = node.getSession().getNodeByUUID(uuid);
       news.setId(originalNode.getUUID());
-    } else {
+    } 
+    else {
       originalNode = node;
       news.setId(node.getUUID());
     }
@@ -419,12 +421,14 @@ public class JcrNewsStorage implements NewsStorage {
     }
     if (originalNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
       news.setDraftVisible(Boolean.valueOf(node.getProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP).getString()));
-    } else {
+    } 
+    else {
       news.setDraftVisible(false);
     }
     if (originalNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
       news.setActivityPosted(Boolean.valueOf(node.getProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP).getString()));
-    } else {
+    } 
+    else {
       news.setActivityPosted(false);
     }
     StringBuilder newsUrl = new StringBuilder("");
@@ -442,7 +446,8 @@ public class JcrNewsStorage implements NewsStorage {
         if (currentUsername != null && spaceService.isMember(newsPostedInSpace, currentUsername)) {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/activity?id=").append(newsActivityId);
           news.setUrl(newsUrl.toString());
-        } else {
+        } 
+        else {
           newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
           news.setUrl(newsUrl.toString());
         }
@@ -455,7 +460,8 @@ public class JcrNewsStorage implements NewsStorage {
           }
         }
         news.setActivities(memberSpaceActivities.toString());
-      } else {
+      } 
+      else {
         newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());
         news.setUrl(newsUrl.toString());
       }
@@ -465,7 +471,8 @@ public class JcrNewsStorage implements NewsStorage {
     }
     if (!node.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
-    } else {
+    } 
+    else {
       news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
     }
     if (node.hasNode("illustration")) {
@@ -537,7 +544,8 @@ public class JcrNewsStorage implements NewsStorage {
     }
     if (newsNode.hasNode("illustration")) {
       illustrationURL.append(currentDomain).append("portal/rest/v1/news/").append(news.getId()).append("/illustration");
-    } else {
+    } 
+    else {
       illustrationURL.append(currentDomain).append("news/images/news.png");
     }
     return illustrationURL.toString();
@@ -564,7 +572,8 @@ public class JcrNewsStorage implements NewsStorage {
       // illustration
       if (StringUtils.isNotEmpty(news.getUploadId())) {
         attachIllustration(newsNode, news.getUploadId());
-      } else if ("".equals(news.getUploadId())) {
+      } 
+      else if ("".equals(news.getUploadId())) {
         removeIllustration(newsNode);
       }
       //draft visible
@@ -596,7 +605,8 @@ public class JcrNewsStorage implements NewsStorage {
           newsNode.removeMixin(MIX_NEWS_MODIFIERS);
           newsNode.save();
         }
-      } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+      } 
+      else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
         publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
         Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
         String currentIdentityId = currentIdentity.getId();
@@ -729,14 +739,16 @@ public class JcrNewsStorage implements NewsStorage {
     Node illustrationNode;
     if (illustrationExists) {
       illustrationNode = newsNode.getNode("illustration");
-    } else {
+    } 
+    else {
       illustrationNode = newsNode.addNode("illustration", "nt:file");
     }
     illustrationNode.setProperty("exo:title", uploadedResource.getFileName());
     Node resourceNode;
     if (illustrationExists) {
       resourceNode = illustrationNode.getNode("jcr:content");
-    } else {
+    } 
+    else {
       resourceNode = illustrationNode.addNode("jcr:content", "nt:resource");
     }
     resourceNode.setProperty("jcr:mimeType", uploadedResource.getMimeType());
@@ -762,14 +774,16 @@ public class JcrNewsStorage implements NewsStorage {
     if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
       newsRootNode = applicationDataNode.addNode(NEWS_NODES_FOLDER, "nt:unstructured");
       applicationDataNode.save();
-    } else {
+    } 
+    else {
       newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
     }
     Node publishedRootNode;
     if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
       publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
       newsRootNode.save();
-    } else {
+    } 
+    else {
       publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
     }
     return publishedRootNode;
@@ -793,7 +807,8 @@ public class JcrNewsStorage implements NewsStorage {
       ((ExtendedNode) spaceNewsRootNode).setPermissions(permissions);
 
       spaceRootNode.save();
-    } else {
+    } 
+    else {
       spaceNewsRootNode = spaceRootNode.getNode(NEWS_NODES_FOLDER);
     }
     return spaceNewsRootNode;
@@ -885,7 +900,8 @@ public class JcrNewsStorage implements NewsStorage {
     VersionNode lastUpdatedVersion = getLastUpdatedVersion(node);
     if(lastUpdatedVersion != null) {
       return lastUpdatedVersion.getAuthor();
-    } else {
+    } 
+    else {
       return getStringProperty(node, "exo:lastModifier");
     }
   }
@@ -901,7 +917,8 @@ public class JcrNewsStorage implements NewsStorage {
     VersionNode lastUpdatedVersion = getLastUpdatedVersion(node);
     if(lastUpdatedVersion != null) {
       return lastUpdatedVersion.getCreatedTime().getTime();
-    } else {
+    } 
+    else {
       return getDateProperty(node, "exo:dateModified");
     }
   }
@@ -965,14 +982,16 @@ public class JcrNewsStorage implements NewsStorage {
     if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
       newsRootNode = applicationDataNode.addNode(NEWS_NODES_FOLDER, "nt:unstructured");
       applicationDataNode.save();
-    } else {
+    } 
+    else {
       newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
     }
     Node publishedRootNode;
     if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
       publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
       newsRootNode.save();
-    } else {
+    } 
+    else {
       publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
     }
     return publishedRootNode;
@@ -993,27 +1012,42 @@ public class JcrNewsStorage implements NewsStorage {
     if (!newsNode.hasProperty("exo:viewers")) {
       newsNode.setProperty("exo:viewers", "");
     }
+
+    String newsViewers = newsNode.getProperty("exo:viewers").getString();
+    if (newsViewers.isEmpty()) {
+      newsViewers = newsViewers.concat(userId);
+    } 
+    else {
+      newsViewers = newsViewers.concat(",").concat(userId);
+    }
+    newsNode.setProperty("exo:viewers", newsViewers);
+    Long newsViewsCount = news.getViewsCount() == null ? (long) 1 : news.getViewsCount() + 1;
+    newsNode.setProperty("exo:viewsCount", newsViewsCount);
+    newsNode.save();
+  }
+  
+  public boolean isCurrentUserInNewsViewers(String newsId, String userId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    if (!newsNode.hasProperty("exo:viewers")) {
+      newsNode.setProperty("exo:viewers", "");
+    }
     String newsViewers = newsNode.getProperty("exo:viewers").getString();
     boolean isCurrentUserInNewsViewers = false;
     if (!newsViewers.isEmpty()) {
       String[] newsViewersArray = newsViewers.split(",");
       isCurrentUserInNewsViewers = Arrays.stream(newsViewersArray).anyMatch(userId::equals);
     }
-    if (!isCurrentUserInNewsViewers) {
-      if (news.getViewsCount() == null) {
-        news.setViewsCount((long) 1);
-      } else {
-        news.setViewsCount(news.getViewsCount() + 1);
-      }
-      if (newsViewers.isEmpty()) {
-        newsViewers = newsViewers.concat(userId);
-      } else {
-        newsViewers = newsViewers.concat(",").concat(userId);
-      }
-      newsNode.setProperty("exo:viewsCount", news.getViewsCount());
-      newsNode.setProperty("exo:viewers", newsViewers);
-      newsNode.save();
-    }
+    return isCurrentUserInNewsViewers;
   }
   
   public void unpublishNews(String newsId) throws Exception {
@@ -1186,7 +1220,8 @@ public class JcrNewsStorage implements NewsStorage {
           String activities = newsNode.getProperty("exo:activities").getString();
           activities = activities.concat(";").concat(space.getId()).concat(":").concat(sharedActivityId);
           newsNode.setProperty("exo:activities", activities);
-        } else {
+        } 
+        else {
           newsNode.setProperty("exo:activities", sharedActivityId);
         }
         newsNode.save();

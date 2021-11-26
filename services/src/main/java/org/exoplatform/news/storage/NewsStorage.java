@@ -28,6 +28,8 @@ public interface NewsStorage {
   
   void markAsRead(News news, String userId) throws Exception;
   
+  boolean isCurrentUserInNewsViewers(String newsId, String userId) throws Exception;
+  
   void unpublishNews(String newsId) throws Exception;
   
   void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws IllegalAccessException, ObjectNotFoundException;

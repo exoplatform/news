@@ -252,8 +252,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
 
     String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
-    Identity currentUser = CommonsUtils.getService(IdentityManager.class)
-                                       .getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser);
+    Identity currentUser = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser, false);
 
     if (offset < 0) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Offset must be 0 or positive").build();

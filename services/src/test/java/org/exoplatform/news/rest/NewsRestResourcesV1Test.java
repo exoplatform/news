@@ -11,6 +11,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.exoplatform.news.model.NewsAttachment;
@@ -2122,4 +2123,176 @@ public class NewsRestResourcesV1Test {
     assertNotNull(canCreateNews);
     assertEquals("true", canCreateNews);
   }
+
+  @Test
+  public void shouldGetBadRequestWhenSearchingWithoutQueryAndFavorites() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    UriInfo uriInfo = mock(UriInfo.class);
+    String text = "text";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+
+    // When
+    Response response = newsRestResourcesV1.search(uriInfo, "", "", 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenSearchingWithNegativeOffset() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    UriInfo uriInfo = mock(UriInfo.class);
+    String text = "text";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    setCurrentUser("john");
+
+    // When
+    Response response = newsRestResourcesV1.search(uriInfo, "query", "", -1, 10, false);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldGetBadRequestWhenSearchingWithNegativeLimit() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    UriInfo uriInfo = mock(UriInfo.class);
+    String text = "text";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    setCurrentUser("john");
+
+    // When
+    Response response = newsRestResourcesV1.search(uriInfo, "query", "", 0, -1, false);
+
+    // Then
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldnewsListWhenSearchingWithQuery() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container);
+    UriInfo uriInfo = mock(UriInfo.class);
+    String text = "text";
+    String spacesIds = "4,1";
+    News news1 = new News();
+    news1.setSpaceId("4");
+    news1.setAuthor("john");
+    news1.setTitle(text);
+    news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news2 = new News();
+    news2.setSpaceId("1");
+    news2.setAuthor("john");
+    news2.setTitle(text);
+    news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news3 = new News();
+    news3.setSpaceId("4");
+    news3.setAuthor("john");
+    news3.setTitle(text);
+    news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    allNews.add(news3);
+    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    setCurrentUser("john");
+
+    // When
+    Response response = newsRestResourcesV1.search(uriInfo, "not_found", "", 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    List<NewsSearchResultEntity> newsList = (List<NewsSearchResultEntity>) response.getEntity();
+    assertNotNull(newsList);
+    assertEquals(0, newsList.size());
+  }
+
+  private void setCurrentUser(final String name) {
+    ConversationState.setCurrent(new ConversationState(new org.exoplatform.services.security.Identity(name)));
+  }
+
 }

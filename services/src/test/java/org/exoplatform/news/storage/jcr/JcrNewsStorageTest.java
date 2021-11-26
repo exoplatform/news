@@ -997,7 +997,7 @@ public class JcrNewsStorageTest {
     String newsId = "newsId";
     when(jcrNewsStorage.getNewsNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
 
-    String username = "mary";
+//    String username = "mary";
     String spaceGroup = "spaceGroup";
 
     News news = mock(News.class);
@@ -1151,92 +1151,76 @@ public class JcrNewsStorageTest {
 
   }
 
-//  @Test
-//  public void shouldCreateNewsDraftAndPublishIt() throws Exception {
-//    // Given
-//    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
-//    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
-//    NewsServiceImpl newsService = new NewsServiceImpl(repositoryService,
-//                                                      sessionProviderService,
-//                                                      nodeHierarchyCreator,
-//                                                      dataDistributionManager,
-//                                                      spaceService,
-//                                                      activityManager,
-//                                                      identityManager,
-//                                                      uploadService,
-//                                                      imageProcessor,
-//                                                      linkManager,
-//                                                      publicationServiceImpl,
-//                                                      publicationManagerImpl,
-//                                                      wcmPublicationServiceImpl,
-//                                                      newsSearchConnector,
-//                                                      newsAttachmentsService,
-//                                                      indexingService,
-//                                                      newsESSearchConnector,
-//                                                      userACL);
-//    News news = new News();
-//    news.setTitle("new published news title");
-//    news.setSummary("new published news summary");
-//    news.setBody("new published news body");
-//    news.setUploadId(null);
-//    String sDate1 = "22/08/2019";
-//    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-//    news.setCreationDate(date1);
-//    news.setPinned(true);
-//    news.setSpaceId("spaceTest");
-//    news.setAuthor("root");
-//    News createdNewsDraft = new News();
-//    createdNewsDraft.setId("id123");
-//    createdNewsDraft.setPinned(true);
-//
-//    Node node = mock(Node.class);
-//    Node spaceRootNode = mock(Node.class);
-//    Node spaceNewsRootNode = mock(Node.class);
-//    Node newsFolderNode = mock(Node.class);
-//    Node newsNode = mock(Node.class);
-//    Space space = mock(Space.class);
-//    Identity poster = mock(Identity.class);
-//    Identity spaceIdentity = mock(Identity.class);
-//    Property property = mock(Property.class);
-//    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
-//    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
-//    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-//    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-//    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
-//    when(sessionProvider.getSession(any(), any())).thenReturn(session);
-//    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
-//    when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
-//    when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
-//    when(space.getGroupId()).thenReturn("spaceTest");
-//    when(session.getItem("spacesspaceTest")).thenReturn(spaceRootNode);
-//    when(spaceRootNode.hasNode("News")).thenReturn(true);
-//    when(spaceRootNode.getNode("News")).thenReturn(spaceNewsRootNode);
-//    when(dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, "2019/8/22")).thenReturn(newsFolderNode);
-//    when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(newsNode);
-//    when(newsNode.getUUID()).thenReturn("id123");
-//    when(node.getProperty(nullable(String.class))).thenReturn(property);
-//    when(property.getDate()).thenReturn(Calendar.getInstance());
-//    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
-//    when(space.getPrettyName()).thenReturn("spaceTest");
-//    when(identityManager.getOrCreateIdentity("space", "spaceTest", false)).thenReturn(spaceIdentity);
-//    when(poster.getId()).thenReturn("root");
-//    NewsServiceImpl newsServiceSpy = Mockito.spy(newsService);
-//
-//    Mockito.doNothing().when(newsServiceSpy).pinNews("id123");
-//    Mockito.doReturn(createdNewsDraft).when(newsServiceSpy).createNewsDraft(news);
-//    Mockito.doNothing().when(newsServiceSpy).postNewsActivity(createdNewsDraft, session);
-//    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+  @Test
+  public void shouldCreateNewsDraftAndPublishIt() throws Exception {
+    // Given
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    News news = new News();
+    news.setTitle("new published news title");
+    news.setSummary("new published news summary");
+    news.setBody("new published news body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPublished(true);
+    news.setSpaceId("spaceTest");
+    news.setAuthor("root");
+    News createdNewsDraft = new News();
+    createdNewsDraft.setId("id123");
+    createdNewsDraft.setPublished(true);
+
+    Node node = mock(Node.class);
+    Node spaceRootNode = mock(Node.class);
+    Node spaceNewsRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node newsNode = mock(Node.class);
+    Space space = mock(Space.class);
+    Identity poster = mock(Identity.class);
+    Identity spaceIdentity = mock(Identity.class);
+    Property property = mock(Property.class);
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(node);
+    when(spaceService.getSpaceById("spaceTest")).thenReturn(space);
+    when(nodeHierarchyCreator.getJcrPath("groupsPath")).thenReturn("spaces");
+    when(space.getGroupId()).thenReturn("spaceTest");
+    when(session.getItem("spacesspaceTest")).thenReturn(spaceRootNode);
+    when(spaceRootNode.hasNode("News")).thenReturn(true);
+    when(spaceRootNode.getNode("News")).thenReturn(spaceNewsRootNode);
+    when(dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, "2019/8/22")).thenReturn(newsFolderNode);
+    when(newsFolderNode.addNode(nullable(String.class), nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.getUUID()).thenReturn("id123");
+    when(node.getProperty(nullable(String.class))).thenReturn(property);
+    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(identityManager.getOrCreateIdentity("organization", "root", false)).thenReturn(poster);
+    when(space.getPrettyName()).thenReturn("spaceTest");
+    when(identityManager.getOrCreateIdentity("space", "spaceTest", false)).thenReturn(spaceIdentity);
+    when(poster.getId()).thenReturn("root");
+    JcrNewsStorage jcrNewsStorageSpy = Mockito.spy(jcrNewsStorage);
+
+    Mockito.doNothing().when(jcrNewsStorageSpy).publishNews(createdNewsDraft);
+    Mockito.doReturn(createdNewsDraft).when(jcrNewsStorageSpy).createNews(news);
+    Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+//TODO to be moved with newsService tests
 //    Mockito.doNothing()
 //           .when(newsServiceSpy)
 //           .sendNotification(createdNewsDraft, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS, session);
-//    // When
-//    News createdNews = newsServiceSpy.createNews(news);
-//
-//    // Then
-//    setRootAsCurrentIdentity();
-//    assertNotNull(createdNews);
+    // When
+    News createdNews = jcrNewsStorageSpy.createNews(news);
+
+    // Then
+    setRootAsCurrentIdentity();
+    assertNotNull(createdNews);
+  //TODO to be moved with newsService tests
 //    verify(newsServiceSpy, times(1)).pinNews("id123");
-//  }
+  }
 //  
 //  @Test
 //  public void shouldScheduleOrCancelNews() throws Exception {
@@ -3520,12 +3504,12 @@ public class JcrNewsStorageTest {
 //    assertFalse(newsService.convertNodeToNews(newsNode, false).getBody().contains("<img"));
 //  }
 //
-//  private void setRootAsCurrentIdentity() {
-//    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
-//    ConversationState state = new ConversationState(currentIdentity);
-//    ConversationState.setCurrent(state);
-//  }
-//
+  private void setRootAsCurrentIdentity() {
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+  }
+
   private JcrNewsStorage buildJcrNewsStorage() {
     JcrNewsStorage jcrNewsStorage = new JcrNewsStorage(repositoryService,
                                                   sessionProviderService,

@@ -1190,7 +1190,6 @@ public class JcrNewsStorage implements NewsStorage {
           newsNode.setProperty("exo:activities", sharedActivityId);
         }
         newsNode.save();
-        NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, getCurrentUserId(), news);
       }
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"

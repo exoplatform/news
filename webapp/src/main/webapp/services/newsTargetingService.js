@@ -16,7 +16,7 @@
  */
 import {newsConstants} from '../js/newsConstants.js';
 
-export function getNewsTarget() {
+export function getAllTargets() {
   return fetch(`${newsConstants.NEWS_API}/targeting`, {
     credentials: 'include',
     method: 'GET',
@@ -27,7 +27,7 @@ export function getNewsTarget() {
   });
 }
 
-export function getReferencedTarget() {
+export function getReferencedTargets() {
   return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
     credentials: 'include',
     method: 'GET',

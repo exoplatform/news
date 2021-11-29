@@ -73,13 +73,6 @@
     &.unauthorizedPublish {
       cursor: not-allowed;
     }
-    .uiIconPin {
-      margin-top: 2px;
-      transform: rotate(30deg);
-    }
-    .uiIconPin:before {
-      content: "\eb54";
-    }
     .publishArticle {
       color: @primaryColorDefault;
     }
@@ -692,43 +685,6 @@
           font-family: Helvetica, regular, sans-serif;
           font-size: 14px;
           color: @grayDark;
-        }
-      }
-
-      .pinArticleContent {
-        padding-top: 10px;
-        margin-right: 10px ~'; /** orientation=lt */ ';
-        margin-left: 10px ~'; /** orientation=rt */ ';
-        cursor: pointer;
-
-        #newsPublishButton {
-          float: right ~'; /** orientation=lt */ ';
-          float: left ~'; /** orientation=rt */ ';
-          i {
-            font-size: 18px;
-          }
-
-          &.unauthorizedPublish {
-            cursor: not-allowed;
-          }
-
-          .uiIconPin {
-            margin-top: 2px;
-            transform: rotate(30deg);
-            font-size: 24px;
-          }
-
-          .uiIconPin:before {
-            content: "\eb54";
-          }
-
-          .publishArticle {
-            color: @primaryColorDefault;
-          }
-
-          .unpublishArticle {
-            color: @greyColorLighten1Default;
-          }
         }
       }
 
@@ -1501,7 +1457,7 @@
 }
 
 
-/*============== Home pinned news =============== */
+/*============== Home published news =============== */
 
 @-webkit-keyframes fadein {
   0% {
@@ -1539,151 +1495,6 @@
   }
 }
 
-.newsPin {
-  margin: 0 !important;
-
-  .uiBox {
-    .title {
-      background: white;
-      font-weight: bold;
-      letter-spacing: .5px;
-    }
-
-    .newsUiContentBox {
-      overflow-x: hidden;
-
-      .prevNewsWrapper {
-        position: absolute;
-        top: 50%;
-        left: 15px ~'; /** orientation=lt */ ';
-        right: 15px ~'; /** orientation=rt */ ';
-
-        .prevItems {
-          cursor: pointer;
-          font-size: 20px;
-        }
-      }
-
-      .nextNewsWrapper {
-        position: absolute;
-        right: 15px ~'; /** orientation=lt */ ';
-        left: 15px ~'; /** orientation=rt */ ';
-        top: 50%;
-
-        .nextItems {
-          cursor: pointer;
-          font-size: 20px;
-        }
-      }
-
-      .rowContent {
-        width: 90%;
-        margin: auto;
-
-        .newsColumn2 {
-          .carouselItems {
-            animation: fadein 2s;
-            -moz-animation: fadein 2s; /* Firefox */
-            -webkit-animation: fadein 2s; /* Safari and Chrome */
-            -o-animation: fadein 2s; /* Opera */
-
-            .media-content {
-              .newsPinContent {
-                display: flex;
-                flex-wrap: wrap;
-                width: 100%;
-
-                .newsPinIllustration {
-                  height: 80px;
-                  background-position: 50%;
-                  background-size: cover;
-                  background-repeat: no-repeat;
-                  flex: 1 1 35%;
-                  margin-right: 10px ~'; /** orientation=lt */ ';
-                  margin-left: 10px ~'; /** orientation=rt */ ';
-                  border-radius: 6px;
-                }
-
-                .media-body {
-                  flex: 1 1 60%;
-
-                  .summary {
-                    max-height: 60px;
-                    overflow: hidden;
-                  }
-                }
-              }
-
-              .newsPinTitle {
-                padding-bottom: 10px;
-
-                .dateAndMail {
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  overflow: hidden;
-
-                  .newsOwner {
-                    padding-left: 10px ~'; /** orientation=lt */ ';
-                    padding-right: 10px ~'; /** orientation=rt */ ';
-                  }
-
-                  span {
-                    font-size: 13px;
-                    font-style: italic;
-                  }
-
-                  i {
-                    font-size: 14px;
-                    margin-right: 4px;
-                    color: #578dc9;
-                  }
-                }
-
-                .heading a {
-                  display: block;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  overflow: hidden;
-                }
-              }
-
-              i {
-                font-size: 14px;
-                margin-right: 4px ~'; /** orientation=lt */ ';
-                margin-left: 4px ~'; /** orientation=rt */ ';
-                color: #578dc9;
-              }
-            }
-
-            .heading a {
-              display: block;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow: hidden;
-            }
-
-            i {
-              font-size: 14px;
-              margin-right: 4px ~'; /** orientation=lt */ ';
-              margin-left: 4px ~'; /** orientation=rt */ ';
-              color: #578dc9;
-            }
-          }
-
-          .heading a {
-            display: block;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-          }
-
-        }
-      }
-    }
-  }
-}
-
-
 /*======================== News App ========================*/
 
 .uiIconExt-news:before {
@@ -1699,7 +1510,7 @@
 }
 .newsApp {
   padding: 10px 20px;
-  .confirmPinMessage {
+  .confirmPublishMessage {
     position: absolute;
     top: 25px;
     left: 50%;
@@ -2349,27 +2160,6 @@
     align-items: center;
     padding-bottom: 30px;
     line-height: 28px;
-
-    .seeAllPinnedNews {
-      margin: 10px 0px;
-
-      a {
-        color: #9e9e9e;
-        padding: 7px 13px;
-        text-shadow: none;
-        letter-spacing: 0.5px;
-        transition: all 0.5s;
-        cursor: pointer;
-        background-color: #f5f5f5;
-        font-size: 12px;
-        text-transform: uppercase;
-        border-radius: 4px;
-      }
-
-      &:hover a {
-        background: #ededed;
-      }
-    }
 
     .newsTitleTop {
       font-size: 16px;

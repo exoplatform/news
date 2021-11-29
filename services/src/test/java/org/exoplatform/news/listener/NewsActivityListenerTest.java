@@ -1,7 +1,13 @@
 package org.exoplatform.news.listener;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
@@ -10,9 +16,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.activity.ActivityLifeCycleEvent;
 import org.exoplatform.social.core.activity.model.ActivityStream;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -37,7 +43,7 @@ public class NewsActivityListenerTest {
 
   @Mock
   private NewsService     newsService;
-
+  
   @Test
   public void testNotShareWhenActivityNotFound() {
     NewsActivityListener newsActivityListener = new NewsActivityListener(activityManager,
@@ -132,7 +138,7 @@ public class NewsActivityListenerTest {
   }
 
   @Test
-  public void testNotShareWhenSharedActivityWhenNewsNotFound() throws IllegalAccessException, ObjectNotFoundException {
+  public void testNotShareWhenSharedActivityWhenNewsNotFound() throws Exception {
     NewsActivityListener newsActivityListener = new NewsActivityListener(activityManager,
                                                                          identityManager,
                                                                          spaceService,
@@ -157,15 +163,17 @@ public class NewsActivityListenerTest {
 
     String newsId = "newsId";
     when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     newsActivityListener.shareActivity(event);
 
-    verify(newsService, times(1)).getNewsById(newsId, false);
+    verify(newsService, times(1)).getNewsById(newsId, currentIdentity, false);
     verify(newsService, never()).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
   }
 
   @Test
-  public void testShareWhenNewsFound() throws IllegalAccessException, ObjectNotFoundException {
+  public void testShareWhenNewsFound() throws Exception {
     NewsActivityListener newsActivityListener = new NewsActivityListener(activityManager,
                                                                          identityManager,
                                                                          spaceService,
@@ -196,14 +204,16 @@ public class NewsActivityListenerTest {
 
     String newsId = "newsId";
     when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
-
+    
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    
     News news = new News();
-    when(newsService.getNewsById(newsId, false)).thenReturn(news);
-
+    when(newsService.getNewsById(newsId, currentIdentity, false)).thenReturn(news);
+    
     newsActivityListener.shareActivity(event);
 
-    verify(newsService, times(1)).getNewsById(newsId, false);
+    verify(newsService, times(1)).getNewsById(newsId, currentIdentity, false);
     verify(newsService, times(1)).shareNews(eq(news), nullable(Space.class), nullable(Identity.class), nullable(String.class));
   }
-
 }

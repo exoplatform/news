@@ -1,8 +1,8 @@
 package org.exoplatform.news.listener;
 
-import org.exoplatform.news.NewsService;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -54,8 +54,9 @@ public class NewsActivityListener extends ActivityListenerPlugin {
       if (originalActivity != null && originalActivity.getTemplateParams() != null
           && originalActivity.getTemplateParams().containsKey(NEWS_ID)) {
         String newsId = originalActivity.getTemplateParams().get(NEWS_ID);
+        org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
         try {
-          News news = newsService.getNewsById(newsId, false);
+          News news = newsService.getNewsById(newsId, currentIdentity, false);
           if (news != null) {
             Identity posterIdentity = getIdentity(sharedActivity);
             Space space = getSpace(sharedActivity);
@@ -72,11 +73,11 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void likeActivity(ActivityLifeCycleEvent event) {
     super.likeActivity(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
-      String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if (activity != null) {
+      org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
-        News news = newsService.getNewsByActivityId(activity.getId(), userId);
-        NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, NewsUtils.getCurrentUserId(), news);
+        News news = newsService.getNewsByActivityId(activity.getId(), currentIdentity);
+        NewsUtils.broadcastEvent(NewsUtils.LIKE_NEWS, currentIdentity.getUserId(), news);
       } catch (Exception e) {
         LOG.error("Error broadcast like news event", e);
       }
@@ -87,11 +88,11 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void saveComment(ActivityLifeCycleEvent event) {
     super.saveComment(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
-      String userId = ConversationState.getCurrent().getIdentity().getUserId();
+    if (activity != null) {
+      org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
-        News news = newsService.getNewsByActivityId(activity.getParentId(), userId);
-        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, NewsUtils.getCurrentUserId(), news);
+        News news = newsService.getNewsByActivityId(activity.getParentId(), currentIdentity);
+        NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, currentIdentity.getUserId(), news);
       } catch (Exception e) {
         LOG.error("Error broadcast comment news event", e);
       }

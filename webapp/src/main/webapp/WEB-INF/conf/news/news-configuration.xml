@@ -23,13 +23,23 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
   <component>
-    <key>org.exoplatform.news.NewsService</key>
-    <type>org.exoplatform.news.NewsServiceImpl</type>
+    <key>org.exoplatform.news.storage.NewsStorage</key>
+    <type>org.exoplatform.news.storage.jcr.JcrNewsStorage</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.news.service.NewsService</key>
+    <type>org.exoplatform.news.service.impl.NewsServiceImpl</type>
+  </component>
+  
+  <component>
+    <key>org.exoplatform.news.service.NewsTargetingService</key>
+    <type>org.exoplatform.news.service.impl.NewsTargetingServiceImpl</type>
   </component>
 
   <component>
-    <key>org.exoplatform.news.NewsAttachmentsService</key>
-    <type>org.exoplatform.news.NewsAttachmentsServiceImpl</type>
+    <key>org.exoplatform.news.storage.NewsAttachmentsStorage</key>
+    <type>org.exoplatform.news.storage.jcr.JcrNewsAttachmentsStorage</type>
   </component>
 
   <component>
@@ -38,11 +48,6 @@
 
   <component>
     <type>org.exoplatform.news.rest.NewsTargetingRestResourcesV1</type>
-  </component>
-
-  <component>
-    <key>org.exoplatform.news.NewsTargetingService</key>
-    <type>org.exoplatform.news.NewsTargetingServiceImpl</type>
   </component>
 
   <component>
@@ -191,21 +196,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-  
-  <external-component-plugins>
-    <target-component>org.exoplatform.groovyscript.text.TemplateService</target-component>
-    <component-plugin>
-      <name>UINewsActivityActionBar-actions</name>
-      <set-method>addTemplateExtension</set-method>
-      <type>org.exoplatform.groovyscript.text.TemplateExtensionPlugin</type>
-      <init-params>
-        <values-param>
-          <name>templates</name>
-          <description>The actionBar news activity template to include in all activity templates</description>
-          <value>war:/groovy/news/webui/activity/commons/UINewsActivityActionBar.gtmpl</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
 </configuration>

@@ -246,7 +246,7 @@ export default {
           scheduled: item.publicationState === 'staged',
           schedulePostDate: item.schedulePostDate,
           canArchive: item.canArchive,
-          pinned: item.pinned,
+          published: item.published,
           activities: item.activities,
           authorAvatarUrl: item.authorAvatarUrl,
           spaceAvatarUrl: item.spaceAvatarUrl,

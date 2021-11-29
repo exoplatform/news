@@ -39,8 +39,8 @@ export function init(params) {
           news: params.news,
           newsId: params.news.newsId,
           activityId: params.activityId,
-          showEditButton: params.showEditButton,
-          showPublishButton: params.showPinInput,
+          showEditButton: params.news.canEdit,
+          showPublishButton: params.news.canPublish,
           showDeleteButton: params.news.canDelete,
         };
       },

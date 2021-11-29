@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.space.model.Space;
@@ -34,7 +34,7 @@ public class NewsQueryBuilderTest {
     // Given
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     NewsFilter filter = new NewsFilter();
-    filter.setPinnedNews(true);
+    filter.setPublishedNews(true);
     filter.setSearchText("text");
     filter.setOrder("jcr:score");
     filter.setAuthor("john");
@@ -63,7 +63,7 @@ public class NewsQueryBuilderTest {
     // Given
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     NewsFilter filter = new NewsFilter();
-    filter.setPinnedNews(true);
+    filter.setPublishedNews(true);
     filter.setSearchText("text");
     filter.setOrder("jcr:score");
     filter.setAuthor("john");
@@ -94,7 +94,7 @@ public class NewsQueryBuilderTest {
     // Given
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     NewsFilter filter = new NewsFilter();
-    filter.setPinnedNews(false);
+    filter.setPublishedNews(false);
     filter.setArchivedNews(false);
     filter.setOrder("jcr:score");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
@@ -119,7 +119,7 @@ public class NewsQueryBuilderTest {
     // Given
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     NewsFilter filter = new NewsFilter();
-    filter.setPinnedNews(false);
+    filter.setPublishedNews(false);
     filter.setArchivedNews(true);
     filter.setOrder("jcr:score");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
@@ -144,7 +144,7 @@ public class NewsQueryBuilderTest {
     // Given
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     NewsFilter filter = new NewsFilter();
-    filter.setPinnedNews(false);
+    filter.setPublishedNews(false);
     filter.setArchivedNews(true);
     filter.setOrder("jcr:score");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");

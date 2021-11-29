@@ -25,7 +25,7 @@ if (extensionRegistry) {
 }
 
 let newsActivityComposerApp;
-export function init(showPin, maxToUpload, maxFileSize) {
+export function init(maxToUpload, maxFileSize) {
   // getting locale resources
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     // init Vue app when locale resources are ready
@@ -36,7 +36,6 @@ export function init(showPin, maxToUpload, maxFileSize) {
           newsId: getURLQueryParam('newsId'),
           spaceId: getURLQueryParam('spaceId'),
           activityId: getURLQueryParam('activityId'),
-          showPinInput: showPin,
           maxToUpload: maxToUpload,
           maxFileSize: maxFileSize
         };

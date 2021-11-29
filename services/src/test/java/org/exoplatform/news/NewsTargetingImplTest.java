@@ -1,6 +1,7 @@
 package org.exoplatform.news;
 
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
 import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataType;

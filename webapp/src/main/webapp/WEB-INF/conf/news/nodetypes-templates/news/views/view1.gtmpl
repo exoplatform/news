@@ -10,7 +10,8 @@
   import org.exoplatform.commons.utils.CommonsUtils;
   import org.exoplatform.social.webui.Utils;
   import org.exoplatform.social.core.manager.IdentityManager;
-  import org.exoplatform.news.NewsService;
+  import org.exoplatform.news.service.NewsService;
+  
 
   import javax.jcr.RepositoryException;
 
@@ -22,10 +23,11 @@
   import java.util.Comparator;
 
   import groovy.json.JsonOutput;
+  import org.exoplatform.services.security.ConversationState;
 
   public String getProfileFullName(String userName) {
     String profileFullName = "";
-    Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
+    org.exoplatform.social.core.identity.model.Identity identity = org.exoplatform.social.webui.Utils.getIdentityManager().getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, true);
     if(identity != null && identity.getProfile() != null) {
       profileFullName = identity.getProfile().getFullName();
     }
@@ -58,8 +60,10 @@
   def pcontext = Util.getPortalRequestContext();
 
   def newsNode = uicomponent.getNode();
+  
+  def currentIdentity = ConversationState.getCurrent().getIdentity();
 
-  def news = newsService.convertNodeToNews(newsNode, false);
+  def news = newsService.getNewsById(newsNode.getUUID(), currentIdentity, false);
 
   if(news.archived && !news.canArchive) {
 
@@ -117,8 +121,6 @@
     def newsBody = news.body.replaceAll("`", "\\\\`");
     def newsAttachments = news.attachments;
 
-    def showEditButton = newsService.canEditNews(news.author, news.spaceId);
-    def showPinInput = newsService.canPublishNews();
     def hiddenSpace = news.hiddenSpace;
 
     def params = """ {
@@ -127,7 +129,7 @@
       news: {
         title: "${newsTitle}",
         summary: `${newsSummary}`,
-        pinned: ${news.pinned},
+        published: ${news.published},
         body: `${newsBody}`,
         illustrationURL: '${illustrationURL}',
         attachments: ${JsonOutput.toJson(newsAttachments)},
@@ -140,6 +142,8 @@
         newsId: '${news.id}',
         archived: ${news.archived},
         canArchive: ${news.canArchive},
+        canEdit: ${news.canEdit},
+        canPublish: ${news.canPublish},
         profileAvatarURL: '${ownerAvatar}',
         spaceDisplayName: "${spaceName}",
         spaceUrl:'${news.spaceUrl}',
@@ -149,8 +153,6 @@
         hiddenSpace: ${news.hiddenSpace},
         isSpaceMember: ${news.isSpaceMember},
       },
-      showEditButton: $showEditButton,
-      showPinInput: $showPinInput,
     } """
     def notAuthorizedUserLabel = "";
     if( hiddenSpace ){
@@ -168,7 +170,7 @@
 %>
 
   <div>
-    <!-- The following bloc is needed in order to display the pin confirmation popup when acceding to news details from news app -->
+    <!-- The following bloc is needed in order to display the publish confirmation popup when acceding to news details from news app -->
     <!--begin -->
     <div class="uiPopupWrapper UISocialConfirmation" style="display: none;">
       <div class="UIPopupWindow UIDragObject uiPopup " style="width: 550px;">

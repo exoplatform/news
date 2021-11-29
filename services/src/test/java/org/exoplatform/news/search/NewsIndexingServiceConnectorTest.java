@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.social.core.activity.model.ActivityStream;
 import org.exoplatform.social.core.activity.model.ActivityStreamImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.filter.NewsFilter;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -32,6 +32,7 @@ public class NewsQueryBuilder {
    */
   public StringBuilder buildQuery(NewsFilter filter) throws Exception {
     StringBuilder sqlQuery = new StringBuilder("SELECT * FROM exo:news WHERE ");
+    //TODO Check if can be retrieved from higher layer
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     boolean isPublisher = currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
     String username = currentIdentity.getUserId();
@@ -54,7 +55,7 @@ public class NewsQueryBuilder {
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
           sqlQuery.append("CONTAINS(.,'").append(filter.getSearchText()).append("') AND ");
         }
-        if (filter.isPinnedNews()) {
+        if (filter.isPublishedNews()) {
           sqlQuery.append("exo:pinned = 'true' AND ");
         }
 

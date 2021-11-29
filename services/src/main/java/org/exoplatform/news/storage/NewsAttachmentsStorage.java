@@ -1,4 +1,4 @@
-package org.exoplatform.news;
+package org.exoplatform.news.storage;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
@@ -7,7 +7,7 @@ import javax.jcr.Node;
 import java.io.InputStream;
 import java.util.List;
 
-public interface NewsAttachmentsService {
+public interface NewsAttachmentsStorage {
 
   List<NewsAttachment> getNewsAttachments(Node newsNode) throws Exception;
 

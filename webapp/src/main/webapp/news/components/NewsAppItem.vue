@@ -91,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             :news-id="news.newsId"
             :news-archived="news.archived"
             :news-title="news.title"
-            :pinned="news.pinned"
+            :published="news.published"
             @refresh-news-list="$emit('update-news-list', false)" />
         </div>
       </div>

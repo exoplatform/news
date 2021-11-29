@@ -26,8 +26,8 @@ import org.exoplatform.commons.search.index.impl.ElasticIndexingServiceConnector
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.news.NewsService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
@@ -87,6 +87,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     }
     LOG.debug("Index document for news id={}", id);
     News news = null;
+    //TODO to be tested and removed
     SessionProvider systemProvider = SessionProvider.createSystemProvider();
     SessionProviderService sessionProviderService = CommonsUtils.getService(SessionProviderService.class);
     sessionProviderService.setSessionProvider(null, systemProvider);

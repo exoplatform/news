@@ -4,10 +4,21 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.jcr.Session;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.NewsService;
-import org.exoplatform.news.NewsUtils;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -16,15 +27,6 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.listener.ListenerService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.jcr.Session;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
@@ -54,7 +56,7 @@ public class NewsGamificationIntegrationListenerTest {
 
   @Mock
   Session session;
-
+  
   @Test
   public void testAddGamificationPointsAfterCreatingAnArticle() throws Exception { // NOSONAR
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
@@ -78,7 +80,7 @@ public class NewsGamificationIntegrationListenerTest {
         executeListener.set(true);
       }
     });
-    newsService.createNews(news, session);
+    newsService.postNews(news, "root");
     assertTrue(executeListener.get());
   }
 

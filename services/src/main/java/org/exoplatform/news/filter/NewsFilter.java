@@ -2,9 +2,14 @@ package org.exoplatform.news.filter;
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class NewsFilter {
 
-  private boolean      pinnedNews;
+  private boolean      publishedNews;
 
   private boolean      archivedNews;
 
@@ -23,87 +28,4 @@ public class NewsFilter {
   private int offset;
 
   private int limit;
-
-  public NewsFilter(){
-  }
-
-  public boolean isPinnedNews() {
-    return pinnedNews;
-  }
-
-  public void setPinnedNews(boolean pinnedNews) {
-    this.pinnedNews = pinnedNews;
-  }
-
-  public boolean isArchivedNews() {
-    return archivedNews;
-  }
-
-  public void setArchivedNews(boolean archivedNews) {
-    this.archivedNews = archivedNews;
-  }
-
-  public boolean isDraftNews() {
-    return draftNews;
-  }
-
-  public void setDraftNews(boolean draftNews) {
-    this.draftNews = draftNews;
-  }
-
-  public boolean isScheduledNews() {
-    return scheduledNews;
-  }
-
-  public void setScheduledNews(boolean scheduledNews) {
-    this.scheduledNews = scheduledNews;
-  }
-
-  public String getSearchText() {
-    return searchText;
-  }
-
-  public void setSearchText(String searchText) {
-    this.searchText = searchText;
-  }
-
-  public String getOrder() {
-    return order;
-  }
-
-  public void setOrder(String order) {
-    this.order = order;
-  }
-
-  public List<String> getSpaces() {
-    return spaces;
-  }
-
-  public void setSpaces(List<String> spaces) {
-    this.spaces = spaces;
-  }
-
-  public String getAuthor() {
-    return author;
-  }
-
-  public void setAuthor(String author) {
-    this.author = author;
-  }
-
-  public int getOffset() {
-    return offset;
-  }
-
-  public void setOffset(int offset) {
-    this.offset = offset;
-  }
-
-  public int getLimit() {
-    return limit;
-  }
-
-  public void setLimit(int limit) {
-    this.limit = limit;
-  }
 }

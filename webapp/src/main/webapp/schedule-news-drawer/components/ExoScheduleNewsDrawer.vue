@@ -370,7 +370,7 @@ export default {
       return this.postArticleMode === 'later' || !this.allowNotPost && this.postArticleMode !== 'immediate';
     },
     selected() {
-      return this.news && this.news.pinned;
+      return this.news && this.news.published;
     },
     visibilityActivity() {
       return this.news && this.news.activityPosted;
@@ -442,7 +442,7 @@ export default {
     },
     closeDrawer() {
       if (this.news) {
-        this.publish = this.news.pinned;
+        this.publish = this.news.published;
       }
       this.stepper = 0;
       this.disabled = false;

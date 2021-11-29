@@ -1,6 +1,10 @@
-package org.exoplatform.news;
+package org.exoplatform.news.utils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -12,7 +16,6 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Authenticator;
-import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -123,15 +126,4 @@ public class NewsUtils {
     }
     return identity;
   }
-
-  public static String getCurrentUserId() {
-    org.exoplatform.services.security.Identity currentIdentity = getCurrentIdentity();
-    return currentIdentity != null ? currentIdentity.getUserId() : null;
-  }
-
-  private static org.exoplatform.services.security.Identity getCurrentIdentity() {
-    ConversationState conversationState = ConversationState.getCurrent();
-    return conversationState != null ? ConversationState.getCurrent().getIdentity() : null;
-  }
-
 }

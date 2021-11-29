@@ -1,10 +1,11 @@
-package org.exoplatform.news;
+package org.exoplatform.news.storage.jcr;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
+import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.documents.DocumentService;
 import org.exoplatform.services.jcr.access.PermissionType;
@@ -30,9 +31,9 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
+public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
 
-  private static final Log LOG = ExoLogger.getLogger(NewsAttachmentsServiceImpl.class);
+  private static final Log LOG = ExoLogger.getLogger(JcrNewsAttachmentsStorage.class);
 
   public static final String NEWS_ATTACHMENTS_NODES_FOLDER = "News Attachments";
 
@@ -50,7 +51,7 @@ public class NewsAttachmentsServiceImpl implements NewsAttachmentsService {
 
   private DocumentService documentService;
 
-  public NewsAttachmentsServiceImpl(SessionProviderService sessionProviderService, RepositoryService repositoryService,
+  public JcrNewsAttachmentsStorage(SessionProviderService sessionProviderService, RepositoryService repositoryService,
                                     NodeHierarchyCreator nodeHierarchyCreator, DataDistributionManager dataDistributionManager,
                                     SpaceService spaceService, UploadService uploadService, DocumentService documentService) {
     this.sessionProviderService = sessionProviderService;

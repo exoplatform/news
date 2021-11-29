@@ -3,7 +3,7 @@
     <div
       v-if="showArchiveMessage"
       id="messageArchive"
-      class="confirmPinMessage">
+      class="confirmPublishMessage">
       <transition name="fade">
         <div :class="[successArchive ? 'alert-success' : 'alert-error']" class="alert text-center">
           <i :class="[successArchive ? 'uiIconSuccess' : 'uiIconError']"></i>
@@ -40,7 +40,7 @@ export default {
       required: true,
       default: false
     },
-    pinned: {
+    published: {
       type: Boolean,
       required: true,
       default: false
@@ -74,18 +74,18 @@ export default {
       eXo.social.PopupConfirmation.confirm('newsArchiveButton', [{action: this.updateArchivedField, label: confirmButton}], captionText, confirmText, cancelButton);
     },
     updateArchivedField: function () {
-      const pinMessageTime = 5000;
+      const publishMessageTime = 5000;
       const context = this;
       let updatedNews = null;
       if (this.newsArchived === false) {
         updatedNews = {
           archived: true,
-          pinned: this.pinned,
+          published: this.published,
         };
       } else {
         updatedNews = {
           archived: false,
-          pinned: this.pinned,
+          published: this.published,
         };
       }
 
@@ -115,7 +115,7 @@ export default {
         }
         setTimeout(function () {
           context.showArchiveMessage = false;
-        }, pinMessageTime);
+        }, publishMessageTime);
       })
         .catch (function() {
           context.showArchiveMessage = true;
@@ -128,7 +128,7 @@ export default {
           setTimeout(function () {
             context.successArchive = true;
             context.showArchiveMessage = false;
-          }, pinMessageTime);
+          }, publishMessageTime);
         });
     },
   }

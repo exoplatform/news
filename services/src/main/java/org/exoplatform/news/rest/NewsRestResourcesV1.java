@@ -50,8 +50,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private final static String    PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  //private final static String    PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
-
   private NewsService            newsService;
 
   private NewsAttachmentsStorage newsAttachmentsService;

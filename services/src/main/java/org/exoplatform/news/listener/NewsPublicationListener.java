@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.cms.CmsService;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
@@ -41,7 +42,7 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
   public void onEvent(Event<CmsService, Node> event) throws Exception {
     if (AuthoringPublicationConstant.POST_CHANGE_STATE_EVENT.equals(event.getEventName())) {
       Node targetNode = event.getData();
-      if (targetNode.isNodeType("exo:news") && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
+      if (targetNode.isNodeType(NewsUtils.EXO_NEWS) && targetNode.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE)
                                                          .getString()
                                                          .equals(PublicationDefaultStates.PUBLISHED)) {
         News news = newsService.getNewsById(targetNode.getUUID(), false);

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 eXo Platform SAS.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.exoplatform.news.service.impl;
 
 import java.util.HashMap;
@@ -41,7 +57,6 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
-import org.exoplatform.upload.UploadService;
 
 /**
  * Service managing News and storing them in ECMS
@@ -50,7 +65,7 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String   PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
-  private final static String   PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+  private static final String   PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   private static final String   NEWS_ID                         = "newsId";
 
@@ -73,7 +88,6 @@ public class NewsServiceImpl implements NewsService {
   public NewsServiceImpl(SpaceService spaceService,
                          ActivityManager activityManager,
                          IdentityManager identityManager,
-                         UploadService uploadService,
                          NewsESSearchConnector newsESSearchConnector,
                          IndexingService indexingService,
                          NewsStorage newsStorage,
@@ -151,9 +165,7 @@ public class NewsServiceImpl implements NewsService {
         News newMentionedNews = news;
         if (!previousMentions.isEmpty()) {
           //clear old mentions from news body before sending a custom object to notification context.
-          previousMentions.forEach(username -> {
-            newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, ""));
-          });
+          previousMentions.forEach(username -> newMentionedNews.setBody(newMentionedNews.getBody().replaceAll("@"+username, "")));
         }
         sendNotification(updater, newMentionedNews, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS);
       }
@@ -211,8 +223,7 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public News getNewsById(String newsId, boolean editMode) throws Exception {
     try {
-      News news = newsStorage.getNewsById(newsId, editMode);
-      return news;
+      return newsStorage.getNewsById(newsId, editMode);
     } catch (Exception e) {
       throw new Exception("An error occurred while retrieving news with id " + newsId, e);
     }
@@ -511,27 +522,47 @@ public class NewsServiceImpl implements NewsService {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
       if(matcher.find()) {
-        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+        Map<String, String> mentionNewsNotificationInformations = new HashMap<String, String>();
+        mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_BODY, contentBody);
+        mentionNewsNotificationInformations.put(NotificationConstants.CURRENT_USER, currentUser);
+        mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_AUTHOR, contentAuthor);
+        mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_SPACE_ID, contentSpaceId);
+        mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_TITLE, contentTitle);
+        mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_SPACE, contentSpaceName);
+        mentionNewsNotificationInformations.put(NotificationConstants.ILLUSTRATION_URL, illustrationURL);
+        mentionNewsNotificationInformations.put(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl);
+        mentionNewsNotificationInformations.put(NotificationConstants.ACTIVITY_LINK, activityLink);
+        sendMentionInNewsNotification(mentionNewsNotificationInformations);
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
-      sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+      Map<String, String> mentionNewsNotificationInformations = new HashMap<String, String>();
+      mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_BODY, contentBody);
+      mentionNewsNotificationInformations.put(NotificationConstants.CURRENT_USER, currentUser);
+      mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_AUTHOR, contentAuthor);
+      mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_SPACE_ID, contentSpaceId);
+      mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_TITLE, contentTitle);
+      mentionNewsNotificationInformations.put(NotificationConstants.CONTENT_SPACE, contentSpaceName);
+      mentionNewsNotificationInformations.put(NotificationConstants.ILLUSTRATION_URL, illustrationURL);
+      mentionNewsNotificationInformations.put(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl);
+      mentionNewsNotificationInformations.put(NotificationConstants.ACTIVITY_LINK, activityLink);
+      sendMentionInNewsNotification(mentionNewsNotificationInformations);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }
   
-  private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
-    Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
+  private void sendMentionInNewsNotification(Map<String, String> mentionNewsNotificationInformations) {
+    Set<String> mentionedIds = NewsUtils.processMentions(mentionNewsNotificationInformations.get(NotificationConstants.CONTENT_BODY));
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
-            .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
-            .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, contentAuthor)
-            .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
-            .append(PostNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
-            .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-            .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
-            .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
-            .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
+            .append(PostNewsNotificationPlugin.CURRENT_USER, mentionNewsNotificationInformations.get(NotificationConstants.CURRENT_USER))
+            .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, mentionNewsNotificationInformations.get(NotificationConstants.CONTENT_AUTHOR))
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, mentionNewsNotificationInformations.get(NotificationConstants.CONTENT_SPACE_ID))
+            .append(PostNewsNotificationPlugin.CONTENT_TITLE, mentionNewsNotificationInformations.get(NotificationConstants.CONTENT_TITLE))
+            .append(PostNewsNotificationPlugin.CONTENT_SPACE, mentionNewsNotificationInformations.get(NotificationConstants.CONTENT_SPACE))
+            .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, mentionNewsNotificationInformations.get(NotificationConstants.ILLUSTRATION_URL))
+            .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, mentionNewsNotificationInformations.get(NotificationConstants.AUTHOR_AVATAR_URL))
+            .append(PostNewsNotificationPlugin.ACTIVITY_LINK, mentionNewsNotificationInformations.get(NotificationConstants.ACTIVITY_LINK))
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }

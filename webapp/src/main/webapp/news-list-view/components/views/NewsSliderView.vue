@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <news-empty-slider-view v-if="!news" />
     <v-carousel
       v-else
+      cycle
       hide-delimiter-background
       class="sliderNewsItems">
       <v-carousel-item
@@ -39,8 +40,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               {{ item.title }}
             </span>
           </div>
-          <div class="flex flex-row flex-grow-1 align-center">
-            <span class="subtitle-2 font-weight-bold white--text my-2">
+          <div class="flex flex-row flex-grow-1 align-center my-2">
+            <span class="subtitle-2 font-weight-bold white--text">
               {{ item.body }}
             </span>
           </div>
@@ -49,7 +50,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             :author-full-name="item.authorFullName"
             :space-id="item.spaceId"
             :post-date="item.postDate"
-            class="d-flex flex-row align-center pa-2 ms-2" />
+            :author-avatar-url="item.authorAvatarUrl"
+            :author-profile-url="item.authorProfileURL"
+            class="d-flex flex-row newsSliderItem align-center pa-2 ms-2" />
         </div>
       </v-carousel-item>
     </v-carousel>
@@ -79,11 +82,11 @@ export default {
           .then(newsList => {
             this.news = newsList;
             this.initialized = true;
-            for (let i=0; i<this.news.length; i++) {
-              if (this.news[i].illustrationURL === null) {
+            this.news.forEach(function (item, i) {
+              if (item.illustrationURL === null) {
                 this.news[i].illustrationURL = '/news/images/news.png';
               }
-            }
+            });
           })
           .finally(() => this.initialized = false);
       }

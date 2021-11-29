@@ -1,25 +1,39 @@
+<!--
+Copyright (C) 2021 eXo Platform SAS.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
 <template>
   <div>
-    <div class="flex-column">
-      <exo-user-avatar
-        :username="author"
-        :fullname="authorFullName"
-        :size="32"
-        :title="author"
-        :retrieve-extra-information="false"
-        :labels="labels"
-        bold-title
-        class="align-center my-auto text-truncate white--text flex-grow-0 flex" />
+    <div class="flex-column newsSliderOwner my-auto">
+      <a :href="authorProfileUrl">
+        <img :src="authorAvatarUrl">
+      </a>
+    </div>
+    <div class="flex-column my-auto">
+      <span class="text-capitalize text--white font-weight-bold body-2">{{ authorFullName }}</span>
     </div>
     <v-icon>
       mdi-chevron-right
     </v-icon>
     <div class="flex-column">
       <exo-space-avatar
+        v-if="space"
         :space="space"
         :size="32"
         :labels="labels"
-        class="align-center my-auto text-truncate white--text flex-grow-0 flex"
+        class="align-center my-auto text-truncate text-capitalize white--text flex-grow-0 flex"
         bold-title
         link-style />
     </div>
@@ -31,23 +45,29 @@
     </div>
     <div class="flex-column my-auto">
       <v-icon
-          class="likeIconStyle baseline-vertical-align ms-6 me-2"
-          size="14">
+        class="likeIconStyle baseline-vertical-align ms-6 me-2"
+        size="14">
         fa-thumbs-up
       </v-icon>
     </div>
     <div class="flex-column subtitle-2 my-auto me-4">
-      <span class="counterStyle">{{ likeSize }}</span>
+      <span class="counterStyle font-weight-bold">{{ likeSize }}</span>
     </div>
     <div class="flex-column my-auto">
       <v-icon
-          class="commentIconStyle baseline-vertical-align mx-auto me-2"
-          size="14">
+        class="commentIconStyle baseline-vertical-align mx-auto me-2"
+        size="14">
         fa-comment
       </v-icon>
     </div>
-    <div class="counterStyle flex-column subtitle-2 my-auto">
-      <span>{{ commentsSize }}</span>
+    <div class="counterStyle flex-column subtitle-2 my-auto me-4">
+      <span class="counterStyle font-weight-bold">{{ commentsSize }}</span>
+    </div>
+    <div class="flex-column my-auto">
+      <i class="uiIconWatch watchIconStyle baseline-vertical-align mx-auto me-2 mb-1"></i>
+    </div>
+    <div class="counterStyle flex-column subtitle-2 my-auto me-2">
+      <span class="counterStyle font-weight-bold">{{ viewsSize }}</span>
     </div>
   </div>
 </template>
@@ -67,6 +87,14 @@ export default {
       type: String,
       default: ''
     },
+    authorAvatarUrl: {
+      type: String,
+      default: ''
+    },
+    authorProfileUrl: {
+      type: String,
+      default: ''
+    },
     postDate: {
       type: String,
       default: ''
@@ -76,6 +104,7 @@ export default {
     space: null,
     commentsSize: 0,
     likeSize: 0,
+    viewsSize: 0,
   }),
   computed: {
     labels() {
@@ -93,7 +122,9 @@ export default {
     },
   },
   created() {
-    this.getSpaceById(this.spaceId);
+    if (this.spaceId) {
+      this.getSpaceById(this.spaceId);
+    }
     this.retrieveComments();
     this.getActivityById();
   },
@@ -109,6 +140,7 @@ export default {
     getActivityById() {
       this.loading = true;
       this.likeSize = 5;
+      this.viewsSize = 27;
     },
     retrieveComments() {
       this.loading = true;

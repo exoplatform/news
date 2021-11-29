@@ -29,6 +29,8 @@ export function getNewsList() {
       author: 'root',
       authorFullName: 'root root',
       authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
       spaceId: '3'
     },
     {
@@ -39,8 +41,10 @@ export function getNewsList() {
       url: '/portal/dw/activity?id=21',
       postDate: 'November 30',
       author: 'root',
-      authorFullName: 'Root Root',
-      authorDisplayName: 'John Wick',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
       spaceId: '3'
     },
     {
@@ -51,8 +55,10 @@ export function getNewsList() {
       url: '/portal/dw/activity?id=21',
       postDate: 'April 20',
       author: 'root',
-      authorFullName: 'Root Root',
-      authorDisplayName: 'John Wick',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
       spaceId: '3'
     },
     {
@@ -63,8 +69,10 @@ export function getNewsList() {
       url: '/portal/dw/activity?id=21',
       postDate: 'May 20',
       author: 'root',
-      authorFullName: 'Root Root',
-      authorDisplayName: 'John Wick',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
       spaceId: '3'
     },
   ];

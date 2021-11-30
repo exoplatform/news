@@ -35,7 +35,21 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getTargets( request);
+    Response response = newsTargetingRestResourcesV1.getTargets(request);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnOkWhenGetReferencedTargets() {
+    // Given
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+
+    // When
+    Response response = newsTargetingRestResourcesV1.getReferencedTargets(request);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

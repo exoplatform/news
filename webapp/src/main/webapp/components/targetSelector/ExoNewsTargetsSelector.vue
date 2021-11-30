@@ -141,7 +141,7 @@ export default {
     addTarget(items) {
       const selectedTargets = [];
       for (const item in items) {
-        selectedTargets.push(this.targets[item]);
+        selectedTargets.push(this.selectedTargets[item]);
       }
       this.$emit('selected-targets', selectedTargets);
     },

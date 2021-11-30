@@ -14,30 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.news.service;
+import {newsConstants} from '../js/newsConstants.js';
 
-import java.util.List;
+export function getAllTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    }
+  });
+}
 
-import org.exoplatform.news.rest.NewsTargetingEntity;
-import org.exoplatform.social.metadata.model.MetadataType;
-
-
-public interface NewsTargetingService {
-  
-  public static final MetadataType METADATA_TYPE = new MetadataType(4, "newsTarget");
-
-  /**
-   * Gets news targets
-   * 
-   * @return {@link List} of news targets
-   */
-  List<NewsTargetingEntity> getTargets();
-
-  /**
-   * Gets  referenced targets
-   *
-   * @return {@link List} of referenced targets
-   */
-  List<NewsTargetingEntity> getReferencedTargets();
-
+export function getReferencedTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    }
+  });
 }

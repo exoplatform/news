@@ -33,6 +33,8 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private static final String        LABEL           =  "label";
 
+  private static final String        REFERENCED           =  "referenced";
+
   private MetadataService        metadataService;
 
   public NewsTargetingServiceImpl(MetadataService metadataService){
@@ -44,6 +46,13 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(),  LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
+
+  @Override
+  public  List<NewsTargetingEntity> getReferencedTargets() {
+    List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), LIMIT);
+    return referencedTargets.stream().map(this::toEntity).collect(Collectors.toList());
+  }
+
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());

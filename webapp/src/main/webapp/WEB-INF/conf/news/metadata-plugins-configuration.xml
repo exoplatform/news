@@ -74,6 +74,10 @@
                   <key><string>label</string></key>
                   <value><string>Snapshot slider news</string></value>
                 </entry>
+                <entry>
+                  <key><string>referenced</string></key>
+                  <value><string>true</string></value>
+                </entry>
               </map>
             </field>
           </object>
@@ -106,6 +110,10 @@
                 <entry>
                   <key><string>label</string></key>
                   <value><string>Snapshot latest news</string></value>
+                </entry>
+                <entry>
+                  <key><string>referenced</string></key>
+                  <value><string>true</string></value>
                 </entry>
               </map>
             </field>

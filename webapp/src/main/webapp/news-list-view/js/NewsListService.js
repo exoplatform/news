@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {newsConstants} from '../../js/newsConstants.js';
 
 export function getNewsList() {
   let newsList = null;
@@ -77,17 +76,6 @@ export function getNewsList() {
     },
   ];
   return Promise.resolve(newsList);
-}
-
-export function getNewsTarget() {
-  return fetch(`${newsConstants.NEWS_API}/targeting`, {
-    credentials: 'include',
-    method: 'GET',
-  }).then((resp) => {
-    if (resp && resp.ok) {
-      return resp.json();
-    }
-  });
 }
 
 export function saveSettings(saveSettingsURL, settings) {

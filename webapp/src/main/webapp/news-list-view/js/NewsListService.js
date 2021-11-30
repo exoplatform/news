@@ -15,9 +15,67 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function getNewsList(newsTarget, limit) { // eslint-disable-line no-unused-vars
-  // TODO
-  return Promise.resolve([]);
+export function getNewsList() {
+  let newsList = null;
+  newsList = [
+    {
+      body: 'The eXo Platform is widely adopted by employees thanks to its simplicity and ease of use.\n',
+      id: '0a1853307f00010130cb81f7419ab5f0',
+      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg',
+      title: 'Welcome to your new digital workplace platform\n ',
+      url: '/portal/dw/activity?id=21',
+      postDate: 'March 18',
+      author: 'root',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
+      spaceId: '3'
+    },
+    {
+      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting',
+      id: '0a1853307f00010130cb81f7419ab5f0',
+      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg',
+      title: 'testing work2 ',
+      url: '/portal/dw/activity?id=21',
+      postDate: 'November 30',
+      author: 'root',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
+      spaceId: '3'
+    },
+    {
+      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting ',
+      id: '0a1853307f00010130cb81f7419ab5f0',
+      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg',
+      title: 'testing work3 ',
+      url: '/portal/dw/activity?id=21',
+      postDate: 'April 20',
+      author: 'root',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
+      spaceId: '3'
+    },
+    {
+      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting',
+      id: '0a1853307f00010130cb81f7419ab5f0',
+      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg',
+      title: 'testing work4 ',
+      url: '/portal/dw/activity?id=21',
+      postDate: 'May 20',
+      author: 'root',
+      authorFullName: 'root root',
+      authorDisplayName: 'Root Root',
+      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
+      authorProfileURL: '/portal/dw/profile/root',
+      spaceId: '3'
+    },
+  ];
+  return Promise.resolve(newsList);
 }
 
 export function saveSettings(saveSettingsURL, settings) {

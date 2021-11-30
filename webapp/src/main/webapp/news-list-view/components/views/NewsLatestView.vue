@@ -52,9 +52,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <v-list three-line class="flex transparent">
                       <v-list-item>
                         <v-list-item-content>
-                          <v-list-item-title class="subtitle-1 font-weight-bold text-uppercase white--text contentTitle" @click="openNews(newsInfo[0].url)">{{ newsInfo[0].title }}</v-list-item-title>
+                          <v-list-item-title>
+                            <exo-space-avatar
+                              v-if="space"
+                              :space="space"
+                              :size="32"
+                              :label="labels"
+                              class="align-center mainSpaceName subtitle-2 my-auto text-truncate text-capitalize white--text flex-grow-0 flex pb-2"
+                              link-style />
+                          </v-list-item-title>
                           <v-list-item-subtitle
-                            class="body-2 white--text contentBody"
+                            class="title mainNewsBody text-truncate font-weight-bold white--text"
                             @click="openNews(newsInfo[0].url)"
                             v-sanitized-html="newsInfo[0].body" />
                         </v-list-item-content>
@@ -68,7 +76,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             fa-thumbs-up
                           </v-icon>
                         </div>
-                        <div class="flex-column my-auto me-4">
+                        <div class="flex-column my-auto me-2">
                           <span>{{ likeSize }}</span>
                         </div>
                         <div class="flex-column my-auto">
@@ -113,7 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <v-list-item-content class="pt-0 pl-3">
                           <v-list-item-title
-                            class="subtitle-2 font-weight-bold text-capitalize newsRightTitle mb-1"
+                            class="subtitle-2 text-capitalize newsRightTitle mb-1"
                             style="margin-bottom: 0px"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.title" />
@@ -130,7 +138,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 fa-thumbs-up
                               </v-icon>
                             </div>
-                            <div class="flex-column subtitle-2 my-auto me-4">
+                            <div class="flex-column subtitle-2 my-auto me-2">
                               <span class="counterStyle">{{ likeSize }}</span>
                             </div>
                             <div class="flex-column my-auto">
@@ -220,7 +228,23 @@ export default {
     limit: 0,
     commentsSize: 0,
     likeSize: 0,
+    space: null,
   }),
+  computed: {
+    labels() {
+      return {
+        CancelRequest: this.$t('profile.CancelRequest'),
+        Confirm: this.$t('profile.Confirm'),
+        Connect: this.$t('profile.Connect'),
+        Ignore: this.$t('profile.Ignore'),
+        RemoveConnection: this.$t('profile.RemoveConnection'),
+        StatusTitle: this.$t('profile.StatusTitle'),
+        join: this.$t('space.join'),
+        leave: this.$t('space.leave'),
+        members: this.$t('space.members'),
+      };
+    },
+  },
   created() {
     this.getNewsList();
     this.retrieveComments();
@@ -235,11 +259,15 @@ export default {
         this.$newsListService.getNewsList(this.newsTarget, this.limit)
           .then(newsList => {
             this.newsInfo = newsList;
+            this.$root.$emit('news-retrieved');
             this.initialized = true;
             for (let i=0; i<this.newsInfo.length; i++) {
               if (this.newsInfo[i].illustrationURL === null) {
                 this.newsInfo[i].illustrationURL = '/news/images/news.png';
               }
+            }
+            if (this.newsInfo[0] && this.newsInfo[0].spaceId) {
+              this.getSpaceById(this.newsInfo[0].spaceId);
             }
           })
           .finally(() => this.initialized = false);
@@ -252,6 +280,14 @@ export default {
     retrieveComments() {
       this.loading = true;
       this.commentsSize = 3;
+    },
+    getSpaceById(spaceId) {
+      this.$spaceService.getSpaceById(spaceId, 'identity')
+        .then((space) => {
+          if (space && space.identity && space.identity.id) {
+            this.space = space;
+          }
+        });
     },
     openNews(url){
       if (url !== null){

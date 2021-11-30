@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="d-flex flex-row mx-3 my-1">
-    <div class="d-flex flex-column flex-grow-1 body-1 text-truncate text-uppercase grey--text my-auto">{{ headerLabel }}</div>
+    <div class="d-flex flex-column flex-grow-1 body-1 text-uppercase text-sub-title text-truncate my-auto">{{ headerLabel }}</div>
     <div class="d-flex flex-column me-2">
       <v-btn
         icon
@@ -47,16 +47,19 @@ export default {
   },
   data: () => ({
     canPublishNews: false,
-    news: null,
+    isFullNewsList: false,
   }),
   created() {
+    this.$root.$on('news-retrieved', ()=>{
+      this.isFullNewsList = true;
+    });
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
   },
   computed: {
     headerLabel() {
-      return this.news ? this.$t('news.latest.header'): this.$t('news.latest.header.post');
+      return this.isFullNewsList ? this.$t('news.latest.header'): this.$t('news.latest.header.post');
     }
   },
   methods: {

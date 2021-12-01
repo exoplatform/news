@@ -68,7 +68,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </v-list-item-content>
                       </v-list-item>
                       <div class="flex d-flex flex-row body-2 white--text my-auto ms-4 mt-2">
-                        <div class="flex-column my-auto me-2">{{ newsInfo[0].schedulePostDate }}</div>
+                        <div class="flex-column my-auto me-2">{{ newsInfo[0].postDate }}</div>
                         <div class="flex-column my-auto">
                           <v-icon
                             class="baseline-vertical-align white--text ms-6 me-2"
@@ -130,7 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
                           <div class="flex d-flex flex-row my-auto mt-1">
-                            <div class="flex-column subtitle-2 my-auto me-2 scheduleDateLatestNews"> {{ item.schedulePostDate }}</div>
+                            <div class="flex-column subtitle-2 my-auto me-2 scheduleDateLatestNews"> {{ item.postDate }}</div>
                             <div class="flex-column my-auto">
                               <v-icon
                                 class="likeIconStyle baseline-vertical-align ms-6 me-2"

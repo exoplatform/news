@@ -211,8 +211,7 @@ export default {
         this.$newsListService.getNewsList(this.newsTarget, this.limit)
           .then(newsList => {
             this.newsInfo = newsList;
-            if (this.newsInfo && this.newsInfo.length >0) {
-              this.$root.$emit('news-retrieved');
+            if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
               this.getSpaceById(this.newsInfo[0].spaceId);
             }
             this.initialized = true;

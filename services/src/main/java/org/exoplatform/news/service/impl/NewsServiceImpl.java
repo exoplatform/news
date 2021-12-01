@@ -43,6 +43,8 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
+import javax.ws.rs.core.Response;
+
 /**
  * Service managing News and storing them in ECMS
  */
@@ -200,6 +202,8 @@ public class NewsServiceImpl implements NewsService {
       news.setCanPublish(canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
       return news;
+    } catch (IllegalAccessException e) {
+      throw new IllegalAccessException("User " + currentIdentity.getUserId()+ " attempt to access unauthorized news with id {}" + newsId);
     } catch (Exception e) {
       throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
     }

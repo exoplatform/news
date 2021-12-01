@@ -7,8 +7,9 @@ export function getNewsById(id, editMode) {
   }).then((resp) => {
     if (resp && resp.ok) {
       return resp.json();
+    } else {
+      return resp.status;
     }
-    return null;
   }).then(resp => {
     return resp;
   });

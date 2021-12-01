@@ -279,23 +279,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         ref="selectVisibilityDialog"
         :items="items" />
     </div>
-    
-    <div v-show="!canCreatNews && !loading" class="newsComposer">
-      <div id="form_msg_error" class="alert alert-error">
-        <span data-dismiss="alert">
-          <i class="uiIconColorError pull-left"></i>
-        </span>
-        <div class="msg_error">
-          <div>
-            <span class="msg_permission_denied">{{ $t("news.permission.denied") }}</span>
-          </div>
-          <div>
-            <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
-          </div>
-        </div>
+
+    <div v-show="(!canCreatNews && !loading) || unAuthorizedAccess" class="newsComposer">
+      <div class="articleNotFound">
+        <i class="iconNotFound"></i>
+        <h3>{{ $t('news.details.restricted') }}</h3>
       </div>
-    </div>
-  </v-app>
+    </div>  </v-app>
 </template>
 
 <script>
@@ -389,6 +379,7 @@ export default {
       scheduleMode: '',
       switchView: false,
       spaceDisplayName: '',
+      unAuthorizedAccess: false,
     };
   },
   computed: {
@@ -663,7 +654,7 @@ export default {
       const self = this;
       this.$newsServices.getNewsById(newsId, true)
         .then(fetchedNode => {
-          if (fetchedNode){
+          if (fetchedNode && fetchedNode.id){
             this.news.id = fetchedNode.id;
             this.news.title = fetchedNode.title;
             this.news.summary = fetchedNode.summary;
@@ -712,6 +703,7 @@ export default {
               self.initDone = true;
             });
           } else {
+            this.unAuthorizedAccess = true;
             self.initDone = true;
           }
         });

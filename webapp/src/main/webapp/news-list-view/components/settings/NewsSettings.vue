@@ -26,7 +26,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="d-flex flex-column justify-end my-auto">
       <v-btn
-        v-if="canPublishNews"
         depressed
         small
         class="caption text-uppercase grey--text my-auto me-2"
@@ -39,27 +38,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
-  props: {
-    hover: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data: () => ({
-    canPublishNews: false,
-    isFullNewsList: false,
+    noNews: true,
   }),
   created() {
     this.$root.$on('news-retrieved', ()=>{
-      this.isFullNewsList = true;
-    });
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
+      this.noNews = false;
     });
   },
   computed: {
     headerLabel() {
-      return this.isFullNewsList ? this.$t('news.latest.header'): this.$t('news.latest.header.post');
+      return this.noNews ? this.$t('news.latest.header.post') : this.$t('news.latest.header');
     }
   },
   methods: {

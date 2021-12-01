@@ -130,7 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
                           <div class="flex d-flex flex-row my-auto mt-1">
-                            <div class="flex-column subtitle-2 my-auto me-2 scheduleDateLatestNews"> {{ item.postDate }}</div>
+                            <div class="flex-column subtitle-2 my-auto me-2 postDateNews"> {{ item.postDate }}</div>
                             <div class="flex-column my-auto">
                               <v-icon
                                 class="likeIconStyle baseline-vertical-align ms-6 me-2"
@@ -158,55 +158,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   </v-list>
                 </v-layout>
               </v-flex>
-              <div v-if="newsInfo.length === 0" class="noNews mx-auto">
-                <div class="noNewsContent">
-                  <i class="uiNoNewsIcon"></i>
-                  <div class="noNewsTitle">{{ $t('news.latest.noNews') }}</div>
-                </div>
-              </div>
             </v-layout>
-
-            <v-carousel
-              v-if="newsInfo.length !== 0"
-              :height="250"
-              class="d-sm-none carousel-news"
-              touch
-              hide-delimiters>
-              <v-carousel-item
-                v-for="(slide, index) of newsInfo"
-                :key="index"
-                :src="slide.illustrationURL"
-                aspect-ratio="2.3"
-                @click="openNews(slide.url)">
-                <v-sheet
-                  color="transparent news-text"
-                  height="50%"
-                  width="100%"
-                  class="mx-auto"
-                  tile>
-                  <v-list three-line class="flex item-lightbox">
-                    <v-list-item class="px-2">
-                      <v-list-item-content class="py-0">
-                        <v-list-item-title
-                          class="font-weight-bold text-uppercase white--text"
-                          @click="openNews(slide.url)"
-                          v-sanitized-html="slide.title" />
-                        <v-list-item-subtitle
-                          class="body-2 white--text"
-                          @click="openNews(slide.url)"
-                          v-sanitized-html="slide.body" />
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-sheet>
-              </v-carousel-item>
-            </v-carousel>
-            <div v-else class="d-sm-none noNews">
-              <div class="noNewsContent">
-                <i class="uiNoNewsIcon"></i>
-                <div class="noNewsTitle">{{ $t('news.latest.noNews') }}</div>
-              </div>
-            </div>
           </v-flex>
         </v-layout>
       </v-container>
@@ -259,16 +211,16 @@ export default {
         this.$newsListService.getNewsList(this.newsTarget, this.limit)
           .then(newsList => {
             this.newsInfo = newsList;
-            this.$root.$emit('news-retrieved');
-            this.initialized = true;
-            for (let i=0; i<this.newsInfo.length; i++) {
-              if (this.newsInfo[i].illustrationURL === null) {
-                this.newsInfo[i].illustrationURL = '/news/images/news.png';
-              }
-            }
-            if (this.newsInfo[0] && this.newsInfo[0].spaceId) {
+            if (this.newsInfo && this.newsInfo.length >0) {
+              this.$root.$emit('news-retrieved');
               this.getSpaceById(this.newsInfo[0].spaceId);
             }
+            this.initialized = true;
+            this.newsInfo.forEach(function (item, i) {
+              if (item.illustrationURL === null) {
+                this.newsInfo[i].illustrationURL = '/news/images/news.png';
+              }
+            });
           })
           .finally(() => this.initialized = false);
       }
@@ -291,7 +243,7 @@ export default {
     },
     openNews(url){
       if (url !== null){
-        window.location.href =url;
+        window.location.href = url;
       }
     },
   }

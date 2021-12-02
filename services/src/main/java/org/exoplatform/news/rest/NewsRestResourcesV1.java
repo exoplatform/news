@@ -13,6 +13,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.social.metadata.favorite.FavoriteService;
+import org.exoplatform.social.rest.impl.favorite.FavoriteRest;
 import org.picocontainer.Startable;
 
 import org.exoplatform.common.http.HTTPStatus;
@@ -44,27 +46,30 @@ import io.swagger.jaxrs.PATCH;
 @Api(tags = "v1/news", value = "v1/news", description = "Managing news")
 public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
-  private static final Log       LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
+  private static final Log         LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
 
-  private static final String    PUBLISHER_MEMBERSHIP_NAME       = "publisher";
+  private static final String      PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
-  private final static String    PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  //private final static String    PLATFORM_ADMINISTRATORS_GROUP = "/platform/administrators";
+  // private final static String PLATFORM_ADMINISTRATORS_GROUP =
+  // "/platform/administrators";
 
-  private NewsService            newsService;
+  private NewsService              newsService;
 
-  private NewsAttachmentsStorage newsAttachmentsService;
+  private NewsAttachmentsStorage   newsAttachmentsService;
 
-  private SpaceService           spaceService;
+  private SpaceService             spaceService;
 
-  private IdentityManager        identityManager;
+  private IdentityManager          identityManager;
 
   private ScheduledExecutorService scheduledExecutor;
 
-  private PortalContainer        container;
+  private PortalContainer          container;
 
-  private Map<String, String>    newsToDeleteQueue = new HashMap<>();
+  private FavoriteService          favoriteService;
+
+  private Map<String, String>      newsToDeleteQueue               = new HashMap<>();
 
   private enum FilterType {
     PINNED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
@@ -493,9 +498,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                          @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,
                          @ApiParam(value = "Properties to expand", required = false) @QueryParam("expand") String expand,
                          @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam("offset") int offset,
-                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit) throws Exception {
+                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit,
+                         @ApiParam(value = "Favorites", required = false, defaultValue = "false") @QueryParam("favorites") boolean favorites) {
 
-    if (StringUtils.isBlank(query)) {
+    if (StringUtils.isBlank(query) && !favorites) {
       return Response.status(Response.Status.BAD_REQUEST).entity("'query' parameter is mandatory").build();
     }
 
@@ -508,12 +514,19 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     if (limit < 0) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Limit must be positive").build();
     }
-    List<NewsESSearchResult> searchResults = newsService.search(currentIdentity, query, offset, limit);
-    List<NewsSearchResultEntity> results = searchResults.stream().map(searchResult -> {
-      NewsSearchResultEntity entity = new NewsSearchResultEntity(searchResult);
-      entity.setPoster(EntityBuilder.buildEntityIdentity(searchResult.getPoster(), uriInfo.getPath(), "all"));
-      return entity;
-    }).collect(Collectors.toList());
+    NewsFilter filter = new NewsFilter();
+    filter.setSearchText(query);
+    filter.setFavorites(favorites);
+    filter.setLimit(limit);
+    filter.setOffset(offset);
+    List<NewsESSearchResult> searchResults = newsService.search(currentIdentity, filter);
+    List<NewsSearchResultEntity> results =
+                                         searchResults.stream()
+                                                      .map(searchResult -> org.exoplatform.news.utils.EntityBuilder.fromNewsSearchResult(favoriteService,
+                                                                                                                                         searchResult,
+                                                                                                                                         currentIdentity,
+                                                                                                                                         uriInfo))
+                                                      .collect(Collectors.toList());
 
     return Response.ok(results).build();
   }

@@ -566,11 +566,11 @@ public class NewsServiceImpl implements NewsService {
     if (authenticatedUser.equals(posterUsername) || spaceService.isSuperManager(authenticatedUser)) {
       return true;
     }
-    Space currentSpace = spaceService.getSpaceById(spaceId);
-    if (spaceService.isManager(currentSpace, authenticatedUser)) {
+    boolean spaceHasARedactor = space != null && space.getRedactors() != null && space.getRedactors().length > 0;
+    if (spaceService.isManager(space, authenticatedUser) && spaceHasARedactor) {
       return true;
     }
-    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
+    if (spaceService.isRedactor(space, authenticatedUser) && news.isDraftVisible()) {
       return true;
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);

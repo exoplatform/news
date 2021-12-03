@@ -321,6 +321,7 @@ export default {
         summary: '',
         illustration: [],
         attachments: [],
+        targets: [],
         spaceId: '',
         published: false,
         archived: false,
@@ -741,9 +742,10 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted) {
+    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets) {
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
+      this.news.targets = selectedTargets;
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {
@@ -772,6 +774,7 @@ export default {
         attachments: this.news.attachments,
         published: this.news.published,
         draftVisible: this.news.draftVisible,
+        targets: this.news.targets,
         spaceId: this.spaceId,
         publicationState: 'published',
         schedulePostDate: null,

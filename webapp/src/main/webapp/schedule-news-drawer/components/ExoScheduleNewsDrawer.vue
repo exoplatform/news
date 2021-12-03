@@ -438,7 +438,7 @@ export default {
         });
     },
     postArticle() {
-      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted);
+      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted, this.selectedTargets);
     },
     closeDrawer() {
       if (this.news) {
@@ -454,8 +454,8 @@ export default {
     nextStep() {
       this.stepper++;
     },
-    getSelectedTargets(event) {
-      this.selectedTargets = event;
+    getSelectedTargets(selectedTargets) {
+      this.selectedTargets = selectedTargets;
     },
   }
 };

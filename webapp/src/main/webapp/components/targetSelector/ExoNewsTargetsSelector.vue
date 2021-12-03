@@ -33,7 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         multiple
         dense
         outlined
-        @change="addTarget(selectedTargets)">
+        @change="addTarget()">
         <template v-slot:prepend-item>
           <v-list-item
             ripple
@@ -115,12 +115,13 @@ export default {
     }
   },
   created() {
+    this.getReferencedTargets();
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
       }
     });
-    this.getReferencedTargets();
+    this.selectedTargets = this.news.targets;
   },
   methods: {
     removeTarget(item) {
@@ -133,17 +134,17 @@ export default {
         if (this.selectAllTargets) {
           this.selectedTargets = [];
         } else {
-          this.selectedTargets = this.referencedTargets.slice();
+          const selectedTargets = [];
+          for (const item in this.referencedTargets) {
+            selectedTargets.push(this.referencedTargets[item].name);
+          }
+          this.selectedTargets = selectedTargets;
         }
         this.$emit('selected-targets', this.selectedTargets);
       });
     },
-    addTarget(items) {
-      const selectedTargets = [];
-      for (const item in items) {
-        selectedTargets.push(this.selectedTargets[item]);
-      }
-      this.$emit('selected-targets', selectedTargets);
+    addTarget() {
+      this.$emit('selected-targets', this.selectedTargets);
     },
     getReferencedTargets() {
       this.$newsTargetingService.getReferencedTargets()

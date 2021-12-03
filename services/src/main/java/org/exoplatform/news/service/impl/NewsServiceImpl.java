@@ -1,9 +1,6 @@
 package org.exoplatform.news.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -54,7 +51,7 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String   NEWS_ID                         = "newsId";
 
-  private SpaceService          spaceService;
+  public SpaceService          spaceService;
 
   private ActivityManager       activityManager;
 
@@ -314,8 +311,8 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public List<NewsESSearchResult> search(Identity currentIdentity, String term, int offset, int limit) {
-    return newsESSearchConnector.search(currentIdentity, term, offset, limit);
+  public List<NewsESSearchResult> search(Identity currentIdentity, NewsFilter filter) {
+    return newsESSearchConnector.search(currentIdentity, filter);
   }
   
   /**

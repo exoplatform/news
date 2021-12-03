@@ -312,6 +312,7 @@ export default {
         summary: '',
         illustration: [],
         attachments: [],
+        targets: [],
         spaceId: '',
         published: false,
         archived: false,
@@ -509,6 +510,7 @@ export default {
       this.openApp();
     });
     this.$root.$on('update-visibility', this.updateVisibility);
+    this.$root.$on('referenced-selected-targets', this.getSelectedTargets);
   },
   methods: {
     initCKEditor: function() {
@@ -761,6 +763,7 @@ export default {
         attachments: this.news.attachments,
         published: this.news.published,
         draftVisible: this.news.draftVisible,
+        targets: this.news.targets,
         spaceId: this.spaceId,
         publicationState: 'published',
         schedulePostDate: null,
@@ -926,6 +929,7 @@ export default {
         publicationState: publicationState,
         draftVisible: this.draftVisible,
         activityPosted: this.news.activityPosted,
+        targets: this.news.targets,
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;
@@ -1033,6 +1037,9 @@ export default {
         this.news.draftVisible = visibility;
         this.updateDraftVisibility();
       }
+    },
+    getSelectedTargets(targets){
+      this.news.targets = targets;
     },
     changeView() {
       const elementNewTop = document.getElementById('newsTop');

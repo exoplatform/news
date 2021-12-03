@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,8 @@ import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.model.NewsObject;
+import org.exoplatform.news.model.NewsTargetsName;
 import org.exoplatform.news.notification.plugin.MentionInNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PostNewsNotificationPlugin;
 import org.exoplatform.news.notification.plugin.PublishNewsNotificationPlugin;
@@ -25,12 +28,15 @@ import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.storage.NewsStorage;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
+import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -40,6 +46,10 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.Metadata;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataKey;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
@@ -68,6 +78,8 @@ public class NewsServiceImpl implements NewsService {
 
   private UserACL               userACL;
 
+  private NewsTargetingService               newsTargetingService;
+
   private static final Log      LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(SpaceService spaceService,
@@ -77,7 +89,8 @@ public class NewsServiceImpl implements NewsService {
                          NewsESSearchConnector newsESSearchConnector,
                          IndexingService indexingService,
                          NewsStorage newsStorage,
-                         UserACL userACL) {
+                         UserACL userACL,
+                         NewsTargetingService newsTargetingService) {
     this.spaceService = spaceService;
     this.activityManager = activityManager;
     this.identityManager = identityManager;
@@ -85,6 +98,7 @@ public class NewsServiceImpl implements NewsService {
     this.indexingService = indexingService;
     this.newsStorage = newsStorage;
     this.userACL = userACL;
+    this.newsTargetingService = newsTargetingService;
   }
 
   /**
@@ -100,6 +114,7 @@ public class NewsServiceImpl implements NewsService {
       News createdNews;
       if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
         createdNews = postNews(news, currentIdentity.getUserId());
+        newsTargetingService.linkNewsToTargets(news);
       } else if(news.getSchedulePostDate() != null){
         createdNews = unScheduleNews(news, currentIdentity);
       } else {
@@ -142,7 +157,8 @@ public class NewsServiceImpl implements NewsService {
         unpublishNews(news.getId());
       }
     }
-    
+
+    newsTargetingService.linkNewsToTargets(news);
     newsStorage.updateNews(news);
     
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
@@ -188,6 +204,7 @@ public class NewsServiceImpl implements NewsService {
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
     try {
       News news = getNewsById(newsId, editMode);
+      List<String> selectedTargets = newsTargetingService.getSelectedTargets(newsId);
       if (editMode) {
         if (!canEditNews(news, currentIdentity.getUserId())) {
           throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
@@ -199,6 +216,7 @@ public class NewsServiceImpl implements NewsService {
       news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
       news.setCanPublish(canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
+      news.setTargets(selectedTargets);
       return news;
     } catch (Exception e) {
       throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
@@ -292,6 +310,7 @@ public class NewsServiceImpl implements NewsService {
     if (!canScheduleNews(space, currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
     }
+    newsTargetingService.linkNewsToTargets(news);
     return newsStorage.scheduleNews(news);
   }
 
@@ -582,4 +601,5 @@ public class NewsServiceImpl implements NewsService {
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
         || spaceService.isManager(currentSpace, authenticatedUser);
   }
+
 }

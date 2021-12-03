@@ -102,4 +102,6 @@ public class News {
   private String               timeZoneId;
 
   private boolean              activityPosted;
+
+  private List<String>              targets;
 }

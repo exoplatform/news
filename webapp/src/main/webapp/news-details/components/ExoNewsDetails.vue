@@ -77,6 +77,7 @@ export default {
     return {
       currentSpace: null,
       spaceId: null,
+      selectedTargets: [],
       BYTES_IN_MB: 1048576,
       dateFormat: {
         year: 'numeric',
@@ -97,6 +98,7 @@ export default {
   created() {
     this.$root.$on('delete-news', this.deleteConfirmDialog);
     this.$root.$on('edit-news', this.editLink);
+    this.$root.$on('referenced-selected-targets', this.getSelectedTargets);
     if (!this.news || !this.news.spaceId) {
       this.getNewsById(this.newsId);
     } else {
@@ -134,6 +136,9 @@ export default {
       const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_target');
     },
+    getSelectedTargets(selectedTargets) {
+      this.selectedTargets = selectedTargets;
+    },
     deleteConfirmDialog() {
       this.$refs.deleteConfirmDialog.open();
     },
@@ -155,6 +160,7 @@ export default {
       this.news.timeZoneId = USER_TIMEZONE_ID;
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
+      this.news.targets = this.selectedTargets;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

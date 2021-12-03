@@ -183,6 +183,7 @@ export default {
       if (this.news) {
         this.publish = this.news.published;
         this.isActivityPosted = !this.news.activityPosted;
+        this.selectedTargets = this.news.targets;
       }
       if (this.$refs.postNewsDrawer) {
         this.disabled = true;
@@ -191,11 +192,13 @@ export default {
     },
     getSelectedTargets(event) {
       this.selectedTargets = event;
+      this.$root.$emit('referenced-selected-targets', event);
     },
     updateNews() {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
+      this.news.targets  = this.selectedTargets ;
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         this.$emit('refresh-news', this.news.newsId);

@@ -141,13 +141,15 @@ export default {
     addTarget(items) {
       const selectedTargets = [];
       for (const item in items) {
-        selectedTargets.push(this.targets[item]);
+        selectedTargets.push(this.selectedTargets[item]);
       }
-      this.$emit('selected-targets', selectedTargets);
+      this.$emit('selected-targets', this.selectedTargets);
+      this.$root.$emit('referenced-selected-targets', this.selectedTargets);
     },
     getReferencedTargets() {
       this.$newsTargetingService.getReferencedTargets()
         .then(referencedTargets => this.referencedTargets = referencedTargets);
+      this.selectedTargets = this.news.targets;
     },
   }
 };

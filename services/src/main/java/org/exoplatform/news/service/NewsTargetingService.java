@@ -18,6 +18,7 @@ package org.exoplatform.news.service;
 
 import java.util.List;
 
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.social.metadata.model.MetadataType;
 
@@ -34,10 +35,24 @@ public interface NewsTargetingService {
   List<NewsTargetingEntity> getTargets();
 
   /**
+   * Gets selected news targets
+   * @param newsId
+   * @return {@link List} of selected news targets
+   */
+  List<String> getSelectedTargets(String newsId);
+
+  /**
    * Gets  referenced targets
    *
    * @return {@link List} of referenced targets
    */
   List<NewsTargetingEntity> getReferencedTargets();
+
+
+  /**
+   * Link news to their targets
+   *@param news
+   */
+  void  linkNewsToTargets(News news);
 
 }

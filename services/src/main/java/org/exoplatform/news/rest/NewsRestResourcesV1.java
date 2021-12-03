@@ -79,13 +79,15 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                              NewsAttachmentsStorage newsAttachmentsService,
                              SpaceService spaceService,
                              IdentityManager identityManager,
-                             PortalContainer container) {
+                             PortalContainer container,
+                             FavoriteService favoriteService) {
 
     this.newsService = newsService;
     this.newsAttachmentsService = newsAttachmentsService;
     this.spaceService = spaceService;
     this.identityManager = identityManager;
     this.container = container;
+    this.favoriteService = favoriteService;
   }
 
   @Override

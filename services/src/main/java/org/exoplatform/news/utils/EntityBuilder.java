@@ -7,6 +7,7 @@ import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.favorite.model.Favorite;
+
 public class EntityBuilder {
   public static final NewsSearchResultEntity fromNewsSearchResult(FavoriteService favoriteService,
                                                                   NewsESSearchResult newsESSearchResult,

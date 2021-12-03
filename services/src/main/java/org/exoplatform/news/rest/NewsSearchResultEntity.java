@@ -113,6 +113,6 @@ public class NewsSearchResultEntity extends BaseEntity {
   }
 
   public void setFavorite(boolean favorite) {
-    this.favorite = favorite;
+    favorite = favorite;
   }
 }

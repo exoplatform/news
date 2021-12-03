@@ -45,44 +45,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <v-img
                   v-if="newsInfo && typeof newsInfo[0] !== 'undefined'"
                   :src="newsInfo[0].illustrationURL"
-                  class="firstNewsImg"
                   aspect-ratio="2.3"
+                  class="leftSideNewsImg"
                   @click="openNews(newsInfo[0].url)">
-                  <v-row align="end" class="lightbox white--text pa-2 fill-height">
-                    <v-list three-line class="flex transparent">
+                  <v-row align="end" class="white--text pa-2 fill-height">
+                    <v-list three-line class="flex leftSideText transparent">
                       <v-list-item>
                         <v-list-item-content>
                           <v-list-item-title>
-                            <exo-space-avatar
-                              v-if="space"
-                              :space="space"
-                              :size="32"
-                              :label="labels"
-                              class="align-center mainSpaceName subtitle-2 my-auto text-truncate text-capitalize white--text flex-grow-0 flex pb-2"
-                              link-style />
+                            <div class="flex d-flex flex-row">
+                              <div class="flex-column newsSpaceInfos me-2 my-auto">
+                                <a :href="spaceUrl">
+                                  <img :src="spaceAvatarUrl">
+                                </a>
+                              </div>
+                              <div class="flex-column text--white my-auto">
+                                <a :href="spaceUrl">
+                                  <span class="text-capitalize spaceName">{{ spaceDisplayName }}</span>
+                                </a>
+                              </div>
+                            </div>
                           </v-list-item-title>
                           <v-list-item-subtitle
-                            class="title mainNewsBody text-truncate font-weight-bold white--text"
+                            class="mainNewsBody text-truncate white--text"
                             @click="openNews(newsInfo[0].url)"
                             v-sanitized-html="newsInfo[0].body" />
                         </v-list-item-content>
                       </v-list-item>
-                      <div class="flex d-flex flex-row body-2 white--text my-auto ms-4 mt-2">
-                        <div class="flex-column my-auto me-2">{{ newsInfo[0].postDate }}</div>
+                      <div class="flex d-flex flex-row white--text my-auto ms-4 mt-2">
+                        <div class="flex-column my-auto me-2 leftPostDate">{{ newsInfo[0].postDate }}</div>
                         <div class="flex-column my-auto">
                           <v-icon
                             class="baseline-vertical-align white--text ms-6 me-2"
-                            size="14">
+                            size="12">
                             fa-thumbs-up
                           </v-icon>
                         </div>
-                        <div class="flex-column my-auto me-2">
+                        <div class="flex-column my-auto me-2 leftTextSize">
                           <span>{{ likeSize }}</span>
                         </div>
                         <div class="flex-column my-auto">
                           <v-icon
-                            class="baseline-vertical-align white--text mx-auto me-2"
-                            size="14">
+                            class="baseline-vertical-align white--text mx-auto me-2 leftTextSize"
+                            size="12">
                             fa-comment
                           </v-icon>
                         </div>
@@ -103,14 +108,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   row
                   wrap
                   mx-0
-                  pl-3
+                  pl-2
                   class="news-right-list">
                   <v-list
                     three-line
-                    class="d-xs-none py-1 list-news">
-                    <template v-for="item of newsInfo.slice(1)">
+                    class="d-xs-none py-0 list-news">
+                    <template v-for="(item, index) of newsInfo.slice(1)">
                       <v-list-item
                         :key="item.title"
+                        :id="`item-news${index}`"
+                        @mouseenter="applyItemClass(index)"
+                        @mouseleave="applyItemClass(index)"
                         class="px-0 news-item">
                         <v-list-item-avatar
                           tile
@@ -119,36 +127,36 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                           <v-img :src="item.illustrationURL" @click="openNews(item.url)" />
                         </v-list-item-avatar>
 
-                        <v-list-item-content class="pt-0 pl-3">
+                        <v-list-item-content class="pt-0 pl-3 my-auto">
                           <v-list-item-title
-                            class="subtitle-2 text-capitalize newsRightTitle mb-1"
+                            class="text-capitalize newsRightTitle mb-1"
                             style="margin-bottom: 0px"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.title" />
                           <v-list-item-subtitle
-                            class="font-weight-bold newsRightBody"
+                            class="newsRightBody my-2"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
-                          <div class="flex d-flex flex-row my-auto mt-1">
-                            <div class="flex-column subtitle-2 my-auto me-2 postDateNews"> {{ item.postDate }}</div>
+                          <div class="flex d-flex flex-row my-auto">
+                            <div class="flex-column my-auto me-2 postDateNews"> {{ item.postDate }}</div>
                             <div class="flex-column my-auto">
                               <v-icon
                                 class="likeIconStyle baseline-vertical-align ms-6 me-2"
-                                size="14">
+                                size="12">
                                 fa-thumbs-up
                               </v-icon>
                             </div>
-                            <div class="flex-column subtitle-2 my-auto me-2">
+                            <div class="flex-column my-auto me-2">
                               <span class="counterStyle">{{ likeSize }}</span>
                             </div>
                             <div class="flex-column my-auto">
                               <v-icon
                                 class="commentIconStyle baseline-vertical-align mx-auto me-2"
-                                size="14">
+                                size="12">
                                 fa-comment
                               </v-icon>
                             </div>
-                            <div class="counterStyle flex-column subtitle-2 my-auto">
+                            <div class="counterStyle flex-column my-auto">
                               <span>{{ commentsSize }}</span>
                             </div>
                           </div>
@@ -181,6 +189,7 @@ export default {
     commentsSize: 0,
     likeSize: 0,
     space: null,
+    isHovered: false,
   }),
   computed: {
     labels() {
@@ -196,6 +205,20 @@ export default {
         members: this.$t('space.members'),
       };
     },
+    spaceUrl() {
+      let groupId;
+      if (this.space && this.space.groupId) {
+        groupId = this.space.groupId.replace(/\//g, ':');
+        return `${eXo.env.portal.context}/g/${groupId}/`;
+      }
+      return `${eXo.env.portal.context}/dw/home/`;
+    },
+    spaceAvatarUrl() {
+      return this.space && this.space.avatarUrl;
+    },
+    spaceDisplayName() {
+      return this.space && this.space.displayName;
+    }
   },
   created() {
     this.getNewsList();
@@ -245,6 +268,11 @@ export default {
         window.location.href = url;
       }
     },
+    applyItemClass(index) {
+      this.isHovered = !this.isHovered;
+      const elementNewTop = document.getElementById(`item-news${index}`);
+      return this.isHovered ? elementNewTop.classList.add('newsRightBodyHover') : elementNewTop.classList.remove('newsRightBodyHover');
+    }
   }
 };
 </script>

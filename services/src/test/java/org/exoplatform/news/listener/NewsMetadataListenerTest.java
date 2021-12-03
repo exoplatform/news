@@ -2,25 +2,27 @@ package org.exoplatform.news.listener;
 
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-
 import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("unchecked")
-public class NewsMetadataListenerTest{
+public class NewsMetadataListenerTest {
 
   private static final String METADATA_TYPE_NAME = "testMetadataListener";
 
@@ -28,13 +30,22 @@ public class NewsMetadataListenerTest{
   private IndexingService     indexingService;
 
   @Mock
-  private NewsService newsService;
+  private NewsService         newsService;
+
+  @Mock
+  private FavoriteService     favoriteService;
+
+  @Mock
+  private IdentityManager     identityManager;
 
   @Test
   public void testReindexNewsWhenNewsSetAsFavorite() throws Exception {
-    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService, newsService);
+    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
+                                                                         newsService,
+                                                                         favoriteService,
+                                                                         identityManager);
     setCurrentUser("john");
-    MetadataItem metadataItem =  mock(MetadataItem.class);
+    MetadataItem metadataItem = mock(MetadataItem.class);
     Event<Long, MetadataItem> event = mock(Event.class);
     lenient().when(event.getData()).thenReturn(metadataItem);
     lenient().when(event.getData().getObjectType()).thenReturn("news");
@@ -47,10 +58,13 @@ public class NewsMetadataListenerTest{
 
   @Test
   public void testReindexActivityWhenNewsSetAsFavorite() throws Exception {
-    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService, newsService);
+    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
+                                                                         newsService,
+                                                                         favoriteService,
+                                                                         identityManager);
     Identity johnIdentity = new Identity("1", Collections.singletonList(new MembershipEntry("john")));
     ConversationState.setCurrent(new ConversationState(johnIdentity));
-    MetadataItem metadataItem =  mock(MetadataItem.class);
+    MetadataItem metadataItem = mock(MetadataItem.class);
     Event<Long, MetadataItem> event = mock(Event.class);
     lenient().when(event.getData()).thenReturn(metadataItem);
     lenient().when(event.getData().getObjectType()).thenReturn("activity");
@@ -58,8 +72,16 @@ public class NewsMetadataListenerTest{
     News news = new News();
     news.setId("1234");
     lenient().when(newsService.getNewsByActivityId("1", johnIdentity)).thenReturn(news);
+    org.exoplatform.social.core.identity.model.Identity userIdentity =
+                                                                     new org.exoplatform.social.core.identity.model.Identity(OrganizationIdentityProvider.NAME,
+                                                                                                                             "john");
+    userIdentity.setId("1");
+    lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
 
     newsActivityListener.onEvent(event);
+    verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);
+    verify(favoriteService, times(1)).createFavorite(any());
+    verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, news.getId());
   }
 
   private void setCurrentUser(final String name) {

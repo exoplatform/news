@@ -182,6 +182,7 @@ public class NewsESSearchConnector {
         newsSearchResult.setPostedTime(postedTime);
         newsSearchResult.setLastUpdatedTime(lastUpdatedTime);
         newsSearchResult.setSpaceDisplayName(spaceDisplayName);
+        newsSearchResult.setActivityId(Long.parseLong(newsActivityId));
 
         String portalName = PortalContainer.getCurrentPortalContainerName();
         String portalOwner = CommonsUtils.getCurrentPortalOwner();

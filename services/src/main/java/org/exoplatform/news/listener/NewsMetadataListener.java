@@ -10,7 +10,11 @@ import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.processor.MetadataActivityProcessor;
+import org.exoplatform.social.metadata.favorite.FavoriteService;
+import org.exoplatform.social.metadata.favorite.model.Favorite;
 import org.exoplatform.social.metadata.model.MetadataItem;
 
 public class NewsMetadataListener extends Listener<Long, MetadataItem> {
@@ -19,9 +23,18 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
   private final NewsService     newsService;
 
-  public NewsMetadataListener(IndexingService indexingService, NewsService newsService) {
+  private final FavoriteService favoriteService;
+
+  private final IdentityManager identityManager;
+
+  public NewsMetadataListener(IndexingService indexingService,
+                              NewsService newsService,
+                              FavoriteService favoriteService,
+                              IdentityManager identityManager) {
     this.indexingService = indexingService;
     this.newsService = newsService;
+    this.favoriteService = favoriteService;
+    this.identityManager = identityManager;
   }
 
   @Override
@@ -36,6 +49,16 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, objectId);
     } else if (StringUtils.equals(objectType, MetadataActivityProcessor.ACTIVITY_METADATA_OBJECT_TYPE)) {
       News news = newsService.getNewsByActivityId(objectId, currentIdentity);
+      if (currentIdentity != null) {
+        org.exoplatform.social.core.identity.model.Identity userIdentity =
+                                                                         identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME,
+                                                                                                             currentIdentity.getUserId());
+        Favorite favorite = new Favorite(NewsUtils.NEWS_METADATA_OBJECT_TYPE,
+                                         news.getId(),
+                                         "",
+                                         Long.parseLong(userIdentity.getId()));
+        favoriteService.createFavorite(favorite);
+      }
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, news.getId());
     }
   }

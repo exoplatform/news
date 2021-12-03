@@ -371,8 +371,6 @@ public class NewsServiceImpl implements NewsService {
     if (sharedActivityId != null) {
       NewsUtils.broadcastEvent(NewsUtils.SHARE_NEWS, userIdentity.getRemoteId(), news);
     }
-    String n ="120D";
-    n.endsWith("");
   }
 
   /**

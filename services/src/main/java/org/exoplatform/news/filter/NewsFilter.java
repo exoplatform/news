@@ -14,7 +14,7 @@ public class NewsFilter {
   private boolean      archivedNews;
 
   private boolean      draftNews;
-  
+
   private boolean      scheduledNews;
 
   private String       searchText;
@@ -23,9 +23,11 @@ public class NewsFilter {
 
   private List<String> spaces;
 
-  private String author;
+  private String       author;
 
-  private int offset;
+  private int          offset;
 
-  private int limit;
+  private int          limit;
+
+  private boolean      favorites;
 }

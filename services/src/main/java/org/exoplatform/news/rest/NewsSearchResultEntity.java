@@ -26,6 +26,8 @@ public class NewsSearchResultEntity extends BaseEntity {
 
   private long              lastUpdatedTime;
 
+  private boolean           favorite;
+
   public NewsSearchResultEntity() {
   }
 
@@ -104,4 +106,11 @@ public class NewsSearchResultEntity extends BaseEntity {
     this.newsUrl = newsUrl;
   }
 
+  public boolean isFavorite() {
+    return favorite;
+  }
+
+  public void setFavorite(boolean favorite) {
+    this.favorite = favorite;
+  }
 }

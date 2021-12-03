@@ -2,6 +2,7 @@ package org.exoplatform.news.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.exoplatform.social.core.space.model.Space;
@@ -9,6 +10,7 @@ import org.exoplatform.social.core.space.model.Space;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.exoplatform.social.metadata.model.MetadataItem;
 
 @Data
 @NoArgsConstructor
@@ -102,4 +104,7 @@ public class News {
   private String               timeZoneId;
 
   private boolean              activityPosted;
+
+  private Map<String, List<MetadataItem>> metadatas;
+
 }

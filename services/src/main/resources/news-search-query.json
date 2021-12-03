@@ -2,12 +2,15 @@
   "from": "@offset@",
   "size": "@limit@",
   "query":{
-    "bool":{
-      "filter":{
-        "terms":{
-          "permissions": [@permissions@]
+    "bool": {
+      "filter": [
+        @metadatas_query@
+        {
+          "terms": {
+            "permissions": [@permissions@]
+          }
         }
-      },
+      ],
       "should": {
         "match_phrase": {
           "body": {

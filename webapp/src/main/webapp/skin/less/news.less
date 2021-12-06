@@ -114,35 +114,73 @@
       }
     }
     .newsSlider {
-      .carouselNewsInfo {
-        margin: auto;
-        width: max-content;
-        padding-top: 50px;
-      }
-      .newsSliderItem {
-        justify-content: center;
-        .watchIconStyle {
-          color: @baseBackgroundDefault;
-        }
-        .newsSliderOwner {
-          max-width: 48%;
-          padding-right: 0 ~'; /** orientation=lt */ ';
-          padding-left: 0 ~'; /** orientation=rt */ ';
-          display: flex;
-          margin-bottom: 0;
-          font-style: italic;
-          font-size: 13px;
-          img {
-            height: 32px;
-            min-width: 32px;
-            width: 32px;
-            border-radius: 50%;
-            margin-right: 10px;
-            max-width: 100%;
-            vertical-align: middle;
-            border: 0;
+      .carouselItem {
+        .slide-text-container {
+          position: absolute;
+          top: 40px;
+          left: 0;
+          right: 0;
+          text-shadow: 0 0 4px rgba(0, 0, 0, 0.78);
+          .carouselNewsInfo {
+            margin: 0;
+            width: max-content;
+            .articleTitle {
+              display: -webkit-box;
+              -webkit-line-clamp: 1;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              font-size: 1.7rem !important;
+              line-height: 3rem;
+              padding-bottom: 0px;
+            }
+            .newsSliderItem {
+              .watchIconStyle {
+                color: @baseBackgroundDefault;
+              }
+
+              .newsSliderOwner {
+                max-width: 48%;
+                padding-right: 0 ~'; /** orientation=lt */ ';
+                padding-left: 0 ~'; /** orientation=rt */ ';
+                display: flex;
+                margin-bottom: 0;
+                font-style: italic;
+                font-size: 13px;
+
+                img {
+                  height: 23px;
+                  min-width: 23px;
+                  width: 23px;
+                  border-radius: 50%;
+                  margin-right: 10px;
+                  max-width: 100%;
+                  vertical-align: middle;
+                  border: 0;
+                }
+              }
+            }
+          }
+          .settingNewsButton {
+            top: -25px;
+            right: 0;
+            position: absolute;
           }
         }
+        .articleImage {
+        -webkit-filter: brightness(0.63);
+        transition: 0.3s;
+        }
+      }
+      .v-carousel__controls__item {
+        height: 20px;
+        width: 20px;
+        margin: 0 2px;
+      }
+      .v-carousel__controls__item i:before {
+        font-size: 10px;
+      }
+      .v-carousel__controls__item.v-item--active i {
+        opacity: 1;
       }
     }
   }

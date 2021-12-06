@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </a>
     </div>
     <div class="flex-column my-auto">
-      <span class="text-capitalize text--white font-weight-bold body-2">{{ authorFullName }}</span>
+      <span class="text-capitalize text--white">{{ authorFullName }}</span>
     </div>
     <v-icon>
       mdi-chevron-right
@@ -31,16 +31,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <exo-space-avatar
         v-if="space"
         :space="space"
-        :size="32"
+        :size="23"
         :labels="labels"
         class="align-center my-auto text-truncate text-capitalize white--text flex-grow-0 flex"
-        bold-title
         link-style />
     </div>
-    <div class="flex-column my-auto font-weight-bold body-2">
+    <div class="flex-column my-auto">
       <v-icon small class="ms-4 me-1">fas fa-clock</v-icon>
     </div>
-    <div class="flex-column me-1 my-auto font-weight-bold body-2">
+    <div class="flex-column me-1 my-auto">
       <span>{{ postDate }}, 2020</span>
     </div>
     <div class="flex-column my-auto">
@@ -50,8 +49,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         fa-thumbs-up
       </v-icon>
     </div>
-    <div class="flex-column subtitle-2 my-auto me-4">
-      <span class="counterStyle font-weight-bold">{{ likeSize }}</span>
+    <div class="flex-column my-auto me-4">
+      <span class="counterStyle">{{ likeSize }}</span>
     </div>
     <div class="flex-column my-auto">
       <v-icon
@@ -60,14 +59,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         fa-comment
       </v-icon>
     </div>
-    <div class="counterStyle flex-column subtitle-2 my-auto me-4">
-      <span class="counterStyle font-weight-bold">{{ commentsSize }}</span>
+    <div class="counterStyle flex-column my-auto me-4">
+      <span class="counterStyle">{{ commentsSize }}</span>
     </div>
     <div class="flex-column my-auto">
       <i class="uiIconWatch watchIconStyle baseline-vertical-align mx-auto me-2 mb-1"></i>
     </div>
-    <div class="counterStyle flex-column subtitle-2 my-auto me-2">
-      <span class="counterStyle font-weight-bold">{{ viewsSize }}</span>
+    <div class="counterStyle flex-column my-auto me-2">
+      <span class="counterStyle">{{ viewsSize }}</span>
     </div>
   </div>
 </template>

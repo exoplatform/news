@@ -43,8 +43,6 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
-import javax.ws.rs.core.Response;
-
 /**
  * Service managing News and storing them in ECMS
  */
@@ -188,25 +186,24 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
+    News news = null;
     try {
-      News news = getNewsById(newsId, editMode);
-      if (editMode) {
-        if (!canEditNews(news, currentIdentity.getUserId())) {
-          throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
-        }
-      } else if (!canViewNews(news, currentIdentity.getUserId())) {
-        throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to view News");
-      }
-      news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
-      news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
-      news.setCanPublish(canPublishNews(currentIdentity));
-      news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
-      return news;
-    } catch (IllegalAccessException e) {
-      throw new IllegalAccessException("User " + currentIdentity.getUserId()+ " attempt to access unauthorized news with id {}" + newsId);
+      news = getNewsById(newsId, editMode);
     } catch (Exception e) {
-      throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
+      LOG.error("An error occurred while retrieving news with id " + newsId, e);
     }
+    if (editMode) {
+      if (!canEditNews(news, currentIdentity.getUserId())) {
+        throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
+      }
+    } else if (!canViewNews(news, currentIdentity.getUserId())) {
+      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to view News");
+    }
+    news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
+    news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
+    news.setCanPublish(canPublishNews(currentIdentity));
+    news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
+    return news;
   }
   
   /**
@@ -566,11 +563,10 @@ public class NewsServiceImpl implements NewsService {
     if (authenticatedUser.equals(posterUsername) || spaceService.isSuperManager(authenticatedUser)) {
       return true;
     }
-    boolean spaceHasARedactor = space != null && space.getRedactors() != null && space.getRedactors().length > 0;
-    if (spaceService.isManager(space, authenticatedUser) && spaceHasARedactor) {
+    if (spaceService.isManager(space, authenticatedUser)) {
       return true;
     }
-    if (spaceService.isRedactor(space, authenticatedUser) && news.isDraftVisible()) {
+    if (spaceService.isRedactor(space, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
       return true;
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);

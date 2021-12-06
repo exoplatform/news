@@ -5,12 +5,15 @@ export function getNewsById(id, editMode) {
     credentials: 'include',
     method: 'GET',
   }).then((resp) => {
-    if (resp && resp.ok) {
+    if ((resp && resp.ok)) {
       return resp.json();
+    } else if ( resp.status === 401) {
+      return resp.status;
     }
-    return null;
   }).then(resp => {
     return resp;
+  }).catch((error) => {
+    return error;
   });
 }
 

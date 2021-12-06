@@ -186,8 +186,13 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
+    News news = null;
     try {
-      News news = getNewsById(newsId, editMode);
+      news = getNewsById(newsId, editMode);
+    } catch (Exception e) {
+      LOG.error("An error occurred while retrieving news with id " + newsId, e);
+    }
+    if (news != null) {
       if (editMode) {
         if (!canEditNews(news, currentIdentity.getUserId())) {
           throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
@@ -199,10 +204,8 @@ public class NewsServiceImpl implements NewsService {
       news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
       news.setCanPublish(canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
-      return news;
-    } catch (Exception e) {
-      throw new IllegalStateException("An error occurred while retrieving news with id " + newsId, e);
     }
+    return news;
   }
   
   /**
@@ -553,24 +556,28 @@ public class NewsServiceImpl implements NewsService {
     if (space == null) {
       return false;
     }
-    Identity authenticatedUserIdentity = identityManager.getOrCreateUserIdentity(authenticatedUser);
+    org.exoplatform.services.security.Identity authenticatedUserIdentity = NewsUtils.getUserIdentity(authenticatedUser);
     if (authenticatedUserIdentity == null) {
       LOG.warn("Can't find user with id {} when checking access on news with id {}", authenticatedUser, news.getId());
       return false;
     }
     String posterUsername = news.getAuthor();
-    if (authenticatedUser.equals(posterUsername) || spaceService.isSuperManager(authenticatedUser)) {
+    if (authenticatedUser.equals(posterUsername)) {
       return true;
     }
     Space currentSpace = spaceService.getSpaceById(spaceId);
-    if (spaceService.isManager(currentSpace, authenticatedUser)) {
+    // Posted news draft
+    if ((spaceService.isManager(currentSpace, authenticatedUser) || spaceService.isSuperManager(authenticatedUser)
+        || authenticatedUserIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME))
+        && news.getActivities() != null) {
       return true;
     }
-    if (spaceService.isRedactor(currentSpace, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
+    // No Posted yet news draft
+    if ((spaceService.isRedactor(currentSpace, authenticatedUser) || spaceService.isManager(currentSpace, authenticatedUser))
+        && news.isDraftVisible() && news.getActivities() == null) {
       return true;
     }
-    org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
-    return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return false;
   }
   
   private boolean canDeleteNews(org.exoplatform.services.security.Identity currentIdentity, String posterId, String spaceId) {

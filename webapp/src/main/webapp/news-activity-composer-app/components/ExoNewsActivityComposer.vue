@@ -279,20 +279,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         ref="selectVisibilityDialog"
         :items="items" />
     </div>
-    
-    <div v-show="!canCreatNews && !loading" class="newsComposer">
-      <div id="form_msg_error" class="alert alert-error">
-        <span data-dismiss="alert">
-          <i class="uiIconColorError pull-left"></i>
-        </span>
-        <div class="msg_error">
-          <div>
-            <span class="msg_permission_denied">{{ $t("news.permission.denied") }}</span>
-          </div>
-          <div>
-            <span class="msg_permission">{{ $t("news.permission.msg") }}</span>
-          </div>
-        </div>
+
+    <div v-show="(!canCreatNews && !loading) || unAuthorizedAccess" class="newsComposer">
+      <div class="articleNotFound">
+        <i class="iconNotFound"></i>
+        <h3 class="restrictedAction">{{ $t('news.details.restricted') }}</h3>
       </div>
     </div>
   </v-app>
@@ -301,6 +292,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 import autosize from 'autosize';
 const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+const UNAUTHORIZED_CODE = 401;
 export default {
   props: {
     newsId: {
@@ -389,6 +381,7 @@ export default {
       scheduleMode: '',
       switchView: false,
       spaceDisplayName: '',
+      unAuthorizedAccess: false,
     };
   },
   computed: {
@@ -663,7 +656,10 @@ export default {
       const self = this;
       this.$newsServices.getNewsById(newsId, true)
         .then(fetchedNode => {
-          if (fetchedNode){
+          if (fetchedNode === UNAUTHORIZED_CODE){
+            this.unAuthorizedAccess = true;
+            self.initDone = true;
+          } else {
             this.news.id = fetchedNode.id;
             this.news.title = fetchedNode.title;
             this.news.summary = fetchedNode.summary;
@@ -711,8 +707,6 @@ export default {
               autosize.update(document.querySelector('#newsSummary'));
               self.initDone = true;
             });
-          } else {
-            self.initDone = true;
           }
         });
     },
@@ -941,7 +935,7 @@ export default {
         attachments: this.news.attachments,
         published: this.news.published,
         publicationState: publicationState,
-        draftVisible: this.draftVisible,
+        draftVisible: this.news.draftVisible,
         activityPosted: this.news.activityPosted,
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {

@@ -554,23 +554,28 @@ public class NewsServiceImpl implements NewsService {
     if (space == null) {
       return false;
     }
-    Identity authenticatedUserIdentity = identityManager.getOrCreateUserIdentity(authenticatedUser);
+    org.exoplatform.services.security.Identity authenticatedUserIdentity = NewsUtils.getUserIdentity(authenticatedUser);
     if (authenticatedUserIdentity == null) {
       LOG.warn("Can't find user with id {} when checking access on news with id {}", authenticatedUser, news.getId());
       return false;
     }
     String posterUsername = news.getAuthor();
-    if (authenticatedUser.equals(posterUsername) || spaceService.isSuperManager(authenticatedUser)) {
+    if (authenticatedUser.equals(posterUsername)) {
       return true;
     }
-    if (spaceService.isManager(space, authenticatedUser)) {
+    Space currentSpace = spaceService.getSpaceById(spaceId);
+    // Posted news draft
+    if ((spaceService.isManager(currentSpace, authenticatedUser) || spaceService.isSuperManager(authenticatedUser)
+        || authenticatedUserIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME))
+        && news.getActivities() != null) {
       return true;
     }
-    if (spaceService.isRedactor(space, authenticatedUser) && news.isDraftVisible() && news.getActivities() == null) {
+    // No Posted yet news draft
+    if ((spaceService.isRedactor(currentSpace, authenticatedUser) || spaceService.isManager(currentSpace, authenticatedUser))
+        && news.isDraftVisible() && news.getActivities() == null) {
       return true;
     }
-    org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
-    return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return false;
   }
   
   private boolean canDeleteNews(org.exoplatform.services.security.Identity currentIdentity, String posterId, String spaceId) {

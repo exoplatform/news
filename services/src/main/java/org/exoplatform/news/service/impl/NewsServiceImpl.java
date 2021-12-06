@@ -192,17 +192,19 @@ public class NewsServiceImpl implements NewsService {
     } catch (Exception e) {
       LOG.error("An error occurred while retrieving news with id " + newsId, e);
     }
-    if (editMode) {
-      if (!canEditNews(news, currentIdentity.getUserId())) {
-        throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
+    if (news != null) {
+      if (editMode) {
+        if (!canEditNews(news, currentIdentity.getUserId())) {
+          throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to edit News");
+        }
+      } else if (!canViewNews(news, currentIdentity.getUserId())) {
+        throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to view News");
       }
-    } else if (!canViewNews(news, currentIdentity.getUserId())) {
-      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " is not authorized to view News");
+      news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
+      news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
+      news.setCanPublish(canPublishNews(currentIdentity));
+      news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
     }
-    news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
-    news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
-    news.setCanPublish(canPublishNews(currentIdentity));
-    news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
     return news;
   }
   

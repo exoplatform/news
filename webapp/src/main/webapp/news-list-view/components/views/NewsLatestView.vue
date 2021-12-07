@@ -206,12 +206,11 @@ export default {
       };
     },
     spaceUrl() {
-      let groupId;
       if (this.space && this.space.groupId) {
-        groupId = this.space.groupId.replace(/\//g, ':');
-        return `${eXo.env.portal.context}/g/${groupId}/`;
+        const uri = this.space.groupId.replace(/\//g, ':');
+        return `${eXo.env.portal.context}/g/${uri}/`;
       }
-      return `${eXo.env.portal.context}/dw/home/`;
+      return '#';
     },
     spaceAvatarUrl() {
       return this.space && this.space.avatarUrl;

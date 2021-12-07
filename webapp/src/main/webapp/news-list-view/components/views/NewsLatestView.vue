@@ -116,24 +116,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <template v-for="(item, index) of newsInfo.slice(1)">
                       <v-list-item
                         :key="item.title"
-                        :id="`item-news${index}`"
                         @mouseenter="applyItemClass(index)"
                         @mouseleave="applyItemClass(index)"
                         class="px-0 news-item">
                         <v-list-item-avatar
+                          :id="`item-avatar${index}`"
                           tile
                           size="95"
-                          class="mr-2 my-0">
+                          class="newsItemAvatar mr-2 my-0">
                           <v-img :src="item.illustrationURL" @click="openNews(item.url)" />
                         </v-list-item-avatar>
 
                         <v-list-item-content class="pt-0 pl-1">
                           <v-list-item-title
                             class="text-capitalize newsRightTitle mb-1"
-                            style="margin-bottom: 0px"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.title" />
                           <v-list-item-subtitle
+                            :id="`item-news${index}`"
                             class="newsRightBody my-1"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
@@ -269,8 +269,15 @@ export default {
     },
     applyItemClass(index) {
       this.isHovered = !this.isHovered;
-      const elementNewTop = document.getElementById(`item-news${index}`);
-      return this.isHovered ? elementNewTop.classList.add('newsRightBodyHover') : elementNewTop.classList.remove('newsRightBodyHover');
+      const elementRightBody = document.getElementById(`item-news${index}`);
+      const elementAvatar = document.getElementById(`item-avatar${index}`);
+      if (this.isHovered) {
+        elementRightBody.classList.add('newsRightBodyHover');
+        elementAvatar.classList.add('newsAvatarHover');
+      } else {
+        elementRightBody.classList.remove('newsRightBodyHover');
+        elementAvatar.classList.remove('newsAvatarHover');
+      }
     }
   }
 };

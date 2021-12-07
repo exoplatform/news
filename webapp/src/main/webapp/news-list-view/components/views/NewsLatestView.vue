@@ -127,14 +127,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                           <v-img :src="item.illustrationURL" @click="openNews(item.url)" />
                         </v-list-item-avatar>
 
-                        <v-list-item-content class="pt-0 pl-3 my-auto">
+                        <v-list-item-content class="pt-0 pl-1">
                           <v-list-item-title
                             class="text-capitalize newsRightTitle mb-1"
                             style="margin-bottom: 0px"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.title" />
                           <v-list-item-subtitle
-                            class="newsRightBody my-2"
+                            class="newsRightBody my-1"
                             @click="openNews(item.url)"
                             v-sanitized-html="item.body" />
                           <div class="flex d-flex flex-row my-auto">

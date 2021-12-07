@@ -231,7 +231,7 @@
           <v-btn
             class="btn ms-2"
             @click="closeDrawer">
-            {{ $t('news.composer.cancel') }}
+            {{ $t('news.composer.btn.cancel') }}
           </v-btn>
           <v-btn
             :disabled="disabled"

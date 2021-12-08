@@ -27,6 +27,10 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
   private final IdentityManager identityManager;
 
+  private static final String   METADATA_CREATED = "social.metadataItem.created";
+
+  private static final String   METADATA_DELETED = "social.metadataItem.deleted";
+
   public NewsMetadataListener(IndexingService indexingService,
                               NewsService newsService,
                               FavoriteService favoriteService,
@@ -57,7 +61,11 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                                          news.getId(),
                                          "",
                                          Long.parseLong(userIdentity.getId()));
-        favoriteService.createFavorite(favorite);
+        if (event.getEventName().equals(METADATA_CREATED)) {
+          favoriteService.createFavorite(favorite);
+        } else if (event.getEventName().equals(METADATA_DELETED)) {
+          favoriteService.deleteFavorite(favorite);
+        }
       }
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, news.getId());
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="newsDetailsTopBar">
+  <div :class="!showEditButton && 'me-5'" class="newsDetailsTopBar">
     <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
     <v-btn
       v-if="publicationState === 'staged'"

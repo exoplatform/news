@@ -9,7 +9,7 @@
     @removed="removed"
     @remove-error="removeError"
     @added="added"
-    @add-error="addError"/>
+    @add-error="addError" />
 </template>
 
 <script>
@@ -20,8 +20,8 @@ export default {
       default: null,
     },
     activityId: {
-      type: Number,
-      default: () => 0,
+      type: String,
+      default: null,
     },
     absolute: {
       type: Boolean,
@@ -51,6 +51,7 @@ export default {
       this.$favoriteService.removeFavorite('news', this.news.id)
         .then(() => {
           this.isFavorite = false;
+          this.$emit('removed');
         })
         .catch(() => this.$emit('remove-error'));
     },
@@ -62,6 +63,7 @@ export default {
       this.$favoriteService.addFavorite('news', this.news.id)
         .then(() => {
           this.isFavorite = true;
+          this.$emit('added');
         })
         .catch(() => this.$emit('add-error'));
     },

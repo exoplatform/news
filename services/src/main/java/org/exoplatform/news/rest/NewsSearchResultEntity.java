@@ -28,7 +28,7 @@ public class NewsSearchResultEntity extends BaseEntity {
 
   private boolean           favorite;
 
-  private long              activityId;
+  private String              activityId;
 
   public NewsSearchResultEntity() {
   }
@@ -117,11 +117,11 @@ public class NewsSearchResultEntity extends BaseEntity {
     this.favorite = favorite;
   }
 
-  public long getActivityId() {
+  public String getActivityId() {
     return activityId;
   }
 
-  public void setActivityId(long activityId) {
+  public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
 

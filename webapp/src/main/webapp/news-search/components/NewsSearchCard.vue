@@ -3,12 +3,19 @@
     class="d-flex flex-column border-radius box-shadow"
     flat
     min-height="227">
-    <div class="flex-grow-1 px-3 py-3">
+    <div class="d-flex flex-grow-1 px-3 py-3">
       <div
         ref="excerptNode"
         :title="excerptText"
-        class="text-wrap text-break caption">
+        class="text-wrap me-3 text-break caption search-card-text">
       </div>
+      <exo-news-favorite-action
+        :news="result"
+        :activity-id="result.activityId"
+        absolute
+        top="0"
+        right="0"
+        @removed="$emit('refresh-favorite')" />
     </div>
     <v-list class="flex-grow-0 no-border-radius pa-0">
       <v-list-item class="px-3 pt-1 pb-2 ">

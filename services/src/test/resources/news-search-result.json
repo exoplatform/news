@@ -22,7 +22,8 @@
           "id" : "6",
           "title": "test news",
           "body" : "term\r\n",
-          "posterId": "root"
+          "posterId": "root",
+          "newsActivityId": "6"
         }
       },
       {
@@ -45,7 +46,8 @@
           "id" : "8",
           "title": "news",
           "body": "test",
-          "posterId": "root"
+          "posterId": "root",
+          "newsActivityId": "8"
         }
       }
     ]

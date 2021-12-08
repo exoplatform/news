@@ -8,6 +8,7 @@ import ExoNewsDetailsBodyMobile from './components/mobile/ExoNewsDetailsBodyMobi
 import ExoNewsDetailsBody from './components/ExoNewsDetailsBody.vue';
 import ExoNewsDetailsTime from './components/ExoNewsDetailsTime.vue';
 import ExoNewsEditPublishingDrawer from './components/ExoNewsEditPublishingDrawer.vue';
+import ExoNewsFavoriteAction from './components/ExoNewsFavoriteAction.vue';
 
 const components = {
   'exo-news-archive': ExoNewsArchive,
@@ -20,6 +21,7 @@ const components = {
   'exo-news-details-body': ExoNewsDetailsBody,
   'exo-news-details-time': ExoNewsDetailsTime,
   'exo-news-edit-publishing-drawer': ExoNewsEditPublishingDrawer,
+  'exo-news-favorite-action': ExoNewsFavoriteAction,
 };
 
 for (const key in components) {

@@ -59,7 +59,7 @@ public interface NewsService {
   /**
    * Delete news
    * 
-   * @param newsId the news id to delete
+   * @param id the news id to delete
    * @param currentIdentity user attempting to delete news
    * @param isDraft
    * @throws Exception when error
@@ -70,7 +70,7 @@ public interface NewsService {
    * Publish a news
    *
    * @param newsId The id of the news to be published
-   * @param publishNews
+   * @param publisher
    * @throws Exception when error
    */
   void publishNews(String newsId, String publisher) throws Exception;
@@ -168,17 +168,15 @@ public interface NewsService {
    * @throws Exception
    */
   News unScheduleNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
-  
+
   /**
    * Search news by term
    *
    * @param currentIdentity
-   * @param term
-   * @param offset
-   * @param limit
+   * @param filter
    * @return News Search Result
    */
-  List<NewsESSearchResult> search(Identity currentIdentity, String term, int offset, int limit);
+  List<NewsESSearchResult> search(Identity currentIdentity, NewsFilter filter);
   
   /**
    * 

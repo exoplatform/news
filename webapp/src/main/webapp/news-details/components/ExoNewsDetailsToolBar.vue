@@ -1,5 +1,5 @@
 <template>
-  <div class="newsDetailsTopBar">
+  <div :class="!showEditButton && 'me-5'" class="newsDetailsTopBar">
     <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
     <v-btn
       v-if="publicationState === 'staged'"
@@ -9,11 +9,16 @@
     </v-btn>
     <exo-news-details-action-menu
       v-if="showEditButton && publicationState !== 'staged'"
+      class="pull-right"
       :news="news"
       :news-published="newsPublished"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton"
       :show-publish-button="showPublishButton" />
+    <exo-news-favorite-action
+      :news="news"
+      :activity-id="activityId"
+      class="mt-6 pull-right" />
   </div>
 </template>
 

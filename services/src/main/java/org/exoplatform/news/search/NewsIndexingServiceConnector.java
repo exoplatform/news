@@ -28,6 +28,7 @@ import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
@@ -38,6 +39,11 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.processor.MetadataActivityProcessor;
+import org.exoplatform.social.core.search.DocumentWithMetadata;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataObject;
 
 public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnector {
 
@@ -51,14 +57,18 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
 
   private final ActivityManager activityManager;
 
+  private final MetadataService metadataService;
+
   public NewsIndexingServiceConnector(IdentityManager identityManager,
                                       InitParams initParams,
                                       NewsService newsService,
-                                      ActivityManager activityManager) {
+                                      ActivityManager activityManager,
+                                      MetadataService metadataService) {
     super(initParams);
     this.newsService = newsService;
     this.identityManager = identityManager;
     this.activityManager = activityManager;
+    this.metadataService = metadataService;
   }
 
   @Override
@@ -174,8 +184,14 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     if (news.getUpdateDate() != null) {
       fields.put("lastUpdatedTime", String.valueOf(news.getUpdateDate().getTime()));
     }
+    DocumentWithMetadata document = new DocumentWithMetadata();
+    document.setId(id);
+    document.setLastUpdatedDate(news.getUpdateDate());
+    document.setPermissions(Collections.singleton(ownerIdentityId));
+    document.setFields(fields);
+    addDocumentMetadata(document, news.getId());
 
-    return new Document(id, null, news.getUpdateDate(), Collections.singleton(ownerIdentityId), fields);
+    return document;
   }
 
   private String htmlToText(String source) {
@@ -197,6 +213,12 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     source = source.replaceAll("<( )*p([^>])*>", "\n");
     source = source.replaceAll("<[^>]*>", "");
     return source;
+  }
+
+  private void addDocumentMetadata(DocumentWithMetadata document, String documentId) {
+    MetadataObject metadataObject = new MetadataObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, documentId);
+    List<MetadataItem> metadataItems = metadataService.getMetadataItemsByObject(metadataObject);
+    document.setMetadataItems(metadataItems);
   }
 
 }

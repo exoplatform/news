@@ -15,60 +15,55 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div>
-    <div class="flex-column newsSliderOwner my-auto">
-      <a :href="authorProfileUrl">
-        <img :src="authorAvatarUrl">
-      </a>
+  <v-row class="d-flex justify-center">
+    <div class="newsSliderOwner">
+      <v-avatar size="24">
+        <v-img
+          class="author-image"
+          :src="authorAvatarUrl"
+          alt="Author image" />
+      </v-avatar>
+      <span class="text-capitalize text--white my-auto ml-2">{{ authorFullName }}</span>
     </div>
-    <div class="flex-column my-auto">
-      <span class="text-capitalize text--white">{{ authorFullName }}</span>
-    </div>
-    <v-icon>
+    <v-icon
+      class="mx-1"
+      small>
       mdi-chevron-right
     </v-icon>
-    <div class="flex-column">
-      <exo-space-avatar
-        v-if="space"
-        :space="space"
-        :size="23"
-        :labels="labels"
-        class="align-center my-auto text-truncate text-capitalize white--text flex-grow-0 flex"
-        link-style />
+    <div class="newsSpaceInfos me-2 my-auto">
+      <v-avatar size="23" rounded>
+        <v-img
+          class="spaceImage"
+          :src="spaceAvatarUrl"
+          alt="Space icon" />
+      </v-avatar>
+      <a :href="spaceUrl">
+        <span class="text-capitalize my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
+      </a>
     </div>
-    <div class="flex-column my-auto">
-      <v-icon small class="ms-4 me-1">fas fa-clock</v-icon>
+    <div class="date-container d-flex">
+      <v-icon class="me-1 ms-2" size="15">mdi-clock</v-icon>
+      <span class="postDate flex-column me-1 my-auto">{{ postDate }}, 2020</span>
     </div>
-    <div class="flex-column me-1 my-auto">
-      <span>{{ postDate }}, 2020</span>
+    <div class="reactions-container d-flex ml-4">
+      <div class="likes-container">
+        <v-icon class="likeIconStyle" size="14">fa-thumbs-up</v-icon>
+        <span class="counterStyle ml-1">{{ likeSize }}</span>
+      </div>
+      <div class="comments-container ml-2">
+        <v-icon
+          class="commentIconStyle"
+          size="14">
+          fa-comment
+        </v-icon>
+        <span class="counterStyle ml-1">{{ commentsSize }}</span>
+      </div>
+      <div class="views-container ml-2">
+        <v-icon class="views-icon" size="16">mdi-eye</v-icon>
+        <span class="counterStyle">{{ viewsSize }}</span>
+      </div>
     </div>
-    <div class="flex-column my-auto">
-      <v-icon
-        class="likeIconStyle baseline-vertical-align ms-6 me-2"
-        size="14">
-        fa-thumbs-up
-      </v-icon>
-    </div>
-    <div class="flex-column my-auto me-4">
-      <span class="counterStyle">{{ likeSize }}</span>
-    </div>
-    <div class="flex-column my-auto">
-      <v-icon
-        class="commentIconStyle baseline-vertical-align mx-auto me-2"
-        size="14">
-        fa-comment
-      </v-icon>
-    </div>
-    <div class="counterStyle flex-column my-auto me-4">
-      <span class="counterStyle">{{ commentsSize }}</span>
-    </div>
-    <div class="flex-column my-auto">
-      <i class="uiIconWatch watchIconStyle baseline-vertical-align mx-auto me-2 mb-1"></i>
-    </div>
-    <div class="counterStyle flex-column my-auto me-2">
-      <span class="counterStyle">{{ viewsSize }}</span>
-    </div>
-  </div>
+  </v-row>
 </template>
 
 <script>
@@ -106,19 +101,19 @@ export default {
     viewsSize: 0,
   }),
   computed: {
-    labels() {
-      return {
-        CancelRequest: this.$t('profile.CancelRequest'),
-        Confirm: this.$t('profile.Confirm'),
-        Connect: this.$t('profile.Connect'),
-        Ignore: this.$t('profile.Ignore'),
-        RemoveConnection: this.$t('profile.RemoveConnection'),
-        StatusTitle: this.$t('profile.StatusTitle'),
-        join: this.$t('space.join'),
-        leave: this.$t('space.leave'),
-        members: this.$t('space.members'),
-      };
+    spaceUrl() {
+      if (this.space && this.space.groupId) {
+        const uri = this.space.groupId.replace(/\//g, ':');
+        return `${eXo.env.portal.context}/g/${uri}/`;
+      }
+      return '#';
     },
+    spaceAvatarUrl() {
+      return this.space && this.space.avatarUrl;
+    },
+    spaceDisplayName() {
+      return this.space && this.space.displayName;
+    }
   },
   created() {
     if (this.spaceId) {

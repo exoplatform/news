@@ -19,8 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <news-empty-slider-view v-if="!news" />
     <v-carousel
       v-else
+      show-arrows-on-hover
       interval="10000"
       hide-delimiter-background
+      cycle
       class="sliderNewsItems">
       <v-carousel-item
         v-for="(item,i) in news"
@@ -29,18 +31,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         eager
         dark>
         <v-img
-          class="articleImage"
+          class="articleImage fill-height"
           :src="item.illustrationURL"
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row flex-grow-1 align-center">
+            <div class="flex flex-row flex-grow-1 align-center justify-center">
               <span class="articleTitle text-h4 font-weight-medium white--text">
                 {{ item.title }}
               </span>
             </div>
-            <div class="flex flex-row flex-grow-1 align-center my-2">
-              <span class="white--text">
+            <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
+              <span class="white--text articleSummary">
                 {{ item.body }}
               </span>
             </div>

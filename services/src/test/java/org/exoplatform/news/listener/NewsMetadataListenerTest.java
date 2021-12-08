@@ -68,6 +68,7 @@ public class NewsMetadataListenerTest {
     Event<Long, MetadataItem> event = mock(Event.class);
     lenient().when(event.getData()).thenReturn(metadataItem);
     lenient().when(event.getData().getObjectType()).thenReturn("activity");
+    lenient().when(event.getEventName()).thenReturn("social.metadataItem.created");
     lenient().when(metadataItem.getObjectId()).thenReturn("1");
     News news = new News();
     news.setId("1234");

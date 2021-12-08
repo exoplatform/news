@@ -16,18 +16,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="news-list-view-app position-relative">
-    <v-hover v-slot="{ hover }">
-      <v-card flat class="list-view-card">
-        <v-card-text class="pa-0">
-          <news-settings v-if="$root.saveSettingsURL && viewTemplate === 'NewsLatest'" :hover="hover" />
-          <extension-registry-component
-            v-if="selectedViewExtension"
-            element-class="news-list-view"
-            :component="selectedViewComponent"
-            :params="viewComponentParams" />
-        </v-card-text>
-      </v-card>
-    </v-hover>
+    <v-card flat class="list-view-card">
+      <v-card-text class="pa-0">
+        <news-settings v-if="viewTemplate !== 'NewsSlider'" />
+        <extension-registry-component
+          v-if="selectedViewExtension"
+          element-class="news-list-view"
+          :component="selectedViewComponent"
+          :params="viewComponentParams" />
+      </v-card-text>
+    </v-card>
   </v-app>
 </template>
 
@@ -52,7 +50,6 @@ export default {
     extensionType: 'views',
     newsList: [],
     viewExtensions: {},
-    hover: false,
     loading: false,
     hasMore: false,
     limit: 10,

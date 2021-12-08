@@ -19,7 +19,7 @@ export function getNewsList() {
   let newsList = null;
   newsList = [
     {
-      body: 'The eXo Platform is widely adopted by employees thanks to its simplicity and ease of use.\n',
+      body: 'Lorem Ipsum is simply dummy text of the printing Lorem Ipsum is simply dummy text of the printing Lorem Ipsum is simply dummy text of the printing',
       id: '0a1853307f00010130cb81f7419ab5f0',
       illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg',
       title: 'Welcome to your new digital workplace platform\n ',

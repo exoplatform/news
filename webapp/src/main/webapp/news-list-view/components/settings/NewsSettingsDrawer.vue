@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     ref="newsSettingsDrawer"
     id="newsSettingsDrawer"
     right
-    disable-pull-to-refresh
+    fixed
     @closed="close">
     <template slot="title">
       {{ $t('news.list.settings.title') }}
@@ -184,13 +184,17 @@ export default {
       this.init();
       this.reset();
       const overlayElement = document.getElementById('drawers-overlay');
-      overlayElement.style.display = 'block';
+      if (overlayElement) {
+        overlayElement.style.display = 'block';
+      }
       this.$refs.newsSettingsDrawer.open();
     },
     close() {
-      const overlayElement = document.getElementById('drawers-overlay');
-      overlayElement.style.display = 'none';
       this.$refs.newsSettingsDrawer.close();
+      const overlayElement = document.getElementById('drawers-overlay');
+      if (overlayElement) {
+        overlayElement.style.display = 'none';
+      }
     },
     reset() {
       this.viewTemplate = this.$root.viewTemplate;

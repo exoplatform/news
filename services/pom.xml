@@ -32,7 +32,7 @@
   <description>News Services</description>
 
   <properties>
-    <exo.test.coverage.ratio>0.4</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.42</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

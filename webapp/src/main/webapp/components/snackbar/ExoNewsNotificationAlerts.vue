@@ -4,6 +4,7 @@
     color="transparent"
     elevation="0"
     app
+    bottom
     left>
     <exo-news-notification-alert
       v-for="alert in alerts"

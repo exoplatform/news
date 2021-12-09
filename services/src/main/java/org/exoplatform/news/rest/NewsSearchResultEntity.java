@@ -26,6 +26,10 @@ public class NewsSearchResultEntity extends BaseEntity {
 
   private long              lastUpdatedTime;
 
+  private boolean           favorite;
+
+  private long              activityId;
+
   public NewsSearchResultEntity() {
   }
 
@@ -38,6 +42,7 @@ public class NewsSearchResultEntity extends BaseEntity {
     this.excerpts = newsESSearchResult.getExcerpts();
     this.postedTime = newsESSearchResult.getPostedTime();
     this.lastUpdatedTime = newsESSearchResult.getLastUpdatedTime();
+    this.activityId = newsESSearchResult.getActivityId();
   }
 
   public IdentityEntity getPoster() {
@@ -102,6 +107,22 @@ public class NewsSearchResultEntity extends BaseEntity {
 
   public void setNewsUrl(String newsUrl) {
     this.newsUrl = newsUrl;
+  }
+
+  public boolean isFavorite() {
+    return favorite;
+  }
+
+  public void setFavorite(boolean favorite) {
+    this.favorite = favorite;
+  }
+
+  public long getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(long activityId) {
+    this.activityId = activityId;
   }
 
 }

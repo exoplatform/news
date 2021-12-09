@@ -19,7 +19,8 @@
           "title": "test news",
           "body" : "term\r\n",
           "posterId": "john",
-          "posterName" : "John Doe"
+          "posterName" : "John Doe",
+          "newsActivityId": "6"
         }
       }
     ]

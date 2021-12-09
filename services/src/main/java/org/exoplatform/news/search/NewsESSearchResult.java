@@ -24,6 +24,8 @@ public class NewsESSearchResult {
 
   private long         lastUpdatedTime;
 
+  private long         activityId;
+
   public String getId() {
     return id;
   }
@@ -94,5 +96,13 @@ public class NewsESSearchResult {
 
   public void setExcerpts(List<String> excerpts) {
     this.excerpts = excerpts;
+  }
+
+  public long getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(long activityId) {
+    this.activityId = activityId;
   }
 }

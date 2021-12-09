@@ -36,12 +36,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-btn>
         <div class="flex flex-column carouselNewsInfo">
           <div class="flex flex-row flex-grow-1 align-center">
-            <span class="headline font-weight-bold white--text">
+            <span class="headline text-truncate font-weight-bold white--text">
               {{ item.title }}
             </span>
           </div>
-          <div class="flex flex-row flex-grow-1 align-center my-2">
-            <span class="subtitle-2 font-weight-bold white--text">
+          <div class="flex flex-row flex-grow-1 align-center mt-2">
+            <span class="subtitle-2 text-truncate font-weight-bold white--text">
               {{ item.body }}
             </span>
           </div>

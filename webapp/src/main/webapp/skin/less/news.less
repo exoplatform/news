@@ -120,6 +120,7 @@
         padding-top: 50px;
       }
       .newsSliderItem {
+        justify-content: center;
         .watchIconStyle {
           color: @baseBackgroundDefault;
         }
@@ -2489,6 +2490,8 @@
 /*===================Latest News======================== */
 
 #latestNewsDetails {
+  background: #fff;
+  overflow: hidden;
   .firstNewsImg {
     cursor: pointer;
   }
@@ -2497,6 +2500,7 @@
 
     .v-list-item__content {
       align-self: flex-start !important;
+      padding: 0;
 
       .v-list-item__subtitle {
         line-height: 1.5;
@@ -2509,7 +2513,7 @@
   }
 
   .news-container {
-    min-height: 310px;
+    min-height: auto !important;
     overflow: hidden;
 
     .news-right-list {
@@ -2517,11 +2521,149 @@
 
       .news-item {
         cursor: pointer;
-        height: 33%;
       }
 
       .news-item:nth-child(2) {
         margin: 10px 0;
+      }
+    }
+    .leftSideNewsImg {
+      float: left;
+      overflow: hidden;
+      height: 305px;
+      min-width: 305px;
+      .mainNewsBody {
+        word-break: break-word;
+        white-space: initial !important;
+        -webkit-box-orient: vertical !important;
+        font-size: 24px !important;
+        line-height: 32px;
+        overflow: hidden !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+      }
+      .v-image__image {
+        max-width: 100%;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+        transition: 0.4s;
+      }
+      .newsSpaceInfos {
+        max-width: 48%;
+        padding-right: 0 ~'; /** orientation=lt */ ';
+        padding-left: 0 ~'; /** orientation=rt */ ';
+        display: flex;
+        margin-bottom: 0;
+        font-style: italic;
+        font-size: 12px;
+        img {
+          width: 23px;
+          height: 23px;
+          min-width: 20px;
+          border-radius: 5px;
+          object-fit: cover;
+        }
+      }
+      .spaceName {
+        color: @baseBackgroundDefault;
+        font-size: 12px;
+      }
+      .leftPostDate {
+        font-size: 12px;
+      }
+      .leftTextSize {
+        font-size: 12px;
+      }
+    }
+    .leftSideNewsImg:hover {
+      cursor: pointer;
+      .v-image__image {
+        transform: scale(1.06);
+        filter: brightness(1);
+      }
+      .mainNewsBody {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+      }
+    }
+    .leftSideText {
+      position: relative;
+      text-shadow: 0 0 4px rgba(0,0,0,0.86);
+      font-family: Helvetica, arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+    }
+    .news-right-list {
+      .newsRightTitle {
+        font-family: Helvetica, arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.2px;
+        overflow: hidden;
+        white-space: initial;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        color: @greyColorLighten1;
+        word-break: break-word;
+      }
+      .newsRightBody {
+        overflow: hidden;
+        white-space: initial;
+        -webkit-line-clamp: 2 !important;
+        line-height: 20px;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        word-break: break-word;
+        color: @blackColorDefault;
+        font-size: 16px;
+        transition: 0.3s;
+
+        p {
+          font-size: 13px;
+          letter-spacing: 0.2px;
+          padding-bottom: 0px;
+          color: @greyColorLighten1;
+          margin-bottom: -4px !important;
+        }
+      }
+      .newsRightBodyHover {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 2px;
+      }
+      .newsAvatarHover {
+        .v-image__image {
+          transform: scale(1.06);
+          filter: brightness(1);
+          transition: 0.4s;
+        }
+      }
+      .postDateNews {
+        min-width: 90px;
+        color: @greyColorLighten1;
+        white-space: nowrap;
+        font-family: Helvetica, arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.2px;
+      }
+      .likeIconStyle {
+        color: @greyColorLighten1;
+      }
+      .commentIconStyle {
+        color: @greyColorLighten1;
+      }
+      .counterStyle {
+        color: @greyColorLighten1;
+        font-family: Helvetica, arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.2px;
       }
     }
   }
@@ -2603,17 +2745,6 @@
     box-shadow: 0 0 20px inset rgba(0, 0, 0, 0.2);
     background-image: linear-gradient(to top,#000 0,rgba(0,0,0,0));
   }
-}
-
-#latestNewsDetails {
-  .news-container {
-    min-height: auto !important;
-  }
-}
-
-#latestNewsDetails {
-  background: #fff;
-  overflow: hidden;
 }
 
 /*========================= Skeleton CLV ======================*/

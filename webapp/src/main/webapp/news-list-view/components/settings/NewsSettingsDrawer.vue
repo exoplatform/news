@@ -147,8 +147,10 @@ export default {
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
         return '/news/images/latestNews.png';
-      } else {
+      } else if ( this.viewTemplate === 'NewsSlider') {
         return '/news/images/sliderNews.png';
+      } else {
+        return '';
       }
     }
   },
@@ -199,7 +201,7 @@ export default {
     reset() {
       this.viewTemplate = this.$root.viewTemplate;
       this.viewExtensions = this.$root.viewExtensions;
-      this.newsTarget = this.$root.newsTarget || 'snapshotLatestNews';
+      this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
     },
     init() {

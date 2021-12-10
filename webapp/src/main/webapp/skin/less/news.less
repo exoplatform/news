@@ -117,7 +117,7 @@
       .carouselItem {
         .slide-text-container {
           position: absolute;
-          top: 40px;
+          top: 10%;
           left: 0;
           right: 0;
           text-shadow: 0 0 4px rgba(0, 0, 0, 0.78);
@@ -196,7 +196,7 @@
             }
           }
           .settingNewsButton {
-            top: -25px;
+            top: -15%;
             right: 0;
             position: absolute;
           }
@@ -2833,6 +2833,12 @@
     background-image: linear-gradient(to top,#000 0,rgba(0,0,0,0));
   }
 }
+#newsListViewApp {
+  display: flex;
+  min-height: 100%;
+  flex: 1 1 auto;
+  max-width: 100%;
+}
 
 /*========================= Skeleton CLV ======================*/
 .skeletonContainer {
@@ -3427,7 +3433,7 @@
       .slide-text-container {
         top: 10px !important;
         .settingNewsButton {
-          top: 0 !important;
+          top: -9% !important;
         }
       }
     }

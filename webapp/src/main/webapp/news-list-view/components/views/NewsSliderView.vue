@@ -23,8 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       interval="10000"
       hide-delimiter-background
       cycle
-      :height="sliderHeight"
-      :width="sliderWidth"
       class="sliderNewsItems">
       <v-carousel-item
         v-for="(item,i) in news"
@@ -60,7 +58,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <v-btn
             icon
             @click="openDrawer"
-            class="me-4 settingNewsButton">
+            class="me-4 mt-4 settingNewsButton">
             <v-icon>mdi-cog</v-icon>
           </v-btn>
         </v-container>
@@ -75,18 +73,9 @@ export default {
     return {
       news: [],
       initialized: false,
-      sliderHeight: 220,
-      sliderWidth: 1440,
     };
   },
   created() {
-    const parentElement = document.getElementById('newsListViewApp').parentElement;
-    if (parentElement && parentElement.clientHeight > 0) {
-      this.sliderHeight = parentElement.clientHeight;
-    }
-    if (parentElement && parentElement.clientWidth > 0) {
-      this.sliderWidth = parentElement.clientWidth;
-    }
     this.getNewsList();
   },
   methods: {

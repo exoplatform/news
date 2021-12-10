@@ -15,13 +15,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 extensionRegistry.registerComponent('NewsList', 'views', {
+  id: 'NewsEmptyTemplate',
+  vueComponent: Vue.options.components['news-empty-template'],
+  rank: 10,
+});
+
+extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsSlider',
   vueComponent: Vue.options.components['news-slider-view'],
-  rank: 10,
+  rank: 20,
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsLatest',
   vueComponent: Vue.options.components['news-latest-view'],
-  rank: 20,
+  rank: 30,
 });

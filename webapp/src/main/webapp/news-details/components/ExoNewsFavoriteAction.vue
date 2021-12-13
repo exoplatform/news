@@ -47,6 +47,7 @@ export default {
         this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
       });
     this.templateParams.newsId = this.news.id;
+    this.templateParams.spaceId = this.news.spaceId;
   },
   methods: {
     removed() {

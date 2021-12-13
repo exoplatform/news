@@ -5,11 +5,12 @@
     :absolute="absolute"
     :top="top"
     :right="right"
+    :template-params="templateParams"
     type="activity"
     @removed="removed"
     @remove-error="removeError"
     @added="added"
-    @add-error="addError"/>
+    @add-error="addError" />
 </template>
 
 <script>
@@ -38,12 +39,15 @@ export default {
   },
   data: () => ({
     isFavorite: false,
+    templateParams: {},
   }),
   created() {
     this.$activityService.getActivityById(this.activityId)
       .then(fullActivity => {
         this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
       });
+    this.templateParams.newsId = this.news.id;
+    this.templateParams.spaceId = this.news.spaceId;
   },
   methods: {
     removed() {

@@ -14,7 +14,8 @@
           <img
             :src="illustrationURL"
             class="newsDetailsImage illustrationPicture"
-            alt="News">
+            alt="News"
+            longdesc="#newsSummary">
         </div>
         <div class="newsDetails">
           <div class="news-top-information d-flex">

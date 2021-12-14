@@ -50,13 +50,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div class="newsInfo">
         <div class="newsOwner">
           <a :href="news.authorProfileURL">
-            <img :src="news.authorAvatarUrl">
+            <img :src="news.authorAvatarUrl" role="presentation">
             <span>{{ news.authorFullName }}</span>
           </a>
           <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
           <span v-if="!news.hiddenSpace" class="newsSpace">
             <a :href="news.spaceUrl" class="newsSpaceName">
-              <img :src="news.spaceAvatarUrl">
+              <img :src="news.spaceAvatarUrl" role="presentation">
               <span>{{ news.spaceDisplayName }}</span>
             </a>
           </span>

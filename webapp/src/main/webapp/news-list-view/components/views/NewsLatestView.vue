@@ -31,7 +31,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
           <div class="articleInfos">
             <div class="articleSpace">
-              <img class="spaceImage" :src="spaceAvatarUrl" :alt="$t('news.latest.alt.spaceImage')">
+              <img
+                class="spaceImage"
+                :src="spaceAvatarUrl"
+                :alt="$t('news.latest.alt.spaceImage')">
               <span class="text-capitalize spaceName">{{ spaceDisplayName }}</span>
             </div>
             <span class="articleTitle">Welcome to your new digital workplace platform! Take this quick tour to discover its features</span>
@@ -41,13 +44,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <v-icon
                   class="likeIconStyle me-1"
                   size="12">
-                  fa-thumbs-up
+                  mdi-thumb-up
                 </v-icon>
                 <div class="likesCount me-2">{{ likeSize }}</div>
                 <v-icon
                   class="commentIconStyle me-1"
                   size="12">
-                  fa-comment
+                  mdi-comment
                 </v-icon>
                 <div class="commentsCount">{{ commentsSize }}</div>
               </div>

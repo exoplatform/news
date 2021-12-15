@@ -46,15 +46,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <span class="postDate flex-column me-1 my-auto">{{ postDate }}, 2020</span>
     </div>
     <div class="reactions-container d-flex ml-4">
-      <div class="likes-container">
-        <v-icon class="likeIconStyle" size="14">fa-thumbs-up</v-icon>
+      <div class="likes-container mb-1">
+        <v-icon class="likeIconStyle" size="14">mdi-thumb-up</v-icon>
         <span class="counterStyle ml-1">{{ likeSize }}</span>
       </div>
       <div class="comments-container ml-2">
         <v-icon
-          class="commentIconStyle"
+          class="commentIconStyle mt-1"
           size="14">
-          fa-comment
+          mdi-comment
         </v-icon>
         <span class="counterStyle ml-1">{{ commentsSize }}</span>
       </div>

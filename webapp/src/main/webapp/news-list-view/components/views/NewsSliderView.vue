@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <news-empty-slider-view v-if="!news" />
     <v-carousel
       v-else
+      cycle
       show-arrows-on-hover
       interval="10000"
       hide-delimiter-background
@@ -43,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <v-icon>mdi-cog</v-icon>
               </v-btn>
             </div>
-            <div class="flex flex-row flex-grow-1 align-center justify-center">
+            <div class="flex flex-row flex-grow-1 align-center justify-center slider-header">
               <span class="articleTitle text-h4 font-weight-medium white--text">
                 {{ item.title }}
               </span>

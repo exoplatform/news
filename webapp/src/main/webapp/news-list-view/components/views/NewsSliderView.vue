@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       show-arrows-on-hover
       interval="10000"
       hide-delimiter-background
-      class="sliderNewsItems">
+      class="sliderNewsItems fill-height">
       <v-carousel-item
         v-for="(item,i) in news"
         :key="i"

@@ -127,6 +127,7 @@ export default {
   computed: {
     viewTemplates() {
       if (this.viewExtensions) {
+        delete this.viewExtensions.NewsEmptyTemplate;
         return Object.keys(this.viewExtensions).map(name => ({
           name,
           label: this.getLabel(`news.list.settings.viewTemplate.${name}`, name),

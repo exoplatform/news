@@ -230,6 +230,7 @@ export default {
           this.$root.viewTemplate = this.viewTemplate;
           this.$root.newsTarget = this.newsTarget;
           this.$root.header = this.newsHeader;
+          this.$root.$emit('saved-news-settings');
           this.close();
         })
         .finally(() => {

@@ -2,6 +2,7 @@ package org.exoplatform.news.storage;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsAttachment;
+import org.exoplatform.social.core.space.model.Space;
 
 import javax.jcr.Node;
 import java.io.InputStream;
@@ -28,4 +29,6 @@ public interface NewsAttachmentsStorage {
   void unmakeAttachmentsPublic(Node newsNode) throws Exception;
 
   void removeAttachment(Node newsNode, String attachmentId);
+
+  void makeAttachmentsShareable(Node newsNode, Space space) throws Exception;
 }

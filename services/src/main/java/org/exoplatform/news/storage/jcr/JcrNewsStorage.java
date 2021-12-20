@@ -1218,6 +1218,13 @@ public class JcrNewsStorage implements NewsStorage {
       if (newsNode.canAddMixin("exo:privilegeable")) {
         newsNode.addMixin("exo:privilegeable");
       }
+      if (newsNode.hasProperty("exo:attachmentsIds")) {
+        try {
+          newsAttachmentsService.makeAttachmentsShareable(newsNode, space);
+        } catch (Exception e) {
+          LOG.error("Error when making attachments public");
+        }
+      }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
       newsNode.save();
       if (sharedActivityId != null) {

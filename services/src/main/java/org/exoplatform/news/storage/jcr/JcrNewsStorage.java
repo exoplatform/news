@@ -454,7 +454,7 @@ public class JcrNewsStorage implements NewsStorage {
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
-        Set<Space> sharedInSpacesList = new HashSet<Space>();
+        Set<Space> sharedInSpacesList = new HashSet<>();
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
           sharedInSpacesList.add(space);

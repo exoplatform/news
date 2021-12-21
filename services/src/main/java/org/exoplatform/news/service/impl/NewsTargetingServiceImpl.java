@@ -80,19 +80,17 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   public void saveNewsTarget(String newsId, List<String> targets, String currentUser) {
     NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
     Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
-    if (targets != null && !targets.isEmpty()) {
-      targets.stream().forEach(targetName -> {
-        try {
-          MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
-          metadataService.createMetadataItem(newsTargetObject, metadataKey, Long.parseLong(currentIdentity.getId()));
-        } catch (ObjectAlreadyExistsException e) {
-          LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",
-                  targetName,
-                  newsTargetObject,
-                  e);
-        }
-      });
-    }
+    targets.stream().forEach(targetName -> {
+      try {
+        MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
+        metadataService.createMetadataItem(newsTargetObject, metadataKey, Long.parseLong(currentIdentity.getId()));
+      } catch (ObjectAlreadyExistsException e) {
+        LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",
+                targetName,
+                newsTargetObject,
+                e);
+      }
+    });
   }
 
   @Override

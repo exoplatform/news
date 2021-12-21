@@ -264,7 +264,7 @@ public class NewsServiceImpl implements NewsService {
       throw new IllegalAccessException("User " + currentIdentity.getUserId() + " isn't allowed to access activity with id " + activityId);
     }
     Map<String, String> templateParams = activity.getTemplateParams();
-    if (templateParams == null || !activity.getTemplateParams().containsKey(NEWS_ID)) {
+    if (templateParams == null) {
       throw new ObjectNotFoundException("Activity with id " + activityId + " isn't of type news nor a shared news");
     }
     String newsId = templateParams.get(NEWS_ID);
@@ -423,7 +423,8 @@ public class NewsServiceImpl implements NewsService {
       if (!news.isPublished()
           && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
           && !(spaceService.isSuperManager(username)
-              || spaceService.isMember(space, username))) {
+              || spaceService.isMember(space, username)
+              || isMemberOfsharedInSpaces(news, username))) {
         return false;
       }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
@@ -585,5 +586,14 @@ public class NewsServiceImpl implements NewsService {
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
         || spaceService.isManager(currentSpace, authenticatedUser);
+  }
+  
+  private boolean isMemberOfsharedInSpaces(News news, String username) {
+    for (Space space : news.getSharedInSpacesList()) {
+      if(spaceService.isMember(space, username)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

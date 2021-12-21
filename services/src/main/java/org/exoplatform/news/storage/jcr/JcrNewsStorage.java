@@ -1222,7 +1222,7 @@ public class JcrNewsStorage implements NewsStorage {
         try {
           newsAttachmentsService.makeAttachmentsShareable(newsNode, space);
         } catch (Exception e) {
-          LOG.error("Error when making attachments public");
+          LOG.error("Error when making attachments shareable in" + space.getId());
         }
       }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);

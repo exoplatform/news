@@ -1219,7 +1219,7 @@ public class JcrNewsStorage implements NewsStorage {
         newsNode.addMixin("exo:privilegeable");
       }
       if (newsNode.hasProperty("exo:attachmentsIds")) {
-        newsAttachmentsService.makeAttachmentsShareable(newsNode, space);
+        newsAttachmentsService.shareAttachments(newsNode, space);
       }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
       newsNode.save();
@@ -1237,7 +1237,7 @@ public class JcrNewsStorage implements NewsStorage {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
           + userIdentity.getId(), e);
     } catch (Exception e) {
-      LOG.error("Error when making attachments shareable in" + space.getId());
+      LOG.error("Error when sharing news with id " + newsId + " attachments in " + space.getId());
     }
   }
   

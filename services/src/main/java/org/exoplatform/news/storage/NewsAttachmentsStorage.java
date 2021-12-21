@@ -30,5 +30,5 @@ public interface NewsAttachmentsStorage {
 
   void removeAttachment(Node newsNode, String attachmentId);
 
-  void makeAttachmentsShareable(Node newsNode, Space space);
+  void shareAttachments(Node newsNode, Space space);
 }

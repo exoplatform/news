@@ -324,7 +324,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
   }
 
   @Override
-  public void makeAttachmentsShareable(Node newsNode, Space space) {
+  public void shareAttachments(Node newsNode, Space space) {
     try {
       for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
         if (attachmentNode.canAddMixin("exo:privilegeable")) {
@@ -334,7 +334,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
         attachmentNode.save();
       }
     } catch (Exception e) {
-      LOG.error("Cannot get News attachment of News " + newsNode, e);
+      LOG.error("Cannot share News attachment of News " + newsNode, e);
     }
   }
 

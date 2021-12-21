@@ -263,24 +263,25 @@
           text-align: center;
           margin: auto;
           .uiNoNewsIcon {
-            color: #6d7d9821;
+            color: @colorNoContentIcon;
             font-size: 60px;
             font-style: normal;
             font-weight: normal;
+            opacity: 0.1;
             &:before {
               font-family: 'PLF-FONT-ICONS';
               content: "\e62a" !important;
             }
           }
           .noNewsTitle {
-            color: #4d5466;
+            color: @darkGrey;
             font-weight: normal;
             font-size: 22px;
           }
           p {
             font-weight: normal;
             font-size: 15px;
-            color: #a8b3c5;
+            color: @greyColorLighten1Default;
           }
         }
       }
@@ -2813,7 +2814,7 @@
         .articleTitle {
           font-size: 24px;
           line-height: 32px;
-          color: #fff;
+          color: @baseBackgroundDefault;
           overflow: hidden;
           display: -webkit-box;
           -webkit-box-orient: vertical;

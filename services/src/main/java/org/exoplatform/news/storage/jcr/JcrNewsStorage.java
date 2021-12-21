@@ -12,8 +12,10 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -452,14 +454,17 @@ public class JcrNewsStorage implements NewsStorage {
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
+        Set<Space> sharedInSpacesList = new HashSet<>();
         for (int i = 1; i < activities.length; i++) {
           Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
+          sharedInSpacesList.add(space);
           String activityId = activities[i].split(":")[1];
           if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && activityManager.isActivityExists(activityId)) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }
         news.setActivities(memberSpaceActivities.toString());
+        news.setSharedInSpacesList(sharedInSpacesList);
       } 
       else {
         newsUrl.append("/").append(portalName).append("/").append(portalOwner).append("/news/detail?newsId=").append(news.getId());

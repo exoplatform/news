@@ -4,11 +4,15 @@ import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.model.MetadataItem;
@@ -38,12 +42,16 @@ public class NewsMetadataListenerTest {
   @Mock
   private IdentityManager     identityManager;
 
+  @Mock
+  private ActivityManager     activityManager;
+
   @Test
   public void testReindexNewsWhenNewsSetAsFavorite() throws Exception {
     NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
                                                                          newsService,
                                                                          favoriteService,
-                                                                         identityManager);
+                                                                         identityManager,
+                                                                         activityManager);
     setCurrentUser("john");
     MetadataItem metadataItem = mock(MetadataItem.class);
     Event<Long, MetadataItem> event = mock(Event.class);
@@ -61,7 +69,8 @@ public class NewsMetadataListenerTest {
     NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
                                                                          newsService,
                                                                          favoriteService,
-                                                                         identityManager);
+                                                                         identityManager,
+                                                                         activityManager);
     Identity johnIdentity = new Identity("1", Collections.singletonList(new MembershipEntry("john")));
     ConversationState.setCurrent(new ConversationState(johnIdentity));
     MetadataItem metadataItem = mock(MetadataItem.class);
@@ -72,12 +81,15 @@ public class NewsMetadataListenerTest {
     lenient().when(metadataItem.getObjectId()).thenReturn("1");
     News news = new News();
     news.setId("1234");
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
     lenient().when(newsService.getNewsByActivityId("1", johnIdentity)).thenReturn(news);
     org.exoplatform.social.core.identity.model.Identity userIdentity =
                                                                      new org.exoplatform.social.core.identity.model.Identity(OrganizationIdentityProvider.NAME,
                                                                                                                              "john");
     userIdentity.setId("1");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
+    lenient().when(activityManager.getActivity("1")).thenReturn(activity);
 
     newsActivityListener.onEvent(event);
     verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);

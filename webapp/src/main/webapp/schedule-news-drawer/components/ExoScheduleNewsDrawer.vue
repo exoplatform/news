@@ -376,7 +376,7 @@ export default {
       return this.news && this.news.activityPosted;
     },
     disableTargetOption() {
-      return this.publish ? this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 : false;
+      return this.publish && this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
     },
   },
   created() {
@@ -434,6 +434,7 @@ export default {
             this.news = news;
             this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
+            this.selectedTargets = news.targets;
           }
         });
     },

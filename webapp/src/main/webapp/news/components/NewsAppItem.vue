@@ -61,8 +61,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </a>
           </span>
         </div>
-        <div class="newsDate">
-          <i class="uiIconClock"></i>
+        <div v-if="!draftNews" class="newsDate">
+          <i v-if="displayClock" class="uiIconClock"></i>
           <span v-if="news && news.schedulePostDate">
             <date-format
               :value="news.schedulePostDate"
@@ -140,6 +140,12 @@ export default {
     confirmDeleteNewsDialogTitle() {
       return this.isDraftsFilter ? this.$t('news.title.confirmDeleteDraftNews') : this.$t('news.title.confirmDeleteNews');
     },
+    displayClock() {
+      return this.news && (this.news.schedulePostDate || this.news.updatedDate);
+    },
+    draftNews() {
+      return this.news && this.news.draft;
+    }
   },
   methods: {
     editLink(news) {

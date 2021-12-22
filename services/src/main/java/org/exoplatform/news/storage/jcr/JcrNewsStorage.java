@@ -1119,6 +1119,10 @@ public class JcrNewsStorage implements NewsStorage {
         unScheduledNewsNode.save();
         publicationService.changeState(unScheduledNewsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
       }
+      if (unScheduledNewsNode.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
+        unScheduledNewsNode.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).remove();
+        unScheduledNewsNode.save();
+      }
       draftNews = getNewsById(news.getId(), false);
       draftNews.setSchedulePostDate(null);
     } finally {

@@ -17,11 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <v-app class="news-list-view-app position-relative">
     <v-card flat class="list-view-card rounded-0">
-      <v-card-text class="pa-0">
+      <v-card-text class="pa-0 fill-height">
         <news-settings v-if="viewTemplate && viewTemplate !== 'NewsSlider'" />
         <extension-registry-component
           v-if="selectedViewExtension"
           element-class="news-list-view"
+          class="fill-height"
           :component="selectedViewComponent"
           :params="viewComponentParams" />
       </v-card-text>

@@ -254,11 +254,15 @@
       }
     }
     .newsEmptyTemplate {
+      .v-main__wrap {
+        height: 100%;
+      }
       .noNews {
         display: flex;
         align-items: center;
         justify-content: center;
         width: -webkit-fill-available;
+        height: ~"calc(100% - 50px)";
         .noNewsContent {
           text-align: center;
           margin: auto;

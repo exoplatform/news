@@ -15,8 +15,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <v-app class="newsEmptyTemplate border-box-sizing" flat>
-    <v-main class="white">
+  <v-app class="newsEmptyTemplate border-box-sizing fill-height" flat>
+    <v-main class="white fill-height">
       <v-flex class="news-empty-header d-flex mx-3 my-2">
         <v-spacer />
         <div class="d-flex flex-row newsSettingButton justify-end">
@@ -27,10 +27,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </v-btn>
         </div>
       </v-flex>
-      <v-flex class="d-flex news-empty-template noNews">
-        <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent">
+      <v-flex class="d-flex news-empty-template noNews fill-height">
+        <div class="ma-auto d-flex flex-column align-center noNewsContent">
           <i class="uiNoNewsIcon"></i>
-          <span class="title mt-5">
+          <span class="title">
             {{ $t('news.latest.noNews') }}
           </span>
         </div>

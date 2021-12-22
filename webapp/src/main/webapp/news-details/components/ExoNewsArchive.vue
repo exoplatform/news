@@ -62,7 +62,7 @@ export default {
     }
   },
   methods: {
-    confirmAction: function() {
+    confirmAction() {
       let confirmText = this.$t('news.archive.confirm');
       let captionText = this.$t('news.archive.action');
       const confirmButton = this.$t('news.archive.btn.confirm');
@@ -71,9 +71,9 @@ export default {
         confirmText = this.$t('news.unarchive.confirm').replace('{0}', this.newsTitle);
         captionText = this.$t('news.unarchive.action');
       }
-      eXo.social.PopupConfirmation.confirm('newsArchiveButton', [{action: this.updateArchivedField, label: confirmButton}], captionText, confirmText, cancelButton);
+      eXo.social.PopupConfirmation.confirm('newsArchiveButton', [{action: this.updateArchivedField(), label: confirmButton}], captionText, confirmText, cancelButton);
     },
-    updateArchivedField: function () {
+    updateArchivedField() {
       const publishMessageTime = 5000;
       const context = this;
       let updatedNews = null;

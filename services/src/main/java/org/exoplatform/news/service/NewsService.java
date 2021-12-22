@@ -69,11 +69,11 @@ public interface NewsService {
   /**
    * Publish a news
    *
-   * @param newsId The id of the news to be published
+   * @param news to be published
    * @param publisher
    * @throws Exception when error
    */
-  void publishNews(String newsId, String publisher) throws Exception;
+  void publishNews(News news, String publisher) throws Exception;
   
   /**
    * 

@@ -22,6 +22,7 @@ import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.storage.NewsStorage;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.portal.config.UserACL;
@@ -65,6 +66,8 @@ public class NewsServiceImpl implements NewsService {
 
   private UserACL               userACL;
 
+  private NewsTargetingService               newsTargetingService;
+
   private static final Log      LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
   public NewsServiceImpl(SpaceService spaceService,
@@ -74,7 +77,8 @@ public class NewsServiceImpl implements NewsService {
                          NewsESSearchConnector newsESSearchConnector,
                          IndexingService indexingService,
                          NewsStorage newsStorage,
-                         UserACL userACL) {
+                         UserACL userACL,
+                         NewsTargetingService newsTargetingService) {
     this.spaceService = spaceService;
     this.activityManager = activityManager;
     this.identityManager = identityManager;
@@ -82,6 +86,7 @@ public class NewsServiceImpl implements NewsService {
     this.indexingService = indexingService;
     this.newsStorage = newsStorage;
     this.userACL = userACL;
+    this.newsTargetingService = newsTargetingService;
   }
 
   /**
@@ -134,12 +139,17 @@ public class NewsServiceImpl implements NewsService {
     if (publish != news.isPublished() && news.isCanPublish()) {
       news.setPublished(publish);
       if (news.isPublished()) {
-        publishNews(news.getId(), updater);
+        publishNews(news, updater);
       } else {
         unpublishNews(news.getId());
       }
     }
-    
+    List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
+    if(publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+      newsTargetingService.deleteNewsTargets(news.getId());
+      newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), updater);
+    }
+
     newsStorage.updateNews(news);
     
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
@@ -201,6 +211,7 @@ public class NewsServiceImpl implements NewsService {
       news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
       news.setCanPublish(canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
+      news.setTargets(newsTargetingService.getTargetsByNewsId(newsId));
     }
     return news;
   }
@@ -292,6 +303,11 @@ public class NewsServiceImpl implements NewsService {
     if (!canScheduleNews(space, currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
     }
+    List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
+    if(news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+      newsTargetingService.deleteNewsTargets(news.getId());
+      newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), currentIdentity.getUserId());
+    }
     return newsStorage.scheduleNews(news);
   }
 
@@ -304,6 +320,7 @@ public class NewsServiceImpl implements NewsService {
     if (!canScheduleNews(space, currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to unschedule news");
     }
+    newsTargetingService.deleteNewsTargets(news.getId());
     return newsStorage.unScheduleNews(news);
   }
   
@@ -323,7 +340,7 @@ public class NewsServiceImpl implements NewsService {
     updateNews(news, poster, null, news.isPublished());
     sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
     if (news.isPublished()) {
-      publishNews(news.getId(), poster);
+      publishNews(news, poster);
     }
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
@@ -345,9 +362,14 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void publishNews(String newsId, String publisher) throws Exception {
-    News news = getNewsById(newsId, false);
+  public void publishNews(News newNews, String publisher) throws Exception {
+    News news = getNewsById(newNews.getId(), false);
     newsStorage.publishNews(news);
+    List<String> oldTargets = newsTargetingService.getTargetsByNewsId(newNews.getId());
+    if(newNews.getTargets() != null && !oldTargets.equals(newNews.getTargets())) {
+      newsTargetingService.deleteNewsTargets(newNews.getId());
+      newsTargetingService.saveNewsTarget(newNews.getId(), newNews.getTargets(), publisher);
+    }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
   }
@@ -358,6 +380,7 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void unpublishNews(String newsId) throws Exception {
     newsStorage.unpublishNews(newsId);
+    newsTargetingService.deleteNewsTargets(newsId);
   }
 
   /**

@@ -17,7 +17,6 @@
 package org.exoplatform.news.service.impl;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.exoplatform.news.model.NewsTargetObject;
@@ -59,8 +58,15 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   @Override
   public List<NewsTargetingEntity> getTargets() {
-    List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(),  LIMIT);
+    List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
+  }
+  
+  @Override
+  public void deleteTargetByName(String targetName) {
+    MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);
+    Metadata targetMetadata = metadataService.getMetadataByKey(targetMetadataKey);
+    metadataService.deleteMetadataById(targetMetadata.getId());
   }
 
   @Override

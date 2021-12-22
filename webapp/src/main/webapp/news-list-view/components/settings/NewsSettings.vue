@@ -15,8 +15,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="d-flex flex-row mx-3 my-1">
-    <div class="d-flex flex-column flex-grow-1 body-1 text-uppercase text-sub-title text-truncate my-auto">{{ $t('news.latest.header') }}</div>
+  <div class="d-flex flex-row pa-2">
+    <div class="d-flex flex-column flex-grow-1 body-1 text-uppercase text-sub-title text-truncate my-auto">{{ newsHeader }}</div>
     <div class="d-flex flex-column me-2">
       <v-btn
         icon
@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>
-    <div class="d-flex flex-column justify-end my-auto">
+    <div class="d-flex flex-column my-auto me-2">
       <v-btn
         depressed
         small
@@ -38,6 +38,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
+  data: () => ({
+    newsHeader: ''
+  }),
+  created() {
+    this.$root.$on('saved-news-settings',() => {
+      this.newsHeader = this.$root.header;
+    });
+    this.newsHeader = this.$root.header;
+  },
   methods: {
     openDrawer() {
       this.$refs.settingsDrawer.open();

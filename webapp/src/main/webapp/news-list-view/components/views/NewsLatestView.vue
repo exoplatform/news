@@ -15,164 +15,53 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div>
-    <news-empty-latest-view v-if="!newsInfo" />
-    <v-app
-      v-else
-      id="latestNewsDetails"
-      class="VuetifyApp"
-      flat>
-      <v-container pa-0>
-        <v-layout
-          row
-          mx-0
-          class="white">
-          <v-flex
-            d-flex
-            xs12
-            px-3
-            pb-3
-            class="news-container">
-            <v-layout
-              row
-              wrap
-              mx-0
-              class="d-none d-sm-flex">
-              <v-flex
-                d-flex
-                xs12
-                sm6>
-                <v-img
-                  v-if="newsInfo && typeof newsInfo[0] !== 'undefined'"
-                  :src="newsInfo[0].illustrationURL"
-                  aspect-ratio="2.3"
-                  class="leftSideNewsImg"
-                  @click="openNews(newsInfo[0].url)">
-                  <v-row align="end" class="white--text pa-2 fill-height">
-                    <v-list three-line class="flex leftSideText transparent">
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>
-                            <div class="flex d-flex flex-row">
-                              <div class="flex-column newsSpaceInfos me-2 my-auto">
-                                <a :href="spaceUrl">
-                                  <img :src="spaceAvatarUrl">
-                                </a>
-                              </div>
-                              <div class="flex-column text--white my-auto">
-                                <a :href="spaceUrl">
-                                  <span class="text-capitalize spaceName">{{ spaceDisplayName }}</span>
-                                </a>
-                              </div>
-                            </div>
-                          </v-list-item-title>
-                          <v-list-item-subtitle
-                            class="mainNewsBody text-truncate white--text"
-                            @click="openNews(newsInfo[0].url)"
-                            v-sanitized-html="newsInfo[0].body" />
-                        </v-list-item-content>
-                      </v-list-item>
-                      <div class="flex d-flex flex-row white--text my-auto ms-4 mt-2">
-                        <div class="flex-column my-auto me-2 leftPostDate">{{ newsInfo[0].postDate }}</div>
-                        <div class="flex-column my-auto">
-                          <v-icon
-                            class="baseline-vertical-align white--text ms-6 me-2"
-                            size="12">
-                            fa-thumbs-up
-                          </v-icon>
-                        </div>
-                        <div class="flex-column my-auto me-2 leftTextSize">
-                          <span>{{ likeSize }}</span>
-                        </div>
-                        <div class="flex-column my-auto">
-                          <v-icon
-                            class="baseline-vertical-align white--text mx-auto me-2 leftTextSize"
-                            size="12">
-                            fa-comment
-                          </v-icon>
-                        </div>
-                        <div class="flex-column my-auto">
-                          <span>{{ commentsSize }}</span>
-                        </div>
-                      </div>
-                    </v-list>
-                  </v-row>
-                </v-img>
-              </v-flex>
-              <v-flex
-                d-flex
-                xs12
-                sm6
-                align-start>
-                <v-layout
-                  row
-                  wrap
-                  mx-0
-                  pl-2
-                  class="news-right-list">
-                  <v-list
-                    three-line
-                    class="d-xs-none py-0 list-news">
-                    <template v-for="(item, index) of newsInfo.slice(1)">
-                      <v-list-item
-                        :key="item.title"
-                        @mouseenter="applyItemClass(index)"
-                        @mouseleave="applyItemClass(index)"
-                        class="px-0 news-item">
-                        <v-list-item-avatar
-                          :id="`item-avatar${index}`"
-                          tile
-                          size="95"
-                          class="newsItemAvatar mr-2 my-0">
-                          <v-img :src="item.illustrationURL" @click="openNews(item.url)" />
-                        </v-list-item-avatar>
-
-                        <v-list-item-content class="pt-0 pl-1">
-                          <v-list-item-title
-                            class="text-capitalize newsRightTitle mb-1"
-                            @click="openNews(item.url)"
-                            v-sanitized-html="item.title" />
-                          <v-list-item-subtitle
-                            :id="`item-news${index}`"
-                            class="newsRightBody my-1"
-                            @click="openNews(item.url)"
-                            v-sanitized-html="item.body" />
-                          <div class="flex d-flex flex-row my-auto">
-                            <div class="flex-column my-auto me-2 postDateNews"> {{ item.postDate }}</div>
-                            <div class="flex-column my-auto">
-                              <v-icon
-                                class="likeIconStyle baseline-vertical-align ms-6 me-2"
-                                size="12">
-                                fa-thumbs-up
-                              </v-icon>
-                            </div>
-                            <div class="flex-column my-auto me-2">
-                              <span class="counterStyle">{{ likeSize }}</span>
-                            </div>
-                            <div class="flex-column my-auto">
-                              <v-icon
-                                class="commentIconStyle baseline-vertical-align mx-auto me-2"
-                                size="12">
-                                fa-comment
-                              </v-icon>
-                            </div>
-                            <div class="counterStyle flex-column my-auto">
-                              <span>{{ commentsSize }}</span>
-                            </div>
-                          </div>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </template>
-                  </v-list>
-                </v-layout>
-              </v-flex>
-            </v-layout>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-app>
+  <div id="news-latest-view" class="px-2 pb-2">
+    <div class="article-container">
+      <div
+        v-for="(item, index) of newsInfo"
+        :key="item"
+        class="article"
+        :id="`articleItem-${index}`">
+        <a
+          class="articleLink"
+          target="_self"
+          :href="item.url">
+          <div class="articleImage">
+            <img :src="item.illustrationURL" :alt="$t('news.latest.alt.articleImage')">
+          </div>
+          <div class="articleInfos">
+            <div class="articleSpace">
+              <img
+                class="spaceImage"
+                :src="spaceAvatarUrl"
+                :alt="$t('news.latest.alt.spaceImage')">
+              <span class="text-capitalize spaceName">{{ spaceDisplayName }}</span>
+            </div>
+            <span class="articleTitle">Welcome to your new digital workplace platform! Take this quick tour to discover its features</span>
+            <div class="articlePostTitle">
+              <span class="articleDate">{{ item.postDate }}</span>
+              <div class="reactions">
+                <v-icon
+                  class="likeIconStyle me-1"
+                  size="12">
+                  mdi-thumb-up
+                </v-icon>
+                <div class="likesCount me-2">{{ likeSize }}</div>
+                <v-icon
+                  class="commentIconStyle me-1"
+                  size="12">
+                  mdi-comment
+                </v-icon>
+                <div class="commentsCount">{{ commentsSize }}</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
 </template>
+
 <script>
 export default {
   props: {
@@ -192,26 +81,6 @@ export default {
     isHovered: false,
   }),
   computed: {
-    labels() {
-      return {
-        CancelRequest: this.$t('profile.CancelRequest'),
-        Confirm: this.$t('profile.Confirm'),
-        Connect: this.$t('profile.Connect'),
-        Ignore: this.$t('profile.Ignore'),
-        RemoveConnection: this.$t('profile.RemoveConnection'),
-        StatusTitle: this.$t('profile.StatusTitle'),
-        join: this.$t('space.join'),
-        leave: this.$t('space.leave'),
-        members: this.$t('space.members'),
-      };
-    },
-    spaceUrl() {
-      if (this.space && this.space.groupId) {
-        const uri = this.space.groupId.replace(/\//g, ':');
-        return `${eXo.env.portal.context}/g/${uri}/`;
-      }
-      return '#';
-    },
     spaceAvatarUrl() {
       return this.space && this.space.avatarUrl;
     },
@@ -267,18 +136,6 @@ export default {
         window.location.href = url;
       }
     },
-    applyItemClass(index) {
-      this.isHovered = !this.isHovered;
-      const elementRightBody = document.getElementById(`item-news${index}`);
-      const elementAvatar = document.getElementById(`item-avatar${index}`);
-      if (this.isHovered) {
-        elementRightBody.classList.add('newsRightBodyHover');
-        elementAvatar.classList.add('newsAvatarHover');
-      } else {
-        elementRightBody.classList.remove('newsRightBodyHover');
-        elementAvatar.classList.remove('newsAvatarHover');
-      }
-    }
   }
 };
 </script>

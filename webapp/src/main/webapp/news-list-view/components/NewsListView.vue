@@ -16,9 +16,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="news-list-view-app position-relative">
-    <v-card flat class="list-view-card">
+    <v-card flat class="list-view-card rounded-0">
       <v-card-text class="pa-0">
-        <news-settings v-if="viewTemplate !== 'NewsSlider'" />
+        <news-settings v-if="viewTemplate && viewTemplate !== 'NewsSlider'" />
         <extension-registry-component
           v-if="selectedViewExtension"
           element-class="news-list-view"
@@ -59,7 +59,7 @@ export default {
       if (this.viewTemplate) {
         return this.viewExtensions[this.viewTemplate];
       } else if (Object.keys(this.viewExtensions).length) {
-        const sortedViewExtensions = Object.values(this.viewExtensions).sort((ext1, ext2) => ext1.rank - ext2.rank);
+        const sortedViewExtensions = Object.values(this.viewExtensions).sort();
         return sortedViewExtensions[0];
       }
       return null;

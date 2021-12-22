@@ -1218,6 +1218,9 @@ public class JcrNewsStorage implements NewsStorage {
       if (newsNode.canAddMixin("exo:privilegeable")) {
         newsNode.addMixin("exo:privilegeable");
       }
+      if (newsNode.hasProperty("exo:attachmentsIds")) {
+        newsAttachmentsService.shareAttachments(newsNode, space);
+      }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
       newsNode.save();
       if (sharedActivityId != null) {
@@ -1225,8 +1228,7 @@ public class JcrNewsStorage implements NewsStorage {
           String activities = newsNode.getProperty("exo:activities").getString();
           activities = activities.concat(";").concat(space.getId()).concat(":").concat(sharedActivityId);
           newsNode.setProperty("exo:activities", activities);
-        } 
-        else {
+        } else {
           newsNode.setProperty("exo:activities", sharedActivityId);
         }
         newsNode.save();
@@ -1234,6 +1236,8 @@ public class JcrNewsStorage implements NewsStorage {
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
           + userIdentity.getId(), e);
+    } catch (Exception e) {
+      LOG.error("Error when sharing news with id " + newsId + " attachments in " + space.getId());
     }
   }
   

@@ -323,6 +323,21 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
     }
   }
 
+  @Override
+  public void shareAttachments(Node newsNode, Space space) {
+    try {
+      for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
+        if (attachmentNode.canAddMixin("exo:privilegeable")) {
+          attachmentNode.addMixin("exo:privilegeable");
+        }
+        ((ExtendedNode) attachmentNode).setPermission(space.getGroupId(), new String[] { PermissionType.READ });
+        attachmentNode.save();
+      }
+    } catch (Exception e) {
+      LOG.error("Cannot share News attachment of News " + newsNode, e);
+    }
+  }
+
   protected NewsAttachment convertNodeToNewsAttachment(Node attachmentNode) throws Exception {
     String mimetype = "";
     int attachmentSize = 0;

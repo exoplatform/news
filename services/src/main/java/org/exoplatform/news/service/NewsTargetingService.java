@@ -18,6 +18,7 @@ package org.exoplatform.news.service;
 
 import java.util.List;
 
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.social.metadata.model.MetadataType;
 
@@ -27,17 +28,40 @@ public interface NewsTargetingService {
   public static final MetadataType METADATA_TYPE = new MetadataType(4, "newsTarget");
 
   /**
-   * Gets news targets
+   * Gets the {@link List} of all {@link News} targets which can be referenced from {@link News} list portlets
    * 
-   * @return {@link List} of news targets
+   * @return {@link List} of all {@link News} targets
    */
   List<NewsTargetingEntity> getTargets();
 
   /**
-   * Gets  referenced targets
+   * Gets the {@link List} of {@link News} targets linked to a given {@link News} id
+   * 
+   * @param newsId {@link News} identifier of {@link News} targets to be retrieved
+   * @return {@link List} of {@link News} targets by {@link News} id
+   */
+  List<String> getTargetsByNewsId(String newsId);
+
+  /**
+   * Gets the {@link List} of referenced targets from {@link News} list portlets 
    *
    * @return {@link List} of referenced targets
    */
   List<NewsTargetingEntity> getReferencedTargets();
+
+  /**
+   * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
+   *
+   * @param newsId {@link News} identifier of {@link News} targets to be saved 
+   * @param targets {@link List} of {@link News} targets to be saved
+   * @param currentUser current user attempting to save {@link News} targets
+   */
+  void saveNewsTarget(String newsId, List<String> targets, String currentUser);
+
+  /**
+   * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
+   *@param newsId {@link News} identifier of {@link News} targets to be deleted
+   */
+  void deleteNewsTargets(String newsId);
 
 }

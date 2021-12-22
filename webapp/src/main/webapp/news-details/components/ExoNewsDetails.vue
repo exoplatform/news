@@ -151,10 +151,11 @@ export default {
         }
       }, redirectionTime);
     },
-    postNews(schedulePostDate, postArticleMode, publish, isActivityPosted) {
+    postNews(schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
+      this.news.targets = selectedTargets;
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

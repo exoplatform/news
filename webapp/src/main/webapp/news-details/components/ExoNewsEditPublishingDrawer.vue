@@ -189,13 +189,14 @@ export default {
         this.$refs.postNewsDrawer.open();
       }
     },
-    getSelectedTargets(event) {
-      this.selectedTargets = event;
+    getSelectedTargets(selectedTargets) {
+      this.selectedTargets = selectedTargets;
     },
     updateNews() {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
+      this.news.targets = this.selectedTargets;
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         this.$emit('refresh-news', this.news.newsId);

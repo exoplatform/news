@@ -376,7 +376,7 @@ export default {
       return this.news && this.news.activityPosted;
     },
     disableTargetOption() {
-      return this.publish ? this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 : false;
+      return this.publish && this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
     },
   },
   created() {
@@ -434,11 +434,12 @@ export default {
             this.news = news;
             this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
+            this.selectedTargets = news.targets;
           }
         });
     },
     postArticle() {
-      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted);
+      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted, this.selectedTargets);
     },
     closeDrawer() {
       if (this.news) {
@@ -454,8 +455,8 @@ export default {
     nextStep() {
       this.stepper++;
     },
-    getSelectedTargets(event) {
-      this.selectedTargets = event;
+    getSelectedTargets(selectedTargets) {
+      this.selectedTargets = selectedTargets;
     },
   }
 };

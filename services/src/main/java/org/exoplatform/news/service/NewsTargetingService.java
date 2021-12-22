@@ -33,6 +33,13 @@ public interface NewsTargetingService {
    * @return {@link List} of all {@link News} targets
    */
   List<NewsTargetingEntity> getTargets();
+  
+  /**
+   * Delete the {@link News} target by a given {@link News} target name
+   * 
+   * @param targetName {@link News} target name to be deleted
+   */
+  void deleteTargetByName(String targetName);
 
   /**
    * Gets the {@link List} of {@link News} targets linked to a given {@link News} id
@@ -60,7 +67,8 @@ public interface NewsTargetingService {
 
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
-   *@param newsId {@link News} identifier of {@link News} targets to be deleted
+   * 
+   * @param newsId {@link News} identifier of {@link News} targets to be deleted
    */
   void deleteNewsTargets(String newsId);
 

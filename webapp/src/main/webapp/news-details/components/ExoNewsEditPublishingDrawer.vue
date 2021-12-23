@@ -55,18 +55,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 v-model="publish"
                 inset
                 dense
-                class="my-auto" />
+                class="my-auto"
+                @change="removeTargets" />
               <label class="publishSectionOption my-auto">
                 {{ $t('news.details.editPublishing.option') }}
               </label>
             </div>
             <exo-news-targets-selector
-              v-if="allowPublishTargeting && publish"
+              v-if="publish"
               id="chooseTargets"
               ref="chooseTargets"
               :news="news"
               :publish="publish"
-              :allow-publish-targeting="allowPublishTargeting"
               @selected-targets="getSelectedTargets" />
           </div>
         </div>
@@ -105,7 +105,6 @@ export default {
       { id: 1, name: 'Snapshot Slider'},
       { id: 2, name: 'Homepage widget'}
     ],
-    allowPublishTargeting: false,
     isActivityPosted: true,
     editingNews: false,
     disabled: false,
@@ -115,21 +114,21 @@ export default {
       this.publish = this.selected;
     },
     isActivityPosted() {
-      if (this.isHiddenActivity === !this.isActivityPosted && (this.publish === this.selected || (this.allowPublishTargeting && this.publish && this.selectedTargets && this.selectedTargets.length === 0))) {
+      if (this.isHiddenActivity === !this.isActivityPosted && (this.publish === this.selected || (this.publish && this.selectedTargets && this.selectedTargets.length === 0))) {
         this.disabled = true;
       } else {
         this.disabled = false;
       }
     },
     publish() {
-      if ((!this.allowPublishTargeting && this.publish === this.selected && this.isHiddenActivity === !this.isActivityPosted) || (this.isHiddenActivity === !this.isActivityPosted && this.allowPublishTargeting && (this.publish === this.selected || (this.publish && this.selectedTargets && this.selectedTargets.length === 0)))) {
+      if ((this.publish === this.selected && this.isHiddenActivity === !this.isActivityPosted) || (this.isHiddenActivity === !this.isActivityPosted && (this.publish === this.selected || (this.publish && this.selectedTargets && this.selectedTargets.length === 0)))) {
         this.disabled = true;
       } else {
         this.disabled = false;
       }
     },
     selectedTargets(newVal, oldVal) {
-      if (newVal.length === 0) {
+      if (this.publish && newVal.length === 0) {
         this.disabled = true;
       } else if (newVal !== oldVal) {
         this.disabled = false;
@@ -146,10 +145,10 @@ export default {
       return this.news && this.news.activityPosted;
     },
     disableTargetOption() {
-      return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
+      return this.selectedTargets && this.selectedTargets.length === 0;
     },
     showTargetInformation() {
-      return this.disableTargetOption && this.allowPublishTargeting && this.publish;
+      return this.disableTargetOption && this.publish;
     },
     selectAllTargets() {
       return this.selectedTargets.length === this.targets.length;
@@ -167,8 +166,6 @@ export default {
     }
   },
   created() {
-    this.$featureService.isFeatureEnabled('news.publishTargeting')
-      .then(enabled => this.allowPublishTargeting = enabled);
     this.$root.$on('open-edit-publishing-drawer', () => {
       this.openDrawer();
     });
@@ -204,6 +201,9 @@ export default {
           this.drawer = false;
         }, 400);
       });
+    },
+    removeTargets() {
+      this.selectedTargets = [];
     },
     closeDrawer() {
       this.disabled = false;

@@ -304,9 +304,13 @@ public class NewsServiceImpl implements NewsService {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
     }
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
-    if(news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+    if (news.isPublished()) {
+      if (news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+        newsTargetingService.deleteNewsTargets(news.getId());
+        newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), currentIdentity.getUserId());
+      }
+    } else {
       newsTargetingService.deleteNewsTargets(news.getId());
-      newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), currentIdentity.getUserId());
     }
     return newsStorage.scheduleNews(news);
   }

@@ -78,14 +78,13 @@
                   {{ $t('news.composer.publishSection.option') }}
                 </label>
               </div>
-              <div v-if="allowPublishTargeting" class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
+              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
               <exo-news-targets-selector
-                v-if="allowPublishTargeting && publish"
+                v-if="publish"
                 id="chooseTargets"
                 ref="chooseTargets"
                 :news="news"
                 :publish="publish"
-                :allow-publish-targeting="allowPublishTargeting"
                 @selected-targets="getSelectedTargets" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
@@ -270,7 +269,6 @@ export default {
     canPublishNews: false,
     publish: false,
     news: null,
-    allowPublishTargeting: false,
     isActivityPosted: true,
     selectedTargets: [],
   }),
@@ -376,13 +374,11 @@ export default {
       return this.news && this.news.activityPosted;
     },
     disableTargetOption() {
-      return this.publish && this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0;
+      return this.publish && this.selectedTargets && this.selectedTargets.length === 0;
     },
   },
   created() {
     this.disabled = true;
-    this.$featureService.isFeatureEnabled('news.publishTargeting')
-      .then(enabled => this.allowPublishTargeting = enabled);
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });

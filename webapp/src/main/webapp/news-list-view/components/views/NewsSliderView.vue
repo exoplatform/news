@@ -32,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         dark>
         <v-img
           class="articleImage fill-height"
-          :src="item.illustrationURL"
+          :src="item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'"
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
@@ -50,18 +50,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </span>
             </div>
             <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
-              <span class="white--text articleSummary">
-                {{ item.body }}
-              </span>
+              <span class="white--text articleSummary"> {{ escapeHTML(item.body) }}</span>
+              <news-slider-view-item
+                :author="item.author"
+                :author-display-name="item.authorDisplayName"
+                :space-id="item.spaceId"
+                :publish-date="formatDate(item.publishDate)"
+                :author-avatar-url="item.authorAvatarUrl"
+                :activity-id="item.activityId"
+                :views-count="item.viewsCount"
+                class="d-flex flex-row newsSliderItem align-center justify-center pa-2 ms-2" />
             </div>
-            <news-slider-details-item
-              :author="item.author"
-              :author-full-name="item.authorFullName"
-              :space-id="item.spaceId"
-              :post-date="item.postDate"
-              :author-avatar-url="item.authorAvatarUrl"
-              :author-profile-url="item.authorProfileURL"
-              class="d-flex flex-row newsSliderItem align-center justify-center pa-2 ms-2" />
           </div>
         </v-container>
       </v-carousel-item>
@@ -71,10 +70,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
+  props: {
+    newsTarget: {
+      type: String,
+      required: false,
+      default: 'snapshotSliderNews'
+    },
+  },
   data () {
     return {
       news: [],
       initialized: false,
+      limit: 4,
+      offset: 0,
+      fullDateFormat: {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      },
     };
   },
   created() {
@@ -88,20 +103,23 @@ export default {
       }
       this.$refs.settingsDrawer.open();
     },
+    formatDate(date) {
+      return this.$dateUtil.formatDateObjectToDisplay(new Date(date.time),this.fullDateFormat, eXo.env.portal.language);
+    },
     getNewsList() {
       if (!this.initialized) {
-        this.$newsListService.getNewsList()
+        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.news = newsList;
+            this.news = newsList.news;
             this.initialized = true;
-            this.news.forEach(function (item, i) {
-              if (item.illustrationURL === null) {
-                this.news[i].illustrationURL = '/news/images/news.png';
-              }
-            });
           })
           .finally(() => this.initialized = false);
       }
+    },
+    escapeHTML: function(html) {
+      const text = document.createElement('textarea');
+      text.innerHTML = html;
+      return text.value.replace(/<\/p\s*>/, ' ').replace(/<\/?[^>]+>/gm, '').trim();
     },
   }
 };

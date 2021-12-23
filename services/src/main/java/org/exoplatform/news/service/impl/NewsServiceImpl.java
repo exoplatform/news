@@ -2,6 +2,7 @@ package org.exoplatform.news.service.impl;
 
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
@@ -242,6 +244,23 @@ public class NewsServiceImpl implements NewsService {
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
     });
     return newsList;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<News> getNewsByTarget(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) {
+    List<MetadataItem> targets = newsTargetingService.getNewsTargetsByName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
+    return targets.stream().map(target -> {
+      try {
+        News news = getNewsById(target.getObjectId(), currentIdentity, false);
+        news.setPublishDate(new Date(target.getCreatedDate()));
+        return news;
+      } catch (Exception e) {
+        return null;
+      }
+    }).collect(Collectors.toList());
   }
   
   /**

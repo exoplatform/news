@@ -52,7 +52,8 @@ export default {
     viewExtensions: {},
     loading: false,
     hasMore: false,
-    limit: 10,
+    limit: 4,
+    offset: 0,
   }),
   computed: {
     selectedViewExtension() {
@@ -94,9 +95,9 @@ export default {
   methods: {
     retrieveNewsList() {
       this.loading = true;
-      return this.$newsListService.getNewsList(this.newsTarget, this.limit + 1)
+      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
         .then(newsList => {
-          this.newsList = newsList || [];
+          this.newsList = newsList.news || [];
           this.hasMore = this.newsList.length > this.limit;
         })
         .finally(() => this.loading = false);

@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :src="authorAvatarUrl"
           alt="Author image" />
       </v-avatar>
-      <span class="text-capitalize text--white my-auto ml-2">{{ authorFullName }}</span>
+      <span class="text-capitalize text--white my-auto ml-2">{{ authorDisplayName }}</span>
     </div>
     <v-icon
       class="mx-1"
@@ -43,7 +43,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="date-container d-flex">
       <v-icon class="me-1 ms-2" size="15">mdi-clock</v-icon>
-      <span class="postDate flex-column me-1 my-auto">{{ postDate }}, 2020</span>
+      <span class="postDate flex-column me-1 my-auto">{{ publishDate }}</span>
     </div>
     <div class="reactions-container d-flex ml-4">
       <div class="likes-container mb-1">
@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </div>
       <div class="views-container ml-2">
         <v-icon class="views-icon" size="16">mdi-eye</v-icon>
-        <span class="counterStyle">{{ viewsSize }}</span>
+        <span class="counterStyle">{{ viewsCount }}</span>
       </div>
     </div>
   </v-row>
@@ -73,7 +73,7 @@ export default {
       type: String,
       default: ''
     },
-    authorFullName: {
+    authorDisplayName: {
       type: String,
       default: ''
     },
@@ -85,20 +85,23 @@ export default {
       type: String,
       default: ''
     },
-    authorProfileUrl: {
+    publishDate: {
       type: String,
       default: ''
     },
-    postDate: {
+    activityId: {
       type: String,
       default: ''
+    },
+    viewsCount: {
+      type: Number,
+      default: 0
     },
   },
   data: () => ({
     space: null,
     commentsSize: 0,
     likeSize: 0,
-    viewsSize: 0,
   }),
   computed: {
     spaceUrl() {
@@ -120,7 +123,7 @@ export default {
       this.getSpaceById(this.spaceId);
     }
     this.retrieveComments();
-    this.getActivityById();
+    this.retrieveLikes();
   },
   methods: {
     getSpaceById(spaceId) {
@@ -131,14 +134,21 @@ export default {
           }
         });
     },
-    getActivityById() {
+    retrieveLikes() {
       this.loading = true;
       this.likeSize = 5;
-      this.viewsSize = 27;
+      return this.$activityService.getActivityById(this.activityId, null)
+        .then(data => {
+          this.likeSize = data && data.likesCount &&  Number(data.likesCount) || 0;
+        });
     },
     retrieveComments() {
-      this.loading = true;
-      this.commentsSize = 3;
+      this.$activityService.getActivityComments(this.activityId, false, 0, 0, null)
+        .then(data => {
+          this.$nextTick().then(() => {
+            this.commentsSize = data && data.size && Number(data.size) || 0;
+          });
+        });
     },
   }
 };

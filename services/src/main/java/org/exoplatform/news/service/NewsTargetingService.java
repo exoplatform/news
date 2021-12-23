@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataType;
 
 
@@ -48,6 +49,16 @@ public interface NewsTargetingService {
    * @return {@link List} of {@link News} targets by {@link News} id
    */
   List<String> getTargetsByNewsId(String newsId);
+
+  /**
+   * Gets the {@link List} of {@link MetadataItem} targets linked to a given target name.
+   *
+   * @param targetName target name of metadata to be retrieved
+   * @param offset limit
+   * @param limit offset
+   * @return {@link List} of {@link MetadataItem} targets by target name
+   */
+  List<MetadataItem> getNewsTargetsByName(String targetName, long offset, long limit);
 
   /**
    * Gets the {@link List} of referenced targets from {@link News} list portlets 

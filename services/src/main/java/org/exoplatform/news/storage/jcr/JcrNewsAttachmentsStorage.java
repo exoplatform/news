@@ -330,7 +330,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
         if (attachmentNode.canAddMixin("exo:privilegeable")) {
           attachmentNode.addMixin("exo:privilegeable");
         }
-        ((ExtendedNode) attachmentNode).setPermission(space.getGroupId(), new String[] { PermissionType.READ });
+        ((ExtendedNode) attachmentNode).setPermission("*:" + space.getGroupId(), new String[] { PermissionType.READ });
         attachmentNode.save();
       }
     } catch (Exception e) {

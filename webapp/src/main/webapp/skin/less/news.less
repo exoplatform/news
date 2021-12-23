@@ -2804,12 +2804,8 @@
           text-shadow: 0 0 4px rgba(0, 0, 0, 0.86);
           margin: auto 15px 15px 15px;
         }
-        .likeIconStyle {
+        .reactionIconStyle {
           color: @baseBackgroundDefault;
-        }
-        .commentIconStyle {
-          color: @baseBackgroundDefault;
-          margin-top: 4px;
         }
         .articleTitle {
           font-size: 24px;
@@ -2974,12 +2970,14 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      .commentIconStyle {
+      .reactionIconStyle {
         color: @greyColorLighten1Default;
-        margin-top: 1px;
       }
-      .likeIconStyle {
-        color: @greyColorLighten1Default;
+      .commentStyle {
+        margin-top: 2px;
+      }
+      .iconStyle {
+        margin-bottom: 2px;
       }
     }
     a {

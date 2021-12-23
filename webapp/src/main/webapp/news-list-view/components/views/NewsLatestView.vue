@@ -39,20 +39,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <span class="articleTitle">Welcome to your new digital workplace platform! Take this quick tour to discover its features</span>
             <div class="articlePostTitle">
-              <span class="articleDate">{{ item.postDate }}</span>
               <div class="reactions">
-                <v-icon
-                  class="likeIconStyle me-1"
-                  size="12">
+                <v-icon class="reactionIconStyle me-1" size="12">mdi-clock</v-icon>
+                <span class="postDate flex-column me-2 my-auto">{{ item.postDate }}, 2020</span>
+                <v-icon class="reactionIconStyle me-1" size="12">
                   mdi-thumb-up
                 </v-icon>
                 <div class="likesCount me-2">{{ likeSize }}</div>
-                <v-icon
-                  class="commentIconStyle me-1"
-                  size="12">
+                <v-icon class="reactionIconStyle commentStyle me-1" size="12">
                   mdi-comment
                 </v-icon>
-                <div class="commentsCount">{{ commentsSize }}</div>
+                <div class="commentsCount me-2">{{ commentsSize }}</div>
+                <v-icon class="reactionIconStyle me-1" size="12">
+                  mdi-eye
+                </v-icon>
+                <div class="viewCount">{{ viewsSize }}</div>
               </div>
             </div>
           </div>
@@ -77,6 +78,7 @@ export default {
     limit: 0,
     commentsSize: 0,
     likeSize: 0,
+    viewsSize: 0,
     space: null,
     isHovered: false,
   }),
@@ -118,6 +120,7 @@ export default {
     getActivityById() {
       this.loading = true;
       this.likeSize = 5;
+      this.viewsSize = 27;
     },
     retrieveComments() {
       this.loading = true;

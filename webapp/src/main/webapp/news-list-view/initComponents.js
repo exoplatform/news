@@ -21,7 +21,8 @@ import NewsSettings from './components/settings/NewsSettings.vue';
 import NewsSettingsDrawer from './components/settings/NewsSettingsDrawer.vue';
 import NewsEmptyLatestView from './components/views/NewsEmptyLatestView.vue';
 import NewsEmptySliderView from './components/views/NewsEmptySliderView.vue';
-import newsSliderDetailsItem from './components/views/newsSliderDetailsItem.vue';
+import NewsSliderDetailsItem from './components/views/NewsSliderDetailsItem.vue';
+import NewsEmptyTemplate from './components/views/NewsEmptyTemplate.vue';
 
 const components = {
   'news-list-view': NewsListView,
@@ -31,7 +32,8 @@ const components = {
   'news-settings-drawer': NewsSettingsDrawer,
   'news-empty-latest-view': NewsEmptyLatestView,
   'news-empty-slider-view': NewsEmptySliderView,
-  'news-slider-details-item': newsSliderDetailsItem,
+  'news-slider-details-item': NewsSliderDetailsItem,
+  'news-empty-template': NewsEmptyTemplate,
 };
 
 for (const key in components) {

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     ref="newsSettingsDrawer"
     id="newsSettingsDrawer"
     right
-    disable-pull-to-refresh
+    fixed
     @closed="close">
     <template slot="title">
       {{ $t('news.list.settings.title') }}
@@ -127,6 +127,7 @@ export default {
   computed: {
     viewTemplates() {
       if (this.viewExtensions) {
+        delete this.viewExtensions.NewsEmptyTemplate;
         return Object.keys(this.viewExtensions).map(name => ({
           name,
           label: this.getLabel(`news.list.settings.viewTemplate.${name}`, name),
@@ -147,8 +148,10 @@ export default {
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
         return '/news/images/latestNews.png';
-      } else {
+      } else if ( this.viewTemplate === 'NewsSlider') {
         return '/news/images/sliderNews.png';
+      } else {
+        return '';
       }
     }
   },
@@ -184,18 +187,22 @@ export default {
       this.init();
       this.reset();
       const overlayElement = document.getElementById('drawers-overlay');
-      overlayElement.style.display = 'block';
+      if (overlayElement) {
+        overlayElement.style.display = 'block';
+      }
       this.$refs.newsSettingsDrawer.open();
     },
     close() {
-      const overlayElement = document.getElementById('drawers-overlay');
-      overlayElement.style.display = 'none';
       this.$refs.newsSettingsDrawer.close();
+      const overlayElement = document.getElementById('drawers-overlay');
+      if (overlayElement) {
+        overlayElement.style.display = 'none';
+      }
     },
     reset() {
       this.viewTemplate = this.$root.viewTemplate;
       this.viewExtensions = this.$root.viewExtensions;
-      this.newsTarget = this.$root.newsTarget || 'snapshotLatestNews';
+      this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
     },
     init() {
@@ -223,6 +230,7 @@ export default {
           this.$root.viewTemplate = this.viewTemplate;
           this.$root.newsTarget = this.newsTarget;
           this.$root.header = this.newsHeader;
+          this.$root.$emit('saved-news-settings');
           this.close();
         })
         .finally(() => {

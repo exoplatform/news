@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <portlet:defineObjects />
 <portlet:actionURL var="saveSettingsURL" />
 
-<div class="VuetifyApp">
+<div id="newsListViewApp" class="VuetifyApp">
   <%
     int generatedId = (int) (Math.random() * 1000000l);
     String appId = "news-list-view-" + generatedId;

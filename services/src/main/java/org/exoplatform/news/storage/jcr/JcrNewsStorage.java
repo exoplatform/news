@@ -1017,7 +1017,6 @@ public class JcrNewsStorage implements NewsStorage {
     if (!newsNode.hasProperty("exo:viewers")) {
       newsNode.setProperty("exo:viewers", "");
     }
-
     String newsViewers = newsNode.getProperty("exo:viewers").getString();
     if (newsViewers.isEmpty()) {
       newsViewers = newsViewers.concat(userId);
@@ -1026,8 +1025,14 @@ public class JcrNewsStorage implements NewsStorage {
       newsViewers = newsViewers.concat(",").concat(userId);
     }
     newsNode.setProperty("exo:viewers", newsViewers);
-    Long newsViewsCount = news.getViewsCount() == null ? (long) 1 : news.getViewsCount() + 1;
-    newsNode.setProperty("exo:viewsCount", newsViewsCount);
+
+    if (!newsNode.hasProperty("exo:viewsCount")) {
+      newsNode.setProperty("exo:viewsCount", 0L);
+    } else {
+      Long newsViewsCount = newsNode.getProperty("exo:viewsCount").getValue().getLong() + 1;
+      newsNode.setProperty("exo:viewsCount", newsViewsCount);
+    }
+
     newsNode.save();
   }
   

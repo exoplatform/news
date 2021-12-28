@@ -33,6 +33,7 @@ import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
 
 @Path("v1/news/targeting")
 @Api(tags = "v1/news/targeting", value = "v1/news/targeting")
@@ -50,8 +51,10 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Get all news targets by a giving type", httpMethod = "GET", response = Response.class, produces = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
+  @ApiResponses(value = {
+    @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
+    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") 
+  })
   public Response getTargets(@Context HttpServletRequest request) {
     try {
       List<NewsTargetingEntity> targets = newsTargetingService.getTargets();
@@ -67,12 +70,19 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer {
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Get all news targets by a giving property", httpMethod = "GET", response = Response.class, produces = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
+  @ApiResponses(value = { 
+    @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
+    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
+    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation")
+  })
   public Response getReferencedTargets(@Context HttpServletRequest request) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets();
+      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets(currentIdentity);
       return Response.ok(referencedTargets).build();
+    } catch (IllegalArgumentException e) {
+      LOG.warn("User '{}' is not autorized to get referenced news targets", currentIdentity.getUserId(), e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news referenced targets", e);
       return Response.serverError().build();

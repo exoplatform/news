@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 
@@ -40,7 +41,7 @@ public class NewsListViewPortlet extends GenericDispatchedViewPortlet {
     if (conversationState != null) {
       currentIdentity = ConversationState.getCurrent().getIdentity();
     }
-    if (getNewsService().canPublishNews(currentIdentity)) {
+    if (NewsUtils.canPublishNews(currentIdentity)) {
       PortletPreferences preferences = request.getPreferences();
       Enumeration<String> parameterNames = request.getParameterNames();
       while (parameterNames.hasMoreElements()) {

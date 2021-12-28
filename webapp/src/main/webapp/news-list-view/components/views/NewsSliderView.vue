@@ -94,6 +94,7 @@ export default {
   },
   created() {
     this.getNewsList();
+    this.$root.$on('saved-news-settings', this.refreshNewsViews);
   },
   methods: {
     openDrawer() {
@@ -121,6 +122,10 @@ export default {
       text.innerHTML = html;
       return text.value.replace(/<\/p\s*>/, ' ').replace(/<\/?[^>]+>/gm, '').trim();
     },
+    refreshNewsViews(selectedTarget){
+      this.newsTarget = selectedTarget;
+      this.getNewsList();
+    }
   }
 };
 </script>

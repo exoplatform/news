@@ -64,6 +64,7 @@ export default {
   },
   created() {
     this.getNewsList();
+    this.$root.$on('saved-news-settings', this.refreshNewsViews);
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
@@ -90,6 +91,10 @@ export default {
           }
         });
     },
+    refreshNewsViews(selectedTarget){
+      this.newsTarget = selectedTarget;
+      this.getNewsList();
+    }
 
   }
 };

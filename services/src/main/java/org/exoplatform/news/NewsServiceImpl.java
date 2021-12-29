@@ -451,18 +451,19 @@ public class NewsServiceImpl implements NewsService {
       isCurrentUserInNewsViewers = Arrays.stream(newsViewersArray).anyMatch(userId::equals);
     }
     if (!isCurrentUserInNewsViewers) {
-      if (news.getViewsCount() == null) {
-        news.setViewsCount((long) 1);
-      } else {
-        news.setViewsCount(news.getViewsCount() + 1);
-      }
       if (newsViewers.isEmpty()) {
         newsViewers = newsViewers.concat(userId);
       } else {
         newsViewers = newsViewers.concat(",").concat(userId);
       }
-      newsNode.setProperty("exo:viewsCount", news.getViewsCount());
       newsNode.setProperty("exo:viewers", newsViewers);
+
+      if (!newsNode.hasProperty("exo:viewsCount")) {
+        newsNode.setProperty("exo:viewsCount", 0L);
+      } else {
+        Long newsViewsCount = newsNode.getProperty("exo:viewsCount").getValue().getLong() + 1;
+        newsNode.setProperty("exo:viewsCount", newsViewsCount);
+      }
       newsNode.save();
     }
   }

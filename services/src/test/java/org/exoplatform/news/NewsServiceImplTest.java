@@ -2137,17 +2137,22 @@ public class NewsServiceImplTest {
     news.setId("id123");
     news.setViewsCount((long) 5);
     Node newsNode = mock(Node.class);
+    Value value = mock(Value.class);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
     Property property = mock(Property.class);
     when(newsNode.hasNode("exo:viewers")).thenReturn(true);
     when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(newsNode.getProperty("exo:viewsCount")).thenReturn(property);
+    when(newsNode.getProperty("exo:viewsCount").getValue()).thenReturn(value);
+    when(value.getLong()).thenReturn(5L);
+    when(newsNode.hasProperty("exo:viewers")).thenReturn(true);
+    when(newsNode.hasProperty("exo:viewsCount")).thenReturn(true);
     when(property.getString()).thenReturn("david,test,hedi");
 
     // When
     newsService.markAsRead(news, "root");
 
     // Then
-    assertEquals(Long.valueOf(6), news.getViewsCount());
     verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 6);
     verify(newsNode, times(1)).setProperty("exo:viewers", "david,test,hedi,root");
     verify(newsNode, times(1)).save();
@@ -2273,17 +2278,22 @@ public class NewsServiceImplTest {
     news.setId("id123");
     news.setViewsCount((long) 5);
     Node newsNode = mock(Node.class);
+    Value value = mock(Value.class);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
     Property property = mock(Property.class);
     when(newsNode.hasNode("exo:viewers")).thenReturn(true);
     when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(newsNode.getProperty("exo:viewsCount")).thenReturn(property);
+    when(newsNode.getProperty("exo:viewsCount").getValue()).thenReturn(value);
+    when(value.getLong()).thenReturn(5L);
+    when(newsNode.hasProperty("exo:viewers")).thenReturn(true);
+    when(newsNode.hasProperty("exo:viewsCount")).thenReturn(true);
     when(property.getString()).thenReturn("");
 
     // When
     newsService.markAsRead(news, "root");
 
     // Then
-    assertEquals(Long.valueOf(6), news.getViewsCount());
     verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 6);
     verify(newsNode, times(1)).setProperty("exo:viewers", "root");
     verify(newsNode, times(1)).save();
@@ -2322,17 +2332,22 @@ public class NewsServiceImplTest {
     News news = new News();
     news.setId("id123");
     Node newsNode = mock(Node.class);
+    Value value = mock(Value.class);
     when(session.getNodeByUUID("id123")).thenReturn(newsNode);
     Property property = mock(Property.class);
     when(newsNode.hasNode("exo:viewers")).thenReturn(true);
     when(newsNode.getProperty("exo:viewers")).thenReturn(property);
+    when(newsNode.hasProperty("exo:viewers")).thenReturn(true);
+    when(newsNode.hasProperty("exo:viewsCount")).thenReturn(true);
+    when(newsNode.getProperty("exo:viewsCount")).thenReturn(property);
+    when(newsNode.getProperty("exo:viewsCount").getValue()).thenReturn(value);
+    when(value.getLong()).thenReturn(0L);
     when(property.getString()).thenReturn("");
 
     // When
     newsService.markAsRead(news, "root");
 
     // Then
-    assertEquals(Long.valueOf(1), news.getViewsCount());
     verify(newsNode, times(1)).setProperty("exo:viewsCount", (long) 1);
     verify(newsNode, times(1)).setProperty("exo:viewers", "root");
     verify(newsNode, times(1)).save();

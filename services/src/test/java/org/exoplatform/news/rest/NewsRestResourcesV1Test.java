@@ -340,7 +340,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.updateNews(any())).then(returnsFirstArg());
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "1", updatedNews);
+    Response response = newsRestResourcesV1.updateNews(request, "1",false, updatedNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -367,7 +367,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(news);
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "1", new News());
+    Response response = newsRestResourcesV1.updateNews(request, "1",false, new News());
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -386,7 +386,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById(anyString(), anyBoolean())).thenReturn(null);
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "1", new News());
+    Response response = newsRestResourcesV1.updateNews(request, "1",false, new News());
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
@@ -622,7 +622,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.updateNews(any())).then(returnsFirstArg());
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "id123", updatedNews);
+    Response response = newsRestResourcesV1.updateNews(request, "id123", false, updatedNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -672,7 +672,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById("id123", false)).thenReturn(oldnews);
     
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "id123", updatedNews);
+    Response response = newsRestResourcesV1.updateNews(request, "id123",false, updatedNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -713,7 +713,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById("id123", false)).thenReturn(oldnews);
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "id123", updatedNews);
+    Response response = newsRestResourcesV1.updateNews(request, "id123",false, updatedNews);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -889,7 +889,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsRestResourcesV1.updateNews(request, "1", null);
+    Response response = newsRestResourcesV1.updateNews(request, "1",false, null);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());

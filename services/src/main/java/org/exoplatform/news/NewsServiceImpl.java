@@ -631,6 +631,7 @@ public class NewsServiceImpl implements NewsService {
                                                  repositoryService.getCurrentRepository());
 
     Node node = session.getNodeByUUID(newsId);
+    News news = convertNodeToNews(node, false);
     if (node.hasProperty("exo:activities")) {
       String newActivities = node.getProperty("exo:activities").getString();
       if (StringUtils.isNotEmpty(newActivities)) {
@@ -653,6 +654,7 @@ public class NewsServiceImpl implements NewsService {
                 .forEach(newsActivityId -> activityManager.deleteActivity(newsActivityId));
       }
     }
+    indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     Utils.removeDeadSymlinks(node, false);
     node.remove();
     session.save();
@@ -1182,6 +1184,15 @@ public class NewsServiceImpl implements NewsService {
     }
     org.exoplatform.services.security.Identity authenticatedSecurityIdentity = NewsUtils.getUserIdentity(authenticatedUser);
     return authenticatedSecurityIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  @Override
+  public void updateNewsActivity(News news, boolean post) {
+    ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+    if(post) {
+      activity.setUpdated(System.currentTimeMillis());
+    }
+    activityManager.updateActivity(activity, true);
   }
 
   /**

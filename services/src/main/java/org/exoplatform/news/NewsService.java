@@ -82,6 +82,8 @@ public interface NewsService {
 
   public boolean canEditNews(String posterId, String spaceId);
 
+  void updateNewsActivity(News news, boolean post);
+
   /**
    * @param news {@link News} to check
    * @param authenticatedUser authenticated username

@@ -60,7 +60,7 @@ export default {
         });
       }
     });
-    this.$root.$on('activity-shared', (activityId, spaces) => {
+    this.$root.$on('activity-apps-shared', (activityId, spaces) => {
       if (activityId && spaces && spaces.length > 0) {
         const spacesList = spaces.map(space => space.displayName);
         const message = `${this.$t('news.share.message')} ${spacesList.join(', ')}`;

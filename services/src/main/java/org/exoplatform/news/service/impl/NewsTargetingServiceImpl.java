@@ -100,7 +100,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<MetadataItem> getNewsTargetsByName(String targetName, long offset, long limit) {
+  public List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit) {
     return metadataService.getMetadataItemsByMetadataNameAndTypeAndObject(targetName, METADATA_TYPE.getName(), NewsUtils.NEWS_METADATA_OBJECT_TYPE, offset, limit);
   }
 

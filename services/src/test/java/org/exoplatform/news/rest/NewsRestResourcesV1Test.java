@@ -120,7 +120,7 @@ public class NewsRestResourcesV1Test {
     NewsFilter newsFilter = new NewsFilter();
     newsFilter.setLimit(10);
     newsFilter.setOrder("exo:dateModified");
-    lenient().when(newsService.getNewsByTarget(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList);
+    lenient().when(newsService.getNewsByTargetName(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList);
 
     // When
     Response response = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false);

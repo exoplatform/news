@@ -448,7 +448,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       NewsFilter newsFilter = buildFilter(null, "", "", authenticatedUser, limit, offset);
       NewsEntity newsEntity = new NewsEntity();
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-      List<News> news = newsService.getNewsByTarget(newsFilter, targetName, currentIdentity);
+      List<News> news = newsService.getNewsByTargetName(newsFilter, targetName, currentIdentity);
       newsEntity.setNews(news);
       newsEntity.setOffset(offset);
       newsEntity.setLimit(limit);

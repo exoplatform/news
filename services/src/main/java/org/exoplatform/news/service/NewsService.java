@@ -118,9 +118,9 @@ public interface NewsService {
    * @param filter
    * @param targetName
    * @param currentIdentity user attempting to access news
-   * @return news by target name
+   * @return {@link News} list by target name.
    */
-  List<News> getNewsByTarget(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity);
+  List<News> getNewsByTargetName(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity);
   
   /**
    * 

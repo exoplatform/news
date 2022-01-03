@@ -250,9 +250,9 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public List<News> getNewsByTarget(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) {
-    List<MetadataItem> targets = newsTargetingService.getNewsTargetsByName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
-    return targets.stream().map(target -> {
+  public List<News> getNewsByTargetName(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) {
+    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
+    return newsTargetItems.stream().map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
         news.setPublishDate(new Date(target.getCreatedDate()));

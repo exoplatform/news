@@ -51,14 +51,14 @@ public interface NewsTargetingService {
   List<String> getTargetsByNewsId(String newsId);
 
   /**
-   * Gets the {@link List} of {@link MetadataItem} targets linked to a given target name.
+   * Gets the {@link List} of {@link News} target items by a given target name.
    *
    * @param targetName target name of metadata to be retrieved
    * @param offset limit
    * @param limit offset
-   * @return {@link List} of {@link MetadataItem} targets by target name
+   * @return {@link List} of {@link News} target items by a target name
    */
-  List<MetadataItem> getNewsTargetsByName(String targetName, long offset, long limit);
+  List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit);
 
   /**
    * Gets the {@link List} of referenced targets from {@link News} list portlets 

@@ -202,7 +202,7 @@ public class NewsTargetingImplTest {
   }
 
   @Test
-  public void testGetNewsTargetsByTargetName() {
+  public void testGetNewsTargetItemsByTargetName() {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
 
@@ -225,11 +225,11 @@ public class NewsTargetingImplTest {
     when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObject("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", 0,10)).thenReturn(metadataItems);
 
     // When
-    List<MetadataItem> targets = newsTargetingService.getNewsTargetsByName("newsTargets", 0, 10);
+    List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);
 
     // Then
-    assertNotNull(targets);
-    assertEquals(1, targets.size());
+    assertNotNull(newsTargetsItems);
+    assertEquals(1, newsTargetsItems.size());
   }
 
 }

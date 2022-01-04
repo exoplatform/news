@@ -354,10 +354,8 @@ public class NewsServiceImpl implements NewsService {
   public void markAsRead(News news, String userId) throws Exception {
     if (!newsStorage.isCurrentUserInNewsViewers(news.getId(), userId)) {
       newsStorage.markAsRead(news, userId);
-      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, userId, news);
-    } else {
-      NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, userId, news);
     }
+    NewsUtils.broadcastEvent(NewsUtils.VIEW_NEWS, userId, news);
   }
 
   /**

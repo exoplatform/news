@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               id="viewTemplates"
               ref="viewTemplates"
               v-model="viewTemplate"
-              :items="viewTemplatesDisplayed"
+              :items="displayedViewTemplates"
               :menu-props="{ bottom: true, offsetY: true}"
               item-text="label"
               item-value="name"
@@ -134,7 +134,7 @@ export default {
       }
       return [];
     },
-    viewTemplatesDisplayed(){
+    displayedViewTemplates() {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {

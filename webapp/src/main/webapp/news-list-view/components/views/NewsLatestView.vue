@@ -16,7 +16,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div id="news-latest-view" class="px-2 pb-2">
-    <div class="article-container">
+    <news-empty-latest-view v-if="!displayedNews" />
+    <div v-else class="article-container">
       <div
         v-for="(item, index) of newsInfo"
         :key="item"
@@ -55,6 +56,9 @@ export default {
     },
   }),
   computed: {
+    displayedNews() {
+      return this.newsInfo && this.newsInfo.length > 0;
+    },
     spaceAvatarUrl() {
       return this.space && this.space.avatarUrl;
     },

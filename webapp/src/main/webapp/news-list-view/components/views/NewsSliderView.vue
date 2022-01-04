@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="newsSlider">
-    <news-empty-slider-view v-if="!news" />
+    <news-empty-slider-view v-if="!displayedNews" />
     <v-carousel
       v-else
       cycle
@@ -91,6 +91,11 @@ export default {
         minute: '2-digit',
       },
     };
+  },
+  computed: {
+    displayedNews() {
+      return this.news && this.news.length > 0;
+    }
   },
   created() {
     this.getNewsList();

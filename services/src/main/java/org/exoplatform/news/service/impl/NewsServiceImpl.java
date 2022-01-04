@@ -184,7 +184,11 @@ public class NewsServiceImpl implements NewsService {
     if (!news.isCanDelete()) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");
     }
-    
+
+    List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
+    if(newsTargets != null) {
+      newsTargetingService.deleteNewsTargets(newsId);
+    }
     newsStorage.deleteNews(newsId, isDraft);
     indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);

@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               id="viewTemplates"
               ref="viewTemplates"
               v-model="viewTemplate"
-              :items="viewTemplates"
+              :items="viewTemplatesDisplayed"
               :menu-props="{ bottom: true, offsetY: true}"
               item-text="label"
               item-value="name"
@@ -127,15 +127,15 @@ export default {
   computed: {
     viewTemplates() {
       if (this.viewExtensions) {
-        delete this.viewExtensions.NewsEmptyTemplate;
-        delete this.viewExtensions.NewsSliderEmptyTemplate;
-        delete this.viewExtensions.NewsLatestEmptyTemplate;
         return Object.keys(this.viewExtensions).map(name => ({
           name,
           label: this.getLabel(`news.list.settings.viewTemplate.${name}`, name),
         }));
       }
       return [];
+    },
+    viewTemplatesDisplayed(){
+      return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {
       if (this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0) {
@@ -175,6 +175,7 @@ export default {
   },
   created() {
     this.disabled = true;
+    this.init();
     $(document).click(() => {
       if (this.$refs.newsTargets) {
         this.$refs.newsTargets.blur();
@@ -186,7 +187,6 @@ export default {
   },
   methods: {
     open() {
-      this.init();
       this.reset();
       const overlayElement = document.getElementById('drawers-overlay');
       if (overlayElement) {

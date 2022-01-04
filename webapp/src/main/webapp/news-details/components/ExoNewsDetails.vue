@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+
 const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
 export default {
   props: {
@@ -120,8 +121,14 @@ export default {
       };
       socialProfile.initUserProfilePopup('newsDetails', labels);
     });
+    this.markNewsAsRead(this.newsId);
   },
   methods: {
+    markNewsAsRead(newsId) {
+      if (newsId) {
+        this.$newsServices.markNewsAsRead(newsId);
+      }
+    },
     getSpaceById(spaceId) {
       this.$spaceService.getSpaceById(spaceId, 'identity')
         .then((space) => {

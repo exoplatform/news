@@ -329,9 +329,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
-      if (!editMode) {//TODO Move to service layer
-        newsService.markAsRead(news, authenticatedUser);
-      }
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {//TODO Move to service layer
         News filteredNews = new News();
         Set<Space> spacesList = new HashSet<>();
@@ -351,6 +348,39 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);
+      return Response.serverError().entity(e.getMessage()).build();
+    }
+  }
+
+  @POST
+  @Path("markAsRead/{id}")
+  @RolesAllowed("users")
+  @Produces(MediaType.TEXT_PLAIN)
+  @ApiOperation(value = "mark a news article as read", httpMethod = "POST", response = Response.class, notes = "This marks a news article as read by the user who accessed its details.")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "Request fulfilled"),
+          @ApiResponse(code = 401, message = "User not authorized to get the news"),
+          @ApiResponse(code = 404, message = "News not found"),
+          @ApiResponse(code = 500, message = "Internal server error")})
+
+  public Response markNewsAsRead(@Context HttpServletRequest request,
+                                 @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+    String authenticatedUser = request.getRemoteUser();
+    try {
+      if (StringUtils.isBlank(id)) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+      News news = newsService.getNewsById(id, currentIdentity, false);
+      if (news == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      newsService.markAsRead(news, authenticatedUser);
+      return Response.ok("ok").type(MediaType.TEXT_PLAIN).build();
+    } catch (IllegalAccessException e) {
+      LOG.warn("User {} has no access rights on news with id {}", authenticatedUser, id);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+    } catch (Exception e) {
+      LOG.error("Error while marking news with id: {} as read", id, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

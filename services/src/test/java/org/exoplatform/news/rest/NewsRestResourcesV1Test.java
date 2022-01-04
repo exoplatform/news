@@ -1617,7 +1617,6 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById("space1")).thenReturn(space1);
     lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
     lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
-    lenient().doNothing().when(newsService).markAsRead(news, "john");
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -1644,8 +1643,6 @@ public class NewsRestResourcesV1Test {
     news.setViewsCount((long) 6);
 
     lenient().when(newsService.getNewsById("1", currentIdentity, false)).thenReturn(news);
-    lenient().doNothing().when(newsService).markAsRead(news, "john");
-
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "2", null, false);
     ;
@@ -2489,5 +2486,26 @@ public class NewsRestResourcesV1Test {
 
   private void setCurrentUser(final String name) {
     ConversationState.setCurrent(new ConversationState(new org.exoplatform.services.security.Identity(name)));
+  }
+
+  @Test
+  public void testMarkAsRead() throws Exception {
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+            newsAttachmentsService,
+            spaceService,
+            identityManager,
+            container,
+            favoriteService);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    News news = new News();
+    news.setId("1");
+    when(newsService.getNewsById("1",currentIdentity, false)).thenReturn(news);
+    doNothing().when(newsService).markAsRead(news, "john");
+    Response response = newsRestResourcesV1.markNewsAsRead(request, "1");
+    verify(newsService, times(1)).markAsRead(news,"john");
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 }

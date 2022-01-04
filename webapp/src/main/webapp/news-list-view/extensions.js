@@ -31,3 +31,15 @@ extensionRegistry.registerComponent('NewsList', 'views', {
   vueComponent: Vue.options.components['news-latest-view'],
   rank: 30,
 });
+
+extensionRegistry.registerComponent('NewsList', 'views', {
+  id: 'NewsSliderEmptyTemplate',
+  vueComponent: Vue.options.components['news-empty-slider-view'],
+  rank: 40,
+});
+
+extensionRegistry.registerComponent('NewsList', 'views', {
+  id: 'NewsLatestEmptyTemplate',
+  vueComponent: Vue.options.components['news-empty-latest-view'],
+  rank: 50,
+});

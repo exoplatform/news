@@ -48,7 +48,7 @@ export default {
   data: () => ({
     extensionApp: 'NewsList',
     extensionType: 'views',
-    newsList: [],
+    newsList: ['emptyNews'],
     viewExtensions: {},
     loading: false,
     hasMore: false,
@@ -58,8 +58,16 @@ export default {
   computed: {
     selectedViewExtension() {
       if (this.viewTemplate) {
-        return this.viewExtensions[this.viewTemplate];
-      } else if (Object.keys(this.viewExtensions).length) {
+        if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
+          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
+          return sortedViewExtensions[3];
+        } else if (this.viewTemplate === 'NewsLatest' && this.newsList.length === 0) {
+          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
+          return sortedViewExtensions[4];
+        } else {
+          return this.viewExtensions[this.viewTemplate];
+        }
+      } else if (Object.keys(this.viewExtensions).length && this.newsList.length > 0) {
         const sortedViewExtensions = Object.values(this.viewExtensions).sort();
         return sortedViewExtensions[0];
       }

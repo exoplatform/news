@@ -16,9 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="newsSlider">
-    <news-empty-slider-view v-if="!displayedNews" />
     <v-carousel
-      v-else
       cycle
       show-arrows-on-hover
       interval="10000"
@@ -44,11 +42,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <v-icon>mdi-cog</v-icon>
               </v-btn>
             </div>
-            <div class="flex flex-row flex-grow-1 align-center justify-center slider-header">
+            <a :href="item.url" class="flex flex-row flex-grow-1 align-center justify-center slider-header">
               <span class="articleTitle text-h4 font-weight-medium white--text">
                 {{ item.title }}
               </span>
-            </div>
+            </a>
             <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
               <span class="white--text articleSummary"> {{ escapeHTML(item.body) }}</span>
               <news-slider-view-item
@@ -91,11 +89,6 @@ export default {
         minute: '2-digit',
       },
     };
-  },
-  computed: {
-    displayedNews() {
-      return this.news && this.news.length > 0;
-    }
   },
   created() {
     this.getNewsList();

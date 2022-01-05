@@ -15,67 +15,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function getNewsList() {
-  let newsList = null;
-  newsList = [
-    {
-      body: 'Lorem Ipsum is simply dummy text of the printing Lorem Ipsum is simply dummy text of the printing Lorem Ipsum is simply dummy text of the printing',
-      id: '0a1853307f00010130cb81f7419ab5f0',
-      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg',
-      title: 'Welcome to your new digital workplace platform\n ',
-      url: '/portal/dw/activity?id=21',
-      postDate: 'March 18',
-      author: 'root',
-      authorFullName: 'root root',
-      authorDisplayName: 'Root Root',
-      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
-      authorProfileURL: '/portal/dw/profile/root',
-      spaceId: '3'
+import {newsConstants} from '../../js/newsConstants.js';
+
+export function getNewsList(targetName, offset, limit, returnSize) {
+  return fetch(`${newsConstants.NEWS_API}/byTarget/${targetName}?offset=${offset}&limit=${limit}&returnSize=${returnSize}`, {
+    headers: {
+      'Content-Type': 'application/json'
     },
-    {
-      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting',
-      id: '0a1853307f00010130cb81f7419ab5f0',
-      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/sky.jpg',
-      title: 'testing work2 ',
-      url: '/portal/dw/activity?id=21',
-      postDate: 'November 30',
-      author: 'root',
-      authorFullName: 'root root',
-      authorDisplayName: 'Root Root',
-      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
-      authorProfileURL: '/portal/dw/profile/root',
-      spaceId: '3'
-    },
-    {
-      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting ',
-      id: '0a1853307f00010130cb81f7419ab5f0',
-      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/bird.jpg',
-      title: 'testing work3 ',
-      url: '/portal/dw/activity?id=21',
-      postDate: 'April 20',
-      author: 'root',
-      authorFullName: 'root root',
-      authorDisplayName: 'Root Root',
-      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
-      authorProfileURL: '/portal/dw/profile/root',
-      spaceId: '3'
-    },
-    {
-      body: 'Lorem Ipsum is simply dummy text of the printing and typesetting',
-      id: '0a1853307f00010130cb81f7419ab5f0',
-      illustrationURL: 'https://cdn.vuetifyjs.com/images/carousel/planet.jpg',
-      title: 'testing work4 ',
-      url: '/portal/dw/activity?id=21',
-      postDate: 'May 20',
-      author: 'root',
-      authorFullName: 'root root',
-      authorDisplayName: 'Root Root',
-      authorAvatarUrl: '/portal/rest/v1/social/users/default-image/avatar',
-      authorProfileURL: '/portal/dw/profile/root',
-      spaceId: '3'
-    },
-  ];
-  return Promise.resolve(newsList);
+    method: 'GET'
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error getting news list by target name');
+    }
+  });
 }
 
 export function saveSettings(saveSettingsURL, settings) {

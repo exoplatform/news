@@ -48,17 +48,26 @@ export default {
   data: () => ({
     extensionApp: 'NewsList',
     extensionType: 'views',
-    newsList: [],
+    newsList: ['emptyNews'],
     viewExtensions: {},
     loading: false,
     hasMore: false,
-    limit: 10,
+    limit: 4,
+    offset: 0,
   }),
   computed: {
     selectedViewExtension() {
       if (this.viewTemplate) {
-        return this.viewExtensions[this.viewTemplate];
-      } else if (Object.keys(this.viewExtensions).length) {
+        if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
+          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
+          return sortedViewExtensions[3];
+        } else if (this.viewTemplate === 'NewsLatest' && this.newsList.length === 0) {
+          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
+          return sortedViewExtensions[4];
+        } else {
+          return this.viewExtensions[this.viewTemplate];
+        }
+      } else if (Object.keys(this.viewExtensions).length && this.newsList.length > 0) {
         const sortedViewExtensions = Object.values(this.viewExtensions).sort();
         return sortedViewExtensions[0];
       }
@@ -94,9 +103,9 @@ export default {
   methods: {
     retrieveNewsList() {
       this.loading = true;
-      return this.$newsListService.getNewsList(this.newsTarget, this.limit + 1)
+      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
         .then(newsList => {
-          this.newsList = newsList || [];
+          this.newsList = newsList.news || [];
           this.hasMore = this.newsList.length > this.limit;
         })
         .finally(() => this.loading = false);

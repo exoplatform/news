@@ -98,6 +98,42 @@ public class NewsRestResourcesV1Test {
   }
 
   @Test
+  public void shouldGetNewsByGivenTargetName() throws Exception {
+    // Given
+    NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,
+                                                                      newsAttachmentsService,
+                                                                      spaceService,
+                                                                      identityManager,
+                                                                      container,
+                                                                      favoriteService);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    List<News> newsList = new LinkedList<>();
+    News news = new News();
+    news.setId("1");
+    List<String> targets = new LinkedList<>();
+    targets.add("sliderNews");
+    news.setTargets(targets);
+    newsList.add(news);
+    NewsFilter newsFilter = new NewsFilter();
+    newsFilter.setLimit(10);
+    newsFilter.setOrder("exo:dateModified");
+    lenient().when(newsService.getNewsByTargetName(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList);
+
+    // When
+    Response response = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertNotNull(response.getEntity());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsEntityNews = newsEntity.getNews();
+    assertEquals(1, newsEntityNews.size());
+  }
+
+  @Test
   public void shouldReturnBadRequestWhenNoActivityId() throws Exception {
     // Given
     NewsRestResourcesV1 newsRestResourcesV1 = new NewsRestResourcesV1(newsService,

@@ -61,6 +61,8 @@ public class News {
 
   private Date                 updateDate;
 
+  private Date                 publishDate;
+
   private boolean              published;
 
   private boolean              archived;

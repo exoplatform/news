@@ -74,7 +74,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               id="viewTemplates"
               ref="viewTemplates"
               v-model="viewTemplate"
-              :items="viewTemplates"
+              :items="displayedViewTemplates"
               :menu-props="{ bottom: true, offsetY: true}"
               item-text="label"
               item-value="name"
@@ -127,13 +127,15 @@ export default {
   computed: {
     viewTemplates() {
       if (this.viewExtensions) {
-        delete this.viewExtensions.NewsEmptyTemplate;
         return Object.keys(this.viewExtensions).map(name => ({
           name,
           label: this.getLabel(`news.list.settings.viewTemplate.${name}`, name),
         }));
       }
       return [];
+    },
+    displayedViewTemplates() {
+      return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {
       if (this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0) {
@@ -173,6 +175,7 @@ export default {
   },
   created() {
     this.disabled = true;
+    this.init();
     $(document).click(() => {
       if (this.$refs.newsTargets) {
         this.$refs.newsTargets.blur();
@@ -184,7 +187,6 @@ export default {
   },
   methods: {
     open() {
-      this.init();
       this.reset();
       const overlayElement = document.getElementById('drawers-overlay');
       if (overlayElement) {
@@ -230,7 +232,7 @@ export default {
           this.$root.viewTemplate = this.viewTemplate;
           this.$root.newsTarget = this.newsTarget;
           this.$root.header = this.newsHeader;
-          this.$root.$emit('saved-news-settings');
+          this.$root.$emit('saved-news-settings', this.newsTarget);
           this.close();
         })
         .finally(() => {

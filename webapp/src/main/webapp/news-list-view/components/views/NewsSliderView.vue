@@ -36,6 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div class="flex flex-column carouselNewsInfo">
             <div class="flex flex-row">
               <v-btn
+                v-if="canPublishNews"
                 icon
                 @click="openDrawer"
                 class="float-right settingNewsButton">
@@ -79,6 +80,7 @@ export default {
     return {
       news: [],
       initialized: false,
+      canPublishNews: false,
       limit: 4,
       offset: 0,
       fullDateFormat: {
@@ -93,6 +95,9 @@ export default {
   created() {
     this.getNewsList();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
   },
   methods: {
     openDrawer() {

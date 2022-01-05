@@ -30,6 +30,7 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
+import org.exoplatform.social.common.RealtimeListAccess;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -218,6 +219,12 @@ public class NewsServiceImpl implements NewsService {
       news.setCanPublish(canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
       news.setTargets(newsTargetingService.getTargetsByNewsId(newsId));
+      ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+      if (activity != null) {
+        RealtimeListAccess<ExoSocialActivity> listAccess = activityManager.getCommentsWithListAccess(activity, true);
+        news.setCommentsCount(listAccess.getSize());
+        news.setLikesCount(activity.getLikeIdentityIds() == null ? 0 : activity.getLikeIdentityIds().length);
+      }
     }
     return news;
   }

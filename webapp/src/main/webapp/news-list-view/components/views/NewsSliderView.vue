@@ -53,10 +53,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               <news-slider-view-item
                 :author="item.author"
                 :author-display-name="item.authorDisplayName"
-                :space-id="item.spaceId"
+                :space-display-name="item.spaceDisplayName"
+                :space-url="item.spaceUrl"
+                :space-avatar-url="item.spaceAvatarUrl"
                 :publish-date="formatDate(item.publishDate)"
                 :author-avatar-url="item.authorAvatarUrl"
                 :activity-id="item.activityId"
+                :likes-count="item.likesCount"
+                :comments-count="item.commentsCount"
                 :views-count="item.viewsCount"
                 class="d-flex flex-row newsSliderItem align-center justify-center pa-2 ms-2" />
             </div>

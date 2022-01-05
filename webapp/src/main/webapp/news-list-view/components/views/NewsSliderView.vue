@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row">
+            <div class="flex flex-row" :class="!canPublishNews ? 'mt-9' : ''">
               <v-btn
                 v-if="canPublishNews"
                 icon
@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </span>
             </a>
             <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
-              <span class="white--text articleSummary"> {{ escapeHTML(item.body) }}</span>
+              <span class="white--text articleSummary"> {{ item.summary }}</span>
               <news-slider-view-item
                 :author="item.author"
                 :author-display-name="item.authorDisplayName"
@@ -119,11 +119,6 @@ export default {
           })
           .finally(() => this.initialized = false);
       }
-    },
-    escapeHTML: function(html) {
-      const text = document.createElement('textarea');
-      text.innerHTML = html;
-      return text.value.replace(/<\/p\s*>/, ' ').replace(/<\/?[^>]+>/gm, '').trim();
     },
     refreshNewsViews(selectedTarget){
       this.newsTarget = selectedTarget;

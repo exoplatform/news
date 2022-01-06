@@ -32,9 +32,8 @@
     <edit-permission>manager:/platform/web-contributors</edit-permission>
     <portlet-application>
       <portlet>
-        <application-ref>newsTargets</application-ref>
+        <application-ref>news</application-ref>
         <portlet-ref>newsTargets</portlet-ref>
-        <preferences></preferences>
       </portlet>
       <title>News targets</title>
       <access-permissions>*:/platform/web-contributors</access-permissions>

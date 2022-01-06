@@ -33,7 +33,7 @@
     <portlet-application>
       <portlet>
         <application-ref>newsTargets</application-ref>
-        <portlet-ref>newsTargetsPortlet</portlet-ref>
+        <portlet-ref>newsTargets</portlet-ref>
         <preferences></preferences>
       </portlet>
       <title>News targets</title>

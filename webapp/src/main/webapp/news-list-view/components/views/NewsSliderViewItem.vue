@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="reactions-container d-flex ml-4">
       <div class="likes-container mb-1">
         <v-icon class="likeIconStyle" size="14">mdi-thumb-up</v-icon>
-        <span class="counterStyle ml-1">{{ likeSize }}</span>
+        <span class="counterStyle ml-1">{{ likesCount }}</span>
       </div>
       <div class="comments-container ml-2">
         <v-icon
@@ -56,7 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           size="14">
           mdi-comment
         </v-icon>
-        <span class="counterStyle ml-1">{{ commentsSize }}</span>
+        <span class="counterStyle ml-1">{{ commentsCount }}</span>
       </div>
       <div class="views-container ml-2">
         <v-icon class="views-icon" size="16">mdi-eye</v-icon>
@@ -77,7 +77,15 @@ export default {
       type: String,
       default: ''
     },
-    spaceId: {
+    spaceDisplayName: {
+      type: String,
+      default: ''
+    },
+    spaceUrl: {
+      type: String,
+      default: ''
+    },
+    spaceAvatarUrl: {
       type: String,
       default: ''
     },
@@ -97,59 +105,14 @@ export default {
       type: Number,
       default: 0
     },
+    likesCount: {
+      type: Number,
+      default: 0
+    },
+    commentsCount: {
+      type: Number,
+      default: 0
+    },
   },
-  data: () => ({
-    space: null,
-    commentsSize: 0,
-    likeSize: 0,
-  }),
-  computed: {
-    spaceUrl() {
-      if (this.space && this.space.groupId) {
-        const uri = this.space.groupId.replace(/\//g, ':');
-        return `${eXo.env.portal.context}/g/${uri}/`;
-      }
-      return '#';
-    },
-    spaceAvatarUrl() {
-      return this.space && this.space.avatarUrl;
-    },
-    spaceDisplayName() {
-      return this.space && this.space.displayName;
-    }
-  },
-  created() {
-    if (this.spaceId) {
-      this.getSpaceById(this.spaceId);
-    }
-    this.retrieveComments();
-    this.retrieveLikes();
-  },
-  methods: {
-    getSpaceById(spaceId) {
-      this.$spaceService.getSpaceById(spaceId, 'identity')
-        .then((space) => {
-          if (space && space.identity && space.identity.id) {
-            this.space = space;
-          }
-        });
-    },
-    retrieveLikes() {
-      this.loading = true;
-      this.likeSize = 5;
-      return this.$activityService.getActivityById(this.activityId, null)
-        .then(data => {
-          this.likeSize = data && data.likesCount &&  Number(data.likesCount) || 0;
-        });
-    },
-    retrieveComments() {
-      this.$activityService.getActivityComments(this.activityId, false, 0, 0, null)
-        .then(data => {
-          this.$nextTick().then(() => {
-            this.commentsSize = data && data.size && Number(data.size) || 0;
-          });
-        });
-    },
-  }
 };
 </script>

@@ -35,18 +35,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="reactions">
           <v-icon class="reactionIconStyle me-1" size="12">mdi-clock</v-icon>
           <span class="postDate flex-column me-2 my-auto">{{ formatDate(item.publishDate) }}</span>
-          <v-icon class="reactionIconStyle me-1" size="12">
-            mdi-thumb-up
-          </v-icon>
-          <div class="likesCount me-2">{{ likeSize }}</div>
-          <v-icon class="reactionIconStyle commentStyle me-1" size="12">
-            mdi-comment
-          </v-icon>
-          <div class="commentsCount me-2">{{ commentsSize }}</div>
-          <v-icon class="reactionIconStyle me-1" size="12">
-            mdi-eye
-          </v-icon>
-          <div class="viewCount">{{ item.viewsCount }}</div>
+          <div class="d-flex">
+            <v-icon class="reactionIconStyle me-1" size="12">
+              mdi-thumb-up
+            </v-icon>
+            <div class="likesCount me-2">{{ item.likesCount }}</div>
+            <v-icon class="reactionIconStyle commentStyle me-1" size="12">
+              mdi-comment
+            </v-icon>
+            <div class="commentsCount me-2">{{ item.commentsCount }}</div>
+            <v-icon class="reactionIconStyle me-1" size="12">
+              mdi-eye
+            </v-icon>
+            <div class="viewCount">{{ item.viewsCount }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -62,8 +64,6 @@ export default {
     },
   },
   data: ()=> ({
-    commentsSize: 0,
-    likeSize: 0,
     fullDateFormat: {
       year: 'numeric',
       month: 'short',
@@ -72,25 +72,7 @@ export default {
       minute: '2-digit',
     },
   }),
-  created() {
-    this.retrieveComments();
-    this.retrieveLikes();
-  },
   methods: {
-    retrieveComments() {
-      this.$activityService.getActivityComments(this.item.activityId, false, 0, 0, null)
-        .then(data => {
-          this.$nextTick().then(() => {
-            this.commentsSize = data && data.size && Number(data.size) || 0;
-          });
-        });
-    },
-    retrieveLikes() {
-      return this.$activityService.getActivityById(this.item.activityId, null)
-        .then(data => {
-          this.likeSize = data && data.likesCount &&  Number(data.likesCount) || 0;
-        });
-    },
     formatDate(date) {
       return this.$dateUtil.formatDateObjectToDisplay(new Date(date.time),this.fullDateFormat, eXo.env.portal.language);
     },

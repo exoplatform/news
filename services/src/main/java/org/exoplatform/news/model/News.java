@@ -81,6 +81,10 @@ public class News {
 
   private Long                 viewsCount;
 
+  private int                 commentsCount;
+
+  private int                 likesCount;
+
   private String               activities;
 
   private String               activityId;

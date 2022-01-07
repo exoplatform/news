@@ -62,6 +62,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :likes-count="item.likesCount"
                 :comments-count="item.commentsCount"
                 :views-count="item.viewsCount"
+                :hidden-space="item.hiddenSpace"
+                :space-member="item.spaceMember"
                 class="d-flex flex-row newsSliderItem align-center justify-center pa-2 ms-2" />
             </div>
           </div>

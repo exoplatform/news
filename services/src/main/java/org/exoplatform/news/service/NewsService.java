@@ -112,6 +112,15 @@ public interface NewsService {
    * @throws Exception when error
    */
   List<News> getNews(NewsFilter filter, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
+
+  /**
+   * Get list of news by a given target name
+   * @param filter
+   * @param targetName
+   * @param currentIdentity user attempting to access news
+   * @return {@link News} list by target name.
+   */
+  List<News> getNewsByTargetName(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity);
   
   /**
    * 

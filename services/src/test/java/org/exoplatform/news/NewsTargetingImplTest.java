@@ -5,6 +5,7 @@ import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -198,6 +199,37 @@ public class NewsTargetingImplTest {
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1");
     verify(metadataService, times(1)).createMetadataItem(newsTargetObject, metadataKey, 1);
+  }
+
+  @Test
+  public void testGetNewsTargetItemsByTargetName() {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
+
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("newsTargets");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("referenced", "true");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+
+    MetadataItem metadataItem = new MetadataItem();
+    metadataItem.setCreatedDate(100);
+    metadataItem.setCreatorId(1);
+    metadataItem.setId(1);
+    metadataItem.setObjectId("123456");
+    metadataItem.setMetadata(sliderNews);
+    List<MetadataItem> metadataItems = new LinkedList<>();
+    metadataItems.add(metadataItem);
+    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObject("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", 0,10)).thenReturn(metadataItems);
+
+    // When
+    List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);
+
+    // Then
+    assertNotNull(newsTargetsItems);
+    assertEquals(1, newsTargetsItems.size());
   }
 
 }

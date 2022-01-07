@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="d-flex flex-column flex-grow-1 body-1 text-uppercase text-sub-title text-truncate my-auto">{{ newsHeader }}</div>
     <div class="d-flex flex-column me-2">
       <v-btn
+        v-if="canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -39,13 +40,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   data: () => ({
-    newsHeader: ''
+    newsHeader: '',
+    canPublishNews: false,
   }),
   created() {
     this.$root.$on('saved-news-settings',() => {
       this.newsHeader = this.$root.header;
     });
     this.newsHeader = this.$root.header;
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
   },
   methods: {
     openDrawer() {

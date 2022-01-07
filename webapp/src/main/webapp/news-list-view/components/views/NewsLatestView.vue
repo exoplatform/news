@@ -22,42 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :key="item"
         class="article"
         :id="`articleItem-${index}`">
-        <a
-          class="articleLink"
-          target="_self"
-          :href="item.url">
-          <div class="articleImage">
-            <img :src="item.illustrationURL" :alt="$t('news.latest.alt.articleImage')">
-          </div>
-          <div class="articleInfos">
-            <div class="articleSpace">
-              <img
-                class="spaceImage"
-                :src="spaceAvatarUrl"
-                :alt="$t('news.latest.alt.spaceImage')">
-              <span class="text-capitalize spaceName">{{ spaceDisplayName }}</span>
-            </div>
-            <span class="articleTitle">Welcome to your new digital workplace platform! Take this quick tour to discover its features</span>
-            <div class="articlePostTitle">
-              <div class="reactions">
-                <v-icon class="reactionIconStyle me-1" size="12">mdi-clock</v-icon>
-                <span class="postDate flex-column me-2 my-auto">{{ item.postDate }}, 2020</span>
-                <v-icon class="reactionIconStyle me-1" size="12">
-                  mdi-thumb-up
-                </v-icon>
-                <div class="likesCount me-2">{{ likeSize }}</div>
-                <v-icon class="reactionIconStyle commentStyle me-1" size="12">
-                  mdi-comment
-                </v-icon>
-                <div class="commentsCount me-2">{{ commentsSize }}</div>
-                <v-icon class="reactionIconStyle me-1" size="12">
-                  mdi-eye
-                </v-icon>
-                <div class="viewCount">{{ viewsSize }}</div>
-              </div>
-            </div>
-          </div>
-        </a>
+        <news-latest-view-item :item="item" :key="index" />
       </div>
     </div>
   </div>
@@ -75,12 +40,19 @@ export default {
   data: ()=> ({
     initialized: false,
     newsInfo: null,
-    limit: 0,
-    commentsSize: 0,
-    likeSize: 0,
-    viewsSize: 0,
+    limit: 4,
+    offset: 0,
     space: null,
     isHovered: false,
+    commentsSize: 0,
+    likeSize: 0,
+    fullDateFormat: {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    },
   }),
   computed: {
     spaceAvatarUrl() {
@@ -92,8 +64,7 @@ export default {
   },
   created() {
     this.getNewsList();
-    this.retrieveComments();
-    this.getActivityById();
+    this.$root.$on('saved-news-settings', this.refreshNewsViews);
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
@@ -101,30 +72,16 @@ export default {
   methods: {
     getNewsList() {
       if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.limit)
+        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.newsInfo = newsList;
+            this.newsInfo = newsList.news;
             if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
               this.getSpaceById(this.newsInfo[0].spaceId);
             }
             this.initialized = true;
-            this.newsInfo.forEach(function (item, i) {
-              if (item.illustrationURL === null) {
-                this.newsInfo[i].illustrationURL = '/news/images/news.png';
-              }
-            });
           })
           .finally(() => this.initialized = false);
       }
-    },
-    getActivityById() {
-      this.loading = true;
-      this.likeSize = 5;
-      this.viewsSize = 27;
-    },
-    retrieveComments() {
-      this.loading = true;
-      this.commentsSize = 3;
     },
     getSpaceById(spaceId) {
       this.$spaceService.getSpaceById(spaceId, 'identity')
@@ -134,11 +91,11 @@ export default {
           }
         });
     },
-    openNews(url){
-      if (url !== null){
-        window.location.href = url;
-      }
-    },
+    refreshNewsViews(selectedTarget){
+      this.newsTarget = selectedTarget;
+      this.getNewsList();
+    }
+
   }
 };
 </script>

@@ -61,6 +61,8 @@ public class News {
 
   private Date                 updateDate;
 
+  private Date                 publishDate;
+
   private boolean              published;
 
   private boolean              archived;
@@ -78,6 +80,10 @@ public class News {
   private String               path;
 
   private Long                 viewsCount;
+
+  private int                 commentsCount;
+
+  private int                 likesCount;
 
   private String               activities;
 

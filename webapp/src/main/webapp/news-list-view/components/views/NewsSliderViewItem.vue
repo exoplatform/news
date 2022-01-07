@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :src="authorAvatarUrl"
           alt="Author image" />
       </v-avatar>
-      <span class="text-capitalize text--white my-auto ml-2">{{ authorFullName }}</span>
+      <span class="text-capitalize text--white my-auto ml-2">{{ authorDisplayName }}</span>
     </div>
     <v-icon
       class="mx-1"
@@ -43,12 +43,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="date-container d-flex">
       <v-icon class="me-1 ms-2" size="15">mdi-clock</v-icon>
-      <span class="postDate flex-column me-1 my-auto">{{ postDate }}, 2020</span>
+      <span class="postDate flex-column me-1 my-auto">{{ publishDate }}</span>
     </div>
     <div class="reactions-container d-flex ml-4">
       <div class="likes-container mb-1">
         <v-icon class="likeIconStyle" size="14">mdi-thumb-up</v-icon>
-        <span class="counterStyle ml-1">{{ likeSize }}</span>
+        <span class="counterStyle ml-1">{{ likesCount }}</span>
       </div>
       <div class="comments-container ml-2">
         <v-icon
@@ -56,11 +56,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           size="14">
           mdi-comment
         </v-icon>
-        <span class="counterStyle ml-1">{{ commentsSize }}</span>
+        <span class="counterStyle ml-1">{{ commentsCount }}</span>
       </div>
       <div class="views-container ml-2">
         <v-icon class="views-icon" size="16">mdi-eye</v-icon>
-        <span class="counterStyle">{{ viewsSize }}</span>
+        <span class="counterStyle">{{ viewsCount }}</span>
       </div>
     </div>
   </v-row>
@@ -73,11 +73,19 @@ export default {
       type: String,
       default: ''
     },
-    authorFullName: {
+    authorDisplayName: {
       type: String,
       default: ''
     },
-    spaceId: {
+    spaceDisplayName: {
+      type: String,
+      default: ''
+    },
+    spaceUrl: {
+      type: String,
+      default: ''
+    },
+    spaceAvatarUrl: {
       type: String,
       default: ''
     },
@@ -85,61 +93,26 @@ export default {
       type: String,
       default: ''
     },
-    authorProfileUrl: {
+    publishDate: {
       type: String,
       default: ''
     },
-    postDate: {
+    activityId: {
       type: String,
       default: ''
     },
+    viewsCount: {
+      type: Number,
+      default: 0
+    },
+    likesCount: {
+      type: Number,
+      default: 0
+    },
+    commentsCount: {
+      type: Number,
+      default: 0
+    },
   },
-  data: () => ({
-    space: null,
-    commentsSize: 0,
-    likeSize: 0,
-    viewsSize: 0,
-  }),
-  computed: {
-    spaceUrl() {
-      if (this.space && this.space.groupId) {
-        const uri = this.space.groupId.replace(/\//g, ':');
-        return `${eXo.env.portal.context}/g/${uri}/`;
-      }
-      return '#';
-    },
-    spaceAvatarUrl() {
-      return this.space && this.space.avatarUrl;
-    },
-    spaceDisplayName() {
-      return this.space && this.space.displayName;
-    }
-  },
-  created() {
-    if (this.spaceId) {
-      this.getSpaceById(this.spaceId);
-    }
-    this.retrieveComments();
-    this.getActivityById();
-  },
-  methods: {
-    getSpaceById(spaceId) {
-      this.$spaceService.getSpaceById(spaceId, 'identity')
-        .then((space) => {
-          if (space && space.identity && space.identity.id) {
-            this.space = space;
-          }
-        });
-    },
-    getActivityById() {
-      this.loading = true;
-      this.likeSize = 5;
-      this.viewsSize = 27;
-    },
-    retrieveComments() {
-      this.loading = true;
-      this.commentsSize = 3;
-    },
-  }
 };
 </script>

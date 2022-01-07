@@ -39,6 +39,19 @@ export function getNewsSpaces(newsId) {
   });
 }
 
+export function markNewsAsRead(newsId){
+  return fetch(`${newsConstants.NEWS_API}/markAsRead/${newsId}`, {
+    credentials: 'include',
+    method: 'POST',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.text();
+    } else {
+      throw new Error('Error while marking news as read');
+    }
+  });
+}
+
 export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
   let url = `${newsConstants.NEWS_API}?author=${newsConstants.userName}&publicationState=published&filter=${filter}`;
   if (searchText) {

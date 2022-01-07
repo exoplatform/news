@@ -16,7 +16,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="d-flex flex-row pa-2">
-    <div class="d-flex flex-column flex-grow-1 body-1 text-uppercase text-sub-title text-truncate my-auto">{{ newsHeader }}</div>
+    <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
+      <span class="headerLatestNews body-1 text-uppercase text-sub-title text-truncate text-center" :title="newsHeader">{{ newsHeader }}</span>
+    </div>
     <div class="d-flex flex-column me-2">
       <v-btn
         v-if="canPublishNews"

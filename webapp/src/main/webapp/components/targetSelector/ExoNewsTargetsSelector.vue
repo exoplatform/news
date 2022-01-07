@@ -74,10 +74,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   props: {
-    allowPublishTargeting: {
-      type: Boolean,
-      default: false
-    },
     publish: {
       type: Boolean,
       default: false
@@ -94,10 +90,10 @@ export default {
   }),
   computed: {
     disableTargetOption() {
-      return this.allowPublishTargeting && this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
+      return this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
     },
     showTargetInformation() {
-      return this.disableTargetOption && this.allowPublishTargeting && this.publish;
+      return this.disableTargetOption && this.publish;
     },
     selectAllTargets() {
       return this.selectedTargets.length === this.referencedTargets.length;

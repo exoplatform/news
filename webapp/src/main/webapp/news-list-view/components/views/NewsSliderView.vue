@@ -56,7 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :space-display-name="item.spaceDisplayName"
                 :space-url="item.spaceUrl"
                 :space-avatar-url="item.spaceAvatarUrl"
-                :publish-date="formatDate(item.publishDate)"
+                :publish-date="item.publishDate"
                 :author-avatar-url="item.authorAvatarUrl"
                 :activity-id="item.activityId"
                 :likes-count="item.likesCount"
@@ -110,9 +110,6 @@ export default {
         overlayElement.style.display = 'block';
       }
       this.$refs.settingsDrawer.open();
-    },
-    formatDate(date) {
-      return this.$dateUtil.formatDateObjectToDisplay(new Date(date.time),this.fullDateFormat, eXo.env.portal.language);
     },
     getNewsList() {
       if (!this.initialized) {

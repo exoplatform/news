@@ -34,7 +34,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div class="articlePostTitle">
         <div class="reactions">
           <v-icon class="reactionIconStyle me-1" size="12">mdi-clock</v-icon>
-          <span class="postDate flex-column me-2 my-auto">{{ formatDate(item.publishDate) }}</span>
+          <div class="postDate flex-column me-2 my-auto">
+            <date-format
+              :value="displayDate"
+              :format="dateFormat" />
+          </div>
           <div class="d-flex">
             <v-icon class="reactionIconStyle me-1" size="12">
               mdi-thumb-up
@@ -64,17 +68,15 @@ export default {
     },
   },
   data: ()=> ({
-    fullDateFormat: {
+    dateFormat: {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     },
   }),
-  methods: {
-    formatDate(date) {
-      return this.$dateUtil.formatDateObjectToDisplay(new Date(date.time),this.fullDateFormat, eXo.env.portal.language);
+  computed: {
+    displayDate() {
+      return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
     },
   }
 };

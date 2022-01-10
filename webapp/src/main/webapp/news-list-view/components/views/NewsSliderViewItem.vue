@@ -37,13 +37,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :src="spaceAvatarUrl"
           alt="Space icon" />
       </v-avatar>
-      <a :href="spaceUrl">
+      <a :href="spaceUrl" class="my-auto">
         <span class="text-capitalize my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
       </a>
     </div>
     <div class="date-container d-flex">
       <v-icon class="me-1 ms-2" size="15">mdi-clock</v-icon>
-      <span class="postDate flex-column me-1 my-auto">{{ publishDate }}</span>
+      <div class="postDate flex-column me-1 my-auto">
+        <date-format
+          :value="displayDate"
+          :format="dateFormat" />
+      </div>
     </div>
     <div class="reactions-container d-flex ml-4">
       <div class="likes-container mb-1">
@@ -114,5 +118,17 @@ export default {
       default: 0
     },
   },
+  data: () => ({
+    dateFormat: {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+  }),
+  computed: {
+    displayDate() {
+      return this.publishDate && this.publishDate.time && new Date(this.publishDate.time);
+    },
+  }
 };
 </script>

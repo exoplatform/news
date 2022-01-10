@@ -30,7 +30,6 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -398,7 +397,6 @@ public class JcrNewsStorage implements NewsStorage {
     news.setSummary(getStringProperty(node, "exo:summary"));
     String body = getStringProperty(node, "exo:body");
     String sanitizedBody = HTMLSanitizer.sanitize(body);
-    sanitizedBody = StringEscapeUtils.unescapeHtml(sanitizedBody);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
     news.setBody(substituteUsernames(portalOwner, sanitizedBody));
     news.setAuthor(getStringProperty(node, "exo:author"));

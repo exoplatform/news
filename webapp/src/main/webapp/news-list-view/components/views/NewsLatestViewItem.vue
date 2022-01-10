@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <img :src="item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="articleInfos">
-      <div class="articleSpace">
+      <div class="articleSpace" v-if="!isHiddenSpace">
         <img
           class="spaceImage"
           :src="item.spaceAvatarUrl"
@@ -78,6 +78,9 @@ export default {
     displayDate() {
       return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
     },
+    isHiddenSpace() {
+      return this.item && !this.item.spaceMember && this.item.hiddenSpace;
+    }
   }
 };
 </script>

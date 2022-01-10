@@ -26,11 +26,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <span class="text-capitalize text--white my-auto ml-2">{{ authorDisplayName }}</span>
     </div>
     <v-icon
+      v-if="!isHiddenSpace"
       class="mx-1"
       small>
       mdi-chevron-right
     </v-icon>
-    <div class="newsSpaceInfos me-2 my-auto">
+    <div class="newsSpaceInfos me-2 my-auto" v-if="!isHiddenSpace">
       <v-avatar size="23" rounded>
         <v-img
           class="spaceImage"
@@ -117,6 +118,14 @@ export default {
       type: Number,
       default: 0
     },
+    spaceMember: {
+      type: Boolean,
+      default: false
+    },
+    hiddenSpace: {
+      type: Boolean,
+      default: false
+    },
   },
   data: () => ({
     dateFormat: {
@@ -129,6 +138,9 @@ export default {
     displayDate() {
       return this.publishDate && this.publishDate.time && new Date(this.publishDate.time);
     },
+    isHiddenSpace() {
+      return !this.spaceMember && this.hiddenSpace;
+    }
   }
 };
 </script>

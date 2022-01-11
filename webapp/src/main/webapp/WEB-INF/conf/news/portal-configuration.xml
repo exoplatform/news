@@ -50,6 +50,12 @@
             <field name="location">
               <string>war:/conf/news/portal</string>
             </field>
+            <field name="override">
+              <boolean>${exo.news.portalConfig.metadata.override:true}</boolean>
+            </field>
+            <field name="importMode">
+              <string>${exo.news.portalConfig.metadata.importmode:insert}</string>
+            </field>
           </object>
         </object-param>
       </init-params>

@@ -99,7 +99,7 @@ public class News {
 
   private boolean              canPublish;
 
-  private Set<Space>           sharedInSpacesList;
+  private List<String>         sharedInSpacesList;
 
   private String               url;
 

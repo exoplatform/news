@@ -91,17 +91,19 @@ export default {
         this.activitiesList.forEach(activity => {
           const spaceId = activity.split(':')[0];
           if (spaceId) {
-            const space = news.sharedInSpacesList.find(space => space.id === spaceId);
-            if (space) {
-              space.avatarUrl = space.avatarUrl ? space.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
-              this.sharedActivities.push({
-                spaceId: spaceId,
-                spaceAvatar: space.avatarUrl,
-                spaceDisplayName: space.displayName,
-                activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activity.split(':')[1]}`
-              });
-              this.sharedActivities.sort((a, b) => a.spaceDisplayName.toLowerCase().localeCompare(b.spaceDisplayName.toLowerCase()));
-            }
+            const sharedInSpaceId = news.sharedInSpacesList.find(sharedInSpaceId => sharedInSpaceId === spaceId);
+            this.$newsServices.getSpaceById(sharedInSpaceId).then(sharedInSpace => {
+              if (sharedInSpace) {
+                sharedInSpace.avatarUrl = sharedInSpace.avatarUrl ? sharedInSpace.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
+                this.sharedActivities.push({
+                  spaceId: spaceId,
+                  spaceAvatar: sharedInSpace.avatarUrl,
+                  spaceDisplayName: sharedInSpace.displayName,
+                  activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activity.split(':')[1]}`
+                });
+                this.sharedActivities.sort((a, b) => a.spaceDisplayName.toLowerCase().localeCompare(b.spaceDisplayName.toLowerCase()));
+              }
+            });
           }
         });
         this.sharedInSpacesUpdated = true;

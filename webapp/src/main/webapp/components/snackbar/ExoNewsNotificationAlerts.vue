@@ -71,9 +71,14 @@ export default {
         });
       }
     });
-    this.$root.$on('restricted-space', (spaceDisplayName) => {
+    this.$root.$on('restricted-space', (spaceDisplayName, hiddenSpace) => {
       if (spaceDisplayName) {
-        const message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
+        let message = '';
+        if (hiddenSpace) {
+          message = this.$t('news.activity.notAuthorizedUserForSpaceHidden');
+        } else {
+          message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
+        }
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'warning',

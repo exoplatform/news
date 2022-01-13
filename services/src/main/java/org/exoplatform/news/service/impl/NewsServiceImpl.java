@@ -646,8 +646,9 @@ public class NewsServiceImpl implements NewsService {
   }
   
   private boolean isMemberOfsharedInSpaces(News news, String username) {
-    for (Space space : news.getSharedInSpacesList()) {
-      if(spaceService.isMember(space, username)) {
+    for (String sharedInSpaceId : news.getSharedInSpacesList()) {
+      Space sharedInSpace = spaceService.getSpaceById(sharedInSpaceId);
+      if(sharedInSpace != null && spaceService.isMember(sharedInSpace, username)) {
         return true;
       }
     }

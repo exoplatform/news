@@ -121,12 +121,12 @@
   </portlet>
 
     <portlet>
-        <portlet-name>newsTargetsSettings</portlet-name>
+        <portlet-name>newsPublishTargetsManagement</portlet-name>
         <display-name xml:lang="EN">Manage news publication targets</display-name>
         <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
         <init-param>
             <name>portlet-view-dispatched-file-path</name>
-            <value>/news-targeting-settings/newsTargetsSettings.html</value>
+            <value>/news-publish-targets-management/newsPublishTargetsManagement.html</value>
         </init-param>
         <init-param>
             <name>preload.resource.bundles</name>

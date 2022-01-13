@@ -209,11 +209,11 @@
   </portlet>
 
   <portlet>
-    <name>newsTargetsSettings</name>
+    <name>newsPublishTargetsManagement</name>
     <module>
       <script>
         <minify>false</minify>
-        <path>/js/newsTargetsSettings.bundle.js</path>
+        <path>/js/newsPublishTargetsManagement.bundle.js</path>
       </script>
       <depends>
         <module>vue</module>

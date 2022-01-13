@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 eXo Platform SAS.
+ * Copyright (C) 2022 eXo Platform SAS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@ import './initComponents.js';
 
 // get override components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('newsTargetsSettings');
+  const components = extensionRegistry.loadComponents('newsPublishTargetsManagement');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -31,7 +31,7 @@ const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
 
 document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
 
-const appId = 'newsTargetsSettings';
+const appId = 'newsPublishTargetsManagement';
 
 // getting language of the PLF
 const lang = eXo && eXo.env && eXo.env.portal.language || 'en';
@@ -44,7 +44,7 @@ export function init() {
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
     // init Vue app when locale ressources are ready
     new Vue({
-      template: `<news-targets-settings id="${appId}" />`,
+      template: `<news-publish-targets-management id="${appId}" />`,
       vuetify,
       i18n
     }).$mount(`#${appId}`);

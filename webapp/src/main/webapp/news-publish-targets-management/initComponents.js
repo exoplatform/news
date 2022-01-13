@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 eXo Platform SAS.
+ * Copyright (C) 2022 eXo Platform SAS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import NewsTargetsSettings from './components/NewsTargetsSettings.vue';
+import NewsPublishTargetsManagement from './components/NewsPublishTargetsManagement.vue';
 
 const components = {
-  'news-targets-settings': NewsTargetsSettings,
+  'news-publish-targets-management': NewsPublishTargetsManagement,
 };
 
 for (const key in components) {

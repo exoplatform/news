@@ -17,7 +17,7 @@ let config = {
     newsDetailsApp: './src/main/webapp/news-details-app/main.js',
     scheduleNewsDrawer: './src/main/webapp/schedule-news-drawer/main.js',
     newsListView: './src/main/webapp/news-list-view/main.js',
-    newsTargetsSettings: './src/main/webapp/news-targeting-settings/main.js',
+    newsPublishTargetsManagement: './src/main/webapp/news-publish-targets-management/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',

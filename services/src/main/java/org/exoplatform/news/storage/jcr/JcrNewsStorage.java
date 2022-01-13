@@ -12,10 +12,8 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -30,9 +28,9 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -454,7 +452,7 @@ public class JcrNewsStorage implements NewsStorage {
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
-        List<String> sharedInSpacesList = new ArrayList<String>();
+        List<String> sharedInSpacesList = new ArrayList<>();
         for (int i = 1; i < activities.length; i++) {
           String sharedInSpaceId =  activities[i].split(":")[0];
           sharedInSpacesList.add(sharedInSpaceId);

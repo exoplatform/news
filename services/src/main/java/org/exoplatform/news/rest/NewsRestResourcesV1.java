@@ -331,7 +331,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setIllustration(null);
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {//TODO Move to service layer
         News filteredNews = new News();
-        List<String> spacesList = new ArrayList<String>();
+        List<String> spacesList = new ArrayList<>();
         String newsActivities = news.getActivities();
         for (String newsActivity : newsActivities.split(";")) {
           String spaceId = newsActivity.split(":")[0];

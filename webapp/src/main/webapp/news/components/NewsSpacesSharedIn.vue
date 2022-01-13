@@ -90,9 +90,8 @@ export default {
       this.$newsServices.getNewsSpaces(this.newsId).then(news => {
         this.activitiesList.forEach(activity => {
           const spaceId = activity.split(':')[0];
-          if (spaceId) {
-            const sharedInSpaceId = news.sharedInSpacesList.find(sharedInSpaceId => sharedInSpaceId === spaceId);
-            this.$newsServices.getSpaceById(sharedInSpaceId).then(sharedInSpace => {
+          if (spaceId && news.sharedInSpacesList.includes(spaceId)) {
+            this.$newsServices.getSpaceById(spaceId).then(sharedInSpace => {
               if (sharedInSpace) {
                 sharedInSpace.avatarUrl = sharedInSpace.avatarUrl ? sharedInSpace.avatarUrl : '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
                 this.sharedActivities.push({

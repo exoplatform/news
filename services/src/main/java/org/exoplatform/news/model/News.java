@@ -3,9 +3,6 @@ package org.exoplatform.news.model;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.exoplatform.social.core.space.model.Space;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -99,7 +96,7 @@ public class News {
 
   private boolean              canPublish;
 
-  private Set<Space>           sharedInSpacesList;
+  private List<String>         sharedInSpacesList;
 
   private String               url;
 

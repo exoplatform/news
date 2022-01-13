@@ -73,12 +73,7 @@ export default {
     });
     this.$root.$on('restricted-space', (spaceDisplayName, hiddenSpace) => {
       if (spaceDisplayName) {
-        let message = '';
-        if (hiddenSpace) {
-          message = this.$t('news.activity.notAuthorizedUserForSpaceHidden');
-        } else {
-          message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
-        }
+        const message = hiddenSpace ? this.$t('news.activity.notAuthorizedUserForSpaceHidden'): this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'warning',

@@ -97,7 +97,7 @@
             id="newsBody"
             :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
-            <span v-html="newsBody"></span>
+            <span v-sanitized-html="newsBody"></span>
           </div>
 
           <div v-show="attachments && attachments.length" class="newsAttachmentsTitle">

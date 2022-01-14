@@ -37,3 +37,30 @@ export function getReferencedTargets() {
     }
   });
 }
+
+export function deleteTargetByName(targetName, delay) {
+  if (delay > 0) {
+    localStorage.setItem('deletedNewsTarget', targetName);
+  }
+  return fetch(`${newsConstants.NEWS_API}/targeting/${targetName}?delay=${delay || 0}`, {
+    credentials: 'include',
+    method: 'DELETE'
+  }).then((resp) => {
+    if (resp && !resp.ok) {
+      throw new Error('Error when deleting news target');
+    }
+  });
+}
+
+export function undoDeleteNewsTarget(targetName) {
+  return fetch(`${newsConstants.NEWS_API}/targeting/${targetName}/undoDeleteNewsTarget`, {
+    method: 'POST',
+    credentials: 'include',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      localStorage.removeItem('deletedNewsTarget');
+    } else {
+      throw new Error('Error when undoing deleting news target');
+    }
+  });
+}

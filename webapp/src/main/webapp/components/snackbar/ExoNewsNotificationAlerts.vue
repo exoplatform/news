@@ -80,6 +80,18 @@ export default {
         });
       }
     });
+    this.$root.$on('confirm-newsTarget-deletion', (targetName) => {
+      if (targetName) {
+        const clickMessage = this.$t('news.details.undoDelete');
+        const message = this.$t('news.newsTarget.deleteSuccess');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+          click: () => this.undoDeleteNewsTarget(targetName),
+          clickMessage,
+        });
+      }
+    });
   },
   methods: {
     addAlert(alert) {
@@ -100,6 +112,16 @@ export default {
           this.deleteAlert(alert);
           this.addAlert({
             message: isDraftsFilter ? this.$t('news.details.deleteDraftCanceled') : this.$t('news.details.deleteCanceled'),
+            type: 'success',
+          });
+        });
+    },
+    undoDeleteNewsTarget(targetName) {
+      return this.$newsTargetingService.undoDeleteNewsTarget(targetName)
+        .then(() => {
+          this.deleteAlert(alert);
+          this.addAlert({
+            message: this.$t('news.newsTarget.deleteCanceled'),
             type: 'success',
           });
         });

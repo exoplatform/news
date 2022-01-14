@@ -39,10 +39,13 @@ import static org.mockito.Mockito.*;
 public class NewsTargetingImplTest {
 
   @Mock
-  MetadataService metadataService;
-  
+  MetadataService  metadataService;
+
   @Mock
-  IdentityManager identityManager;
+  IdentityManager  identityManager;
+
+  @Mock
+  IdentityRegistry identityRegistry;
 
   @Test
   public void shouldReturnTargets() {
@@ -260,6 +263,47 @@ public class NewsTargetingImplTest {
     // Then
     assertNotNull(newsTargetsItems);
     assertEquals(1, newsTargetsItems.size());
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void testDeleteTargetByName() {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
+    String username = "user";
+    Identity userIdentity = new Identity();
+    userIdentity.setRemoteId(username);
+    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    when(identity.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
+
+    List<Metadata> newsTargets = new LinkedList<>();
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+    newsTargets.add(sliderNews);
+
+    List<NewsTargetingEntity> targets = new LinkedList<>();
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName("test1");
+    newsTargetingEntity.setLabel("test1");
+    targets.add(newsTargetingEntity);
+
+    when(newsTargetingService.getTargets()).thenReturn(targets);
+    when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
+    newsTargetingService.deleteTargetByName(targets.get(0).getName(), identity);
+
+    // When
+    verify(metadataService, atLeastOnce()).deleteMetadataById(newsTargets.get(0).getId());
   }
 
 }

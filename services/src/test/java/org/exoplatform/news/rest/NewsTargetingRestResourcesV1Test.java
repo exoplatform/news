@@ -1,5 +1,6 @@
 package org.exoplatform.news.rest;
 
+import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.junit.Before;
@@ -22,6 +23,9 @@ public class NewsTargetingRestResourcesV1Test {
   @Mock
   NewsTargetingService newsTargetingService;
 
+  @Mock
+  PortalContainer container;
+
   @Before
   public void setup() {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -30,7 +34,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
@@ -44,7 +48,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetReferencedTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 

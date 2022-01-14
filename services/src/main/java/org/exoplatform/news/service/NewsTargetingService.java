@@ -22,6 +22,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataType;
+import org.exoplatform.social.core.identity.model.Identity;
 
 
 public interface NewsTargetingService {
@@ -40,8 +41,9 @@ public interface NewsTargetingService {
    * Delete the {@link News} target by a given {@link News} target name
    * 
    * @param targetName {@link News} target name to be deleted
+   * @param currentIdentity {@link Identity} technical identifier
    */
-  void deleteTargetByName(String targetName);
+  void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity);
 
   /**
    * Gets the {@link List} of {@link News} targets linked to a given {@link News} id

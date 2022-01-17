@@ -42,13 +42,13 @@ import org.exoplatform.social.metadata.model.MetadataKey;
  */
 public class NewsTargetingServiceImpl implements NewsTargetingService {
 
-  private static final Log    LOG        = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
+  private static final Log    LOG                             = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  public static final long    LIMIT      = 100;
+  public static final long    LIMIT                           = 100;
 
-  private static final String LABEL      = "label";
+  private static final String LABEL                           = "label";
 
-  private static final String REFERENCED = "referenced";
+  private static final String REFERENCED                      = "referenced";
 
   private MetadataService     metadataService;
 
@@ -67,7 +67,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   
   @Override
   public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) {
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
+    if (currentIdentity != null && !NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to publish news");
     }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);

@@ -150,7 +150,7 @@ public class NewsServiceImpl implements NewsService {
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
     if(publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
       newsTargetingService.deleteNewsTargets(news.getId());
-      newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), updater);
+      newsTargetingService.saveNewsTarget(news.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), news.getTargets(), updater);
     }
 
     newsStorage.updateNews(news);
@@ -337,7 +337,7 @@ public class NewsServiceImpl implements NewsService {
     if (news.isPublished()) {
       if (news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
         newsTargetingService.deleteNewsTargets(news.getId());
-        newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), currentIdentity.getUserId());
+        newsTargetingService.saveNewsTarget(news.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), news.getTargets(), currentIdentity.getUserId());
       }
     } else {
       newsTargetingService.deleteNewsTargets(news.getId());
@@ -402,7 +402,17 @@ public class NewsServiceImpl implements NewsService {
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(newNews.getId());
     if(newNews.getTargets() != null && !oldTargets.equals(newNews.getTargets())) {
       newsTargetingService.deleteNewsTargets(newNews.getId());
-      newsTargetingService.saveNewsTarget(newNews.getId(), newNews.getTargets(), publisher);
+      newsTargetingService.saveNewsTarget(newNews.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), newNews.getTargets(), publisher);
+    }
+    //Update staged property to false when news is published.
+    Map<String, String> properties = new LinkedHashMap<>();
+    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
+    List<MetadataItem> targets = newsTargetingService.getTargetsListByNewsId(newNews.getId());
+    if(!Objects.isNull(targets)) {
+      for (MetadataItem metadataItem : targets) {
+        metadataItem.setProperties(properties);
+        newsTargetingService.updateNewsTarget(metadataItem);
+      }
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);

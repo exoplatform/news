@@ -51,6 +51,22 @@ public interface NewsTargetingService {
   List<String> getTargetsByNewsId(String newsId);
 
   /**
+   * Gets the {@link List} of {@link MetadataItem} targets linked to a given {@link News} id
+   *
+   * @param newsId {@link News} identifier of {@link News} targets to be retrieved
+   * @return {@link List} of {@link MetadataItem} targets
+   */
+  List<MetadataItem> getTargetsListByNewsId(String newsId);
+
+  /**
+   * Update the {@link MetadataItem} target
+   *
+   * @param metadataItem {@link MetadataItem}
+   * @return {@link MetadataItem} updated target.
+   */
+  MetadataItem updateNewsTarget(MetadataItem metadataItem);
+
+  /**
    * Gets the {@link List} of {@link News} target items by a given target name.
    *
    * @param targetName target name of metadata to be retrieved
@@ -71,10 +87,11 @@ public interface NewsTargetingService {
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
    *
    * @param newsId {@link News} identifier of {@link News} targets to be saved 
+   * @param isStaged {@link News} is staged news
    * @param targets {@link List} of {@link News} targets to be saved
    * @param currentUser current user attempting to save {@link News} targets
    */
-  void saveNewsTarget(String newsId, List<String> targets, String currentUser);
+  void saveNewsTarget(String newsId, boolean isStaged, List<String> targets, String currentUser);
 
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id

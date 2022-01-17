@@ -122,15 +122,15 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Path("{targetName}")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Delete target news", httpMethod = "DELETE", response = Response.class, notes = "This deletes the target news", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News target deleted"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 401, message = "User not authorized to delete the news target"),
-          @ApiResponse(code = 500, message = "Internal server error") })
-  public Response deleteTargetByName(@Context HttpServletRequest request,
+  @ApiOperation(value = "Delete news target", httpMethod = "DELETE", response = Response.class, notes = "This deletes the target news", consumes = "application/json")
+  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "News target deleted"),
+          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to delete the news target"),
+          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") })
+  public Response deleteTarget(@Context HttpServletRequest request,
                                      @ApiParam(value = "Target name", required = true)
                                      @PathParam("targetName") String targetName,
-                                     @ApiParam(value = "Time to effectively delete target news", required = false)
+                                     @ApiParam(value = "Time to effectively delete news target", required = false)
                                      @QueryParam("delay") long delay) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
@@ -146,8 +146,8 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
             try {
               newsTargetToDeleteQueue.remove(targetName);
               newsTargetingService.deleteTargetByName(targetName, currentIdentity);
-            }  catch (Exception e) {
-              LOG.warn("Error when deleting the news target with name " + targetName, e);
+            } catch (Exception e) {
+              LOG.error("Error when deleting the news target with name " + targetName, e);
             } finally {
               RequestLifeCycle.end();
             }
@@ -159,7 +159,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
       }
       return Response.ok().build();
     } catch (Exception e) {
-      LOG.warn("Error when deleting the news target");
+      LOG.error("Error when deleting the news target with name " + targetName, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -174,11 +174,8 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   )
   @ApiResponses(
           value = {
-                  @ApiResponse(code = HTTPStatus.NO_CONTENT, message = "Request fulfilled"),
                   @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
-                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
-                  @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), }
+                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"), }
   )
   public Response undoDeleteNewsTarget(@Context HttpServletRequest request,
                                        @ApiParam(value = "News target name identifier", required = true)

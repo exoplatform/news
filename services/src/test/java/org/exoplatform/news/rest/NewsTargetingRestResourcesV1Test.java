@@ -83,7 +83,7 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(newsTargetingService.getTargets()).thenReturn(targets);
 
     // When
-    Response response = newsTargetingRestResourcesV1.deleteTargetByName(request, targets.get(0).getName(), 0);
+    Response response = newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

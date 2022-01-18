@@ -39,10 +39,10 @@ import static org.mockito.Mockito.*;
 public class NewsTargetingImplTest {
 
   @Mock
-  MetadataService metadataService;
-  
+  MetadataService  metadataService;
+
   @Mock
-  IdentityManager identityManager;
+  IdentityManager  identityManager;
 
   @Mock
   IdentityRegistry identityRegistry;

@@ -164,11 +164,11 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     }
   }
 
-  @Path("{targetName}/undoDeleteNewsTarget")
+  @Path("{targetName}/undoDelete")
   @POST
   @RolesAllowed("users")
   @ApiOperation(
-          value = "Undo deleting target news if not yet effectively deleted.",
+          value = "Undo deleting news target if not yet effectively deleted.",
           httpMethod = "POST",
           response = Response.class
   )
@@ -177,7 +177,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
                   @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
                   @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"), }
   )
-  public Response undoDeleteNewsTarget(@Context HttpServletRequest request,
+  public Response undoDeleteTarget(@Context HttpServletRequest request,
                                        @ApiParam(value = "News target name identifier", required = true)
                                        @PathParam("targetName") String targetName) {
     if (StringUtils.isBlank(targetName)) {

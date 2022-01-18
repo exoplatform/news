@@ -52,8 +52,8 @@ export function deleteTargetByName(targetName, delay) {
   });
 }
 
-export function undoDeleteNewsTarget(targetName) {
-  return fetch(`${newsConstants.NEWS_API}/targeting/${targetName}/undoDeleteNewsTarget`, {
+export function undoDeleteTarget(targetName) {
+  return fetch(`${newsConstants.NEWS_API}/targeting/${targetName}/undoDelete`, {
     method: 'POST',
     credentials: 'include',
   }).then((resp) => {

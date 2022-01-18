@@ -117,7 +117,7 @@ export default {
         });
     },
     undoDeleteNewsTarget(targetName) {
-      return this.$newsTargetingService.undoDeleteNewsTarget(targetName)
+      return this.$newsTargetingService.undoDeleteTarget(targetName)
         .then(() => {
           this.deleteAlert(alert);
           this.addAlert({

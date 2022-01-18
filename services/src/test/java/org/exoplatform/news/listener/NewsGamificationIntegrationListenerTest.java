@@ -29,7 +29,8 @@ import org.exoplatform.services.listener.Listener;
 import org.exoplatform.services.listener.ListenerService;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
+    "com.sun.org.apache.*", "org.w3c.*" })
 @PrepareForTest(CommonsUtils.class)
 public class NewsGamificationIntegrationListenerTest {
 

@@ -36,7 +36,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.Serializable;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
+    "com.sun.org.apache.*", "org.w3c.*" })
 public class PostNewsNotificationPluginTest {
 
   @Mock

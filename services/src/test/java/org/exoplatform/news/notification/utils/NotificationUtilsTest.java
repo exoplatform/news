@@ -27,7 +27,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
+    "com.sun.org.apache.*", "org.w3c.*" })
 public class NotificationUtilsTest {
 
   @PrepareForTest({ExoContainerContext.class, PortalContainer.class, PropertyManager.class})

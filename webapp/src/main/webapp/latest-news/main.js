@@ -23,12 +23,9 @@ export function initLatestNews(params) {
   const lang = typeof eXo !== 'undefined' ? eXo.env.portal.language : 'en';
   // should expose the locale resources as REST API
   const url = `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
-  exoi18n.loadLanguageAsync(lang, url).then(i18n => {
-    const appElement = document.createElement('div');
-    appElement.id = appId;
-
-    // init Vue app when locale resources are ready
-    latestNewsDetails = new Vue({
+  exoi18n.loadLanguageAsync(lang, url).then(i18n => {  
+  // init Vue app when locale resources are ready
+    latestNewsDetails = Vue.createApp({
       data: function() {
         return {
           newsInfo: params.newsInfo,
@@ -41,7 +38,7 @@ export function initLatestNews(params) {
       template: `<exo-news-latest id="${appId}" v-cacheable :news-info="newsInfo" :header="header" :see-all="seeAllLabel" :url="url"  :is-show-header="isShowHeader"></exo-news-latest>`,
       i18n,
       vuetify,
-    }).$mount(appElement);
+    }, `#${appId}`, 'news');
   });
 }
 

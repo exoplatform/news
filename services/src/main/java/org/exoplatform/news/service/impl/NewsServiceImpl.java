@@ -333,9 +333,8 @@ public class NewsServiceImpl implements NewsService {
     if (!canScheduleNews(space, currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
     }
-    List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
     if (news.isPublished()) {
-      if (news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+      if (news.getTargets() != null) {
         newsTargetingService.deleteNewsTargets(news.getId());
         newsTargetingService.saveNewsTarget(news.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), news.getTargets(), currentIdentity.getUserId());
       }
@@ -399,20 +398,9 @@ public class NewsServiceImpl implements NewsService {
   public void publishNews(News newNews, String publisher) throws Exception {
     News news = getNewsById(newNews.getId(), false);
     newsStorage.publishNews(news);
-    List<String> oldTargets = newsTargetingService.getTargetsByNewsId(newNews.getId());
-    if(newNews.getTargets() != null && !oldTargets.equals(newNews.getTargets())) {
+    if(newNews.getTargets() != null) {
       newsTargetingService.deleteNewsTargets(newNews.getId());
       newsTargetingService.saveNewsTarget(newNews.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), newNews.getTargets(), publisher);
-    }
-    //Update staged property to false when news is published.
-    Map<String, String> properties = new LinkedHashMap<>();
-    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
-    List<MetadataItem> targets = newsTargetingService.getTargetsListByNewsId(newNews.getId());
-    if(!Objects.isNull(targets)) {
-      for (MetadataItem metadataItem : targets) {
-        metadataItem.setProperties(properties);
-        newsTargetingService.updateNewsTarget(metadataItem);
-      }
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);

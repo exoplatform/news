@@ -86,25 +86,14 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<MetadataItem> getTargetsListByNewsId(String newsId) {
-    NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
-    return metadataService.getMetadataItemsByMetadataTypeAndObject(METADATA_TYPE.getName(), newsTargetObject);
-  }
-
-  @Override
-  public MetadataItem updateNewsTarget(MetadataItem metadataItem) {
-    return metadataService.updateMetadataItem(metadataItem);
-  }
-
-  @Override
-  public void saveNewsTarget(String newsId, boolean isStaged, List<String> targets, String currentUser) {
+  public void saveNewsTarget(String newsId, boolean staged, List<String> targets, String currentUser) {
     NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
     Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
     targets.stream().forEach(targetName -> {
       try {
         MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
         Map<String, String> properties = new LinkedHashMap<>();
-        properties.put(PublicationDefaultStates.STAGED, String.valueOf(isStaged));
+        properties.put(PublicationDefaultStates.STAGED, String.valueOf(staged));
         metadataService.createMetadataItem(newsTargetObject, metadataKey, properties, Long.parseLong(currentIdentity.getId()));
       } catch (ObjectAlreadyExistsException e) {
         LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",

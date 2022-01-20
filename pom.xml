@@ -40,9 +40,9 @@
   </modules>
 
   <properties>
-    <org.exoplatform.social.version>6.3.x-SNAPSHOT</org.exoplatform.social.version>
-    <org.exoplatform.platform-ui.version>6.3.x-SNAPSHOT</org.exoplatform.platform-ui.version>
-    <addon.exo.ecms.version>6.3.x-SNAPSHOT</addon.exo.ecms.version>
+    <org.exoplatform.social.version>6.3.0-M20</org.exoplatform.social.version>
+    <org.exoplatform.platform-ui.version>6.3.0-M20</org.exoplatform.platform-ui.version>
+    <addon.exo.ecms.version>6.3.0-M20</addon.exo.ecms.version>
     <pitest.version>1.4.10</pitest.version>
     
     <sonar.organization>exoplatform</sonar.organization>

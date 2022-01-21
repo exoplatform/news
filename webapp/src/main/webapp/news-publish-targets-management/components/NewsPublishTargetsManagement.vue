@@ -74,12 +74,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   <v-btn
                     icon
                     text
-                    @click="deleteNewsTarget(props.item.name)">
+                    @click="deleteConfirmDialog(props.item.name)">
                     <v-icon
                       dark
                       color="primary"
-                      size="16"
-                      @click="deleteConfirmDialog(props.item.name)">
+                      size="16">
                       fas fa-trash
                     </v-icon>
                   </v-btn>

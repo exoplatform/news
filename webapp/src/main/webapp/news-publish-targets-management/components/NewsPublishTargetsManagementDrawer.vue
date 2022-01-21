@@ -1,7 +1,7 @@
 <template>
   <exo-drawer
-    id="newsPublishTargetsDrawer"
-    ref="newsPublishTargetsDrawer"
+    id="newsPublishTargetsManagementDrawer"
+    ref="newsPublishTargetsManagementDrawer"
     body-classes="hide-scroll decrease-z-index-more"
     right>
     <template slot="title">
@@ -20,13 +20,13 @@
           </div>
           <div class="d-flex flex-row">
             <input
-              id="nameTarget"
-              ref="nameTarget"
-              v-model="nameTarget"
-              :placeholder="$t('news.publishTargets.placeholderDrawer.nameTarget')"
+              id="targetName"
+              ref="targetName"
+              v-model="targetName"
+              :placeholder="$t('news.publishTargets.managementDrawer.placeholder.name')"
               type="text"
               name="title"
-              class="ignore-vuetify-classes nameTarget"
+              class="ignore-vuetify-classes targetName"
               required
               autofocus>
           </div>
@@ -40,7 +40,7 @@
               id="targetDescription"
               ref="targetDescription"
               v-model="targetDescription"
-              :placeholder="$t('news.publishTargets.placeholderDrawer.descriptionTarget')"
+              :placeholder="$t('news.publishTargets.managementDrawer.placeholder.description')"
               :max-length="targetDescriptionTextLength"
               class="targetDescription pt-0 " />
           </div>
@@ -52,12 +52,12 @@
         <v-btn
           class="btn ms-2"
           @click="closeDrawer">
-          {{ $t('news.publishTargets.management.btn.cancel') }}
+          {{ $t('news.publishTargets.managementDrawer.btn.cancel') }}
         </v-btn>
         <v-btn
           :disabled="true"
           class="btn btn-primary ms-2">
-          {{ $t('news.publishTargets.management.btn.confirm') }}
+          {{ $t('news.publishTargets.managementDrawer.btn.confirm') }}
         </v-btn>
       </div>
     </template>
@@ -70,14 +70,14 @@ export default {
     drawer: false,
     targetDescriptionTextLength: 100,
     targetDescription: '',
-    nameTarget: '',
+    targetName: '',
   }),
   methods: {
     open() {
-      this.$refs.newsPublishTargetsDrawer.open();
+      this.$refs.newsPublishTargetsManagementDrawer.open();
     },
     closeDrawer() {
-      this.$refs.newsPublishTargetsDrawer.close();
+      this.$refs.newsPublishTargetsManagementDrawer.close();
     }
   }
 };

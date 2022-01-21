@@ -39,7 +39,7 @@ export default {
           this.showPublishButton = this.news.canPublish;
           this.showDeleteButton = this.news.canDelete;
           if (!this.news.spaceMember) {
-            this.$root.$emit('restricted-space', this.news.spaceDisplayName);
+            this.$root.$emit('restricted-space', this.news.spaceDisplayName, this.news.hiddenSpace);
           }
         } else {
           this.notFound = true;

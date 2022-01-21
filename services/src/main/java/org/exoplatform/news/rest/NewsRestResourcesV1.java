@@ -331,12 +331,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setIllustration(null);
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {//TODO Move to service layer
         News filteredNews = new News();
-        Set<Space> spacesList = new HashSet<>();
+        List<String> spacesList = new ArrayList<>();
         String newsActivities = news.getActivities();
-        for (String act : newsActivities.split(";")) {
-          String spaceId = act.split(":")[0];
-          Space space = spaceService.getSpaceById(spaceId);
-          spacesList.add(space);
+        for (String newsActivity : newsActivities.split(";")) {
+          String spaceId = newsActivity.split(":")[0];
+          spacesList.add(spaceId);
         }
         filteredNews.setSharedInSpacesList(spacesList);
         return Response.ok(filteredNews).build();

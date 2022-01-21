@@ -12,10 +12,8 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -30,9 +28,9 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -453,12 +451,13 @@ public class JcrNewsStorage implements NewsStorage {
           news.setUrl(newsUrl.toString());
         }
         memberSpaceActivities.append(activities[0]).append(";");
-        Set<Space> sharedInSpacesList = new HashSet<>();
+        List<String> sharedInSpacesList = new ArrayList<>();
         for (int i = 1; i < activities.length; i++) {
-          Space space = spaceService.getSpaceById(activities[i].split(":")[0]);
-          sharedInSpacesList.add(space);
+          String sharedInSpaceId =  activities[i].split(":")[0];
+          sharedInSpacesList.add(sharedInSpaceId);
+          Space sharedInSpace = spaceService.getSpaceById(sharedInSpaceId);
           String activityId = activities[i].split(":")[1];
-          if (space != null && currentUsername != null && spaceService.isMember(space, currentUsername) && activityManager.isActivityExists(activityId)) {
+          if (sharedInSpace != null && currentUsername != null && spaceService.isMember(sharedInSpace, currentUsername) && activityManager.isActivityExists(activityId)) {
             memberSpaceActivities.append(activities[i]).append(";");
           }
         }

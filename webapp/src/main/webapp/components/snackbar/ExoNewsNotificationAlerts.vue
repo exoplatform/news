@@ -71,9 +71,9 @@ export default {
         });
       }
     });
-    this.$root.$on('restricted-space', (spaceDisplayName) => {
+    this.$root.$on('restricted-space', (spaceDisplayName, hiddenSpace) => {
       if (spaceDisplayName) {
-        const message = this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
+        const message = hiddenSpace ? this.$t('news.activity.notAuthorizedUserForSpaceHidden'): this.$t('news.activity.notAuthorizedUser').replace('{0}', spaceDisplayName);
         this.$root.$emit('news-notification-alert', {
           message,
           type: 'warning',

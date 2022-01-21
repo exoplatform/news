@@ -71,10 +71,11 @@ public interface NewsTargetingService {
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
    *
    * @param newsId {@link News} identifier of {@link News} targets to be saved 
+   * @param staged {@link News} is staged news
    * @param targets {@link List} of {@link News} targets to be saved
    * @param currentUser current user attempting to save {@link News} targets
    */
-  void saveNewsTarget(String newsId, List<String> targets, String currentUser);
+  void saveNewsTarget(String newsId, boolean staged, List<String> targets, String currentUser);
 
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id

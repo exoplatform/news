@@ -6,6 +6,7 @@ import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -20,9 +21,7 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -192,13 +191,15 @@ public class NewsTargetingImplTest {
     Identity userIdentity = new Identity("1");
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
     when(metadataService.createMetadataItem(newsTargetObject, metadataKey, 1)).thenReturn(metadataItem);
+    Map<String, String> properties = new LinkedHashMap<>();
+    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
 
     // When
-    newsTargetingService.saveNewsTarget(news.getId(), news.getTargets(), "1");
+    newsTargetingService.saveNewsTarget(news.getId(),false, news.getTargets(), "1");
 
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1");
-    verify(metadataService, times(1)).createMetadataItem(newsTargetObject, metadataKey, 1);
+    verify(metadataService, times(1)).createMetadataItem(newsTargetObject, metadataKey, properties, 1);
   }
 
   @Test
@@ -222,7 +223,7 @@ public class NewsTargetingImplTest {
     metadataItem.setMetadata(sliderNews);
     List<MetadataItem> metadataItems = new LinkedList<>();
     metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObject("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", 0,10)).thenReturn(metadataItems);
+    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObject("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", PublicationDefaultStates.STAGED, String.valueOf(false),0,10)).thenReturn(metadataItems);
 
     // When
     List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);

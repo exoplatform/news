@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.cms.CmsService;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;
@@ -33,9 +34,12 @@ import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 public class NewsPublicationListener extends Listener<CmsService, Node> {
 
   private NewsService            newsService;
+  
+  private NewsTargetingService   newsTargetingService;
 
   public NewsPublicationListener() {
     newsService = WCMCoreUtils.getService(NewsService.class);
+    newsTargetingService = WCMCoreUtils.getService(NewsTargetingService.class);
   }
 
   public void onEvent(Event<CmsService, Node> event) throws Exception {
@@ -46,6 +50,7 @@ public class NewsPublicationListener extends Listener<CmsService, Node> {
                                                          .equals(PublicationDefaultStates.PUBLISHED)) {
         News news = newsService.getNewsById(targetNode.getUUID(), false);
         if (StringUtils.isEmpty(news.getActivities())) {
+          news.setTargets(newsTargetingService.getTargetsByNewsId(news.getId()));
           newsService.postNews(news, news.getAuthor());
         }
       }

@@ -78,9 +78,10 @@ public interface NewsService {
   /**
    * 
    * @param newsId
+   * @param publisher
    * @throws Exception
    */
-  void unpublishNews(String newsId) throws Exception;
+  void unpublishNews(String newsId, String publisher) throws Exception;
   
   
   /**
@@ -119,8 +120,9 @@ public interface NewsService {
    * @param targetName
    * @param currentIdentity user attempting to access news
    * @return {@link News} list by target name.
+   * throws Exception when error
    */
-  List<News> getNewsByTargetName(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity);
+  List<News> getNewsByTargetName(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity) throws Exception;
   
   /**
    * 
@@ -200,15 +202,7 @@ public interface NewsService {
    * @param authenticatedUser authenticated username
    * @return true if user has access to news, else false
    */
-  boolean canViewNews(News news, String authenticatedUser);  
-  
-  /**
-   * Return a boolean that indicates if the current user can publish the news or not
-   *
-   * @param currentIdentity
-   * @return if the news can be published
-   */
-  boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity);
+  boolean canViewNews(News news, String authenticatedUser);
   
   /**
    * Shares a news into a dedicated space

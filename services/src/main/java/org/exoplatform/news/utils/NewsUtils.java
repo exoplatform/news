@@ -47,6 +47,10 @@ public class NewsUtils {
 
   public static final String NEWS_METADATA_OBJECT_TYPE = "news";
 
+  private static final String   PUBLISHER_MEMBERSHIP_NAME       = "publisher";
+
+  private static final String   PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);
@@ -108,6 +112,10 @@ public class NewsUtils {
     return spaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
                  .collect(Collectors.toList());
+  }
+
+  public static boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {
+    return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
   public static org.exoplatform.services.security.Identity getUserIdentity(String username) {

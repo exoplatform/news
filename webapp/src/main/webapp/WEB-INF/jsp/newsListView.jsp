@@ -14,10 +14,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-<%@page import="org.exoplatform.news.service.NewsService"%>
 <%@page import="org.exoplatform.container.ExoContainerContext"%>
 <%@page import="org.exoplatform.services.security.ConversationState"%>
 <%@page import="org.exoplatform.services.security.Identity"%>
+<%@ page import="org.exoplatform.news.utils.NewsUtils" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <portlet:defineObjects />
@@ -34,13 +34,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String newsTarget = newsTargetParams == null || newsTargetParams.length == 0 ? "": newsTargetParams[0];
     String header = headerParams == null || headerParams.length == 0 ? "": headerParams[0];
 
-    NewsService newsService = ExoContainerContext.getService(NewsService.class);
     ConversationState conversationState = ConversationState.getCurrent();
     Identity currentIdentity = null;
     if (conversationState != null) {
       currentIdentity = ConversationState.getCurrent().getIdentity();
     }
-    if (!newsService.canPublishNews(currentIdentity)) {
+    if (!NewsUtils.canPublishNews(currentIdentity)) {
       saveSettingsURL = null;
     }
   %>

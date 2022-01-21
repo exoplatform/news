@@ -13,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.picocontainer.Startable;
 
@@ -867,7 +868,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response canPublishNews(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      return Response.ok(String.valueOf(newsService.canPublishNews(currentIdentity))).build();
+      return Response.ok(String.valueOf(NewsUtils.canPublishNews(currentIdentity))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can publish a news to all users", e);
       return Response.serverError().build();

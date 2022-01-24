@@ -68,7 +68,8 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   @Override
   public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
     if (currentIdentity != null && !NewsUtils.canPublishNews(currentIdentity)) {
-      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to publish news");
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId()
+          + " not authorized to delete news target with name " + targetName);
     }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);
     Metadata targetMetadata = metadataService.getMetadataByKey(targetMetadataKey);

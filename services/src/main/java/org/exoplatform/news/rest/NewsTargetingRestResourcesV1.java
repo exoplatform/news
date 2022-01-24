@@ -122,7 +122,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Path("{targetName}")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Delete news target", httpMethod = "DELETE", response = Response.class, notes = "This deletes the target news", consumes = "application/json")
+  @ApiOperation(value = "Delete news target", httpMethod = "DELETE", response = Response.class, notes = "This deletes news target", consumes = "application/json")
   @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "News target deleted"),
           @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
           @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to delete the news target"),
@@ -147,7 +147,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
               newsTargetToDeleteQueue.remove(targetName);
               newsTargetingService.deleteTargetByName(targetName, currentIdentity);
             } catch (IllegalAccessException e) {
-              LOG.error("Error when deleting the news target with name " + targetName, e);
+              LOG.warn("User '{}' is not authorized to delete the news target with name " + targetName, e);
             } catch (Exception e) {
               LOG.error("Error when deleting the news target with name " + targetName, e);
             } finally {
@@ -160,9 +160,6 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
         newsTargetingService.deleteTargetByName(targetName, currentIdentity);
       }
       return Response.ok().build();
-    } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to delete news target", currentIdentity.getUserId(), e);
-      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news target with name " + targetName, e);
       return Response.serverError().entity(e.getMessage()).build();
@@ -200,7 +197,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
       return Response.noContent().build();
     } else {
       return Response.status(Response.Status.BAD_REQUEST)
-                     .entity("Target News with name {} was already deleted or isn't planned to be deleted" + targetName)
+                     .entity("News target with name {} was already deleted or isn't planned to be deleted" + targetName)
                      .build();
     }
   }

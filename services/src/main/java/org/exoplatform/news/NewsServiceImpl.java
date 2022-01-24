@@ -1189,6 +1189,9 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void updateNewsActivity(News news, boolean post) {
     ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+    if (activity == null) {
+      return;
+    }
     if(post) {
       activity.setUpdated(System.currentTimeMillis());
     }

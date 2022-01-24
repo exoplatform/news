@@ -58,7 +58,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </td>
               <td>
                 <div class="align-center">
-                  {{ $t(props.item.name) }}
+                  {{ $t(props.item.description) }}
                 </div>
               </td>
               <td>
@@ -95,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :ok-label="$t('news.button.ok')"
         :cancel-label="$t('news.button.cancel')"
         @ok="deleteNewsTarget(selectedTarget)" />
-      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" />
+      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" @news-target-saved="init" />
       <exo-news-notification-alerts />
     </v-main>
   </v-app>
@@ -136,6 +136,7 @@ export default {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,
               label: newsTarget.label,
+              description: newsTarget.description,
             }));
             this.initialized = true;
           })

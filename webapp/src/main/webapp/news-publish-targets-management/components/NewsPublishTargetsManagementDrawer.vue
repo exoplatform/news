@@ -72,8 +72,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           {{ $t('news.publishTargets.managementDrawer.btn.cancel') }}
         </v-btn>
         <v-btn
-          :disabled="true"
-          class="btn btn-primary ms-2">
+          :disabled="saving || disabled"
+          :loading="saving"
+          class="btn btn-primary ms-2"
+          @click="createTarget">
           {{ $t('news.publishTargets.managementDrawer.btn.confirm') }}
         </v-btn>
       </div>
@@ -97,6 +99,18 @@ export default {
         return '';
       }
     },
+    disabled() {
+      return this.checkAlphanumeric !== '' || (this.targetName && this.targetName.length === 0);
+    },
+  },
+  watch: {
+    saving() {
+      if (this.saving) {
+        this.$refs.newsPublishTargetsManagementDrawer.startLoading();
+      } else {
+        this.$refs.newsPublishTargetsManagementDrawer.endLoading();
+      }
+    },
   },
   methods: {
     open() {
@@ -104,7 +118,35 @@ export default {
     },
     closeDrawer() {
       this.$refs.newsPublishTargetsManagementDrawer.close();
+    },
+    createTarget() {
+      this.saving = true;
+      const target = {
+        name: '',
+        type: '',
+        properties: ''
+      };
+      target.name = this.targetName;
+      target.properties = {
+        description: this.targetDescription,
+        label: this.targetName
+      };
+      target.type = {
+        id: 4,
+        name: 'newsTarget'
+      };
+      this.$newsTargetingService.createTarget(target)
+        .then(() => {
+          this.$emit('news-target-saved');
+          this.reset();
+          this.closeDrawer();
+        })
+        .finally(() => this.saving = false);
+    },
+    reset() {
+      this.targetDescription = '';
+      this.targetName = '';
     }
-  }
+  },
 };
 </script>

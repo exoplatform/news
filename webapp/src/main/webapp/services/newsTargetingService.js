@@ -64,3 +64,20 @@ export function undoDeleteTarget(targetName) {
     }
   });
 }
+
+export function createTarget(target) {
+  return fetch(`${newsConstants.NEWS_API}/targeting`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(target),
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when undoing deleting news target');
+    }
+  });
+}

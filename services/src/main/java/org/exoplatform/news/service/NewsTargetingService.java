@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataType;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -100,5 +101,14 @@ public interface NewsTargetingService {
    * @param newsId {@link News} identifier of {@link News} to delete targets
    */
   void deleteNewsTargets(String newsId);
+
+  /**
+   * Create a news Metadata
+   * 
+   * @param metadata {@link Metadata}
+   * @param userIdentityId {@link Identity} identifier of the creator
+   * @return created {@link Metadata}
+   */
+  Metadata createMetadata(Metadata metadata, long userIdentityId);
 
 }

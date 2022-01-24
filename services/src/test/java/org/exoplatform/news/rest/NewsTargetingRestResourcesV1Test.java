@@ -6,6 +6,7 @@ import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,10 @@ public class NewsTargetingRestResourcesV1Test {
   NewsTargetingService newsTargetingService;
 
   @Mock
-  PortalContainer container;
+  PortalContainer      container;
+
+  @Mock
+  IdentityManager      identityManager;
 
   @Before
   public void setup() {
@@ -41,7 +45,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
@@ -55,7 +59,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetReferencedTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
@@ -69,7 +73,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenDeleteNewsTarget() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     Identity currentIdentity = new Identity("john");

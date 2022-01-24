@@ -16,6 +16,7 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -141,5 +142,15 @@ public class NewsUtils {
       throw new IllegalStateException("Error occurred while retrieving security identity of user " + username);
     }
     return identity;
+  }
+
+  public static final String getCurrentUser() {
+    return ConversationState.getCurrent().getIdentity().getUserId();
+  }
+
+  public static final long getCurrentUserIdentityId(IdentityManager identityManager) {
+    String currentUser = getCurrentUser();
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
+    return identity == null ? 0 : Long.parseLong(identity.getId());
   }
 }

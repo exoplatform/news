@@ -26,4 +26,6 @@ public class NewsTargetingEntity {
   private String name;
 
   private String label;
+
+  private String description;
 }

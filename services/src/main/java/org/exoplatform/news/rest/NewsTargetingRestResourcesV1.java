@@ -37,10 +37,13 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.news.service.NewsTargetingService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.metadata.model.Metadata;
 import org.picocontainer.Startable;
 
 @Path("v1/news/targeting")
@@ -51,6 +54,8 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
 
   private NewsTargetingService     newsTargetingService;
 
+  private IdentityManager          identityManager;
+
   private ScheduledExecutorService scheduledExecutor;
 
   private PortalContainer          container;
@@ -58,9 +63,12 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   private Map<String, String>      newsTargetToDeleteQueue = new HashMap<>();
 
 
-  public NewsTargetingRestResourcesV1(NewsTargetingService newsTargetingService, PortalContainer container) {
+  public NewsTargetingRestResourcesV1(NewsTargetingService newsTargetingService,
+                                      PortalContainer container,
+                                      IdentityManager identityManager) {
     this.newsTargetingService = newsTargetingService;
     this.container = container;
+    this.identityManager = identityManager;
   }
 
 
@@ -199,6 +207,32 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
       return Response.status(Response.Status.BAD_REQUEST)
                      .entity("News target with name {} was already deleted or isn't planned to be deleted" + targetName)
                      .build();
+    }
+  }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(
+          value = "Create a new target.",
+          httpMethod = "POST",
+          response = Response.class
+  )
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"), }
+  )
+  public Response createNewsTarget(@Context HttpServletRequest request,
+                                @ApiParam(value = "News target to create", required = true) Metadata newsTarget) {
+    long userIdentityId = NewsUtils.getCurrentUserIdentityId(identityManager);
+    try {
+      Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTarget, userIdentityId);
+      return Response.ok(addedNewsTarget).build();
+    } catch (Exception e) {
+      LOG.error("Error creating a news target", e);
+      return Response.serverError().entity(e.getMessage()).build();
     }
   }
 

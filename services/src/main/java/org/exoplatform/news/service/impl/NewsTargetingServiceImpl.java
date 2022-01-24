@@ -42,13 +42,15 @@ import org.exoplatform.social.metadata.model.MetadataKey;
  */
 public class NewsTargetingServiceImpl implements NewsTargetingService {
 
-  private static final Log    LOG                             = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
+  private static final Log    LOG         = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  public static final long    LIMIT                           = 100;
+  public static final long    LIMIT       = 100;
 
-  private static final String LABEL                           = "label";
+  private static final String LABEL       = "label";
 
-  private static final String REFERENCED                      = "referenced";
+  private static final String REFERENCED  = "referenced";
+
+  private static final String DESCRIPTION = "description";
 
   private MetadataService     metadataService;
 
@@ -135,11 +137,17 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     deleteNewsTargets(newsId);
   }
 
+  @Override
+  public Metadata createMetadata(Metadata metadata, long userIdentityId) {
+    return metadataService.createMetadata(metadata, userIdentityId);
+  }
+
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
-    if(metadata.getProperties() != null) {
+    if (metadata.getProperties() != null) {
       newsTargetingEntity.setLabel(metadata.getProperties().get(LABEL));
+      newsTargetingEntity.setDescription(metadata.getProperties().get(DESCRIPTION));
     }
     return newsTargetingEntity;
   }

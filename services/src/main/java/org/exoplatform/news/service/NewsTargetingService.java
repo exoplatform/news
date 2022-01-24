@@ -70,7 +70,7 @@ public interface NewsTargetingService {
    * @param currentIdentity
    *
    * @return {@link List} of referenced targets
-   * @throws IllegalAccessException when user doesn't have access to  get referenced targets {@link News}
+   * @throws IllegalAccessException when user doesn't have access to  get referenced {@link News} targets
    */
   List<NewsTargetingEntity> getReferencedTargets(org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException;
 
@@ -81,8 +81,8 @@ public interface NewsTargetingService {
    * @param staged {@link News} is staged news
    * @param targets {@link List} of {@link News} targets to be saved
    * @param currentUser current user attempting to save {@link News} targets
-   * @throws IllegalAccessException when user doesn't have access to save targets {@link News}
-   */
+   * @throws IllegalAccessException when user doesn't have access to save {@link News} targets of a given {@link News} id
+   */ 
   void saveNewsTarget(String newsId, boolean staged, List<String> targets, String currentUser) throws IllegalAccessException;
 
   /**
@@ -90,14 +90,14 @@ public interface NewsTargetingService {
    * 
    * @param newsId {@link News} identifier of {@link News} targets to be deleted
    * @param currentUserId
-   * @throws IllegalAccessException when user doesn't have access to delete {@link News}
+   * @throws IllegalAccessException when user doesn't have access to delete {@link News} targets of a given {@link News} id
    */
   void deleteNewsTargets(String newsId, String currentUserId) throws IllegalAccessException;
   
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
    * 
-   * @param newsId {@link News} identifier of {@link News} targets to be deleted
+   * @param newsId {@link News} identifier of {@link News} to delete targets
    */
   void deleteNewsTargets(String newsId);
 

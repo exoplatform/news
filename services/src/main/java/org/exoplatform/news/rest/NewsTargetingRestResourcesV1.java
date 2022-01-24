@@ -146,6 +146,8 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
             try {
               newsTargetToDeleteQueue.remove(targetName);
               newsTargetingService.deleteTargetByName(targetName, currentIdentity);
+            } catch (IllegalAccessException e) {
+              LOG.error("Error when deleting the news target with name " + targetName, e);
             } catch (Exception e) {
               LOG.error("Error when deleting the news target with name " + targetName, e);
             } finally {
@@ -158,6 +160,9 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
         newsTargetingService.deleteTargetByName(targetName, currentIdentity);
       }
       return Response.ok().build();
+    } catch (IllegalAccessException e) {
+      LOG.warn("User '{}' is not authorized to delete news target", currentIdentity.getUserId(), e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when deleting the news target with name " + targetName, e);
       return Response.serverError().entity(e.getMessage()).build();

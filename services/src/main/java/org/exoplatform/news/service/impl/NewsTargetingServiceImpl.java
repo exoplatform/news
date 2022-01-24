@@ -66,7 +66,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
   
   @Override
-  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) {
+  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
     if (currentIdentity != null && !NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to publish news");
     }

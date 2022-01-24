@@ -267,7 +267,7 @@ public class NewsTargetingImplTest {
 
   @Test
   @PrepareForTest({ ExoContainerContext.class })
-  public void testDeleteTargetByName() {
+  public void testDeleteTargetByName() throws IllegalAccessException {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
     String username = "user";

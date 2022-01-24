@@ -43,7 +43,7 @@ public interface NewsTargetingService {
    * @param targetName {@link News} target name to be deleted
    * @param currentIdentity {@link Identity} technical identifier
    */
-  void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity);
+  void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException ;
 
   /**
    * Gets the {@link List} of {@link News} targets linked to a given {@link News} id

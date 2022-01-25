@@ -280,7 +280,7 @@ public class NewsTargetingImplTest {
     when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
     org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
     when(identityRegistry.getIdentity(username)).thenReturn(identity);
-    when(identity.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
+    when(identity.isMemberOf("/platform/web-contributors", "manager")).thenReturn(true);
 
     List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();

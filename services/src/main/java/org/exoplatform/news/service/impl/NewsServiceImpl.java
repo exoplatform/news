@@ -44,6 +44,8 @@ import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
+import javax.jcr.ItemNotFoundException;
+
 /**
  * Service managing News and storing them in ECMS
  */
@@ -365,14 +367,22 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   public News postNews(News news, String poster) throws Exception {
-    postNewsActivity(news);
-    updateNews(news, poster, null, news.isPublished());
-    sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
-    if (news.isPublished()) {
-      publishNews(news, poster);
+    News existNews;
+    try {
+      existNews = newsStorage.getNewsById(news.getId(), false);
+    } catch (ItemNotFoundException e) {
+      existNews = newsStorage.createNews(news);
     }
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
-    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
+    if (existNews != null) {
+      postNewsActivity(news);
+      updateNews(news, poster, null, news.isPublished());
+      sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+      if (news.isPublished()) {
+        publishNews(news, poster);
+      }
+      NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
+      NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
+    }
     return news;
   }
 

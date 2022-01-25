@@ -8,6 +8,12 @@
         <h3>{{ $t('news.archive.text') }}</h3>
       </div>
     </div>
+    <div v-show="unAuthorizedAccess" class="newsComposer">
+      <div class="articleNotFound">
+        <i class="iconNotFound"></i>
+        <h3 class="restrictedAction">{{ $t('news.details.restricted') }}</h3>
+      </div>
+    </div>
     <div class="newsDetails-description">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="illustrationURL" class="illustration">
@@ -127,6 +133,11 @@ export default {
       required: false,
       default: null
     },
+    unAuthorizedAccess: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data: () => ({
     dateFormat: {
@@ -201,7 +212,7 @@ export default {
       return this.news && this.news.publicationState;
     },
     notSameUpdater() {
-      return this.news && this.news.updater !=='__system' && this.news.updater !== this.news.author;
+      return this.news && !this.news.publicationState === 'staged' && this.news.updater !=='__system' && this.news.updater !== this.news.author;
     },
     scheduleDate() {
       return this.news && this.news.schedulePostDate;

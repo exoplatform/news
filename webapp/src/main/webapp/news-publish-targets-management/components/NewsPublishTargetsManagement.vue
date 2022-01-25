@@ -75,7 +75,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                       dark
                       color="primary"
                       size="16"
-                      @click="deleteNewsTarget(props.item.name)">
+                      @click="deleteConfirmDialog(props.item.name)">
                       fas fa-trash
                     </v-icon>
                   </v-btn>
@@ -85,6 +85,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </template>
         </v-data-table>
       </div>
+      <exo-confirm-dialog
+        ref="deleteConfirmDialog"
+        :message="$t('news.newsTarget.message.confirmDeleteNews')"
+        :title="$t('news.newsTarget.title.confirmDeleteNews')"
+        :ok-label="$t('news.button.ok')"
+        :cancel-label="$t('news.button.cancel')"
+        @ok="deleteNewsTarget(selectedTarget)" />
       <exo-news-notification-alerts />
     </v-main>
   </v-app>
@@ -97,6 +104,7 @@ export default {
     itemsPerPage: 10,
     initialized: false,
     loading: true,
+    selectedTarget: '',
   }),
   computed: {
     hideFooter() {
@@ -149,6 +157,10 @@ export default {
           this.init();
         }
       }, redirectionTime);
+    },
+    deleteConfirmDialog(target) {
+      this.selectedTarget = target;
+      this.$refs.deleteConfirmDialog.open();
     },
   }
 };

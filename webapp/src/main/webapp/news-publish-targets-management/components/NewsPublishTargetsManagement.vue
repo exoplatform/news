@@ -74,7 +74,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <v-icon
                       dark
                       color="primary"
-                      size="16">
+                      size="16"
+                      @click="deleteConfirmDialog(props.item.name)">
                       fas fa-trash
                     </v-icon>
                   </v-btn>
@@ -84,6 +85,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </template>
         </v-data-table>
       </div>
+      <exo-confirm-dialog
+        ref="deleteConfirmDialog"
+        :message="$t('news.newsTarget.message.confirmDeleteNews')"
+        :title="$t('news.newsTarget.title.confirmDeleteNews')"
+        :ok-label="$t('news.button.ok')"
+        :cancel-label="$t('news.button.cancel')"
+        @ok="deleteNewsTarget(selectedTarget)" />
+      <exo-news-notification-alerts />
     </v-main>
   </v-app>
 </template>
@@ -95,6 +104,7 @@ export default {
     itemsPerPage: 10,
     initialized: false,
     loading: true,
+    selectedTarget: '',
   }),
   computed: {
     hideFooter() {
@@ -133,6 +143,24 @@ export default {
             this.initialized = false;
           });
       }
+    },
+    deleteNewsTarget(targetName) {
+      const deleteDelay = 6;
+      const redirectionTime = 8100;
+      this.$newsTargetingService.deleteTargetByName(targetName, deleteDelay)
+        .then(() => {
+          this.$root.$emit('confirm-newsTarget-deletion', targetName);
+        });
+      setTimeout(() => {
+        const deletedNewsTarget = localStorage.getItem('deletedNewsTarget');
+        if (deletedNewsTarget != null) {
+          this.init();
+        }
+      }, redirectionTime);
+    },
+    deleteConfirmDialog(target) {
+      this.selectedTarget = target;
+      this.$refs.deleteConfirmDialog.open();
     },
   }
 };

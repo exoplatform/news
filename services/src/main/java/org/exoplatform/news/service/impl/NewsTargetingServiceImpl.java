@@ -42,17 +42,17 @@ import org.exoplatform.social.metadata.model.MetadataKey;
  */
 public class NewsTargetingServiceImpl implements NewsTargetingService {
 
-  private static final Log LOG                             = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
+  private static final Log    LOG                             = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  public static final long        LIMIT           =  100;
+  public static final long    LIMIT                           = 100;
 
-  private static final String        LABEL           =  "label";
+  private static final String LABEL                           = "label";
 
-  private static final String        REFERENCED           =  "referenced";
+  private static final String REFERENCED                      = "referenced";
 
-  private MetadataService        metadataService;
-  
-  private IdentityManager identityManager;
+  private MetadataService     metadataService;
+
+  private IdentityManager     identityManager;
 
   public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager){
     this.metadataService = metadataService;
@@ -66,7 +66,11 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
   
   @Override
-  public void deleteTargetByName(String targetName) {
+  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
+    if (currentIdentity != null && !NewsUtils.canDeleteTargetNews(currentIdentity)) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId()
+          + " not authorized to delete news target with name " + targetName);
+    }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);
     Metadata targetMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     metadataService.deleteMetadataById(targetMetadata.getId());

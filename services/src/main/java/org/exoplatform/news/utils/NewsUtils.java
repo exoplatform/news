@@ -25,31 +25,33 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 
 public class NewsUtils {
 
-  private static final Log   LOG                       = ExoLogger.getLogger(NewsUtils.class);
+  private static final Log    LOG                             = ExoLogger.getLogger(NewsUtils.class);
 
-  public static final String POST_NEWS                 = "exo.news.postArticle";
+  public static final String  POST_NEWS                       = "exo.news.postArticle";
 
-  public static final String POST_NEWS_ARTICLE         = "exo.news.gamification.postArticle";
+  public static final String  POST_NEWS_ARTICLE               = "exo.news.gamification.postArticle";
 
-  public static final String PUBLISH_NEWS              = "exo.news.gamification.PublishArticle";
+  public static final String  PUBLISH_NEWS                    = "exo.news.gamification.PublishArticle";
 
-  public static final String VIEW_NEWS                 = "exo.news.viewArticle";
+  public static final String  VIEW_NEWS                       = "exo.news.viewArticle";
 
-  public static final String SHARE_NEWS                = "exo.news.shareArticle";
+  public static final String  SHARE_NEWS                      = "exo.news.shareArticle";
 
-  public static final String COMMENT_NEWS              = "exo.news.commentArticle";
+  public static final String  COMMENT_NEWS                    = "exo.news.commentArticle";
 
-  public static final String LIKE_NEWS                 = "exo.news.likeArticle";
+  public static final String  LIKE_NEWS                       = "exo.news.likeArticle";
 
-  public static final String DELETE_NEWS               = "exo.news.deleteArticle";
+  public static final String  DELETE_NEWS                     = "exo.news.deleteArticle";
 
-  public static final String UPDATE_NEWS               = "exo.news.updateArticle";
+  public static final String  UPDATE_NEWS                     = "exo.news.updateArticle";
 
-  public static final String NEWS_METADATA_OBJECT_TYPE = "news";
+  public static final String  NEWS_METADATA_OBJECT_TYPE       = "news";
 
-  private static final String   PUBLISHER_MEMBERSHIP_NAME       = "publisher";
+  private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
-  private static final String   PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+  private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
+
+  private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
@@ -116,6 +118,10 @@ public class NewsUtils {
 
   public static boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+  }
+
+  public static boolean canDeleteTargetNews(org.exoplatform.services.security.Identity currentIdentity) {
+    return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
   }
 
   public static org.exoplatform.services.security.Identity getUserIdentity(String username) {

@@ -234,6 +234,9 @@
       <depends>
         <module>commonVueComponents</module>
       </depends>
+      <depends>
+        <module>newsSnackbarComponent</module>
+      </depends>
     </module>
   </portlet>
 

@@ -1,6 +1,5 @@
 <template>
   <v-app
-    id="latestNewsDetails"
     class="VuetifyApp"
     flat>
     <v-container pa-0>
@@ -202,7 +201,7 @@ export default {
     }
   },
   mounted() {
-    this.$nextTick().then(() => this.$root.$emit('application-loaded'));
+    this.$root.$emit('application-loaded');
   },
   methods: {
     openNews(url){

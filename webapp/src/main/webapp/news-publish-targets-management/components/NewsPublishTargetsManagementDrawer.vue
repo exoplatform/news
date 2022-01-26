@@ -32,16 +32,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </label>
           </div>
           <div class="d-flex flex-row">
-            <input
+            <v-text-field
               id="targetName"
               ref="targetName"
               v-model="targetName"
+              type="string"
+              name="newsHeader"
               :placeholder="$t('news.publishTargets.managementDrawer.placeholder.name')"
-              type="text"
-              name="title"
-              class="ignore-vuetify-classes targetName"
+              :error-messages="checkAlphanumeric"
+              maxlength="100"
+              class="targetName input-block-level ignore-vuetify-classes"
+              counter
               required
-              autofocus>
+              outlined
+              dense />
           </div>
           <div class="d-flex flex-row mt-6">
             <label class="text-subtitle-1 font-weight-bold">
@@ -81,10 +85,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 export default {
   data: () => ({
     drawer: false,
-    targetDescriptionTextLength: 100,
+    targetDescriptionTextLength: 1000,
     targetDescription: '',
     targetName: '',
   }),
+  computed: {
+    checkAlphanumeric() {
+      if (this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0) {
+        return this.$t('news.list.settings.name.errorMessage');
+      } else {
+        return '';
+      }
+    },
+  },
   methods: {
     open() {
       this.$refs.newsPublishTargetsManagementDrawer.open();

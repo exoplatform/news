@@ -222,16 +222,20 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @ApiResponses(
           value = {
                   @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"), }
+                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
+                  @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") }
   )
   public Response createNewsTarget(@Context HttpServletRequest request,
-                                @ApiParam(value = "News target to create", required = true) Metadata newsTarget) {
+                                       @ApiParam(value = "News target to create", required = true) Metadata newsTarget) {
     long userIdentityId = NewsUtils.getCurrentUserIdentityId(identityManager);
     try {
       Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTarget, userIdentityId);
       return Response.ok(addedNewsTarget).build();
+    } catch (IllegalArgumentException e) {
+      LOG.warn("User '{}' can't create a news targets '{}' with the same name ", userIdentityId, newsTarget, e);
+      return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
-      LOG.error("Error creating a news target", e);
+      LOG.error("Error creating a news target ", e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

@@ -61,6 +61,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :max-length="targetDescriptionTextLength"
               class="targetDescription pt-0 " />
           </div>
+          <div v-if="sameTargetError" class="d-flex flex-row mt-4">
+            <v-icon class="warning--text">warning</v-icon>
+            <span class="ms-2 grey--text">
+              {{ $t('news.publishTargets.managementDrawer.sameTargetWarning') }}
+            </span>
+          </div>
         </div>
       </v-form>
     </template>
@@ -90,6 +96,7 @@ export default {
     targetDescriptionTextLength: 1000,
     targetDescription: '',
     targetName: '',
+    sameTargetError: false,
   }),
   computed: {
     checkAlphanumeric() {
@@ -100,7 +107,7 @@ export default {
       }
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.targetName && this.targetName.length === 0);
+      return this.checkAlphanumeric !== '' || (this.targetName && this.targetName.length === 0) || (this.targetName && this.targetName.length >0 && this.sameTargetError);
     },
   },
   watch: {
@@ -111,6 +118,13 @@ export default {
         this.$refs.newsPublishTargetsManagementDrawer.endLoading();
       }
     },
+    targetName(newVal, oldVal) {
+      if (newVal && newVal.length > 0 && oldVal && newVal === oldVal) {
+        this.sameTargetError =  true;
+      } else {
+        this.sameTargetError =false;
+      }
+    }
   },
   methods: {
     open() {
@@ -135,18 +149,24 @@ export default {
         id: 4,
         name: 'newsTarget'
       };
+      this.sameTargetError = false;
       this.$newsTargetingService.createTarget(target)
-        .then(() => {
-          this.$emit('news-target-saved');
-          this.reset();
-          this.closeDrawer();
+        .then((resp) => {
+          if (resp && resp === 200) {
+            this.$emit('news-target-saved');
+            this.reset();
+            this.closeDrawer();
+          } else if (resp && resp === 409) {
+            this.sameTargetError = true;
+            this.disabled = true;
+          }
         })
         .finally(() => this.saving = false);
     },
     reset() {
       this.targetDescription = '';
       this.targetName = '';
-    }
+    },
   },
 };
 </script>

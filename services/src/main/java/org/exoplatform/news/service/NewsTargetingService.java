@@ -108,7 +108,8 @@ public interface NewsTargetingService {
    * @param metadata {@link Metadata}
    * @param userIdentityId {@link Identity} identifier of the creator
    * @return created {@link Metadata}
+   * @throws IllegalArgumentException when user create a metadata that already exist
    */
-  Metadata createMetadata(Metadata metadata, long userIdentityId);
+  Metadata createMetadata(Metadata metadata, long userIdentityId) throws IllegalArgumentException;
 
 }

@@ -75,7 +75,9 @@ export function createTarget(target) {
     body: JSON.stringify(target),
   }).then((resp) => {
     if (resp && resp.ok) {
-      return resp.json();
+      return resp.status;
+    } else if ( resp.status === 409) {
+      return resp.status;
     } else {
       throw new Error('Error when undoing deleting news target');
     }

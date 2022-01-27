@@ -25,7 +25,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
         <div class="d-flex flex-row pb-5">
           <v-btn
-            class="btn btn-primary">
+            class="btn btn-primary"
+            @click="openDrawer">
             <v-icon dark>
               mdi-plus
             </v-icon>
@@ -70,12 +71,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                       fas fa-pen
                     </v-icon>
                   </v-btn>
-                  <v-btn icon text>
+                  <v-btn
+                    icon
+                    text
+                    @click="deleteConfirmDialog(props.item.name)">
                     <v-icon
                       dark
                       color="primary"
-                      size="16"
-                      @click="deleteConfirmDialog(props.item.name)">
+                      size="16">
                       fas fa-trash
                     </v-icon>
                   </v-btn>
@@ -92,6 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :ok-label="$t('news.button.ok')"
         :cancel-label="$t('news.button.cancel')"
         @ok="deleteNewsTarget(selectedTarget)" />
+      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" />
       <exo-news-notification-alerts />
     </v-main>
   </v-app>
@@ -162,6 +166,9 @@ export default {
       this.selectedTarget = target;
       this.$refs.deleteConfirmDialog.open();
     },
+    openDrawer() {
+      this.$refs.newsPublishTargetsManagementDrawer.open();
+    }
   }
 };
 </script>

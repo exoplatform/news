@@ -79,7 +79,7 @@ export function createTarget(target) {
     } else if ( resp.status === 409) {
       return resp.status;
     } else {
-      throw new Error('Error when undoing deleting news target');
+      throw new Error('Error when creating news target');
     }
   });
 }

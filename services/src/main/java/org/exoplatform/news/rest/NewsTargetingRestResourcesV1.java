@@ -223,6 +223,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
           value = {
                   @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
                   @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
+                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to create news target"),
                   @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") }
   )
   public Response createNewsTarget(@Context HttpServletRequest request,
@@ -231,6 +232,9 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     try {
       Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTarget, userIdentityId);
       return Response.ok(addedNewsTarget).build();
+    } catch(IllegalAccessException e) {
+      LOG.warn("User '{}' is not authorized to create a news target with name " + newsTarget, e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
       LOG.warn("User '{}' can't create a news targets '{}' with the same name ", userIdentityId, newsTarget, e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();

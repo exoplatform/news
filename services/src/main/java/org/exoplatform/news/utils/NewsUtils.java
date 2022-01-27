@@ -124,6 +124,15 @@ public class NewsUtils {
   public static boolean canDeleteTargetNews(org.exoplatform.services.security.Identity currentIdentity) {
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
   }
+  
+  public static boolean canCreateTarget(IdentityManager identityManager, long userIdentityId) {
+    Identity userIdentity = identityManager.getIdentity(String.valueOf(userIdentityId));
+    if (userIdentity == null) {
+      throw new IllegalStateException("User with id " + userIdentityId + " wasn't found");
+    }
+    org.exoplatform.services.security.Identity currentIdentity = getUserIdentity(userIdentity.getRemoteId());
+    return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
+  }
 
   public static org.exoplatform.services.security.Identity getUserIdentity(String username) {
     IdentityRegistry identityRegistry = ExoContainerContext.getService(IdentityRegistry.class);

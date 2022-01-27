@@ -138,11 +138,14 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public Metadata createMetadata(Metadata metadata, long userIdentityId) throws IllegalArgumentException {
+  public Metadata createMetadata(Metadata metadata, long userIdentityId) throws IllegalArgumentException, IllegalAccessException {
+    if (!NewsUtils.canCreateTarget(identityManager, userIdentityId)) {
+      throw new IllegalAccessException("User " + userIdentityId + " not authorized to delete news targets");
+    }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), metadata.getName(), 0);
     Metadata storedMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     if (storedMetadata != null) {
-      throw new IllegalArgumentException("User " + userIdentityId + " not authorized to delete news target with name "
+      throw new IllegalArgumentException("User " + userIdentityId + " not authorized to create news target with name "
           + metadata.getName());
     }
     return metadataService.createMetadata(metadata, userIdentityId);

@@ -115,10 +115,6 @@
                   <key><string>referenced</string></key>
                   <value><string>true</string></value>
                 </entry>
-                <entry>
-                  <key><string>description</string></key>
-                  <value><string>true</string></value>
-                </entry>
               </map>
             </field>
           </object>

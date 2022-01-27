@@ -93,6 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 export default {
   data: () => ({
     drawer: false,
+    saving: false,
     targetDescriptionTextLength: 1000,
     targetDescription: '',
     targetName: '',
@@ -159,6 +160,7 @@ export default {
           } else if (resp && resp === 409) {
             this.sameTargetError = true;
             this.disabled = true;
+            this.saving = false;
           }
         })
         .finally(() => this.saving = false);

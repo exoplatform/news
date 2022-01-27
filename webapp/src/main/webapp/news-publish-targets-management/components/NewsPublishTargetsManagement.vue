@@ -57,7 +57,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
               </td>
               <td>
-                <div class="align-center">
+                <div :title="props.item.description" class="align-center text-truncate">
                   {{ $t(props.item.description) }}
                 </div>
               </td>

@@ -1,12 +1,12 @@
 package org.exoplatform.news.rest;
 
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.metadata.model.Metadata;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
@@ -88,6 +88,30 @@ public class NewsTargetingRestResourcesV1Test {
 
     // When
     Response response = newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void shouldReturnOkWhenCreateTargets() throws IllegalAccessException {
+    // Given
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+    lenient().when(newsTargetingService.createMetadata(sliderNews, 0)).thenReturn(sliderNews);
+
+    // When
+    Response response = newsTargetingRestResourcesV1.createNewsTarget(request, sliderNews);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

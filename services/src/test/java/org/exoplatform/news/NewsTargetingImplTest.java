@@ -28,8 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -304,6 +303,73 @@ public class NewsTargetingImplTest {
 
     // When
     verify(metadataService, atLeastOnce()).deleteMetadataById(newsTargets.get(0).getId());
+  }
+
+  @Test
+  @PrepareForTest({ ExoContainerContext.class })
+  public void testCreateTarget() throws IllegalAccessException {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
+    String username = "Mary";
+    String id = "1";
+    Identity userIdentity = new Identity();
+    userIdentity.setId(id);
+    userIdentity.setRemoteId(username);
+    when(identityManager.getIdentity(id)).thenReturn(userIdentity);
+
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry.getIdentity(username)).thenReturn(identity);
+    when(identity.isMemberOf("/platform/web-contributors", "manager")).thenReturn(true);
+
+    List<Metadata> newsTargets = new LinkedList<>();
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+    newsTargets.add(sliderNews);
+    when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
+
+    Metadata createdNewsTarget = newsTargetingService.createMetadata(sliderNews, Long.parseLong(userIdentity.getId()));
+
+    assertNotNull(createdNewsTarget);
+    assertEquals(sliderNews.getId(), createdNewsTarget.getId());
+    assertEquals(sliderNews.getName(), createdNewsTarget.getName());
+
+    // use case when adding a target with the same name
+    when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
+    try {
+      newsTargetingService.createMetadata(sliderNews, 1);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    // use case when adding a target with user that is not a manager
+    String username1 = "John";
+    String id1 = "2";
+    Identity userIdentity1 = new Identity();
+    userIdentity1.setId(id1);
+    userIdentity1.setRemoteId(username1);
+    when(identityManager.getIdentity(id1)).thenReturn(userIdentity1);
+
+    IdentityRegistry identityRegistry1 = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry1);
+    org.exoplatform.services.security.Identity identity1 = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry1.getIdentity(username1)).thenReturn(identity1);
+    when(identity1.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
+    try {
+      newsTargetingService.createMetadata(sliderNews, 2);
+      fail();
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
   }
 
 }

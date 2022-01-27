@@ -255,7 +255,7 @@ public class NewsTargetingImplTest {
     metadataItem.setMetadata(sliderNews);
     List<MetadataItem> metadataItems = new LinkedList<>();
     metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObject("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", PublicationDefaultStates.STAGED, String.valueOf(false),0,10)).thenReturn(metadataItems);
+    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", PublicationDefaultStates.STAGED, String.valueOf(false),0,10)).thenReturn(metadataItems);
 
     // When
     List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);

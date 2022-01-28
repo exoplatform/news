@@ -105,9 +105,9 @@ public class NewsServiceImpl implements NewsService {
         throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news");
       }
       News createdNews;
-      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState()) && recreateIfDraftDeleted(news) != null) {
         createdNews = postNews(news, currentIdentity.getUserId());
-      } else if (news.getSchedulePostDate() != null){
+      } else if (news.getSchedulePostDate() != null) {
         createdNews = unScheduleNews(news, currentIdentity);
       } else {
         createdNews = newsStorage.createNews(news);
@@ -117,6 +117,16 @@ public class NewsServiceImpl implements NewsService {
       LOG.error("Error when creating the news " + news.getTitle(), e);
       return null;
     }
+  }
+
+  private News recreateIfDraftDeleted(News news) throws Exception {
+    News existNews;
+    try {
+      existNews = newsStorage.getNewsById(news.getId(), false);
+    } catch (ItemNotFoundException e) {
+      existNews = newsStorage.createNews(news);
+    }
+    return existNews;
   }
   
   /**
@@ -367,22 +377,14 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   public News postNews(News news, String poster) throws Exception {
-    News existNews;
-    try {
-      existNews = newsStorage.getNewsById(news.getId(), false);
-    } catch (ItemNotFoundException e) {
-      existNews = newsStorage.createNews(news);
+    postNewsActivity(news);
+    updateNews(news, poster, null, news.isPublished());
+    sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
+    if (news.isPublished()) {
+      publishNews(news, poster);
     }
-    if (existNews != null) {
-      postNewsActivity(news);
-      updateNews(news, poster, null, news.isPublished());
-      sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
-      if (news.isPublished()) {
-        publishNews(news, poster);
-      }
-      NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
-      NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
-    }
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
+    NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
     return news;
   }
 

@@ -73,7 +73,7 @@ export default {
     };
   },
   computed: {
-    backUrlHistoryCleared() {
+    historyClearedBackUrl() {
       return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
     },
     archivedNews() {
@@ -94,10 +94,11 @@ export default {
   },
   methods: {
     goBack() {
-      if (this.lastVisitedPage)
-      {history.back();}
+      if (this.lastVisitedPage){
+        history.back();
+      }
       else {
-        window.open(this.backUrlHistoryCleared ,'_self');
+        window.open(this.historyClearedBackUrl ,'_self');
       }
     },
   }

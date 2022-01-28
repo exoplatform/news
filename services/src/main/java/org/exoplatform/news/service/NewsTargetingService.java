@@ -113,4 +113,16 @@ public interface NewsTargetingService {
    */
   Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException;
 
+  /**
+   * Get a news Metadata by it name
+   * @param originalTargetName identifier of the news target
+   * @param newsTargetingEntity {@link News} TargetingEntity
+   * @param currentIdentity {@link Identity} technical identifier
+   * @throws IllegalArgumentException when user create a metadata that already exist
+   * @throws IllegalAccessException when user doesn't have access to create {@link News} target
+   *
+   * @throws IllegalAccessException when user doesn't have access to get news targets of a given target name
+   */
+  Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException;
+
 }

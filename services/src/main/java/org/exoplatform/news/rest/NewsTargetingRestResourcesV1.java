@@ -237,4 +237,42 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     }
   }
 
+  @PUT
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(value = "Update an existing new target", httpMethod = "PUT", response = Response.class, consumes = "application/json")
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = HTTPStatus.NOT_FOUND, message = "Object not found"),
+                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+                  @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
+                  @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation")
+          }
+  )
+  public Response updateNewsTarget(
+                              @ApiParam(value = "News target to create", required = true)
+                              NewsTargetingEntity newsTargetingEntity,
+                              @ApiParam(value = "Original news target name", required = true)
+                              @QueryParam("originalTargetName")String originalTargetName) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    try {
+      Metadata metadata = newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
+      return Response.ok(metadata).build();
+    } catch (IllegalAccessException e) {
+      LOG.warn("User '{}' is not authorized to update a news target with name " + originalTargetName, e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+    } catch (IllegalArgumentException e) {
+      LOG.warn("User '{}' can't update a news targets with the name '{}'", currentIdentity.getUserId(), originalTargetName, e);
+      return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+    } catch (IllegalStateException e) {
+      LOG.warn("This news target '{}' can't be found", newsTargetingEntity.getName(), e);
+      return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+    } catch (Exception e) {
+      LOG.error("Error updating a news target ", e);
+      return Response.serverError().entity(e.getMessage()).build();
+    }
+
+  }
+
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.service.NewsTargetingService;
@@ -149,6 +150,34 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
               + metadata.getName());
     }
     return metadataService.createMetadata(metadata, userIdentityId);
+  }
+
+  @Override
+  public Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
+    if (!NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
+      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get news targets");
+    }
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentIdentity.getUserId());
+    long userIdentityId = identity == null ? 0 : Long.parseLong(identity.getId());
+    MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), originalTargetName, 0);
+    Metadata storedMetadata = metadataService.getMetadataByKey(targetMetadataKey);
+    if (storedMetadata == null) {
+      throw new IllegalStateException("User " + currentIdentity.getUserId() + " can not get news target with this name " + originalTargetName);
+    }
+    boolean isSameName = StringUtils.equals(newsTargetingEntity.getName(), originalTargetName);
+    if (!isSameName) {
+      storedMetadata.setName(newsTargetingEntity.getName());
+    }
+    boolean isSameDescription = newsTargetingEntity.getProperties().entrySet().stream()
+            .allMatch(e -> e.getValue().equals(storedMetadata.getProperties().get(e.getKey())));
+    if (!isSameDescription) {
+      storedMetadata.setProperties(newsTargetingEntity.getProperties());
+    }
+    if (isSameDescription && isSameDescription) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " don't make any changes");
+    }
+    Metadata updatedMetadata = metadataService.updateMetadata(storedMetadata, userIdentityId);
+    return updatedMetadata;
   }
 
   private NewsTargetingEntity toEntity(Metadata metadata) {

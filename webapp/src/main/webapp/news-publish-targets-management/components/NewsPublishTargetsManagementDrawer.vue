@@ -16,7 +16,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     id="newsPublishTargetsManagementDrawer"
     ref="newsPublishTargetsManagementDrawer"
     body-classes="hide-scroll decrease-z-index-more"
-    right>
+    right
+    @closed="reset">
     <template slot="title">
       {{ $t('news.publishTargets.management.addTarget') }}
     </template>
@@ -67,6 +68,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               {{ $t('news.publishTargets.managementDrawer.sameNewsTargetWarning') }}
             </span>
           </div>
+          <div v-else-if="sameDataError" class="d-flex flex-row mt-4">
+            <v-icon class="warning--text">warning</v-icon>
+            <span class="ms-2 grey--text">
+              {{ $t('news.publishTargets.managementDrawer.noChangesTargetWarning') }}
+            </span>
+          </div>
         </div>
       </v-form>
     </template>
@@ -81,8 +88,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :disabled="saving || disabled"
           :loading="saving"
           class="btn btn-primary ms-2"
-          @click="createTarget">
-          {{ $t('news.publishTargets.managementDrawer.btn.confirm') }}
+          @click="saveTarget">
+          {{ saveButtonLabel }}
         </v-btn>
       </div>
     </template>
@@ -98,14 +105,20 @@ export default {
     targetDescription: '',
     targetName: '',
     sameTargetError: false,
+    sameDataError: false,
+    selectedTarget: '',
+    saveMode: 'creationMode',
   }),
   computed: {
     checkAlphanumeric() {
       return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError;
+      return this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.sameDataError;
     },
+    saveButtonLabel() {
+      return this.saveMode === 'edit' ? 'Update' : this.$t('news.publishTargets.managementDrawer.btn.confirm');
+    }
   },
   watch: {
     saving() {
@@ -117,7 +130,19 @@ export default {
     },
     targetName(newVal, oldVal) {
       this.sameTargetError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
+      this.sameDataError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
+    },
+    targetDescription(newVal, oldVal) {
+      this.sameDataError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
     }
+  },
+  created() {
+    this.$root.$on('selected-target', (selectedTarget) => {
+      this.selectedTarget = selectedTarget.targetName;
+      this.targetName = selectedTarget.targetName;
+      this.targetDescription = selectedTarget.targetDescription;
+      this.saveMode = 'edit';
+    });
   },
   methods: {
     open() {
@@ -125,12 +150,19 @@ export default {
     },
     closeDrawer() {
       this.$refs.newsPublishTargetsManagementDrawer.close();
+      this.reset();
+    },
+    saveTarget() {
+      if (this.saveMode === 'edit') {
+        this.updateNewsTarget();
+      } else {
+        this.createTarget();
+      }
     },
     createTarget() {
       this.saving = true;
       const target = {
         name: '',
-        type: '',
         properties: ''
       };
       target.name = this.targetName;
@@ -147,6 +179,32 @@ export default {
             this.closeDrawer();
           } else if (resp && resp === 409) {
             this.sameTargetError = true;
+            this.disabled = true;
+            this.saving = false;
+          }
+        })
+        .finally(() => this.saving = false);
+    },
+    updateNewsTarget() {
+      this.saving = true;
+      const target = {
+        name: '',
+        type: '',
+        properties: ''
+      };
+      target.name = this.targetName;
+      target.properties = {
+        description: this.targetDescription,
+        label: this.targetName
+      };
+      this.$newsTargetingService.updateTarget(target, this.selectedTarget)
+        .then((resp) => {
+          if (resp && resp === 200) {
+            this.$emit('news-target-saved');
+            this.reset();
+            this.closeDrawer();
+          } else if (resp && resp === 409) {
+            this.sameDataError = true;
             this.disabled = true;
             this.saving = false;
           }

@@ -42,7 +42,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.picocontainer.Startable;
 
@@ -54,8 +53,6 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
 
   private NewsTargetingService     newsTargetingService;
 
-  private IdentityManager          identityManager;
-
   private ScheduledExecutorService scheduledExecutor;
 
   private PortalContainer          container;
@@ -63,12 +60,9 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   private Map<String, String>      newsTargetToDeleteQueue = new HashMap<>();
 
 
-  public NewsTargetingRestResourcesV1(NewsTargetingService newsTargetingService,
-                                      PortalContainer container,
-                                      IdentityManager identityManager) {
+  public NewsTargetingRestResourcesV1(NewsTargetingService newsTargetingService, PortalContainer container) {
     this.newsTargetingService = newsTargetingService;
     this.container = container;
-    this.identityManager = identityManager;
   }
 
 
@@ -227,16 +221,16 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
                   @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") }
   )
   public Response createNewsTarget(@Context HttpServletRequest request,
-                                       @ApiParam(value = "News target to create", required = true) Metadata newsTarget) {
-    long userIdentityId = NewsUtils.getCurrentUserIdentityId(identityManager);
+                                       @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTarget, userIdentityId);
+      Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTargetingEntity, currentIdentity);
       return Response.ok(addedNewsTarget).build();
-    } catch(IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to create a news target with name " + newsTarget, e);
+    } catch (IllegalAccessException e) {
+      LOG.warn("User '{}' is not authorized to create a news target with name " + currentIdentity.getUserId(), e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' can't create a news targets '{}' with the same name ", userIdentityId, newsTarget, e);
+      LOG.warn("User '{}' can't create a news targets '{}' with the same name ", currentIdentity.getUserId(), newsTargetingEntity.getName(), e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error creating a news target ", e);

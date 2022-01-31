@@ -45,7 +45,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
@@ -59,7 +59,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenGetReferencedTargets() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
@@ -73,7 +73,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenDeleteNewsTarget() {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     Identity currentIdentity = new Identity("john");
@@ -82,7 +82,6 @@ public class NewsTargetingRestResourcesV1Test {
     List<NewsTargetingEntity> targets = new LinkedList<>();
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName("test1");
-    newsTargetingEntity.setLabel("test1");
     targets.add(newsTargetingEntity);
     lenient().when(newsTargetingService.getTargets()).thenReturn(targets);
 
@@ -96,7 +95,7 @@ public class NewsTargetingRestResourcesV1Test {
   @Test
   public void shouldReturnOkWhenCreateTargets() throws IllegalAccessException {
     // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container, identityManager);
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     Identity currentIdentity = new Identity("john");
@@ -108,10 +107,12 @@ public class NewsTargetingRestResourcesV1Test {
     sliderNewsProperties.put("label", "slider news");
     sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
-    lenient().when(newsTargetingService.createMetadata(sliderNews, 0)).thenReturn(sliderNews);
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName(sliderNews.getName());
+    lenient().when(newsTargetingService.createMetadata(newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 
     // When
-    Response response = newsTargetingRestResourcesV1.createNewsTarget(request, sliderNews);
+    Response response = newsTargetingRestResourcesV1.createNewsTarget(request, newsTargetingEntity);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

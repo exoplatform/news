@@ -1,5 +1,5 @@
 <!--
-Copyright (C) 2021 eXo Platform SAS.
+Copyright (C) 2022 eXo Platform SAS.
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -101,14 +101,10 @@ export default {
   }),
   computed: {
     checkAlphanumeric() {
-      if (this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0) {
-        return this.$t('news.list.settings.name.errorMessage');
-      } else {
-        return '';
-      }
+      return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.targetName && this.targetName.length === 0) || (this.targetName && this.targetName.length >0 && this.sameTargetError);
+      return this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError;
     },
   },
   watch: {
@@ -120,11 +116,7 @@ export default {
       }
     },
     targetName(newVal, oldVal) {
-      if (newVal && newVal.length > 0 && oldVal && newVal === oldVal) {
-        this.sameTargetError =  true;
-      } else {
-        this.sameTargetError =false;
-      }
+      this.sameTargetError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
     }
   },
   methods: {
@@ -145,10 +137,6 @@ export default {
       target.properties = {
         description: this.targetDescription,
         label: this.targetName
-      };
-      target.type = {
-        id: 4,
-        name: 'newsTarget'
       };
       this.sameTargetError = false;
       this.$newsTargetingService.createTarget(target)

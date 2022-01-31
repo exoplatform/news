@@ -19,13 +19,13 @@ package org.exoplatform.news.rest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @NoArgsConstructor
 @Data
 public class NewsTargetingEntity {
 
   private String name;
 
-  private String label;
-
-  private String description;
+  private Map<String, String> properties;
 }

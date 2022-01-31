@@ -135,8 +135,8 @@ export default {
           .then(newsTargets => {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,
-              label: newsTarget.label,
-              description: newsTarget.description,
+              label: newsTarget.properties.label,
+              description: newsTarget.properties.description,
             }));
             this.initialized = true;
           })

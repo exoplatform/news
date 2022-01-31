@@ -153,13 +153,4 @@ public class NewsUtils {
     return identity;
   }
 
-  public static final String getCurrentUser() {
-    return ConversationState.getCurrent().getIdentity().getUserId();
-  }
-
-  public static final long getCurrentUserIdentityId(IdentityManager identityManager) {
-    String currentUser = getCurrentUser();
-    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUser);
-    return identity == null ? 0 : Long.parseLong(identity.getId());
-  }
 }

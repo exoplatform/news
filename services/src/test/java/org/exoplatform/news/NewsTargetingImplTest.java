@@ -80,8 +80,6 @@ public class NewsTargetingImplTest {
     assertEquals(2, newsTargetingEntities.size());
     assertEquals("sliderNews", newsTargetingEntities.get(0).getName());
     assertEquals("latestNews", newsTargetingEntities.get(1).getName());
-    assertEquals("slider news", newsTargetingEntities.get(0).getLabel());
-    assertEquals("latest news", newsTargetingEntities.get(1).getLabel());
   }
 
   @Test
@@ -294,7 +292,6 @@ public class NewsTargetingImplTest {
     List<NewsTargetingEntity> targets = new LinkedList<>();
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName("test1");
-    newsTargetingEntity.setLabel("test1");
     targets.add(newsTargetingEntity);
 
     when(newsTargetingService.getTargets()).thenReturn(targets);
@@ -310,12 +307,11 @@ public class NewsTargetingImplTest {
   public void testCreateTarget() throws IllegalAccessException {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
-    String username = "Mary";
-    String id = "1";
+    String username = "mary";
     Identity userIdentity = new Identity();
-    userIdentity.setId(id);
+    userIdentity.setId("1");
     userIdentity.setRemoteId(username);
-    when(identityManager.getIdentity(id)).thenReturn(userIdentity);
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "mary")).thenReturn(userIdentity);
 
     IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
     PowerMockito.mockStatic(ExoContainerContext.class);
@@ -324,7 +320,6 @@ public class NewsTargetingImplTest {
     when(identityRegistry.getIdentity(username)).thenReturn(identity);
     when(identity.isMemberOf("/platform/web-contributors", "manager")).thenReturn(true);
 
-    List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();
     sliderNews.setName("sliderNews");
     sliderNews.setCreatedDate(100);
@@ -332,10 +327,12 @@ public class NewsTargetingImplTest {
     sliderNewsProperties.put("label", "slider news");
     sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
-    newsTargets.add(sliderNews);
     when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName("test1");
+    newsTargetingEntity.setProperties(sliderNewsProperties);
 
-    Metadata createdNewsTarget = newsTargetingService.createMetadata(sliderNews, Long.parseLong(userIdentity.getId()));
+    Metadata createdNewsTarget = newsTargetingService.createMetadata(newsTargetingEntity, identity);
 
     assertNotNull(createdNewsTarget);
     assertEquals(sliderNews.getId(), createdNewsTarget.getId());
@@ -344,7 +341,7 @@ public class NewsTargetingImplTest {
     // use case when adding a target with the same name
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     try {
-      newsTargetingService.createMetadata(sliderNews, 1);
+      newsTargetingService.createMetadata(newsTargetingEntity, identity);
       fail();
     } catch (IllegalArgumentException e) {
       // Expected
@@ -365,7 +362,7 @@ public class NewsTargetingImplTest {
     when(identityRegistry1.getIdentity(username1)).thenReturn(identity1);
     when(identity1.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
     try {
-      newsTargetingService.createMetadata(sliderNews, 2);
+      newsTargetingService.createMetadata(newsTargetingEntity, identity1);
       fail();
     } catch (IllegalAccessException e) {
       // Expected

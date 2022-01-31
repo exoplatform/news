@@ -16,6 +16,7 @@
  */
 package org.exoplatform.news.service.impl;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +47,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   public static final long    LIMIT       = 100;
 
-  private static final String LABEL       = "label";
-
   private static final String REFERENCED  = "referenced";
-
-  private static final String DESCRIPTION = "description";
 
   private MetadataService     metadataService;
 
@@ -138,15 +135,19 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public Metadata createMetadata(Metadata metadata, long userIdentityId) throws IllegalArgumentException, IllegalAccessException {
-    if (!NewsUtils.canCreateTarget(identityManager, userIdentityId)) {
-      throw new IllegalAccessException("User " + userIdentityId + " not authorized to delete news targets");
+  public Metadata createMetadata(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentIdentity.getUserId());
+    long userIdentityId = identity == null ? 0 : Long.parseLong(identity.getId());
+    Metadata metadata = fromEntity(newsTargetingEntity);
+    metadata.setCreatorId(userIdentityId);
+    if (!NewsUtils.canDeleteTargetNews(currentIdentity)) {
+      throw new IllegalAccessException("User " + userIdentityId + " not authorized to add news targets");
     }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), metadata.getName(), 0);
     Metadata storedMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     if (storedMetadata != null) {
       throw new IllegalArgumentException("User " + userIdentityId + " not authorized to create news target with name "
-          + metadata.getName());
+              + metadata.getName());
     }
     return metadataService.createMetadata(metadata, userIdentityId);
   }
@@ -155,10 +156,20 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
     if (metadata.getProperties() != null) {
-      newsTargetingEntity.setLabel(metadata.getProperties().get(LABEL));
-      newsTargetingEntity.setDescription(metadata.getProperties().get(DESCRIPTION));
+      newsTargetingEntity.setProperties(metadata.getProperties());
     }
     return newsTargetingEntity;
+  }
+
+  private Metadata fromEntity(NewsTargetingEntity newsTargetingEntity) {
+    Metadata metadata = new Metadata();
+    metadata.setName(newsTargetingEntity.getName());
+    metadata.setAudienceId(0);
+    metadata.setCreatedDate(new Date().getTime());
+    metadata.setType(METADATA_TYPE);
+    metadata.setProperties(newsTargetingEntity.getProperties());
+    metadata.setCreatorId(0);
+    return metadata;
   }
 
 }

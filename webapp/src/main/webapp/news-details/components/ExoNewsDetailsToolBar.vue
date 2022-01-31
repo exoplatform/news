@@ -1,6 +1,6 @@
 <template>
   <div :class="!showEditButton && 'me-5'" class="newsDetailsTopBar">
-    <a class="backBtn" :href="backURL"><i class="uiIconBack my-4"></i></a>
+    <a class="backBtn" @click="goBack"><i class="uiIconBack my-4"></i></a>
     <v-btn
       v-if="publicationState === 'staged'"
       class="btn newsDetailsActionMenu mt-6 mr-2 pull-right"
@@ -73,7 +73,7 @@ export default {
     };
   },
   computed: {
-    backURL() {
+    historyClearedBackUrl() {
       return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
     },
     archivedNews() {
@@ -87,7 +87,20 @@ export default {
     },
     newsPublished() {
       return this.news && this.news.published;
+    },
+    lastVisitedPage(){
+      return history && history.length && history.length > 2;
     }
   },
+  methods: {
+    goBack() {
+      if (this.lastVisitedPage){
+        history.back();
+      }
+      else {
+        window.open(this.historyClearedBackUrl ,'_self');
+      }
+    },
+  }
 };
 </script>

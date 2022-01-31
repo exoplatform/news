@@ -15,9 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import NewsPublishTargetsManagement from './components/NewsPublishTargetsManagement.vue';
+import NewsPublishTargetsManagementDrawer from './components/NewsPublishTargetsManagementDrawer.vue';
 
 const components = {
   'news-publish-targets-management': NewsPublishTargetsManagement,
+  'news-publish-targets-management-drawer': NewsPublishTargetsManagementDrawer,
 };
 
 for (const key in components) {

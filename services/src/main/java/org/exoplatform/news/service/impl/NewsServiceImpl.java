@@ -44,6 +44,8 @@ import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
+import javax.jcr.ItemNotFoundException;
+
 /**
  * Service managing News and storing them in ECMS
  */
@@ -103,9 +105,9 @@ public class NewsServiceImpl implements NewsService {
         throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news");
       }
       News createdNews;
-      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState()) && recreateIfDraftDeleted(news) != null) {
         createdNews = postNews(news, currentIdentity.getUserId());
-      } else if (news.getSchedulePostDate() != null){
+      } else if (news.getSchedulePostDate() != null) {
         createdNews = unScheduleNews(news, currentIdentity);
       } else {
         createdNews = newsStorage.createNews(news);
@@ -116,7 +118,18 @@ public class NewsServiceImpl implements NewsService {
       return null;
     }
   }
-  
+
+  private News recreateIfDraftDeleted(News news) throws Exception {
+    News existNews;
+    try {
+      existNews = newsStorage.getNewsById(news.getId(), false);
+    } catch (ItemNotFoundException e) {
+      existNews = newsStorage.createNews(news);
+    }
+    return existNews;
+  }
+
+
   /**
    * {@inheritDoc}
    */

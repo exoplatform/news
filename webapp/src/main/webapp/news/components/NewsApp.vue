@@ -216,13 +216,10 @@ export default {
     },
     updateNewsList(data, append = true) {
       const result = [];
-      const language = eXo.env.portal.language;
-      const local = `${language}-${language.toUpperCase()}`;
-      const options = {year: 'numeric', month: 'short', day: 'numeric'};
 
       data.forEach((item) => {
-        const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time).toLocaleDateString(local, options) : null;
-        const newsUpdateDate = new Date(item.updateDate.time).toLocaleDateString(local, options);
+        const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time) : null;
+        const newsUpdateDate = new Date(item.updateDate.time);
         const newsIllustration = item.illustrationURL == null ? '/news/images/news.png' : item.illustrationURL;
         const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';

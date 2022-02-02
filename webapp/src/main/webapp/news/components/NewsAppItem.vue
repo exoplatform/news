@@ -74,7 +74,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :format="dateTimeFormat"
               class="newsTime" />
           </span>
-          <span v-else>{{ news.updatedDate }}</span>
+          <span v-else>
+            <date-format
+              :value="news.updatedDate"
+              :format="dateFormat"
+              class="newsTime" />
+          </span>
         </div>
         <div class="newsViews" v-if="!news.draft && !news.scheduled">
           <i class="uiIconWatch"></i>

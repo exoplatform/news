@@ -109,7 +109,7 @@ public class NewsTargetingRestResourcesV1Test {
     sliderNews.setId(1);
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(sliderNews.getName());
-    lenient().when(newsTargetingService.createMetadata(newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
+    lenient().when(newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 
     // When
     Response response = newsTargetingRestResourcesV1.createNewsTarget(request, newsTargetingEntity);

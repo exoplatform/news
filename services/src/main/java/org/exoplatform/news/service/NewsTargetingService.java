@@ -110,6 +110,6 @@ public interface NewsTargetingService {
    * @return created {@link Metadata}
    * @throws IllegalArgumentException when user create a metadata that already exist
    */
-  Metadata createMetadata(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException ;
+  Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException ;
 
 }

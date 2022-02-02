@@ -224,7 +224,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
                                        @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      Metadata addedNewsTarget = newsTargetingService.createMetadata(newsTargetingEntity, currentIdentity);
+      Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
       return Response.ok(addedNewsTarget).build();
     } catch (IllegalAccessException e) {
       LOG.warn("User '{}' is not authorized to create a news target with name " + currentIdentity.getUserId(), e);

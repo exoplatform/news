@@ -66,7 +66,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   
   @Override
   public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
-    if (currentIdentity != null && !NewsUtils.canDeleteTargetNews(currentIdentity)) {
+    if (currentIdentity != null && !NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId()
           + " not authorized to delete news target with name " + targetName);
     }
@@ -135,12 +135,12 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public Metadata createMetadata(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
+  public Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
     Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentIdentity.getUserId());
     long userIdentityId = identity == null ? 0 : Long.parseLong(identity.getId());
     Metadata metadata = fromEntity(newsTargetingEntity);
     metadata.setCreatorId(userIdentityId);
-    if (!NewsUtils.canDeleteTargetNews(currentIdentity)) {
+    if (!NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalAccessException("User " + userIdentityId + " not authorized to add news targets");
     }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), metadata.getName(), 0);
@@ -165,7 +165,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     Metadata metadata = new Metadata();
     metadata.setName(newsTargetingEntity.getName());
     metadata.setAudienceId(0);
-    metadata.setCreatedDate(new Date().getTime());
     metadata.setType(METADATA_TYPE);
     metadata.setProperties(newsTargetingEntity.getProperties());
     metadata.setCreatorId(0);

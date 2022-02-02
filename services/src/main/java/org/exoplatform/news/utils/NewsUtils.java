@@ -121,7 +121,7 @@ public class NewsUtils {
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 
-  public static boolean canDeleteTargetNews(org.exoplatform.services.security.Identity currentIdentity) {
+  public static boolean canManageNewsPublishTargets(org.exoplatform.services.security.Identity currentIdentity) {
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
   }
   

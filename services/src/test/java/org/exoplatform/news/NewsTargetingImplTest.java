@@ -303,45 +303,46 @@ public class NewsTargetingImplTest {
   }
 
   @Test
-  @PrepareForTest({ ExoContainerContext.class })
   public void testCreateTarget() throws IllegalAccessException {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
-    String username = "mary";
-    Identity userIdentity = new Identity();
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "manager");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    Identity userIdentity = new Identity("organization", "root");
     userIdentity.setId("1");
-    userIdentity.setRemoteId(username);
-    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "mary")).thenReturn(userIdentity);
+    when(identityManager.getOrCreateIdentity(any(), any())).thenReturn(userIdentity);
 
-    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
-    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
-    when(identityRegistry.getIdentity(username)).thenReturn(identity);
-    when(identity.isMemberOf("/platform/web-contributors", "manager")).thenReturn(true);
-
+    List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();
+    MetadataType metadataType = new MetadataType(4, "newsTarget");
+    sliderNews.setType(metadataType);
     sliderNews.setName("sliderNews");
-    sliderNews.setCreatedDate(100);
+    sliderNews.setCreatorId(1);
     HashMap<String, String> sliderNewsProperties = new HashMap<>();
     sliderNewsProperties.put("label", "slider news");
     sliderNews.setProperties(sliderNewsProperties);
-    sliderNews.setId(1);
-    when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
+    sliderNews.setId(0);
+    newsTargets.add(sliderNews);
+
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
-    newsTargetingEntity.setName("test1");
-    newsTargetingEntity.setProperties(sliderNewsProperties);
+    newsTargetingEntity.setName(sliderNews.getName());
+    newsTargetingEntity.setProperties(sliderNews.getProperties());
+    when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
 
-    Metadata createdNewsTarget = newsTargetingService.createMetadata(newsTargetingEntity, identity);
+    Metadata createdMetadata = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
 
-    assertNotNull(createdNewsTarget);
-    assertEquals(sliderNews.getId(), createdNewsTarget.getId());
-    assertEquals(sliderNews.getName(), createdNewsTarget.getName());
+    // Then
+    assertNotNull(createdMetadata);
+    assertEquals(sliderNews.getId(), createdMetadata.getId());
+    assertEquals(sliderNews.getName(), createdMetadata.getName());
 
     // use case when adding a target with the same name
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     try {
-      newsTargetingService.createMetadata(newsTargetingEntity, identity);
+      newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
       fail();
     } catch (IllegalArgumentException e) {
       // Expected
@@ -362,7 +363,7 @@ public class NewsTargetingImplTest {
     when(identityRegistry1.getIdentity(username1)).thenReturn(identity1);
     when(identity1.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
     try {
-      newsTargetingService.createMetadata(newsTargetingEntity, identity1);
+      newsTargetingService.createNewsTarget(newsTargetingEntity, identity1);
       fail();
     } catch (IllegalAccessException e) {
       // Expected

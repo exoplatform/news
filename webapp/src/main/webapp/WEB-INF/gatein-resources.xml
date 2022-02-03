@@ -308,6 +308,9 @@
     <depends>
       <module>vuetify</module>
     </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
   </module>
 
   <module>

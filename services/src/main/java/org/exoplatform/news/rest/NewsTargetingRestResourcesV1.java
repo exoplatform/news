@@ -124,15 +124,17 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @ApiOperation(value = "Delete news target", httpMethod = "DELETE", response = Response.class, notes = "This deletes news target", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "News target deleted"),
-          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to delete the news target"),
-          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") })
+  @ApiResponses(value = { 
+      @ApiResponse(code = HTTPStatus.OK, message = "News target deleted"),
+      @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+      @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to delete the news target"),
+      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") 
+  })
   public Response deleteTarget(@Context HttpServletRequest request,
-                                     @ApiParam(value = "Target name", required = true)
-                                     @PathParam("targetName") String targetName,
-                                     @ApiParam(value = "Time to effectively delete news target", required = false)
-                                     @QueryParam("delay") long delay) {
+                               @ApiParam(value = "Target name", required = true)
+                               @PathParam("targetName") String targetName,
+                               @ApiParam(value = "Time to effectively delete news target", required = false)
+                               @QueryParam("delay") long delay) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       if (StringUtils.isBlank(targetName)) {
@@ -148,7 +150,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
               newsTargetToDeleteQueue.remove(targetName);
               newsTargetingService.deleteTargetByName(targetName, currentIdentity);
             } catch (IllegalAccessException e) {
-              LOG.warn("User '{}' is not authorized to delete the news target with name " + targetName, e);
+              LOG.warn("User '{}' is not authorized to delete the news target with name " + targetName, currentIdentity.getUserId(), e);
             } catch (Exception e) {
               LOG.error("Error when deleting the news target with name " + targetName, e);
             } finally {
@@ -170,19 +172,14 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Path("{targetName}/undoDelete")
   @POST
   @RolesAllowed("users")
-  @ApiOperation(
-          value = "Undo deleting news target if not yet effectively deleted.",
-          httpMethod = "POST",
-          response = Response.class
-  )
-  @ApiResponses(
-          value = {
-                  @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"), }
-  )
+  @ApiOperation(value = "Undo deleting news target if not yet effectively deleted.", httpMethod = "POST", response = Response.class)
+  @ApiResponses( value = {
+    @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+    @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation")
+  })
   public Response undoDeleteTarget(@Context HttpServletRequest request,
-                                       @ApiParam(value = "News target name identifier", required = true)
-                                       @PathParam("targetName") String targetName) {
+                                   @ApiParam(value = "News target name identifier", required = true)
+                                   @PathParam("targetName") String targetName) {
     if (StringUtils.isBlank(targetName)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Target name ist mandatory").build();
     }
@@ -207,32 +204,27 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(
-          value = "Create a new target.",
-          httpMethod = "POST",
-          response = Response.class
-  )
-  @ApiResponses(
-          value = {
-                  @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
-                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to create news target"),
-                  @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") }
-  )
+  @ApiOperation(value = "Create news target", httpMethod = "POST", response = Response.class)
+  @ApiResponses(value = {
+    @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+    @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
+    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to create news target"),
+    @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") 
+  })
   public Response createNewsTarget(@Context HttpServletRequest request,
-                                       @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
+                                   @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
       return Response.ok(addedNewsTarget).build();
     } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to create a news target with name ", newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      LOG.warn("User '{}' is not authorized to create a news target with name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' can't create a news targets '{}' with the same name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      LOG.warn("User '{}' can't create a news target with the same name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
-      LOG.error("Error creating a news target ", e);
+      LOG.error("Error when creating a news target with name " + newsTargetingEntity.getName(), e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -241,38 +233,33 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Update an existing new target", httpMethod = "PUT", response = Response.class, consumes = "application/json")
-  @ApiResponses(
-          value = {
-                  @ApiResponse(code = HTTPStatus.NOT_FOUND, message = "Object not found"),
-                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
-                  @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
-                  @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation")
-          }
-  )
-  public Response updateNewsTarget(
-                              @ApiParam(value = "News target to create", required = true)
-                              NewsTargetingEntity newsTargetingEntity,
-                              @ApiParam(value = "Original news target name", required = true)
-                              @QueryParam("originalTargetName")String originalTargetName) {
+  @ApiOperation(value = "Update an existing news target", httpMethod = "PUT", response = Response.class, consumes = "application/json")
+  @ApiResponses( value = {
+    @ApiResponse(code = HTTPStatus.NOT_FOUND, message = "Object not found"),
+    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
+    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
+    @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation")
+  })
+  public Response updateNewsTarget(@ApiParam(value = "News target to create", required = true)
+                                   NewsTargetingEntity newsTargetingEntity,
+                                   @ApiParam(value = "Original news target name", required = true)
+                                   @QueryParam("originalTargetName") String originalTargetName) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata metadata = newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
       return Response.ok(metadata).build();
     } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to update a news target with name " + originalTargetName, e);
+      LOG.warn("User '{}' is not authorized to update news target with name '{}'", currentIdentity.getUserId(), originalTargetName, e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' can't update a news targets with the name '{}'", currentIdentity.getUserId(), originalTargetName, e);
+      LOG.warn("User '{}' can't update news target with name '{}'", currentIdentity.getUserId(), originalTargetName, e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (IllegalStateException e) {
-      LOG.warn("This news target '{}' can't be found", newsTargetingEntity.getName(), e);
+      LOG.warn("The news target '{}' can't be found", newsTargetingEntity.getName(), e);
       return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
     } catch (Exception e) {
-      LOG.error("Error updating a news target ", e);
+      LOG.error("Error when updating the news target with name " + newsTargetingEntity.getName(), e);
       return Response.serverError().entity(e.getMessage()).build();
     }
-
   }
-
 }

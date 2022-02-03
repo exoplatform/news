@@ -153,7 +153,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
+  public Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException, IllegalStateException, IllegalArgumentException {
     if (!NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get news targets");
     }

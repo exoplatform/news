@@ -81,8 +81,7 @@
                         :format="dateTimeFormat"
                         class="newsInformationValue newsUpdatedDate ml-1 me-1" />
                     </template>
-                    <div v-else-if="news && news.updatedDate" class="newsInformationValue newsUpdatedDate">{{ news.updatedDate }}</div>
-                    <div v-if="notSameUpdater">
+                    <div v-if="notSameUpdater && showUpdateInfo">
                       <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
                       <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
                     </div>
@@ -161,7 +160,7 @@ export default {
       return this.news && this.news.title;
     },
     showUpdateInfo() {
-      return this.news && this.news.updateDate && this.news.updateDate !== 'null' && this.news.publicationDate && this.news.publicationDate!== 'null' && this.news.updateDate.time > this.news.publicationDate.time;
+      return this.news && this.news.updateDate && this.news.updater !=='__system' && this.news.updateDate !== 'null' && this.news.publicationDate && this.news.publicationDate !== 'null' && this.news.updateDate.time > this.news.publicationDate.time;
     },
     authorFullName() {
       return this.news && (this.news.authorFullName || this.news.authorDisplayName);
@@ -179,7 +178,7 @@ export default {
       return this.news && this.targetBlank(this.news.body);
     },
     updaterFullName() {
-      return this.news && this.news.updater !=='__system' ? this.news.updaterFullName : this.news.authorFullName;
+      return this.news && this.news.updaterFullName;
     },
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
@@ -212,7 +211,7 @@ export default {
       return this.news && this.news.publicationState;
     },
     notSameUpdater() {
-      return this.news && !this.news.publicationState === 'staged' && this.news.updater !=='__system' && this.news.updater !== this.news.author;
+      return this.news && this.news.updater !== this.news.author;
     },
     scheduleDate() {
       return this.news && this.news.schedulePostDate;

@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div v-if="sameTargetError" class="d-flex flex-row mt-4">
             <v-icon class="warning--text">warning</v-icon>
             <span class="ms-2 grey--text">
-              {{ $t('news.publishTargets.managementDrawer.sameTargetWarning') }}
+              {{ $t('news.publishTargets.managementDrawer.sameNewsTargetWarning') }}
             </span>
           </div>
         </div>

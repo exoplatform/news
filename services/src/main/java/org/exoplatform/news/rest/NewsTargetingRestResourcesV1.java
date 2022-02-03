@@ -37,7 +37,6 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.news.service.NewsTargetingService;
-import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -227,10 +226,10 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
       Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
       return Response.ok(addedNewsTarget).build();
     } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to create a news target with name " + currentIdentity.getUserId(), e);
+      LOG.warn("User '{}' is not authorized to create a news target with name ", newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' can't create a news targets '{}' with the same name ", currentIdentity.getUserId(), newsTargetingEntity.getName(), e);
+      LOG.warn("User '{}' can't create a news targets '{}' with the same name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error creating a news target ", e);

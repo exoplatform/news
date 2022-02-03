@@ -16,7 +16,6 @@
  */
 package org.exoplatform.news.service.impl;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,12 +140,12 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     Metadata metadata = fromEntity(newsTargetingEntity);
     metadata.setCreatorId(userIdentityId);
     if (!NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
-      throw new IllegalAccessException("User " + userIdentityId + " not authorized to add news targets");
+      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to create news targets");
     }
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), metadata.getName(), 0);
     Metadata storedMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     if (storedMetadata != null) {
-      throw new IllegalArgumentException("User " + userIdentityId + " not authorized to create news target with name "
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news target with same name "
               + metadata.getName());
     }
     return metadataService.createMetadata(metadata, userIdentityId);

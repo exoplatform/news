@@ -16,7 +16,6 @@ import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Authenticator;
-import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -122,15 +121,6 @@ public class NewsUtils {
   }
 
   public static boolean canManageNewsPublishTargets(org.exoplatform.services.security.Identity currentIdentity) {
-    return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
-  }
-  
-  public static boolean canCreateTarget(IdentityManager identityManager, long userIdentityId) {
-    Identity userIdentity = identityManager.getIdentity(String.valueOf(userIdentityId));
-    if (userIdentity == null) {
-      throw new IllegalStateException("User with id " + userIdentityId + " wasn't found");
-    }
-    org.exoplatform.services.security.Identity currentIdentity = getUserIdentity(userIdentity.getRemoteId());
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, MANAGER_MEMBERSHIP_NAME);
   }
 

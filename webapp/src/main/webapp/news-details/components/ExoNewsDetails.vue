@@ -26,7 +26,6 @@
       @ok="deleteNews" />
     <exo-news-details-body
       v-if="!isMobile"
-      :un-authorized-access="unAuthorizedAccess"
       :news="news" />
     <exo-news-details-body-mobile
       v-if="isMobile"
@@ -42,7 +41,6 @@
 <script>
 
 const USER_TIMEZONE_ID = new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-const UNAUTHORIZED_CODE = 401;
 export default {
   props: {
     news: {
@@ -81,7 +79,6 @@ export default {
       currentSpace: null,
       spaceId: null,
       BYTES_IN_MB: 1048576,
-      unAuthorizedAccess: false,
       dateFormat: {
         year: 'numeric',
         month: 'long',
@@ -203,19 +200,15 @@ export default {
     getNewsById(newsId) {
       this.$newsServices.getNewsById(newsId)
         .then(news => {
-          if (news === UNAUTHORIZED_CODE){
-            this.unAuthorizedAccess = true;
-          } else {
-            this.spaceId = news.spaceId;
-            this.getSpaceById(this.spaceId);
-            if (!this.news) {
-              this.news = news;
-            }
-            if (!this.news.newsId) {
-              this.news.newsId = newsId;
-            }
-            return this.$nextTick();
+          this.spaceId = news.spaceId;
+          this.getSpaceById(this.spaceId);
+          if (!this.news) {
+            this.news = news;
           }
+          if (!this.news.newsId) {
+            this.news.newsId = newsId;
+          }
+          return this.$nextTick();
         })
         .finally(() => {
           document.title = this.$t('news.window.title', {0: this.news.title});

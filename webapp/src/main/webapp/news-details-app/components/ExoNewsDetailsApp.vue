@@ -16,6 +16,7 @@
 </template>
 
 <script>
+const UNAUTHORIZED_CODE = 401;
 export default {
   props: {
     newsId: {
@@ -33,7 +34,7 @@ export default {
   created() {
     this.$newsServices.getNewsById(this.newsId, false)
       .then(news => {
-        if (news !== null) {
+        if (news !== null && news !== UNAUTHORIZED_CODE) {
           this.news = news;
           this.showEditButton = this.news.canEdit;
           this.showPublishButton = this.news.canPublish;

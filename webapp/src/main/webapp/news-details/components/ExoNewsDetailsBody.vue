@@ -8,12 +8,6 @@
         <h3>{{ $t('news.archive.text') }}</h3>
       </div>
     </div>
-    <div v-show="unAuthorizedAccess" class="newsComposer">
-      <div class="articleNotFound">
-        <i class="iconNotFound"></i>
-        <h3 class="restrictedAction">{{ $t('news.details.restricted') }}</h3>
-      </div>
-    </div>
     <div class="newsDetails-description">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="illustrationURL" class="illustration">
@@ -131,11 +125,6 @@ export default {
       type: Object,
       required: false,
       default: null
-    },
-    unAuthorizedAccess: {
-      type: Boolean,
-      required: false,
-      default: false
     },
   },
   data: () => ({

@@ -46,8 +46,8 @@ export default {
       .then(fullActivity => {
         this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
       });
-    this.templateParams.newsId = this.news.id;
-    this.templateParams.spaceId = this.news.spaceId;
+    this.templateParams.newsId = this.news && this.news.id;
+    this.templateParams.spaceId = this.news && this.news.spaceId;
   },
   methods: {
     removed() {

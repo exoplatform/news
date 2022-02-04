@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <template slot="item" slot-scope="props">
             <tr>
               <td>
-                <div class="align-center">
+                <div :title="props.item.label" class="align-center text-truncate">
                   {{ $t(props.item.label) }}
                 </div>
               </td>

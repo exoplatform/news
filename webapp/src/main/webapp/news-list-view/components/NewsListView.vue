@@ -122,7 +122,7 @@ export default {
         }
       });
     },
-    refreshViewExtension() {
+    selectViewExtension() {
       if (this.viewTemplate) {
         if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
@@ -145,7 +145,7 @@ export default {
       this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
       this.retrieveNewsList();
-      this.refreshViewExtension();
+      this.selectViewExtension();
     }
   },
 };

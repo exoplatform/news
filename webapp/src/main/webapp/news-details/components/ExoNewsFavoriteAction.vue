@@ -7,6 +7,7 @@
     :right="right"
     :template-params="templateParams"
     type="activity"
+    type-label="News"
     @removed="removed"
     @remove-error="removeError"
     @added="added"

@@ -30,6 +30,7 @@ const switchToArticleActivityComposerPlugin = Object.assign({}, newsActivityComp
 });
 
 const newsActivityTypeExtensionOptions = {
+  name: 'News',
   getExtendedComponent: (activity, isActivityDetail) => {
     if (activity && isActivityDetail) {
       return {

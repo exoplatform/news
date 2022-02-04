@@ -1,3 +1,5 @@
+import './initComponents.js';
+import {initExtensions} from './extensions.js';
 import * as  newsServices from '../services/newsServices';
 
 if (!Vue.prototype.$newsServices) {
@@ -5,8 +7,6 @@ if (!Vue.prototype.$newsServices) {
     value: newsServices,
   });
 }
-
-import {initExtensions} from './extensions.js';
 
 export function init() {
   initExtensions();

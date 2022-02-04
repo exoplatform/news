@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataType;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -100,5 +101,16 @@ public interface NewsTargetingService {
    * @param newsId {@link News} identifier of {@link News} to delete targets
    */
   void deleteNewsTargets(String newsId);
+
+  /**
+   * Create a news Metadata
+   * 
+   * @param newsTargetingEntity {@link News} TargetingEntity
+   * @param currentIdentity {@link Identity} technical identifier
+   * @return created {@link Metadata}
+   * @throws IllegalArgumentException when user create a metadata that already exist
+   * @throws IllegalAccessException when user doesn't have access to create {@link News} target
+   */
+  Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException;
 
 }

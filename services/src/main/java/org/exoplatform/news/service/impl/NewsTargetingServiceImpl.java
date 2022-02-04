@@ -42,13 +42,11 @@ import org.exoplatform.social.metadata.model.MetadataKey;
  */
 public class NewsTargetingServiceImpl implements NewsTargetingService {
 
-  private static final Log    LOG                             = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
+  private static final Log    LOG         = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  public static final long    LIMIT                           = 100;
+  public static final long    LIMIT       = 100;
 
-  private static final String LABEL                           = "label";
-
-  private static final String REFERENCED                      = "referenced";
+  private static final String REFERENCED  = "referenced";
 
   private MetadataService     metadataService;
 
@@ -67,7 +65,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   
   @Override
   public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
-    if (currentIdentity != null && !NewsUtils.canDeleteTargetNews(currentIdentity)) {
+    if (currentIdentity != null && !NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId()
           + " not authorized to delete news target with name " + targetName);
     }
@@ -135,13 +133,41 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     deleteNewsTargets(newsId);
   }
 
+  @Override
+  public Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException {
+    Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentIdentity.getUserId());
+    long userIdentityId = identity == null ? 0 : Long.parseLong(identity.getId());
+    Metadata metadata = fromEntity(newsTargetingEntity);
+    metadata.setCreatorId(userIdentityId);
+    if (!NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
+      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to create news targets");
+    }
+    MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), metadata.getName(), 0);
+    Metadata storedMetadata = metadataService.getMetadataByKey(targetMetadataKey);
+    if (storedMetadata != null) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news target with same name "
+              + metadata.getName());
+    }
+    return metadataService.createMetadata(metadata, userIdentityId);
+  }
+
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
-    if(metadata.getProperties() != null) {
-      newsTargetingEntity.setLabel(metadata.getProperties().get(LABEL));
+    if (metadata.getProperties() != null) {
+      newsTargetingEntity.setProperties(metadata.getProperties());
     }
     return newsTargetingEntity;
+  }
+
+  private Metadata fromEntity(NewsTargetingEntity newsTargetingEntity) {
+    Metadata metadata = new Metadata();
+    metadata.setName(newsTargetingEntity.getName());
+    metadata.setAudienceId(0);
+    metadata.setType(METADATA_TYPE);
+    metadata.setProperties(newsTargetingEntity.getProperties());
+    metadata.setCreatorId(0);
+    return metadata;
   }
 
 }

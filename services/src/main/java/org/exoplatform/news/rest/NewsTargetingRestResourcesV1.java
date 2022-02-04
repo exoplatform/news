@@ -41,6 +41,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.social.metadata.model.Metadata;
 import org.picocontainer.Startable;
 
 @Path("v1/news/targeting")
@@ -199,6 +200,40 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
       return Response.status(Response.Status.BAD_REQUEST)
                      .entity("News target with name {} was already deleted or isn't planned to be deleted" + targetName)
                      .build();
+    }
+  }
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @ApiOperation(
+          value = "Create a new target.",
+          httpMethod = "POST",
+          response = Response.class
+  )
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
+                  @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
+                  @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to create news target"),
+                  @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") }
+  )
+  public Response createNewsTarget(@Context HttpServletRequest request,
+                                       @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    try {
+      Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
+      return Response.ok(addedNewsTarget).build();
+    } catch (IllegalAccessException e) {
+      LOG.warn("User '{}' is not authorized to create a news target with name ", newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+    } catch (IllegalArgumentException e) {
+      LOG.warn("User '{}' can't create a news targets '{}' with the same name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+    } catch (Exception e) {
+      LOG.error("Error creating a news target ", e);
+      return Response.serverError().entity(e.getMessage()).build();
     }
   }
 

@@ -61,6 +61,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :max-length="targetDescriptionTextLength"
               class="targetDescription pt-0 " />
           </div>
+          <div v-if="sameTargetError" class="d-flex flex-row mt-4">
+            <v-icon class="warning--text">warning</v-icon>
+            <span class="ms-2 grey--text">
+              {{ $t('news.publishTargets.managementDrawer.sameNewsTargetWarning') }}
+            </span>
+          </div>
         </div>
       </v-form>
     </template>
@@ -72,8 +78,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           {{ $t('news.publishTargets.managementDrawer.btn.cancel') }}
         </v-btn>
         <v-btn
-          :disabled="true"
-          class="btn btn-primary ms-2">
+          :disabled="saving || disabled"
+          :loading="saving"
+          class="btn btn-primary ms-2"
+          @click="createTarget">
           {{ $t('news.publishTargets.managementDrawer.btn.confirm') }}
         </v-btn>
       </div>
@@ -85,18 +93,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 export default {
   data: () => ({
     drawer: false,
+    saving: false,
     targetDescriptionTextLength: 1000,
     targetDescription: '',
     targetName: '',
+    sameTargetError: false,
   }),
   computed: {
     checkAlphanumeric() {
-      if (this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0) {
-        return this.$t('news.list.settings.name.errorMessage');
+      return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
+    },
+    disabled() {
+      return this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError;
+    },
+  },
+  watch: {
+    saving() {
+      if (this.saving) {
+        this.$refs.newsPublishTargetsManagementDrawer.startLoading();
       } else {
-        return '';
+        this.$refs.newsPublishTargetsManagementDrawer.endLoading();
       }
     },
+    targetName(newVal, oldVal) {
+      this.sameTargetError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
+    }
   },
   methods: {
     open() {
@@ -104,7 +125,38 @@ export default {
     },
     closeDrawer() {
       this.$refs.newsPublishTargetsManagementDrawer.close();
-    }
-  }
+    },
+    createTarget() {
+      this.saving = true;
+      const target = {
+        name: '',
+        type: '',
+        properties: ''
+      };
+      target.name = this.targetName;
+      target.properties = {
+        description: this.targetDescription,
+        label: this.targetName
+      };
+      this.sameTargetError = false;
+      this.$newsTargetingService.createTarget(target)
+        .then((resp) => {
+          if (resp && resp === 200) {
+            this.$emit('news-target-saved');
+            this.reset();
+            this.closeDrawer();
+          } else if (resp && resp === 409) {
+            this.sameTargetError = true;
+            this.disabled = true;
+            this.saving = false;
+          }
+        })
+        .finally(() => this.saving = false);
+    },
+    reset() {
+      this.targetDescription = '';
+      this.targetName = '';
+    },
+  },
 };
 </script>

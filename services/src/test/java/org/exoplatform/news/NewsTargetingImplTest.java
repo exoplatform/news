@@ -28,8 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
@@ -81,8 +80,6 @@ public class NewsTargetingImplTest {
     assertEquals(2, newsTargetingEntities.size());
     assertEquals("sliderNews", newsTargetingEntities.get(0).getName());
     assertEquals("latestNews", newsTargetingEntities.get(1).getName());
-    assertEquals("slider news", newsTargetingEntities.get(0).getLabel());
-    assertEquals("latest news", newsTargetingEntities.get(1).getLabel());
   }
 
   @Test
@@ -295,7 +292,6 @@ public class NewsTargetingImplTest {
     List<NewsTargetingEntity> targets = new LinkedList<>();
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName("test1");
-    newsTargetingEntity.setLabel("test1");
     targets.add(newsTargetingEntity);
 
     when(newsTargetingService.getTargets()).thenReturn(targets);
@@ -304,6 +300,74 @@ public class NewsTargetingImplTest {
 
     // When
     verify(metadataService, atLeastOnce()).deleteMetadataById(newsTargets.get(0).getId());
+  }
+
+  @Test
+  public void testCreateTarget() throws IllegalAccessException {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "manager");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    Identity userIdentity = new Identity("organization", "root");
+    userIdentity.setId("1");
+    when(identityManager.getOrCreateIdentity(any(), any())).thenReturn(userIdentity);
+
+    List<Metadata> newsTargets = new LinkedList<>();
+    Metadata sliderNews = new Metadata();
+    MetadataType metadataType = new MetadataType(4, "newsTarget");
+    sliderNews.setType(metadataType);
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatorId(1);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(0);
+    newsTargets.add(sliderNews);
+
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName(sliderNews.getName());
+    newsTargetingEntity.setProperties(sliderNews.getProperties());
+    when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
+
+    Metadata createdMetadata = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
+
+    // Then
+    assertNotNull(createdMetadata);
+    assertEquals(sliderNews.getId(), createdMetadata.getId());
+    assertEquals(sliderNews.getName(), createdMetadata.getName());
+
+    // use case when adding a target with the same name
+    when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
+    try {
+      newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    // use case when adding a target with user that is not a manager
+    String username1 = "John";
+    String id1 = "2";
+    Identity userIdentity1 = new Identity();
+    userIdentity1.setId(id1);
+    userIdentity1.setRemoteId(username1);
+    when(identityManager.getIdentity(id1)).thenReturn(userIdentity1);
+
+    IdentityRegistry identityRegistry1 = mock(IdentityRegistry.class);
+    PowerMockito.mockStatic(ExoContainerContext.class);
+    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry1);
+    org.exoplatform.services.security.Identity identity1 = mock(org.exoplatform.services.security.Identity.class);
+    when(identityRegistry1.getIdentity(username1)).thenReturn(identity1);
+    when(identity1.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
+    try {
+      newsTargetingService.createNewsTarget(newsTargetingEntity, identity1);
+      fail();
+    } catch (IllegalAccessException e) {
+      // Expected
+    }
   }
 
 }

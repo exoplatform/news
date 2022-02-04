@@ -144,7 +144,12 @@ export default {
     },
     getReferencedTargets() {
       this.$newsTargetingService.getReferencedTargets()
-        .then(referencedTargets => this.referencedTargets = referencedTargets);
+        .then(referencedTargets => {
+          this.referencedTargets = referencedTargets.map(referencedTarget => ({
+            name: referencedTarget.name,
+            label: referencedTarget.properties && referencedTarget.properties.label,
+          }));
+        });
     },
   }
 };

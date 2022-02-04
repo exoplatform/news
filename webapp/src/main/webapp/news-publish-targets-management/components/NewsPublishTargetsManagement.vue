@@ -52,13 +52,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <template slot="item" slot-scope="props">
             <tr>
               <td>
-                <div class="align-center">
+                <div :title="props.item.label" class="align-center text-truncate">
                   {{ $t(props.item.label) }}
                 </div>
               </td>
               <td>
-                <div class="align-center">
-                  {{ $t(props.item.name) }}
+                <div :title="props.item.description" class="align-center text-truncate">
+                  {{ $t(props.item.description) }}
                 </div>
               </td>
               <td>
@@ -95,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :ok-label="$t('news.button.ok')"
         :cancel-label="$t('news.button.cancel')"
         @ok="deleteNewsTarget(selectedTarget)" />
-      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" />
+      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" @news-target-saved="init" />
       <exo-news-notification-alerts />
     </v-main>
   </v-app>
@@ -135,7 +135,8 @@ export default {
           .then(newsTargets => {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,
-              label: newsTarget.label,
+              label: newsTarget.properties.label,
+              description: newsTarget.properties.description,
             }));
             this.initialized = true;
           })

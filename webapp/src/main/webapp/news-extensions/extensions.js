@@ -108,4 +108,16 @@ export function initExtensions() {
     options: newsActivityTypeExtensionOptions,
   });
 
+  extensionRegistry.registerExtension('AnalyticsTable', 'CellValue', {
+    type: 'news',
+    options: {
+      // Rank of executing 'match' method
+      rank: 60,
+      // Used Vue component to display cell value
+      vueComponent: Vue.options.components['analytics-table-cell-content-value'],
+      // Method complete signature : match: (fieldName, aggregationType, fieldDataType, item) => { ... }
+      match: (fieldName, aggregationType) => fieldName === 'contentId.keyword' && aggregationType === 'TERMS',
+    },
+  });
+
 }

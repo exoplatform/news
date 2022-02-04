@@ -68,12 +68,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               {{ $t('news.publishTargets.managementDrawer.sameNewsTargetWarning') }}
             </span>
           </div>
-          <div v-else-if="sameDataError" class="d-flex flex-row mt-4">
-            <v-icon class="warning--text">warning</v-icon>
-            <span class="ms-2 grey--text">
-              {{ $t('news.publishTargets.managementDrawer.noChangesTargetWarning') }}
-            </span>
-          </div>
         </div>
       </v-form>
     </template>
@@ -105,8 +99,8 @@ export default {
     targetDescription: '',
     targetName: '',
     sameTargetError: false,
-    sameDataError: false,
     selectedTarget: '',
+    originalTargetName: '',
     saveMode: 'creationMode',
   }),
   computed: {
@@ -114,7 +108,7 @@ export default {
       return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.sameDataError;
+      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError;
     },
     saveButtonLabel() {
       return this.saveMode === 'edit' ? 'Update' : this.$t('news.publishTargets.managementDrawer.btn.confirm');
@@ -130,17 +124,17 @@ export default {
     },
     targetName(newVal, oldVal) {
       this.sameTargetError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
-      this.sameDataError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
     },
-    targetDescription(newVal, oldVal) {
-      this.sameDataError = newVal && newVal.length > 0 && oldVal.length > 0 && newVal === oldVal;
-    }
   },
   created() {
     this.$root.$on('selected-target', (selectedTarget) => {
-      this.selectedTarget = selectedTarget.targetName;
+      this.selectedTarget = selectedTarget;
+      this.originalTargetName = selectedTarget.targetName;
       this.targetName = selectedTarget.targetName;
       this.targetDescription = selectedTarget.targetDescription;
+      if ( this.targetName === selectedTarget.targetName && this.targetDescription === selectedTarget.targetDescription) {
+        this.sameTargetError = true;
+      }
       this.saveMode = 'edit';
     });
   },
@@ -197,16 +191,12 @@ export default {
         description: this.targetDescription,
         label: this.targetName
       };
-      this.$newsTargetingService.updateTarget(target, this.selectedTarget)
+      this.$newsTargetingService.updateTarget(target, this.originalTargetName)
         .then((resp) => {
           if (resp && resp === 200) {
             this.$emit('news-target-saved');
             this.reset();
             this.closeDrawer();
-          } else if (resp && resp === 409) {
-            this.sameDataError = true;
-            this.disabled = true;
-            this.saving = false;
           }
         })
         .finally(() => this.saving = false);
@@ -214,6 +204,7 @@ export default {
     reset() {
       this.targetDescription = '';
       this.targetName = '';
+      this.saveMode = 'creationMode';
     },
   },
 };

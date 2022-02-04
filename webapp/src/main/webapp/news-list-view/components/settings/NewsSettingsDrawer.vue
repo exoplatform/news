@@ -138,11 +138,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {
-      if (this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0) {
-        return this.$t('news.list.settings.name.errorMessage');
-      } else {
-        return '';
-      }
+      return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
       return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0);

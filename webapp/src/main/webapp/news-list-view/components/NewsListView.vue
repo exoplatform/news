@@ -96,7 +96,8 @@ export default {
   },
   created() {
     this.$root.$on('saved-news-settings',() => {
-      this.reset();
+      this.newsTarget = this.$root.newsTarget;
+      this.retrieveNewsList();
     });
     this.retrieveNewsList().finally(() => this.$root.$applicationLoaded());
     document.addEventListener(`component-${this.extensionApp}-${this.extensionType}-updated`, this.refreshViewExtensions);
@@ -122,31 +123,6 @@ export default {
         }
       });
     },
-    selectViewExtension() {
-      if (this.viewTemplate) {
-        if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
-          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
-          return sortedViewExtensions[3];
-        } else if (this.viewTemplate === 'NewsLatest' && this.newsList.length === 0) {
-          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
-          return sortedViewExtensions[4];
-        } else {
-          return this.viewExtensions[this.viewTemplate];
-        }
-      } else if (Object.keys(this.viewExtensions).length && this.newsList.length > 0) {
-        const sortedViewExtensions = Object.values(this.viewExtensions).sort();
-        return sortedViewExtensions[0];
-      }
-      return null;
-    },
-    reset() {
-      this.viewTemplate = this.$root.viewTemplate;
-      this.viewExtensions = this.$root.viewExtensions;
-      this.newsTarget = this.$root.newsTarget;
-      this.newsHeader = this.$root.header;
-      this.retrieveNewsList();
-      this.selectViewExtension();
-    }
   },
 };
 </script>

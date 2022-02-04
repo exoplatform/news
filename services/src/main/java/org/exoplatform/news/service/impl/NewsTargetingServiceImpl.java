@@ -173,7 +173,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     if (!isSameDescription) {
       storedMetadata.setProperties(newsTargetingEntity.getProperties());
     }
-    if (isSameDescription && isSameDescription) {
+    if (isSameName && isSameDescription) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " don't make any changes");
     }
     Metadata updatedMetadata = metadataService.updateMetadata(storedMetadata, userIdentityId);

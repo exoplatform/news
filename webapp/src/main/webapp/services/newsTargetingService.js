@@ -95,8 +95,6 @@ export function updateTarget(target, originalTargetName) {
   }).then((resp) => {
     if (resp && resp.ok) {
       return resp.status;
-    } else if ( resp.status === 409) {
-      return resp.status;
     } else {
       throw new Error('Error updating news target');
     }

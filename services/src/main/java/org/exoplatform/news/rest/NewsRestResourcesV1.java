@@ -461,7 +461,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                   @ApiParam(value = "News target name", required = true) @PathParam("targetName") String targetName,
                                   @ApiParam(value = "News pagination offset", defaultValue = "0") @QueryParam("offset") int offset,
                                   @ApiParam(value = "News pagination limit", defaultValue = "10") @QueryParam("limit") int limit,
-                                  @ApiParam(value = "News total size", defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
+                                  @ApiParam(value = "News total size", defaultValue = "false") @QueryParam("returnSize") boolean returnSize,
+                                  @ApiParam(value = "News order criteria", defaultValue = "lastPublished") @QueryParam("orderCriteria") String orderCriteria) {
     try {
       String authenticatedUser = request.getRemoteUser();
       if (StringUtils.isBlank(authenticatedUser)) {
@@ -470,6 +471,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(targetName)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
+
       if (offset < 0) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Offset must be 0 or positive").build();
       }
@@ -480,6 +482,15 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       NewsEntity newsEntity = new NewsEntity();
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       List<News> news = newsService.getNewsByTargetName(newsFilter, targetName, currentIdentity);
+      List<News> sortedList = null;
+      if (StringUtils.isNotBlank(orderCriteria) && orderCriteria.equals("lastPublished")) {
+        sortedList = news.stream().sorted(Comparator.comparing(News::getPublicationDate).reversed()).collect(Collectors.toList());
+
+      }
+      if (StringUtils.isNotBlank(orderCriteria) && orderCriteria.equals("lastModified")) {
+        sortedList = news.stream().sorted(Comparator.comparing(News::getUpdateDate).reversed()).collect(Collectors.toList());
+      }
+      news = sortedList != null ? sortedList : news;
       newsEntity.setNews(news);
       newsEntity.setOffset(offset);
       newsEntity.setLimit(limit);

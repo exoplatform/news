@@ -22,7 +22,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :key="item"
         class="article"
         :id="`articleItem-${index}`">
-        <news-latest-view-item :item="item" :key="index" />
+        <news-latest-view-item
+          :item="item"
+          :selected-option="selectedOption"
+          :key="index" />
       </div>
     </div>
   </div>
@@ -53,6 +56,9 @@ export default {
       hour: '2-digit',
       minute: '2-digit',
     },
+    seeAllUrl: '',
+    selectedType: 'lastPublished',
+    selectedOption: null,
   }),
   computed: {
     spaceAvatarUrl() {
@@ -63,8 +69,9 @@ export default {
     }
   },
   created() {
-    this.getNewsList();
+    this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
+    this.getNewsList();
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
@@ -72,7 +79,7 @@ export default {
   methods: {
     getNewsList() {
       if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
+        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true, this.selectedType)
           .then(newsList => {
             this.newsInfo = newsList.news;
             if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
@@ -91,11 +98,42 @@ export default {
           }
         });
     },
-    refreshNewsViews(selectedTarget){
+    refreshNewsViews(selectedTarget, selectedOption){
+      this.selectedOption = selectedOption;
+      this.selectedType = selectedOption.selectedType;
+      this.seeAllUrl = selectedOption.seeAllUrl;
+      this.limit = selectedOption.limit;
       this.newsTarget = selectedTarget;
       this.getNewsList();
-    }
-
+    },
+    reset() {
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showSummary = this.$root.showSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
+      this.showArticleReactions = this.$root.showArticleReactions;
+      this.seeAllUrl = this.$root.seeAllUrl;
+      this.selectedType = this.$root.selectedType;
+      this.selectedOption = {
+        limit: this.limit,
+        showHeader: this.showHeader,
+        showSeeAll: this.showSeeAll,
+        showArticleTitle: this.showArticleTitle,
+        showSummary: this.showSummary,
+        showArticleAuthor: this.showArticleAuthor,
+        showArticleSpace: this.showArticleSpace,
+        showArticleDate: this.showArticleDate,
+        showArticleReactions: this.showArticleReactions,
+        showArticleImage: this.showArticleImage,
+        seeAllUrl: this.seeAllUrl,
+        selectedType: this.selectedType,
+      };
+    },
   }
 };
 </script>

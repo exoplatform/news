@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-row class="d-flex justify-center">
-    <div class="newsSliderOwner">
+    <div v-if="showArticleAuthor" class="newsSliderOwner">
       <v-avatar size="24">
         <v-img
           class="author-image"
@@ -26,12 +26,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <span class="text-capitalize text--white my-auto ml-2">{{ authorDisplayName }}</span>
     </div>
     <v-icon
-      v-if="!isHiddenSpace"
+      v-if="!isHiddenSpace && showArticleSpace && showArticleAuthor"
       class="mx-1"
       small>
       mdi-chevron-right
     </v-icon>
-    <div class="newsSpaceInfos me-2 my-auto" v-if="!isHiddenSpace">
+    <div v-if="!isHiddenSpace && showArticleSpace" class="newsSpaceInfos me-2 my-auto">
       <v-avatar size="23" rounded>
         <v-img
           class="spaceImage"
@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <span class="text-capitalize my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
       </a>
     </div>
-    <div class="date-container d-flex">
+    <div v-if="showArticleDate" class="date-container d-flex">
       <v-icon class="me-1 ms-2" size="15">mdi-clock</v-icon>
       <div class="postDate flex-column me-1 my-auto">
         <date-format
@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :format="dateFormat" />
       </div>
     </div>
-    <div class="reactions-container d-flex ml-4">
+    <div v-if="showArticleReactions" class="reactions-container d-flex ml-4">
       <div class="likes-container mb-1">
         <v-icon class="likeIconStyle" size="14">mdi-thumb-up</v-icon>
         <span class="counterStyle ml-1">{{ likesCount }}</span>
@@ -126,6 +126,11 @@ export default {
       type: Boolean,
       default: false
     },
+    selectedOption: {
+      type: Object,
+      required: false,
+      default: null
+    },
   },
   data: () => ({
     dateFormat: {
@@ -140,7 +145,49 @@ export default {
     },
     isHiddenSpace() {
       return !this.spaceMember && this.hiddenSpace;
-    }
+    },
+    showArticleTitle() {
+      return this.selectedOption && this.selectedOption.showArticleTitle;
+    },
+    showSummary() {
+      return this.selectedOption && this.selectedOption.showSummary;
+    },
+    showArticleImage() {
+      return this.selectedOption && this.selectedOption.showArticleImage;
+    },
+    showArticleAuthor() {
+      return this.selectedOption && this.selectedOption.showArticleAuthor;
+    },
+    showArticleSpace() {
+      return this.selectedOption && this.selectedOption.showArticleSpace;
+    },
+    showArticleDate() {
+      return this.selectedOption && this.selectedOption.showArticleDate;
+    },
+    showArticleReactions() {
+      return this.selectedOption && this.selectedOption.showArticleReactions;
+    },
+  },
+  created() {
+    this.reset();
+  },
+  methods: {
+    reset() {
+      this.viewTemplate = this.$root.viewTemplate;
+      this.viewExtensions = this.$root.viewExtensions;
+      this.newsTarget = this.$root.newsTarget;
+      this.newsHeader = this.$root.header;
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showSummary = this.$root.showSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
+      this.showArticleReactions = this.$root.showArticleReactions;
+    },
   }
 };
 </script>

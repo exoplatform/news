@@ -20,26 +20,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     target="_self"
     :href="item.url">
     <div class="articleImage">
-      <img :src="item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+      <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="articleInfos">
-      <div class="articleSpace" v-if="!isHiddenSpace">
+      <div class="articleSpace" v-if="!isHiddenSpace && showArticleSpace">
         <img
           class="spaceImage"
           :src="item.spaceAvatarUrl"
           :alt="$t('news.latest.alt.spaceImage')">
         <span class="text-capitalize spaceName">{{ item.spaceDisplayName }}</span>
       </div>
-      <span class="articleTitle">{{ item.title }}</span>
+      <span v-if="showArticleTitle" class="articleTitle">{{ item.title }}</span>
       <div class="articlePostTitle">
         <div class="reactions">
-          <v-icon class="reactionIconStyle me-1" size="12">mdi-clock</v-icon>
-          <div class="postDate flex-column me-2 my-auto">
+          <v-icon
+            v-if="showArticleDate"
+            class="reactionIconStyle me-1"
+            size="12">mdi-clock</v-icon>
+          <div v-if="showArticleDate" class="postDate flex-column me-2 my-auto">
             <date-format
               :value="displayDate"
               :format="dateFormat" />
           </div>
-          <div class="d-flex">
+          <div v-if="showArticleReactions" class="d-flex">
             <v-icon class="reactionIconStyle me-1" size="12">
               mdi-thumb-up
             </v-icon>
@@ -66,6 +69,11 @@ export default {
       required: false,
       default: null
     },
+    selectedOption: {
+      type: Object,
+      required: false,
+      default: null
+    },
   },
   data: ()=> ({
     dateFormat: {
@@ -73,6 +81,13 @@ export default {
       month: 'long',
       day: 'numeric',
     },
+    showArticleTitle: true,
+    showSummary: false,
+    showArticleImage: true,
+    showArticleAuthor: false,
+    showArticleSpace: true,
+    showArticleDate: true,
+    showArticleReactions: true,
   }),
   computed: {
     displayDate() {
@@ -81,6 +96,28 @@ export default {
     isHiddenSpace() {
       return this.item && !this.item.spaceMember && this.item.hiddenSpace;
     }
+  },
+  created() {
+    this.reset();
+  },
+  methods: {
+    reset() {
+      this.viewTemplate = this.$root.viewTemplate;
+      this.viewExtensions = this.$root.viewExtensions;
+      this.newsTarget = this.$root.newsTarget;
+      this.newsHeader = this.$root.header;
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showSummary = this.$root.showSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
+      this.showArticleReactions = this.$root.showArticleReactions;
+      this.seeAllUrl = this.$root.seeAllUrl;
+    },
   }
 };
 </script>

@@ -44,6 +44,50 @@ export default {
       type: String,
       default: null,
     },
+    limit: {
+      type: String,
+      default: null,
+    },
+    showHeader: {
+      type: Boolean,
+      default: false,
+    },
+    showSeeAll: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleTitle: {
+      type: Boolean,
+      default: false,
+    },
+    showSummary: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleImage: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleAuthor: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleSpace: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleDate: {
+      type: Boolean,
+      default: false,
+    },
+    seeAllUrl: {
+      type: String,
+      default: null,
+    },
+    selectedType: {
+      type: String,
+      default: null,
+    },
   },
   data: () => ({
     extensionApp: 'NewsList',
@@ -52,7 +96,6 @@ export default {
     viewExtensions: {},
     loading: false,
     hasMore: false,
-    limit: 4,
     offset: 0,
   }),
   computed: {
@@ -85,6 +128,18 @@ export default {
         newsTarget: this.newsTarget,
         newsList: this.newsList,
         header: this.header,
+        limit: this.limit,
+        showHeader: this.showHeader,
+        showSeeAll: this.showSeeAll,
+        showArticleTitle: this.showArticleTitle,
+        showSummary: this.showSummary,
+        showArticleImage: this.showArticleImage,
+        showArticleAuthor: this.showArticleAuthor,
+        showArticleSpace: this.showArticleSpace,
+        showArticleReactions: this.showArticleReactions,
+        showArticleDate: this.showArticleDate,
+        seeAllUrl: this.seeAllUrl,
+        selectedType: this.selectedType,
         hasMore: this.hasMore,
       };
     },
@@ -95,10 +150,21 @@ export default {
     },
   },
   created() {
-    this.$root.$on('saved-news-settings',() => {
-      this.newsTarget = this.$root.newsTarget;
+    this.$root.$on('saved-news-settings',(newsTarget, selectedOption) => {
+      this.selectedType = selectedOption.selectedType;
+      this.seeAllUrl = selectedOption.seeAllUrl;
+      this.showSeeAll = selectedOption.showSeeAll;
+      this.showHeader = selectedOption.showHeader;
+      this.newsTarget = newsTarget;
+      this.limit = this.$root.limit;
       this.retrieveNewsList();
     });
+    this.selectedType = this.$root.selectedType;
+    this.seeAllUrl = this.$root.seeAllUrl;
+    this.showSeeAll = this.$root.showSeeAll;
+    this.showHeader = this.$root.showHeader;
+    this.newsTarget = this.$root.newsTarget;
+    this.limit = this.$root.limit;
     this.retrieveNewsList().finally(() => this.$root.$applicationLoaded());
     document.addEventListener(`component-${this.extensionApp}-${this.extensionType}-updated`, this.refreshViewExtensions);
     this.refreshViewExtensions();
@@ -106,7 +172,7 @@ export default {
   methods: {
     retrieveNewsList() {
       this.loading = true;
-      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
+      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true, this.selectedType)
         .then(newsList => {
           this.newsList = newsList.news || [];
           this.hasMore = this.newsList.length > this.limit;

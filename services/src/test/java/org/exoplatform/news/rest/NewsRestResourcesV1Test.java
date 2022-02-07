@@ -123,7 +123,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsByTargetName(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList);
 
     // When
-    Response response = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false);
+    Response response = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false, null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

@@ -22,14 +22,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     fixed
     @closed="close">
     <template slot="title">
-      {{ $t('news.list.settings.title') }}
+      <div class="flex flex-row">
+        <v-btn
+          v-if="showAdvancedSettings"
+          class="flex flex-column me-1"
+          icon
+          text>
+          <v-icon
+            @click="showAdvancedSettings = !showAdvancedSettings">
+            mdi-keyboard-backspace
+          </v-icon>
+        </v-btn>
+        <div v-else class="flex flex-column">{{ $t('news.list.settings.title') }}</div>
+      </div>
     </template>
     <template slot="content">
       <form ref="form1" class="pa-2 ms-2">
-        <div class="d-flex flex-column flex-grow-1">
+        <div v-if="!showAdvancedSettings" class="d-flex flex-column flex-grow-1">
           <div class="d-flex flex-row">
             <label for="name" class="listViewLabel text-subtitle-1 mt-6">
-              {{ $t('news.list.settings.name') }}
+              {{ $t('news.list.settings.header') }}
             </label>
           </div>
           <div class="d-flex flex-row">
@@ -94,7 +106,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               class="previewTemplate" />
           </div>
         </div>
+        <news-advanced-settings
+          v-else
+          @limit-value="limit = $event"
+          @see-all-url="seeAllUrl = $event"
+          @selected-option="selectedOption" />
       </form>
+      <div class="d-flex flex-row mt-4 mx-8 justify-end advancedSettings">
+        <span v-if="!showAdvancedSettings" @click="showAdvancedSettings = !showAdvancedSettings">{{ $t('news.list.settings.drawer.advancedSettings') }}</span>
+      </div>
     </template>
     <template slot="footer">
       <div class="d-flex">
@@ -129,6 +149,18 @@ export default {
     newsTarget: null,
     limit: 5,
     newsHeader: '',
+    showAdvancedSettings: false,
+    showHeader: false,
+    showSeeAll: false,
+    showArticleTitle: false,
+    showSummary: false,
+    showArticleImage: false,
+    showArticleAuthor: false,
+    showArticleSpace: false,
+    showArticleDate: false,
+    showArticleReactions: false,
+    seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
+    selectedType: 'lastPublished',
   }),
   computed: {
     viewTemplates() {
@@ -202,12 +234,24 @@ export default {
       if (overlayElement) {
         overlayElement.style.display = 'none';
       }
+      window.setTimeout(() =>this.showAdvancedSettings = false, 200);
     },
     reset() {
       this.viewTemplate = this.$root.viewTemplate;
       this.viewExtensions = this.$root.viewExtensions;
       this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showSummary = this.$root.showSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleReactions = this.$root.showArticleReactions;
+      this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
+      this.selectedType = this.$root.selectedType || 'lastPublished';
     },
     init() {
       if (!this.initialized) {
@@ -226,16 +270,55 @@ export default {
     },
     save() {
       this.saving = true;
+      let selectedOption = null;
       this.$newsListService.saveSettings(this.$root.saveSettingsURL ,{
         viewTemplate: this.viewTemplate,
         newsTarget: this.newsTarget,
         header: this.newsHeader,
+        showHeader: this.showHeader,
+        showSeeAll: this.showSeeAll,
+        showArticleTitle: this.showArticleTitle,
+        showSummary: this.showSummary,
+        showArticleImage: this.showArticleImage,
+        showArticleAuthor: this.showArticleAuthor,
+        showArticleSpace: this.showArticleSpace,
+        showArticleReactions: this.showArticleReactions,
+        showArticleDate: this.showArticleDate,
+        seeAllUrl: this.seeAllUrl,
+        selectedType: this.selectedType,
+        limit: this.limit,
       })
         .then(() => {
           this.$root.viewTemplate = this.viewTemplate;
           this.$root.newsTarget = this.newsTarget;
           this.$root.header = this.newsHeader;
-          this.$root.$emit('saved-news-settings', this.newsTarget);
+          this.$root.limit = this.limit;
+          this.$root.showHeader = this.showHeader;
+          this.$root.showSeeAll = this.showSeeAll;
+          this.$root.showArticleTitle = this.showArticleTitle;
+          this.$root.showSummary = this.showSummary;
+          this.$root.showArticleAuthor = this.showArticleAuthor;
+          this.$root.showArticleSpace = this.showArticleSpace;
+          this.$root.showArticleImage = this.showArticleImage;
+          this.$root.showArticleDate = this.showArticleDate;
+          this.$root.showArticleReactions = this.showArticleReactions;
+          this.$root.seeAllUrl = this.seeAllUrl;
+          this.$root.selectedType = this.selectedType;
+          selectedOption = {
+            limit: this.limit,
+            showHeader: this.showHeader,
+            showSeeAll: this.showSeeAll,
+            showArticleTitle: this.showArticleTitle,
+            showSummary: this.showSummary,
+            showArticleAuthor: this.showArticleAuthor,
+            showArticleSpace: this.showArticleSpace,
+            showArticleDate: this.showArticleDate,
+            showArticleReactions: this.showArticleReactions,
+            showArticleImage: this.showArticleImage,
+            seeAllUrl: this.seeAllUrl,
+            selectedType: this.selectedType,
+          };
+          this.$root.$emit('saved-news-settings', this.newsTarget, selectedOption);
           this.close();
         })
         .finally(() => {
@@ -249,6 +332,46 @@ export default {
         return this.$t(label);
       }
     },
+    showAdvancedSettings() {
+      this.showAdvancedSettings = !this.showAdvancedSettings;
+    },
+    selectedOption(selectedOption, optionValue) {
+      switch (selectedOption) {
+      case 'showArticleSpace':
+        this.showArticleSpace = optionValue;
+        break;
+      case 'showArticleDate':
+        this.showArticleDate = optionValue;
+        break;
+      case 'showArticleReactions':
+        this.showArticleReactions = optionValue;
+        break;
+      case 'showArticleAuthor':
+        this.showArticleAuthor = optionValue;
+        break;
+      case 'showArticleImage':
+        this.showArticleImage = optionValue;
+        break;
+      case 'showSummary':
+        this.showSummary = optionValue;
+        break;
+      case 'showArticleTitle':
+        this.showArticleTitle = optionValue;
+        break;
+      case 'showSeeAll':
+        this.showSeeAll = optionValue;
+        break;
+      case 'showHeader':
+        this.showHeader = optionValue;
+        break;
+      case 'seeAllUrl':
+        this.seeAllUrl = optionValue;
+        break;
+      case 'selectedType':
+        this.selectedType = optionValue;
+        break;
+      }
+    }
   },
 };
 </script>

@@ -85,7 +85,7 @@ export function createTarget(target) {
 }
 
 export function updateTarget(target, originalTargetName) {
-  return fetch(`${newsConstants.NEWS_API}/targeting?originalTargetName=${originalTargetName}`, {
+  return fetch(`${newsConstants.NEWS_API}/targeting/${originalTargetName}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
@@ -96,7 +96,7 @@ export function updateTarget(target, originalTargetName) {
     if (resp && resp.ok) {
       return resp.status;
     } else {
-      throw new Error('Error updating news target');
+      throw new Error('Error when updating news target');
     }
   });
 }

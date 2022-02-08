@@ -115,7 +115,7 @@ public interface NewsTargetingService {
   Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException;
 
   /**
-   * Update news Metadata by it name
+   * Update news target
    * 
    * @param originalTargetName identifier of the {@link News} target
    * @param newsTargetingEntity {@link News} TargetingEntity to be updated

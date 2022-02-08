@@ -230,6 +230,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   }
 
   @PUT
+  @Path("{originalTargetName}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
@@ -243,7 +244,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   public Response updateNewsTarget(@ApiParam(value = "News target to create", required = true)
                                    NewsTargetingEntity newsTargetingEntity,
                                    @ApiParam(value = "Original news target name", required = true)
-                                   @QueryParam("originalTargetName") String originalTargetName) {
+                                   @PathParam("originalTargetName") String originalTargetName) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata metadata = newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);

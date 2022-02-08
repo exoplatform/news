@@ -18,8 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     body-classes="hide-scroll decrease-z-index-more"
     right
     @closed="reset">
-    <template slot="title">
+    <template v-if="saveMode === 'creationMode'" slot="title">
       {{ $t('news.publishTargets.management.addTarget') }}
+    </template>
+    <template v-else slot="title">
+      {{ $t('news.publishTargets.management.editTarget') }}
     </template>
     <template slot="content">
       <v-form

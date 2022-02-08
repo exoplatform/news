@@ -16,13 +16,13 @@
   <external-component-plugins>
     <target-component>org.exoplatform.application.registry.ApplicationRegistryService</target-component>
     <component-plugin>
-      <name>spaces.portlets.registry</name>
+      <name>news.portlets.registry</name>
       <set-method>initListener</set-method>
       <type>org.exoplatform.application.registry.ApplicationCategoriesPlugins</type>
       <description>this listener init the portlets are registered in PortletRegister</description>
       <init-params>
         <value-param>
-          <name>merge</name>
+          <name>system</name>
           <value>true</value>
         </value-param>
         <object-param>
@@ -41,7 +41,7 @@
             <field name="accessPermissions">
               <collection type="java.util.ArrayList" item-type="java.lang.String">
                 <value>
-                  <string>*:/platform/web-contributors</string>
+                  <string>*:/platform/users</string>
                 </value>
               </collection>
             </field>

@@ -176,8 +176,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     if (isSameName && isSameDescription) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " don't make any changes");
     }
-    Metadata updatedMetadata = metadataService.updateMetadata(storedMetadata, userIdentityId);
-    return updatedMetadata;
+    return metadataService.updateMetadata(storedMetadata, userIdentityId);
   }
 
   private NewsTargetingEntity toEntity(Metadata metadata) {

@@ -118,4 +118,31 @@ public class NewsTargetingRestResourcesV1Test {
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
+  @Test
+  public void shouldReturnOkWhenUpdateTargets() throws IllegalAccessException {
+    // Given
+    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn("john");
+    Identity currentIdentity = new Identity("john");
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    Metadata sliderNews = new Metadata();
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatedDate(100);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(1);
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName(sliderNews.getName());
+    String originalTargetName = "sliderNews";
+    lenient().when(newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
+
+    // When
+    Response response = newsTargetingRestResourcesV1.updateNewsTarget(newsTargetingEntity, originalTargetName);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+  }
+
 }

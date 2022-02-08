@@ -83,3 +83,20 @@ export function createTarget(target) {
     }
   });
 }
+
+export function updateTarget(target, originalTargetName) {
+  return fetch(`${newsConstants.NEWS_API}/targeting/${originalTargetName}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(target),
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.status;
+    } else {
+      throw new Error('Error when updating news target');
+    }
+  });
+}

@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="d-flex flex-row pb-5">
           <v-btn
             class="btn btn-primary"
-            @click="openDrawer">
+            @click="openAddTargetDrawer">
             <v-icon dark>
               mdi-plus
             </v-icon>
@@ -63,7 +63,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </td>
               <td>
                 <div class="align-center">
-                  <v-btn icon text>
+                  <v-btn
+                    icon
+                    text
+                    @click="openDrawer(props.item.name, props.item.description)">
                     <v-icon
                       dark
                       color="primary"
@@ -94,8 +97,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :title="$t('news.newsTarget.title.confirmDeleteNews')"
         :ok-label="$t('news.button.ok')"
         :cancel-label="$t('news.button.cancel')"
-        @ok="deleteNewsTarget(selectedTarget)" />
-      <news-publish-targets-management-drawer ref="newsPublishTargetsManagementDrawer" @news-target-saved="init" />
+        @ok="deleteNewsTarget(selectedTargetName)" />
+      <news-publish-targets-management-drawer
+        ref="newsPublishTargetsManagementDrawer"
+        @news-target-saved="init" />
       <exo-news-notification-alerts />
     </v-main>
   </v-app>
@@ -108,7 +113,7 @@ export default {
     itemsPerPage: 10,
     initialized: false,
     loading: true,
-    selectedTarget: '',
+    selectedTargetName: '',
   }),
   computed: {
     hideFooter() {
@@ -164,10 +169,19 @@ export default {
       }, redirectionTime);
     },
     deleteConfirmDialog(target) {
-      this.selectedTarget = target;
+      this.selectedTargetName = target;
       this.$refs.deleteConfirmDialog.open();
     },
-    openDrawer() {
+    openDrawer(targetName, targetDescription) {
+      let selectedTarget = null;
+      selectedTarget = {
+        targetName: targetName && targetName.trim(),
+        targetDescription: targetDescription && targetDescription.trim(),
+      };
+      this.$root.$emit('selected-target', selectedTarget);
+      this.$refs.newsPublishTargetsManagementDrawer.open();
+    },
+    openAddTargetDrawer() {
       this.$refs.newsPublishTargetsManagementDrawer.open();
     }
   }

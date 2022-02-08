@@ -370,4 +370,73 @@ public class NewsTargetingImplTest {
     }
   }
 
+  @Test
+  public void testUpdateTarget() throws IllegalAccessException {
+    // Given
+    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager);
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("root");
+    MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "manager");
+    List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
+    memberships.add(membershipentry);
+    currentIdentity.setMemberships(memberships);
+    Identity userIdentity = new Identity("organization", "root");
+    userIdentity.setId("1");
+    when(identityManager.getOrCreateIdentity(any(), any())).thenReturn(userIdentity);
+
+    List<Metadata> newsTargets = new LinkedList<>();
+    Metadata sliderNews = new Metadata();
+    MetadataType metadataType = new MetadataType(4, "newsTarget");
+    sliderNews.setType(metadataType);
+    sliderNews.setName("sliderNews");
+    sliderNews.setCreatorId(1);
+    HashMap<String, String> sliderNewsProperties = new HashMap<>();
+    sliderNewsProperties.put("label", "slider news");
+    sliderNewsProperties.put("description", "description slider news");
+    sliderNews.setProperties(sliderNewsProperties);
+    sliderNews.setId(0);
+    newsTargets.add(sliderNews);
+
+    NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
+    newsTargetingEntity.setName(sliderNews.getName());
+    newsTargetingEntity.setProperties(sliderNews.getProperties());
+    when(metadataService.createMetadata(sliderNews, 1)).thenReturn(sliderNews);
+
+    Metadata createdMetadata = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
+
+    String originalTargetName = "sliderNews";
+    NewsTargetingEntity newsTargetingEntityUpdated = new NewsTargetingEntity();
+    newsTargetingEntityUpdated.setName("sliderNews update");
+    newsTargetingEntityUpdated.setProperties(sliderNews.getProperties());
+    MetadataKey targetMetadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), originalTargetName, 0);
+    when(metadataService.updateMetadata(createdMetadata, 1)).thenReturn(sliderNews);
+    when(metadataService.getMetadataByKey(targetMetadataKey)).thenReturn(createdMetadata);
+
+    Metadata updatedMetadata = newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntityUpdated, currentIdentity);
+
+    // Then
+    assertNotNull(updatedMetadata);
+    assertEquals(sliderNews.getId(), updatedMetadata.getId());
+    assertEquals(sliderNews.getName(), updatedMetadata.getName());
+
+    // use case when updating a target with the same name and same description
+    when(metadataService.updateMetadata(createdMetadata, 1)).thenReturn(sliderNews);
+    when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
+    try {
+      newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
+
+    when(metadataService.updateMetadata(createdMetadata, 1)).thenReturn(sliderNews);
+    when(metadataService.getMetadataByKey(any())).thenReturn(null);
+    try {
+      newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
+      fail();
+    } catch (IllegalStateException e) {
+      // Expected
+    }
+
+  }
+
 }

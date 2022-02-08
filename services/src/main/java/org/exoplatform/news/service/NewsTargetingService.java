@@ -34,7 +34,6 @@ public interface NewsTargetingService {
    * Gets the {@link List} of all {@link News} targets which can be referenced from {@link News} list portlets
    *
    * @return {@link List} of all {@link News} targets
-   *
    */
   List<NewsTargetingEntity> getTargets();
   
@@ -61,6 +60,7 @@ public interface NewsTargetingService {
    * @param targetName target name of metadata to be retrieved
    * @param offset limit
    * @param limit offset
+   * 
    * @return {@link List} of {@link News} target items by a target name
    */
   List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit);
@@ -68,7 +68,7 @@ public interface NewsTargetingService {
   /**
    * Gets the {@link List} of referenced targets from {@link News} list portlets 
    *
-   * @param currentIdentity
+   * @param currentIdentity attempting to get referenced {@link News} targets
    *
    * @return {@link List} of referenced targets
    * @throws IllegalAccessException when user doesn't have access to  get referenced {@link News} targets
@@ -90,7 +90,7 @@ public interface NewsTargetingService {
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
    * 
    * @param newsId {@link News} identifier of {@link News} targets to be deleted
-   * @param currentUserId
+   * @param currentUserId attempting to delete {@link News} target
    * @throws IllegalAccessException when user doesn't have access to delete {@link News} targets of a given {@link News} id
    */
   void deleteNewsTargets(String newsId, String currentUserId) throws IllegalAccessException;
@@ -103,14 +103,29 @@ public interface NewsTargetingService {
   void deleteNewsTargets(String newsId);
 
   /**
-   * Create a news Metadata
+   * Create news target
    * 
    * @param newsTargetingEntity {@link News} TargetingEntity
-   * @param currentIdentity {@link Identity} technical identifier
-   * @return created {@link Metadata}
-   * @throws IllegalArgumentException when user create a metadata that already exist
+   * @param currentIdentity current {@link Identity} attempting to create {@link News} target
+   * 
+   * @return created {@link News} target {@link Metadata}
+   * @throws IllegalArgumentException when user creates a {@link News} target that already exists
    * @throws IllegalAccessException when user doesn't have access to create {@link News} target
    */
   Metadata createNewsTarget(NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalArgumentException, IllegalAccessException;
+
+  /**
+   * Update news target
+   * 
+   * @param originalTargetName identifier of the {@link News} target
+   * @param newsTargetingEntity {@link News} TargetingEntity to be updated
+   * @param currentIdentity current {@link Identity} attempting to update {@link News} target
+   * 
+   * @return updated {@link News} target {@link Metadata}
+   * @throws IllegalAccessException when user doesn't have access to update {@link News} target
+   * @throws IllegalStateException when user tries to update a not existing {@link News} target
+   * @throws IllegalArgumentException when user tries to update a not changed {@link News} target
+   */
+  Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException, IllegalStateException, IllegalArgumentException;
 
 }

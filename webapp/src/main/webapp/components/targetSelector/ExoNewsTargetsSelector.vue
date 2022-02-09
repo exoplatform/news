@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <v-chip
             v-if="index === 0"
             close
+            :title="item.tooltipInfo"
             @click:close="removeTarget(item)">
             <span>{{ item.label }}</span>
           </v-chip>
@@ -147,7 +148,8 @@ export default {
         .then(targets => {
           this.targets = targets.map(target => ({
             name: target.name,
-            label: target.properties && target.properties.label,
+            label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
+            tooltipInfo: target.properties && target.properties.label
           }));
         });
     },

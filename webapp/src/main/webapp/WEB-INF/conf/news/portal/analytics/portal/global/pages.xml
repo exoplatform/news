@@ -114,7 +114,8 @@
                                           "periodIndependent":false,
                                           "aggregation":{
                                              "sortDirection":"desc",
-                                             "type":"COUNT",
+                                             "field": "userId",
+                                             "type": "CARDINALITY"
                                          }
                                       },
                                       "sortable":true,
@@ -154,7 +155,8 @@
                                           "periodIndependent":true,
                                           "aggregation":{
                                               "sortDirection":"desc",
-                                              "type":"COUNT",
+                                              "field": "userId",
+                                              "type": "CARDINALITY"
                                           }
                                      },
                                       "sortable":true,

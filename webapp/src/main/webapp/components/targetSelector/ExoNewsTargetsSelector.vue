@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         id="chooseTargets"
         ref="chooseTargets"
         v-model="selectedTargets"
-        :items="referencedTargets"
+        :items="targets"
         :menu-props="{ bottom: true, offsetY: true}"
         :placeholder="$t('news.composer.stepper.chooseTarget.option')"
         item-text="label"
@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <v-chip
             v-if="index === 0"
             close
+            :title="item.tooltipInfo"
             @click:close="removeTarget(item)">
             <span>{{ item.label }}</span>
           </v-chip>
@@ -86,7 +87,7 @@ export default {
   },
   data: () =>({
     selectedTargets: [],
-    referencedTargets: [],
+    targets: [],
   }),
   computed: {
     disableTargetOption() {
@@ -96,7 +97,7 @@ export default {
       return this.disableTargetOption && this.publish;
     },
     selectAllTargets() {
-      return this.selectedTargets.length === this.referencedTargets.length;
+      return this.selectedTargets.length === this.targets.length;
     },
     selectSomeTarget() {
       return this.selectedTargets.length > 0 && !this.selectAllTargets;
@@ -111,7 +112,7 @@ export default {
     }
   },
   created() {
-    this.getReferencedTargets();
+    this.getAllTargets();
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
@@ -131,8 +132,8 @@ export default {
           this.selectedTargets = [];
         } else {
           const selectedTargets = [];
-          for (const item in this.referencedTargets) {
-            selectedTargets.push(this.referencedTargets[item].name);
+          for (const item in this.targets) {
+            selectedTargets.push(this.targets[item].name);
           }
           this.selectedTargets = selectedTargets;
         }
@@ -142,12 +143,13 @@ export default {
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
     },
-    getReferencedTargets() {
-      this.$newsTargetingService.getReferencedTargets()
-        .then(referencedTargets => {
-          this.referencedTargets = referencedTargets.map(referencedTarget => ({
-            name: referencedTarget.name,
-            label: referencedTarget.properties && referencedTarget.properties.label,
+    getAllTargets() {
+      this.$newsTargetingService.getAllTargets()
+        .then(targets => {
+          this.targets = targets.map(target => ({
+            name: target.name,
+            label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
+            tooltipInfo: target.properties && target.properties.label
           }));
         });
     },

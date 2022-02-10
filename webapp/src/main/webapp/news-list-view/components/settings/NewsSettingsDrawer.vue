@@ -62,7 +62,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               item-value="name"
               dense
               outlined
-              @click.stop />
+              @click.stop>
+              <template v-slot:selection="{ item, index }">
+                <span :title="item.toolTipInfo">
+                  {{ item.label }}
+                </span>
+              </template>
+            </v-select>
           </div>
           <div class="d-flex flex-row">
             <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-6">
@@ -210,7 +216,8 @@ export default {
           .then(newsTargets => {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,
-              label: newsTarget.properties && newsTarget.properties.label,
+              label: newsTarget.properties && newsTarget.properties.label && newsTarget.properties.label.length > 35 ? newsTarget.properties.label.substring(0, 35).concat('...'): newsTarget.properties.label,
+              toolTipInfo: newsTarget.properties && newsTarget.properties.label
             }));
             this.initialized = true;
           })

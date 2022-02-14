@@ -30,7 +30,10 @@
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
                 <div class="activityAvatar avatarCircle">
                   <a :href="authorProfileURL">
-                    <img :src="authorAvatarURL" class="avatar">
+                    <img
+                      :src="authorAvatarURL"
+                      class="avatar"
+                      role="presentation">
                   </a>
                 </div>
               </div>

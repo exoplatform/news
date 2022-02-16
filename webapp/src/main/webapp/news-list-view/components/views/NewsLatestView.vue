@@ -100,6 +100,7 @@ export default {
     },
     refreshNewsViews(selectedTarget, selectedOption){
       this.selectedOption = selectedOption;
+      this.newsHeader = selectedOption.header;
       this.selectedType = selectedOption.selectedType;
       this.seeAllUrl = selectedOption.seeAllUrl;
       this.limit = selectedOption.limit;
@@ -109,6 +110,7 @@ export default {
     reset() {
       this.limit = this.$root.limit;
       this.showHeader = this.$root.showHeader;
+      this.newsHeader = this.$root.header;
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;

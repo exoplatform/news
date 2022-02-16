@@ -106,6 +106,7 @@ public class NewsRestResourcesV1Test {
                                                                       identityManager,
                                                                       container,
                                                                       favoriteService);
+    SimpleDateFormat dateFormate = new SimpleDateFormat ("yyyy-MM-dd");
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
     Identity currentIdentity = new Identity("john");
@@ -113,6 +114,7 @@ public class NewsRestResourcesV1Test {
     List<News> newsList = new LinkedList<>();
     News news = new News();
     news.setId("1");
+    news.setPublicationDate(dateFormate.parse("2022-04-20"));
     List<String> targets = new LinkedList<>();
     targets.add("sliderNews");
     news.setTargets(targets);
@@ -131,6 +133,59 @@ public class NewsRestResourcesV1Test {
     NewsEntity newsEntity = (NewsEntity) response.getEntity();
     List<News> newsEntityNews = newsEntity.getNews();
     assertEquals(1, newsEntityNews.size());
+
+    // Get news order by last publish date
+    News news1 = new News();
+    news1.setId("2");
+    news1.setPublicationDate(dateFormate.parse("2019-04-20"));
+    News news2 = new News();
+    news2.setId("3");
+    news2.setPublicationDate(dateFormate.parse("2020-03-20"));
+    targets = new LinkedList<>();
+    targets.add("sliderNews");
+    news1.setTargets(targets);
+    news2.setTargets(targets);
+    newsList.add(news1);
+    newsList.add(news2);
+    lenient().when(newsService.getNewsByTargetName(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList);
+
+    // When
+    Response response1 = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false, "lastPublished");
+
+    assertEquals(Response.Status.OK.getStatusCode(), response1.getStatus());
+    assertNotNull(response1.getEntity());
+    NewsEntity newsEntity1 = (NewsEntity) response1.getEntity();
+    List<News> newsEntityNews1 = newsEntity1.getNews();
+    assertEquals(3, newsEntityNews1.size());
+    assertEquals("1", newsEntityNews1.get(0).getId());
+    assertEquals("3", newsEntityNews1.get(1).getId());
+    assertEquals("2", newsEntityNews1.get(2).getId());
+
+    // Get news order by last modified date
+    news.setUpdateDate(dateFormate.parse("2022-04-21"));
+    news1.setUpdateDate(dateFormate.parse("2023-03-19"));
+    news2.setUpdateDate(dateFormate.parse("2023-03-20"));
+    targets = new LinkedList<>();
+    targets.add("sliderNews");
+    news1.setTargets(targets);
+    news2.setTargets(targets);
+    news.setTargets(targets);
+    List<News> newsList1 = new LinkedList<>();
+    newsList1.add(news);
+    newsList1.add(news1);
+    newsList1.add(news2);
+    lenient().when(newsService.getNewsByTargetName(newsFilter, "sliderNews", currentIdentity)).thenReturn(newsList1);
+    // When
+    Response response2 = newsRestResourcesV1.getNewsByTarget(request, "sliderNews", 0, 10, false, "lastModified");
+
+    assertEquals(Response.Status.OK.getStatusCode(), response2.getStatus());
+    assertNotNull(response2.getEntity());
+    NewsEntity newsEntity2 = (NewsEntity) response2.getEntity();
+    List<News> newsEntityNews2 = newsEntity2.getNews();
+    assertEquals(3, newsEntityNews2.size());
+    assertEquals("3", newsEntityNews2.get(0).getId());
+    assertEquals("2", newsEntityNews2.get(1).getId());
+    assertEquals("1", newsEntityNews2.get(2).getId());
   }
 
   @Test

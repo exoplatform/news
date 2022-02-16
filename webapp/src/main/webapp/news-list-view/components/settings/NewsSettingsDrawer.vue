@@ -307,6 +307,7 @@ export default {
           selectedOption = {
             limit: this.limit,
             showHeader: this.showHeader,
+            header: this.newsHeader,
             showSeeAll: this.showSeeAll,
             showArticleTitle: this.showArticleTitle,
             showSummary: this.showSummary,

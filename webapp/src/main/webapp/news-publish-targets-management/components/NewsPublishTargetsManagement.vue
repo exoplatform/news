@@ -134,7 +134,6 @@ export default {
   methods: {
     init() {
       if (!this.initialized) {
-        this.initializing = true;
         this.loading = true;
         this.$newsTargetingService.getAllTargets()
           .then(newsTargets => {

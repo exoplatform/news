@@ -21,6 +21,7 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
@@ -29,6 +30,7 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
+import org.exoplatform.social.metadata.tag.TagService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -99,7 +101,7 @@ public class NewsESSearchConnector {
     if (filter.getLimit() < 0) {
       throw new IllegalArgumentException("Limit must be positive");
     }
-    if (StringUtils.isBlank(filter.getSearchText()) && !filter.isFavorites()) {
+    if (StringUtils.isBlank(filter.getSearchText()) && !filter.isFavorites() && CollectionUtils.isEmpty(filter.getTagNames())) {
       throw new IllegalArgumentException("Filter term is mandatory");
     }
     Set<Long> streamFeedOwnerIds = activityStorage.getStreamFeedOwnerIds(viewerIdentity);
@@ -121,8 +123,7 @@ public class NewsESSearchConnector {
     Map<String, List<String>> metadataFilters = buildMetadatasFilter(filter, viewerIdentity);
     String metadataQuery = buildMetadatasQueryStatement(metadataFilters);
     String termQuery = termsQuery.isEmpty() ? "*:*" : StringUtils.join(termsQuery, " AND ");
-    return retrieveSearchQuery().replace("@term@", term)
-                                .replace("@term_query@", termQuery)
+    return retrieveSearchQuery().replace("@term_query@", termQuery)
                                 .replace("@metadatas_query@", metadataQuery)
                                 .replace("@permissions@", StringUtils.join(streamFeedOwnerIds, ","))
                                 .replace("@offset@", String.valueOf(filter.getOffset()))
@@ -242,6 +243,9 @@ public class NewsESSearchConnector {
     Map<String, List<String>> metadataFilters = new HashMap<>();
     if (filter.isFavorites()) {
       metadataFilters.put(FavoriteService.METADATA_TYPE.getName(), Collections.singletonList(viewerIdentity.getId()));
+    }
+    if (CollectionUtils.isNotEmpty(filter.getTagNames())) {
+      metadataFilters.put(TagService.METADATA_TYPE.getName(), filter.getTagNames());
     }
     return metadataFilters;
   }

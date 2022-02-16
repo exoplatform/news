@@ -11,18 +11,16 @@
           }
         }
       ],
-      "should": {
+      "should":{
+        "query_string":{
+          "fields": ["body", "summary", "title"],
+          "query": "@term_query@"
+        },
         "match_phrase": {
           "body": {
             "query": "@term@",
             "boost": 5
           }
-        }
-      },
-      "must":{
-        "query_string":{
-          "fields": ["body", "summary", "title"],
-          "query": "@term_query@"
         }
       }
     }

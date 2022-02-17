@@ -526,7 +526,7 @@ export default {
       if (CKEDITOR.instances['newsContent'] && CKEDITOR.instances['newsContent'].destroy) {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
-      CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
+      CKEDITOR.plugins.addExternal('video','/social-portlet/js/ckeditor/plugins/video/','plugin.js');
       CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
       CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
@@ -537,10 +537,11 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
+
       if (eXo.env.portal.activityTagsEnabled) {
         extraPlugins = `${extraPlugins},tagSuggester`;
       }
-      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
+      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; } .video { width: 900px; height: 506px; margin: 0 auto; }');
       // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';

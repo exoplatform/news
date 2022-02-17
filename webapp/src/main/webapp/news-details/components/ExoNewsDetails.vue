@@ -110,17 +110,6 @@ export default {
     }
   },
   mounted() {
-    window.require(['SHARED/social-ui-profile'], function(socialProfile) {
-      const labels = {
-        StatusTitle: 'Loading...',
-        Connect: 'Connect',
-        Confirm: 'Confirm',
-        CancelRequest: 'Cancel Request',
-        RemoveConnection: 'Remove Connection',
-        Ignore: 'Ignore'
-      };
-      socialProfile.initUserProfilePopup('newsDetails', labels);
-    });
     this.markNewsAsRead(this.newsId);
   },
   methods: {

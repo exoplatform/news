@@ -47,41 +47,43 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :cancel-label="$t('news.button.cancel')"
           @ok="$emit('delete-news',news)" />
       </div>
-      <div class="newsInfo">
-        <div class="newsOwner">
-          <a :href="news.authorProfileURL">
-            <img :src="news.authorAvatarUrl" role="presentation">
-            <span>{{ news.authorFullName }}</span>
-          </a>
-          <i v-if="!news.hiddenSpace" class="uiIconArrowNext"></i>
+      <div class="newsInfo d-flex pb-1">
+        <div class="newsOwner d-flex align-center pe-4">
+          <exo-user
+            :profile-id="newsAuthor"
+            :size="25"
+            class="align-center my-auto text-truncate flex-grow-0 flex"
+            small-font-size
+            popover />
+          <i v-if="!news.hiddenSpace" class="uiIconArrowNext pt-1"></i>
           <span v-if="!news.hiddenSpace" class="newsSpace">
-            <a :href="news.spaceUrl" class="newsSpaceName">
+            <a :href="news.spaceUrl" class="newsSpaceName caption">
               <img :src="news.spaceAvatarUrl" role="presentation">
               <span>{{ news.spaceDisplayName }}</span>
             </a>
           </span>
         </div>
-        <div v-if="!draftNews" class="newsDate">
+        <div v-if="!draftNews" class="newsDate pe-4">
           <i v-if="displayClock" class="uiIconClock"></i>
           <span v-if="news && news.schedulePostDate">
             <date-format
               :value="news.schedulePostDate"
               :format="dateFormat"
-              class="newsTime" />
+              class="newsTime caption" />
             -
             <date-format
               :value="news.schedulePostDate"
               :format="dateTimeFormat"
-              class="newsTime" />
+              class="newsTime caption" />
           </span>
           <span v-else>
             <date-format
               :value="news.updatedDate"
               :format="dateFormat"
-              class="newsTime" />
+              class="newsTime caption" />
           </span>
         </div>
-        <div class="newsViews" v-if="!news.draft && !news.scheduled">
+        <div class="newsViews " v-if="!news.draft && !news.scheduled">
           <i class="uiIconWatch"></i>
           <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
         </div>
@@ -150,6 +152,9 @@ export default {
     },
     draftNews() {
       return this.news && this.news.draft;
+    },
+    newsAuthor() {
+      return this.news && this.news.authorProfileURL && this.news.authorProfileURL.split('/').pop();
     }
   },
   methods: {

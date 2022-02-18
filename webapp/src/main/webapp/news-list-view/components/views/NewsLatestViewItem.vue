@@ -82,7 +82,7 @@ export default {
       day: 'numeric',
     },
     showArticleTitle: true,
-    showSummary: false,
+    showArticleSummary: false,
     showArticleImage: true,
     showArticleAuthor: false,
     showArticleSpace: true,
@@ -111,7 +111,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;

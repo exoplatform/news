@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </span>
             </a>
             <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
-              <span v-if="showSummary" class="white--text articleSummary"> {{ item.summary }}</span>
+              <span v-if="showArticleSummary" class="white--text articleSummary"> {{ item.summary }}</span>
               <news-slider-view-item
                 :author="item.author"
                 :author-display-name="item.authorDisplayName"
@@ -103,7 +103,7 @@ export default {
       showHeader: false,
       showSeeAll: false,
       showArticleTitle: true,
-      showSummary: true,
+      showArticleSummary: true,
       showArticleImage: true,
       showArticleAuthor: true,
       showArticleSpace: true,
@@ -141,7 +141,7 @@ export default {
       }
     },
     refreshNewsViews(selectedTarget, selectedOption){
-      this.showSummary = selectedOption.showSummary;
+      this.showArticleSummary = selectedOption.showArticleSummary;
       this.showArticleTitle = selectedOption.showArticleTitle;
       this.showArticleImage = selectedOption.showArticleImage;
       this.selectedType = selectedOption.selectedType;
@@ -157,7 +157,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
@@ -169,7 +169,7 @@ export default {
         showHeader: this.showHeader,
         showSeeAll: this.showSeeAll,
         showArticleTitle: this.showArticleTitle,
-        showSummary: this.showSummary,
+        showArticleSummary: this.showArticleSummary,
         showArticleAuthor: this.showArticleAuthor,
         showArticleSpace: this.showArticleSpace,
         showArticleDate: this.showArticleDate,

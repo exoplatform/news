@@ -146,12 +146,6 @@ export default {
     isHiddenSpace() {
       return !this.spaceMember && this.hiddenSpace;
     },
-    showArticleTitle() {
-      return this.selectedOption && this.selectedOption.showArticleTitle;
-    },
-    showSummary() {
-      return this.selectedOption && this.selectedOption.showSummary;
-    },
     showArticleImage() {
       return this.selectedOption && this.selectedOption.showArticleImage;
     },
@@ -182,7 +176,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;

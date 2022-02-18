@@ -60,7 +60,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    showSummary: {
+    showArticleSummary: {
       type: Boolean,
       default: false,
     },
@@ -132,7 +132,7 @@ export default {
         showHeader: this.showHeader,
         showSeeAll: this.showSeeAll,
         showArticleTitle: this.showArticleTitle,
-        showSummary: this.showSummary,
+        showArticleSummary: this.showArticleSummary,
         showArticleImage: this.showArticleImage,
         showArticleAuthor: this.showArticleAuthor,
         showArticleSpace: this.showArticleSpace,
@@ -150,11 +150,11 @@ export default {
     },
   },
   created() {
-    this.$root.$on('saved-news-settings',(newsTarget, selectedOption) => {
-      this.selectedType = selectedOption.selectedType;
-      this.seeAllUrl = selectedOption.seeAllUrl;
-      this.showSeeAll = selectedOption.showSeeAll;
-      this.showHeader = selectedOption.showHeader;
+    this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
+      this.selectedType = selectedOptions.selectedType;
+      this.seeAllUrl = selectedOptions.seeAllUrl;
+      this.showSeeAll = selectedOptions.showSeeAll;
+      this.showHeader = selectedOptions.showHeader;
       this.newsTarget = newsTarget;
       this.limit = this.$root.limit;
       this.retrieveNewsList();

@@ -153,7 +153,7 @@ export default {
     showHeader: false,
     showSeeAll: false,
     showArticleTitle: false,
-    showSummary: false,
+    showArticleSummary: false,
     showArticleImage: false,
     showArticleAuthor: false,
     showArticleSpace: false,
@@ -234,7 +234,7 @@ export default {
       if (overlayElement) {
         overlayElement.style.display = 'none';
       }
-      window.setTimeout(() =>this.showAdvancedSettings = false, 200);
+      window.setTimeout(() => this.showAdvancedSettings = false, 200);
     },
     reset() {
       this.viewTemplate = this.$root.viewTemplate;
@@ -246,7 +246,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleReactions = this.$root.showArticleReactions;
@@ -270,7 +270,7 @@ export default {
     },
     save() {
       this.saving = true;
-      let selectedOption = null;
+      let selectedOptions = null;
       this.$newsListService.saveSettings(this.$root.saveSettingsURL ,{
         viewTemplate: this.viewTemplate,
         newsTarget: this.newsTarget,
@@ -278,7 +278,7 @@ export default {
         showHeader: this.showHeader,
         showSeeAll: this.showSeeAll,
         showArticleTitle: this.showArticleTitle,
-        showSummary: this.showSummary,
+        showArticleSummary: this.showArticleSummary,
         showArticleImage: this.showArticleImage,
         showArticleAuthor: this.showArticleAuthor,
         showArticleSpace: this.showArticleSpace,
@@ -296,7 +296,7 @@ export default {
           this.$root.showHeader = this.showHeader;
           this.$root.showSeeAll = this.showSeeAll;
           this.$root.showArticleTitle = this.showArticleTitle;
-          this.$root.showSummary = this.showSummary;
+          this.$root.showArticleSummary = this.showArticleSummary;
           this.$root.showArticleAuthor = this.showArticleAuthor;
           this.$root.showArticleSpace = this.showArticleSpace;
           this.$root.showArticleImage = this.showArticleImage;
@@ -304,13 +304,13 @@ export default {
           this.$root.showArticleReactions = this.showArticleReactions;
           this.$root.seeAllUrl = this.seeAllUrl;
           this.$root.selectedType = this.selectedType;
-          selectedOption = {
+          selectedOptions = {
             limit: this.limit,
             showHeader: this.showHeader,
             header: this.newsHeader,
             showSeeAll: this.showSeeAll,
             showArticleTitle: this.showArticleTitle,
-            showSummary: this.showSummary,
+            showArticleSummary: this.showArticleSummary,
             showArticleAuthor: this.showArticleAuthor,
             showArticleSpace: this.showArticleSpace,
             showArticleDate: this.showArticleDate,
@@ -319,7 +319,7 @@ export default {
             seeAllUrl: this.seeAllUrl,
             selectedType: this.selectedType,
           };
-          this.$root.$emit('saved-news-settings', this.newsTarget, selectedOption);
+          this.$root.$emit('saved-news-settings', this.newsTarget, selectedOptions);
           this.close();
         })
         .finally(() => {
@@ -353,8 +353,8 @@ export default {
       case 'showArticleImage':
         this.showArticleImage = optionValue;
         break;
-      case 'showSummary':
-        this.showSummary = optionValue;
+      case 'showArticleSummary':
+        this.showArticleSummary = optionValue;
         break;
       case 'showArticleTitle':
         this.showArticleTitle = optionValue;

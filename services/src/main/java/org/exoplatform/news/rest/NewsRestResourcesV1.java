@@ -483,10 +483,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       List<News> news = newsService.getNewsByTargetName(newsFilter, targetName, currentIdentity);
       List<News> sortedList = null;
-      if (StringUtils.isNotBlank(orderCriteria) && orderCriteria.equals("lastPublished")) {
-        sortedList = news.stream().sorted(Comparator.comparing(News::getPublicationDate).reversed()).collect(Collectors.toList());
-
-      }
       if (StringUtils.isNotBlank(orderCriteria) && orderCriteria.equals("lastModified")) {
         sortedList = news.stream().sorted(Comparator.comparing(News::getUpdateDate).reversed()).collect(Collectors.toList());
       }

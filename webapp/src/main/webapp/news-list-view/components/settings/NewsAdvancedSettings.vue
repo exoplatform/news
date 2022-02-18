@@ -133,10 +133,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
-          v-model="showSummary"
+          v-model="showArticleSummary"
           inset
           dense
-          @change="selectedOption('showSummary', showSummary)"
+          @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
     </v-list-item>
@@ -228,7 +228,7 @@ export default {
     showHeader: false,
     showSeeAll: false,
     showArticleTitle: false,
-    showSummary: false,
+    showArticleSummary: false,
     showArticleImage: false,
     showArticleAuthor: false,
     showArticleSpace: false,
@@ -255,7 +255,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;

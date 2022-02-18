@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String[] showHeaderParams = (String[]) request.getAttribute("showHeader");
     String[] showSeeAllParams = (String[]) request.getAttribute("showSeeAll");
     String[] showArticleTitleParams = (String[]) request.getAttribute("showArticleTitle");
-    String[] showSummaryParams = (String[]) request.getAttribute("showSummary");
+    String[] showArticleSummaryParams = (String[]) request.getAttribute("showArticleSummary");
     String[] showArticleImageParams = (String[]) request.getAttribute("showArticleImage");
     String[] showArticleAuthorParams = (String[]) request.getAttribute("showArticleAuthor");
     String[] showArticleSpaceParams = (String[]) request.getAttribute("showArticleSpace");
@@ -46,15 +46,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String newsTarget = newsTargetParams == null || newsTargetParams.length == 0 ? "": newsTargetParams[0];
     String header = headerParams == null || headerParams.length == 0 ? "": headerParams[0];
     String limit = limitParams == null || limitParams.length == 0 ? "": limitParams[0];
-    String showHeader = showHeaderParams == null || showHeaderParams.length == 0 ? "": showHeaderParams[0];
-    String showSeeAll = showSeeAllParams == null || showSeeAllParams.length == 0 ? "": showSeeAllParams[0];
-    String showArticleTitle = showArticleTitleParams == null || showArticleTitleParams.length == 0 ? "": showArticleTitleParams[0];
-    String showSummary = showSummaryParams == null || showSummaryParams.length == 0 ? "": showSummaryParams[0];
-    String showArticleImage = showArticleImageParams == null || showArticleImageParams.length == 0 ? "": showArticleImageParams[0];
-    String showArticleAuthor = showArticleAuthorParams == null || showArticleAuthorParams.length == 0 ? "": showArticleAuthorParams[0];
-    String showArticleDate = showArticleDateParams == null || showArticleDateParams.length == 0 ? "": showArticleDateParams[0];
-    String showArticleSpace = showArticleSpaceParams == null || showArticleSpaceParams.length == 0 ? "": showArticleSpaceParams[0];
-    String showArticleReactions = showArticleReactionsParams == null || showArticleReactionsParams.length == 0 ? "": showArticleReactionsParams[0];
+    String showHeader = showHeaderParams == null || showHeaderParams.length == 0 ? "true": showHeaderParams[0];
+    String showSeeAll = showSeeAllParams == null || showSeeAllParams.length == 0 ? "true": showSeeAllParams[0];
+    String showArticleTitle = showArticleTitleParams == null || showArticleTitleParams.length == 0 ? "true": showArticleTitleParams[0];
+    String showArticleSummary = showArticleSummaryParams == null || showArticleSummaryParams.length == 0 ? "true": showArticleSummaryParams[0];
+    String showArticleImage = showArticleImageParams == null || showArticleImageParams.length == 0 ? "true": showArticleImageParams[0];
+    String showArticleAuthor = showArticleAuthorParams == null || showArticleAuthorParams.length == 0 ? "true": showArticleAuthorParams[0];
+    String showArticleDate = showArticleDateParams == null || showArticleDateParams.length == 0 ? "true": showArticleDateParams[0];
+    String showArticleSpace = showArticleSpaceParams == null || showArticleSpaceParams.length == 0 ? "true": showArticleSpaceParams[0];
+    String showArticleReactions = showArticleReactionsParams == null || showArticleReactionsParams.length == 0 ? "true": showArticleReactionsParams[0];
     String seeAllUrl = seeAllUrlParams == null || seeAllUrlParams.length == 0 ? "": seeAllUrlParams[0];
     String selectedType = selectedTypeParams == null || selectedTypeParams.length == 0 ? "": selectedTypeParams[0];
 
@@ -79,7 +79,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         limit: <%= limit == null ? null : "'" + limit + "'" %>,
         showSeeAll: <%= showSeeAll == null ? null : "'" + showSeeAll + "'" %>,
         showArticleTitle: <%= showArticleTitle == null ? null : "'" + showArticleTitle + "'" %>,
-        showSummary: <%= showSummary == null ? null : "'" + showSummary + "'" %>,
+        showArticleSummary: <%= showArticleSummary == null ? null : "'" + showArticleSummary + "'" %>,
         showArticleImage: <%= showArticleImage == null ? null : "'" + showArticleImage + "'" %>,
         showArticleAuthor: <%= showArticleAuthor == null ? null : "'" + showArticleAuthor + "'" %>,
         showArticleSpace: <%= showArticleSpace == null ? null : "'" + showArticleSpace + "'" %>,

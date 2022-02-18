@@ -66,7 +66,7 @@ export function init(params) {
   const showHeader = viewTemplate === 'NewsSlider' ? false: params.showHeader === 'true';
   const showSeeAll = viewTemplate === 'NewsSlider' ? false: params.showSeeAll === 'true';
   const showArticleTitle = params.showArticleTitle === '' ? true : params.showArticleTitle === 'true';
-  const showSummary = viewTemplate === 'NewsLatest' ? false: params.showSummary === 'true';
+  const showArticleSummary = viewTemplate === 'NewsLatest' ? false: params.showArticleSummary === 'true';
   const showArticleImage = params.showArticleImage === '' ? true : params.showArticleImage === 'true';
   const showArticleAuthor = viewTemplate === 'NewsLatest' ? false: params.showArticleAuthor === 'true';
   const showArticleSpace = params.showArticleSpace === '' ? true : params.showArticleSpace === 'true';
@@ -87,7 +87,7 @@ export function init(params) {
         showHeader,
         showSeeAll,
         showArticleTitle,
-        showSummary,
+        showArticleSummary,
         showArticleImage,
         showArticleAuthor,
         showArticleSpace,
@@ -108,7 +108,7 @@ export function init(params) {
                   :show-article-title="showArticleTitle"
                   :show-header="showHeader"
                   :show-see-all="showSeeAll"
-                  :show-summary="showSummary"
+                  :show-article-summary="showArticleSummary"
                   :limit="limit"/>`,
       vuetify: Vue.prototype.vuetifyOptions,
       i18n,

@@ -51,11 +51,11 @@ export default {
     canPublishNews: false,
   }),
   created() {
-    this.$root.$on('saved-news-settings',(newsTarget, selectedOption) => {
-      this.newsHeader = selectedOption.header;
-      this.seeAllUrl = selectedOption.seeAllUrl;
-      this.showSeeAll = selectedOption.showSeeAll;
-      this.showHeader = selectedOption.showHeader;
+    this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
+      this.newsHeader = selectedOptions.header;
+      this.seeAllUrl = selectedOptions.seeAllUrl;
+      this.showSeeAll = selectedOptions.showSeeAll;
+      this.showHeader = selectedOptions.showHeader;
     });
     this.newsHeader = this.$root.header;
     this.seeAllUrl = this.$root.seeAllUrl;

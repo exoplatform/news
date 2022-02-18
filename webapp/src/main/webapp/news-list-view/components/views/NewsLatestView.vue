@@ -59,6 +59,15 @@ export default {
     seeAllUrl: '',
     selectedType: 'lastPublished',
     selectedOption: null,
+    showHeader: false,
+    showSeeAll: false,
+    showArticleTitle: false,
+    showArticleSummary: false,
+    showArticleImage: false,
+    showArticleAuthor: false,
+    showArticleSpace: false,
+    showArticleDate: false,
+    showArticleReactions: false,
   }),
   computed: {
     spaceAvatarUrl() {
@@ -114,7 +123,7 @@ export default {
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showSummary = this.$root.showSummary;
+      this.showArticleSummary = this.$root.showArticleSummary;
       this.showArticleAuthor = this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
@@ -126,7 +135,7 @@ export default {
         showHeader: this.showHeader,
         showSeeAll: this.showSeeAll,
         showArticleTitle: this.showArticleTitle,
-        showSummary: this.showSummary,
+        showArticleSummary: this.showArticleSummary,
         showArticleAuthor: this.showArticleAuthor,
         showArticleSpace: this.showArticleSpace,
         showArticleDate: this.showArticleDate,

@@ -15,6 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import './initComponents.js';
+import * as newsTargetingService from '../services/newsTargetingService.js';
+
+if (!Vue.prototype.$newsTargetingService) {
+  window.Object.defineProperty(Vue.prototype, '$newsTargetingService', {
+    value: newsTargetingService,
+  });
+}
 
 // get override components if exists
 if (extensionRegistry) {

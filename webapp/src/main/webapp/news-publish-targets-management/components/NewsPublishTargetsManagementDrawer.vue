@@ -111,7 +111,7 @@ export default {
       return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError;
+      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
     },
     saveButtonLabel() {
       return this.saveMode === 'edit' ? 'Update' : this.$t('news.publishTargets.managementDrawer.btn.confirm');

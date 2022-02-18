@@ -98,6 +98,7 @@ public class WebTemplateProvider extends TemplateProvider {
       // binding the exception throws by processing template
       ctx.setException(templateContext.getException());
       MessageInfo messageInfo = new MessageInfo();
+      messageInfo.subject(activityUrl.toString());
       return messageInfo.body(body).end();
     }
 

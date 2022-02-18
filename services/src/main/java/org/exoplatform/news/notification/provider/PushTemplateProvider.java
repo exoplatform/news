@@ -10,7 +10,8 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 
 @TemplateConfigs(templates = {
     @TemplateConfig(pluginId = PostNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl"),
-    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl") })
+    @TemplateConfig(pluginId = MentionInNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl"),
+    @TemplateConfig(pluginId = PublishNewsNotificationPlugin.ID, template = "war:/notification/templates/push/postNewsNotificationPlugin.gtmpl")})
 public class PushTemplateProvider extends WebTemplateProvider {
   protected static Log log = ExoLogger.getLogger(PushTemplateProvider.class);
 

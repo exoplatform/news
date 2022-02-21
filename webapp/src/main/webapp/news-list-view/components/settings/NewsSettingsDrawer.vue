@@ -98,6 +98,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               item-value="name"
               dense
               outlined
+              @change="initDefaultValue"
               @click.stop />
           </div>
           <div class="d-flex flex-row mt-4 mx-8">
@@ -108,6 +109,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
         <news-advanced-settings
           v-else
+          :show-article-summary="showArticleSummary"
+          :show-see-all="showSeeAll"
+          :show-header="showHeader"
+          :show-article-author="showArticleAuthor"
+          :view-template="viewTemplate"
           @limit-value="limit = $event"
           @see-all-url="seeAllUrl = $event"
           @selected-option="selectedOption" />
@@ -160,7 +166,6 @@ export default {
     showArticleDate: false,
     showArticleReactions: false,
     seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
-    selectedType: 'lastPublished',
   }),
   computed: {
     viewTemplates() {
@@ -242,16 +247,16 @@ export default {
       this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
-      this.showHeader = this.$root.showHeader;
-      this.showSeeAll = this.$root.showSeeAll;
+      this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
+      this.showSeeAll = this.viewTemplate === 'NewsSlider' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.$root.showArticleSummary;
-      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSummary = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleSummary;
+      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
-      this.selectedType = this.$root.selectedType || 'lastPublished';
     },
     init() {
       if (!this.initialized) {
@@ -285,7 +290,6 @@ export default {
         showArticleReactions: this.showArticleReactions,
         showArticleDate: this.showArticleDate,
         seeAllUrl: this.seeAllUrl,
-        selectedType: this.selectedType,
         limit: this.limit,
       })
         .then(() => {
@@ -303,7 +307,6 @@ export default {
           this.$root.showArticleDate = this.showArticleDate;
           this.$root.showArticleReactions = this.showArticleReactions;
           this.$root.seeAllUrl = this.seeAllUrl;
-          this.$root.selectedType = this.selectedType;
           selectedOptions = {
             limit: this.limit,
             showHeader: this.showHeader,
@@ -317,7 +320,6 @@ export default {
             showArticleReactions: this.showArticleReactions,
             showArticleImage: this.showArticleImage,
             seeAllUrl: this.seeAllUrl,
-            selectedType: this.selectedType,
           };
           this.$root.$emit('saved-news-settings', this.newsTarget, selectedOptions);
           this.close();
@@ -368,9 +370,15 @@ export default {
       case 'seeAllUrl':
         this.seeAllUrl = optionValue;
         break;
-      case 'selectedType':
-        this.selectedType = optionValue;
-        break;
+      }
+    },
+    initDefaultValue() {
+      if ( this.viewTemplate === 'NewsLatest') {
+        this.showArticleAuthor = false;
+        this.showArticleSummary = false;
+      } else if ( this.viewTemplate === 'NewsSlider') {
+        this.showSeeAll = false;
+        this.showHeader = false;
       }
     }
   },

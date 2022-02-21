@@ -39,23 +39,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title>
-          {{ $t('news.list.settings.drawer.advancedSettings.orderCriteria') }}
-        </v-list-item-title>
-      </v-list-item-content>
-      <v-list-item-action>
-        <select
-          v-model="selectedType"
-          @change="selectedOption('selectedType', selectedType)"
-          class="width-auto my-auto subtitle-1 ignore-vuetify-classes">
-          <option value="lastPublished">{{ $t('news.list.settings.drawer.advancedSettings.lastPublished') }}</option>
-          <option value="lastModified">{{ $t('news.list.settings.drawer.advancedSettings.lastModified') }}</option>
-        </select>
-      </v-list-item-action>
-    </v-list-item>
-
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title>
           {{ $t('news.list.settings.drawer.advancedSettings.showListHeader') }}
         </v-list-item-title>
         <v-list-item-subtitle>
@@ -67,6 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-model="showHeader"
           inset
           dense
+          :disabled="displaySeeAllButton"
           @change="selectedOption('showHeader', showHeader)"
           class="my-auto" />
       </v-list-item-action>
@@ -86,6 +70,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-model="showSeeAll"
           inset
           dense
+          :disabled="displayHeaderTitle"
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="my-auto" />
       </v-list-item-action>
@@ -136,6 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-model="showArticleSummary"
           inset
           dense
+          :disabled="displayArticleSummary"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
@@ -168,6 +154,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-model="showArticleAuthor"
           inset
           dense
+          :disabled="displayArticleAuthor"
           @change="selectedOption('showArticleAuthor', showArticleAuthor)"
           class="my-auto" />
       </v-list-item-action>
@@ -224,20 +211,51 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
+  props: {
+    showArticleSummary: {
+      type: Boolean,
+      default: false,
+    },
+    showArticleAuthor: {
+      type: Boolean,
+      default: false,
+    },
+    showHeader: {
+      type: Boolean,
+      default: false,
+    },
+    showSeeAll: {
+      type: Boolean,
+      default: false,
+    },
+    viewTemplate: {
+      type: String,
+      default: '',
+    }
+  },
   data: () => ({
-    showHeader: false,
-    showSeeAll: false,
     showArticleTitle: false,
-    showArticleSummary: false,
     showArticleImage: false,
-    showArticleAuthor: false,
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
     seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
-    selectedType: 'lastPublished',
     limit: null
   }),
+  computed: {
+    displaySeeAllButton() {
+      return this.viewTemplate === 'NewsSlider';
+    },
+    displayHeaderTitle() {
+      return this.viewTemplate === 'NewsSlider';
+    },
+    displayArticleSummary() {
+      return this.viewTemplate === 'NewsLatest';
+    },
+    displayArticleAuthor() {
+      return this.viewTemplate === 'NewsLatest';
+    },
+  },
   created() {
     this.reset();
   },
@@ -246,22 +264,20 @@ export default {
       this.$emit('selected-option', selectedOption, optionValue);
     },
     reset() {
-      this.viewTemplate = this.$root.viewTemplate;
       this.viewExtensions = this.$root.viewExtensions;
       this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
-      this.showHeader = this.$root.showHeader;
-      this.showSeeAll = this.$root.showSeeAll;
+      this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
+      this.showSeeAll = this.viewTemplate === 'NewsSlider' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.$root.showArticleSummary;
-      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSummary = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleSummary;
+      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
-      this.selectedType = this.$root.selectedType || 'lastPublished';
     },
   }
 };

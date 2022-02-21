@@ -41,7 +41,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String[] showArticleReactionsParams = (String[]) request.getAttribute("showArticleReactions");
     String[] showArticleDateParams = (String[]) request.getAttribute("showArticleDate");
     String[] seeAllUrlParams = (String[]) request.getAttribute("seeAllUrl");
-    String[] selectedTypeParams = (String[]) request.getAttribute("selectedType");
     String viewTemplate = viewTemplateParams == null || viewTemplateParams.length == 0 ? "": viewTemplateParams[0];
     String newsTarget = newsTargetParams == null || newsTargetParams.length == 0 ? "": newsTargetParams[0];
     String header = headerParams == null || headerParams.length == 0 ? "": headerParams[0];
@@ -56,7 +55,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String showArticleSpace = showArticleSpaceParams == null || showArticleSpaceParams.length == 0 ? "true": showArticleSpaceParams[0];
     String showArticleReactions = showArticleReactionsParams == null || showArticleReactionsParams.length == 0 ? "true": showArticleReactionsParams[0];
     String seeAllUrl = seeAllUrlParams == null || seeAllUrlParams.length == 0 ? "": seeAllUrlParams[0];
-    String selectedType = selectedTypeParams == null || selectedTypeParams.length == 0 ? "": selectedTypeParams[0];
 
     ConversationState conversationState = ConversationState.getCurrent();
     Identity currentIdentity = null;
@@ -86,7 +84,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         showArticleReactions: <%= showArticleReactions == null ? null : "'" + showArticleReactions + "'" %>,
         showArticleDate: <%= showArticleDate == null ? null : "'" + showArticleDate + "'" %>,
         seeAllUrl: <%= seeAllUrl == null ? null : "'" + seeAllUrl + "'" %>,
-        selectedType: <%= selectedType == null ? null : "'" + selectedType + "'" %>,
       }));
     </script>
   </div>

@@ -84,10 +84,6 @@ export default {
       type: String,
       default: null,
     },
-    selectedType: {
-      type: String,
-      default: null,
-    },
   },
   data: () => ({
     extensionApp: 'NewsList',
@@ -139,7 +135,6 @@ export default {
         showArticleReactions: this.showArticleReactions,
         showArticleDate: this.showArticleDate,
         seeAllUrl: this.seeAllUrl,
-        selectedType: this.selectedType,
         hasMore: this.hasMore,
       };
     },
@@ -151,7 +146,6 @@ export default {
   },
   created() {
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
-      this.selectedType = selectedOptions.selectedType;
       this.seeAllUrl = selectedOptions.seeAllUrl;
       this.showSeeAll = selectedOptions.showSeeAll;
       this.showHeader = selectedOptions.showHeader;
@@ -159,7 +153,6 @@ export default {
       this.limit = this.$root.limit;
       this.retrieveNewsList();
     });
-    this.selectedType = this.$root.selectedType;
     this.seeAllUrl = this.$root.seeAllUrl;
     this.showSeeAll = this.$root.showSeeAll;
     this.showHeader = this.$root.showHeader;
@@ -172,7 +165,7 @@ export default {
   methods: {
     retrieveNewsList() {
       this.loading = true;
-      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true, this.selectedType)
+      return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
         .then(newsList => {
           this.newsList = newsList.news || [];
           this.hasMore = this.newsList.length > this.limit;

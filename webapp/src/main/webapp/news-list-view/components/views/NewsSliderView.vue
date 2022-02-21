@@ -110,7 +110,6 @@ export default {
       showArticleDate: true,
       showArticleReactions: true,
       seeAllUrl: '',
-      selectedType: 'lastPublished',
       selectedOption: null,
     };
   },
@@ -132,7 +131,7 @@ export default {
     },
     getNewsList() {
       if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true, this.selectedType)
+        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
             this.news = newsList.news;
             this.initialized = true;
@@ -144,7 +143,6 @@ export default {
       this.showArticleSummary = selectedOption.showArticleSummary;
       this.showArticleTitle = selectedOption.showArticleTitle;
       this.showArticleImage = selectedOption.showArticleImage;
-      this.selectedType = selectedOption.selectedType;
       this.seeAllUrl = selectedOption.seeAllUrl;
       this.limit = selectedOption.limit;
       this.selectedOption = selectedOption;
@@ -163,7 +161,6 @@ export default {
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl;
-      this.selectedType = this.$root.selectedType;
       this.selectedOption = {
         limit: this.limit,
         showHeader: this.showHeader,
@@ -176,7 +173,6 @@ export default {
         showArticleReactions: this.showArticleReactions,
         showArticleImage: this.showArticleImage,
         seeAllUrl: this.seeAllUrl,
-        selectedType: this.selectedType,
       };
     },
   }

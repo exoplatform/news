@@ -73,7 +73,6 @@ export function init(params) {
   const showArticleReactions = params.showArticleReactions === '' ? true : params.showArticleReactions === 'true';
   const showArticleDate  = params.showArticleDate === '' ? true : params.showArticleDate === 'true';
   const seeAllUrl = params.seeAllUrl;
-  const selectedType = params.selectedType === '' ? 'lastPublished' : params.selectedType;
 
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
     // init Vue app when locale resources are ready
@@ -94,7 +93,6 @@ export function init(params) {
         showArticleReactions,
         showArticleDate,
         seeAllUrl,
-        selectedType,
       },
       template: `<news-list-view
                   id="${appId}"
@@ -108,6 +106,7 @@ export function init(params) {
                   :show-article-title="showArticleTitle"
                   :show-header="showHeader"
                   :show-see-all="showSeeAll"
+                  :show-article-date="showArticleDate"
                   :show-article-summary="showArticleSummary"
                   :limit="limit"/>`,
       vuetify: Vue.prototype.vuetifyOptions,

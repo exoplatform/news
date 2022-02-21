@@ -57,7 +57,6 @@ export default {
       minute: '2-digit',
     },
     seeAllUrl: '',
-    selectedType: 'lastPublished',
     selectedOption: null,
     showHeader: false,
     showSeeAll: false,
@@ -88,7 +87,7 @@ export default {
   methods: {
     getNewsList() {
       if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true, this.selectedType)
+        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
             this.newsInfo = newsList.news;
             if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
@@ -110,7 +109,6 @@ export default {
     refreshNewsViews(selectedTarget, selectedOption){
       this.selectedOption = selectedOption;
       this.newsHeader = selectedOption.header;
-      this.selectedType = selectedOption.selectedType;
       this.seeAllUrl = selectedOption.seeAllUrl;
       this.limit = selectedOption.limit;
       this.newsTarget = selectedTarget;
@@ -129,7 +127,6 @@ export default {
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl;
-      this.selectedType = this.$root.selectedType;
       this.selectedOption = {
         limit: this.limit,
         showHeader: this.showHeader,
@@ -142,7 +139,6 @@ export default {
         showArticleReactions: this.showArticleReactions,
         showArticleImage: this.showArticleImage,
         seeAllUrl: this.seeAllUrl,
-        selectedType: this.selectedType,
       };
     },
   }

@@ -1,34 +1,5 @@
 import {canUserCreateNews} from '../services/newsServices.js';
 
-const newsActivityComposerPlugin = {
-  key: 'news',
-  rank: 30,
-  resourceBundle: 'locale.portlet.news.News',
-  labelKey: 'news.composer.write',
-  description: 'news.composer.write.description',
-  iconClass: 'newsComposerIcon',
-  enabled: false,
-  onExecute: function (attachments) {
-    let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
-    if (eXo.env.portal.spaceId) {
-      url += `?spaceId=${eXo.env.portal.spaceId}`;
-    }
-    const editor = CKEDITOR.instances['activityContent'];
-    if (editor) {
-      const message = CKEDITOR.instances['activityContent'].getData();
-      localStorage.setItem('exo-activity-composer-message', message);
-      localStorage.setItem('exo-activity-composer-attachments', JSON.stringify(attachments));
-    }
-    window.open(url, '_blank');
-  }
-};
-
-const switchToArticleActivityComposerPlugin = Object.assign({}, newsActivityComposerPlugin, {
-  key: 'switchToArticle',
-  rank: 10,
-  labelKey: 'news.composer.switch.article'
-});
-
 const newsActivityTypeExtensionOptions = {
   name: 'News',
   getExtendedComponent: (activity, isActivityDetail) => {
@@ -87,21 +58,27 @@ const newsActivityTypeExtensionOptions = {
 const lang = eXo.env.portal.language || 'en';
 const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.news.News-${lang}.json`;
 
-exoi18n.loadLanguageAsync(lang, url).then(i18n => new Vue({i18n}));
+const i18nPromise = exoi18n.loadLanguageAsync(lang, url).then(i18n => new Vue({i18n}));
 
 export function initExtensions() {
-  extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-hint-action', switchToArticleActivityComposerPlugin);
-  document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));
-
-  if (eXo.env.portal.spaceId) {
+  if (eXo.env.portal.spaceId && eXo.env.portal.spaceId !== '') {
     canUserCreateNews(eXo.env.portal.spaceId)
       .then(canCreateNews => {
-        switchToArticleActivityComposerPlugin.enabled = newsActivityComposerPlugin.enabled = (eXo.env.portal.spaceId && eXo.env.portal.spaceId !== '') && canCreateNews;
-        extensionRegistry.registerExtension('ActivityComposer', 'activity-composer-action', newsActivityComposerPlugin);
-        document.dispatchEvent(new CustomEvent('activity-composer-extension-updated'));
+        if (canCreateNews) {
+          return i18nPromise.then(() => {
+            extensionRegistry.registerComponent('ActivityComposerAction', 'activity-composer-action', {
+              id: 'switchNewsButton',
+              vueComponent: Vue.options.components['activity-switch-to-news'],
+              rank: 10,
+            });
+            extensionRegistry.registerComponent('ActivityComposerFooterAction', 'activity-composer-footer-action', {
+              id: 'writeNewsButton',
+              vueComponent: Vue.options.components['activity-write-news'],
+              rank: 30,
+            });
+          });
+        }
       });
-  } else {
-    switchToArticleActivityComposerPlugin.enabled = newsActivityComposerPlugin.enabled = false;
   }
 
   extensionRegistry.registerExtension('activity', 'type', {

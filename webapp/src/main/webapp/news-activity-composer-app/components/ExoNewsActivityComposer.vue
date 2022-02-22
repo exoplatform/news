@@ -970,7 +970,10 @@ export default {
     },
     onHideAttachmentsDrawer: function(){
       const spanBadge = document.getElementById('badge');
-      spanBadge.innerHTML = String(this.news.attachments.length);
+      if (spanBadge) {
+        const attachmentsLength = this.news && this.news.attachments && this.news.attachments.length || 0;
+        spanBadge.innerHTML = `${attachmentsLength}`;
+      }
     },
     setUploadingCount: function(uploadingCount) {
       this.uploading = uploadingCount > 0;

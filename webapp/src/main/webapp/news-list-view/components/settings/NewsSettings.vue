@@ -16,10 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="d-flex flex-row pa-2">
-    <div v-if="showHeader" class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
-      <span class="headerLatestNews body-1 text-uppercase text-sub-title text-truncate text-center" :title="newsHeader">{{ newsHeader }}</span>
-    </div>
-    <div v-else class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
+    <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
+      <span
+        v-if="showHeader"
+        class="headerLatestNews body-1 text-uppercase text-sub-title text-truncate text-center"
+        :title="newsHeader">{{ newsHeader }}</span>
     </div>
     <div class="d-flex flex-column me-2">
       <v-btn
@@ -45,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 export default {
   data: () => ({
     newsHeader: '',
-    seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
+    seeAllUrl: 'news?filter=pinned',
     showHeader: false,
     showSeeAll: false,
     canPublishNews: false,
@@ -70,7 +71,7 @@ export default {
       this.$refs.settingsDrawer.open();
     },
     seeAllNews() {
-      window.location.href = this.seeAllUrl;
+      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;
     }
   },
 };

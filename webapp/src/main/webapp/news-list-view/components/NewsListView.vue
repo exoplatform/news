@@ -72,6 +72,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    showArticleReactions: {
+      type: Boolean,
+      default: false,
+    },
     showArticleSpace: {
       type: Boolean,
       default: false,

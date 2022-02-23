@@ -108,7 +108,8 @@ export function init(params) {
                   :show-see-all="showSeeAll"
                   :show-article-date="showArticleDate"
                   :show-article-summary="showArticleSummary"
-                  :limit="limit"/>`,
+                  :limit="limit"
+                  :see-all-url="seeAllUrl"/>`,
       vuetify: Vue.prototype.vuetifyOptions,
       i18n,
     }, `#${appId}`, `News List View - ${viewTemplate}`);

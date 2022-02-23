@@ -1,5 +1,6 @@
 package org.exoplatform.news.listener;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.model.News;
@@ -18,6 +19,11 @@ import org.exoplatform.social.core.processor.MetadataActivityProcessor;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.favorite.model.Favorite;
 import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.tag.TagService;
+import org.exoplatform.social.metadata.tag.model.TagName;
+import org.exoplatform.social.metadata.tag.model.TagObject;
+
+import java.util.Set;
 
 public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
@@ -31,6 +37,9 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
   private final ActivityManager activityManager;
 
+  private TagService tagService;
+
+
   private static final String   METADATA_CREATED = "social.metadataItem.created";
 
   private static final String   METADATA_DELETED = "social.metadataItem.deleted";
@@ -39,12 +48,14 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                               NewsService newsService,
                               FavoriteService favoriteService,
                               IdentityManager identityManager,
-                              ActivityManager activityManager) {
+                              ActivityManager activityManager,
+                              TagService tagService) {
     this.indexingService = indexingService;
     this.newsService = newsService;
     this.favoriteService = favoriteService;
     this.identityManager = identityManager;
     this.activityManager = activityManager;
+    this.tagService = tagService;
   }
 
   @Override
@@ -69,6 +80,7 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                                          "",
                                          Long.parseLong(userIdentity.getId()));
         if (event.getEventName().equals(METADATA_CREATED)) {
+          updateActivityTags(activity,news);
           favoriteService.createFavorite(favorite);
         } else if (event.getEventName().equals(METADATA_DELETED)) {
           favoriteService.deleteFavorite(favorite);
@@ -77,4 +89,40 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
       }
     }
   }
+  private void updateActivityTags(ExoSocialActivity activity, News news) {
+    String objectType = MetadataActivityProcessor.NEWS_METADATA_OBJECT_TYPE;
+
+    long creatorId = getPosterId(activity);
+
+    org.exoplatform.social.core.identity.model.Identity audienceIdentity = activityManager.getActivityStreamOwnerIdentity(activity.getId());
+    long audienceId = Long.parseLong(audienceIdentity.getId());
+    String content = getActivityBody(activity);
+
+    Set<TagName> tagNames = tagService.detectTagNames(content);
+    tagService.saveTags(new TagObject(objectType,
+                    news.getId(),
+                    activity.getParentId()),
+            tagNames,
+            audienceId,
+            creatorId);
+  }
+  private long getPosterId(ExoSocialActivity activity) {
+    String userId = activity.getUserId();
+    if (StringUtils.isBlank(userId)) {
+      userId = activity.getPosterId();
+    }
+    return StringUtils.isBlank(userId) ? 0 : Long.parseLong(userId);
+  }
+
+  private String getActivityBody(ExoSocialActivity activity) {
+    String body = MapUtils.getString(activity.getTemplateParams(), "comment");
+    if (StringUtils.isNotBlank(body)) {
+      return body;
+    } else if (StringUtils.isNotBlank(activity.getTitle())) {
+      return activity.getTitle();
+    } else {
+      return activity.getBody();
+    }
+  }
+
 }

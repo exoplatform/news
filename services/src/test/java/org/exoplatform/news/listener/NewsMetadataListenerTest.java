@@ -16,6 +16,7 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.tag.TagService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -45,13 +46,17 @@ public class NewsMetadataListenerTest {
   @Mock
   private ActivityManager     activityManager;
 
+  @Mock
+  private TagService          tagService;
+
   @Test
   public void testReindexNewsWhenNewsSetAsFavorite() throws Exception {
     NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
                                                                          newsService,
                                                                          favoriteService,
                                                                          identityManager,
-                                                                         activityManager);
+                                                                         activityManager,
+                                                                         tagService);
     setCurrentUser("john");
     MetadataItem metadataItem = mock(MetadataItem.class);
     Event<Long, MetadataItem> event = mock(Event.class);
@@ -70,7 +75,8 @@ public class NewsMetadataListenerTest {
                                                                          newsService,
                                                                          favoriteService,
                                                                          identityManager,
-                                                                         activityManager);
+                                                                         activityManager,
+                                                                         tagService);
     Identity johnIdentity = new Identity("1", Collections.singletonList(new MembershipEntry("john")));
     ConversationState.setCurrent(new ConversationState(johnIdentity));
     MetadataItem metadataItem = mock(MetadataItem.class);

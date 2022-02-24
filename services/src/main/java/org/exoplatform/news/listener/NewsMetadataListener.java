@@ -80,7 +80,9 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                                          "",
                                          Long.parseLong(userIdentity.getId()));
         if (event.getEventName().equals(METADATA_CREATED)) {
-          updateActivityTags(activity,news);
+          if (!metadataItem.getObjectType().equals(MetadataActivityProcessor.NEWS_METADATA_OBJECT_TYPE)) {
+            updateActivityTags(activity, news);
+          }
           favoriteService.createFavorite(favorite);
         } else if (event.getEventName().equals(METADATA_DELETED)) {
           favoriteService.deleteFavorite(favorite);

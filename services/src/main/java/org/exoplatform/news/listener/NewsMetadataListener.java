@@ -94,7 +94,7 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
     }
   }
   private void updateActivityTags(ExoSocialActivity activity, News news) {
-    String objectType = MetadataActivityProcessor.NEWS_METADATA_OBJECT_TYPE;
+    String objectType = NEWS_METADATA_OBJECT_TYPE;
 
     long creatorId = getPosterId(activity);
 

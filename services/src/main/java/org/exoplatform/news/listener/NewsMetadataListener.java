@@ -27,6 +27,8 @@ import java.util.Set;
 
 public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
+  public static final String NEWS_METADATA_OBJECT_TYPE = "news";
+
   private final IndexingService indexingService;
 
   private final NewsService     newsService;
@@ -80,7 +82,7 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                                          "",
                                          Long.parseLong(userIdentity.getId()));
         if (event.getEventName().equals(METADATA_CREATED)) {
-          if (!metadataItem.getObjectType().equals(MetadataActivityProcessor.NEWS_METADATA_OBJECT_TYPE)) {
+          if (!metadataItem.getObjectType().equals(NEWS_METADATA_OBJECT_TYPE)) {
             updateActivityTags(activity, news);
           }
           favoriteService.createFavorite(favorite);

@@ -68,6 +68,21 @@ public class NewsESSearchConnector {
 
   private String                       searchQuery;
 
+  public static final String            SEARCH_QUERY_TERM            = "\"should\": {" +
+          "  \"match_phrase\": {" +
+          "    \"body\": {" +
+          "      \"query\": \"@term@\"," +
+          "      \"boost\": 5" +
+          "    }" +
+          "  }" +
+          "}," +
+          "\"must\":{" +
+          "  \"query_string\":{" +
+          "    \"fields\": [\"body\", \"summary\", \"title\"]," +
+          "    \"query\": \"@term_query@\"" +
+          "  }" +
+          "},";
+
   public NewsESSearchConnector(ConfigurationManager configurationManager,
                                IdentityManager identityManager,
                                ActivityStorage activityStorage,
@@ -111,18 +126,9 @@ public class NewsESSearchConnector {
   }
 
   private String buildQueryStatement(Identity viewerIdentity, Set<Long> streamFeedOwnerIds, NewsFilter filter) {
-    String term = removeSpecialCharacters(filter.getSearchText());
-    term = StringUtils.isBlank(term) ? "*:*" : term;
-    List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
-      word = word.trim();
-      if (word.length() > 5) {
-        word = word + "~1";
-      }
-      return word;
-    }).collect(Collectors.toList());
     Map<String, List<String>> metadataFilters = buildMetadatasFilter(filter, viewerIdentity);
     String metadataQuery = buildMetadatasQueryStatement(metadataFilters);
-    String termQuery = termsQuery.isEmpty() ? "*:*" : StringUtils.join(termsQuery, " AND ");
+    String termQuery = buildTermQueryStatement(filter.getSearchText());
     return retrieveSearchQuery().replace("@term_query@", termQuery)
                                 .replace("@metadatas_query@", metadataQuery)
                                 .replace("@permissions@", StringUtils.join(streamFeedOwnerIds, ","))
@@ -201,7 +207,22 @@ public class NewsESSearchConnector {
     }
     return results;
   }
-
+  private String buildTermQueryStatement(String term) {
+    if (StringUtils.isBlank(term)) {
+      return term;
+    }
+    term = removeSpecialCharacters(term);
+    List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
+      word = word.trim();
+      if (word.length() > 5) {
+        word = word + "~1";
+      }
+      return word;
+    }).collect(Collectors.toList());
+    String termQuery = StringUtils.join(termsQuery, " AND ");
+    return SEARCH_QUERY_TERM.replace("@term@", term)
+            .replace("@term_query@", termQuery);
+  }
   private Long parseLong(JSONObject hitSource, String key) {
     String value = (String) hitSource.get(key);
     return StringUtils.isBlank(value) ? null : Long.parseLong(value);

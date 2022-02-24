@@ -3,6 +3,7 @@
   "size": "@limit@",
   "query":{
     "bool": {
+      @term_query@
       "filter": [
         @metadatas_query@
         {
@@ -10,19 +11,7 @@
             "permissions": [@permissions@]
           }
         }
-      ],
-      "should":{
-        "query_string":{
-          "fields": ["body", "summary", "title"],
-          "query": "@term_query@"
-        },
-        "match_phrase": {
-          "body": {
-            "query": "@term@",
-            "boost": 5
-          }
-        }
-      }
+      ]
     }
   },
   "highlight" : {

@@ -96,6 +96,7 @@ public class NewsMetadataListenerTest {
     userIdentity.setId("1");
     lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
     lenient().when(activityManager.getActivity("1")).thenReturn(activity);
+    lenient().when(activityManager.getActivityStreamOwnerIdentity(activity.getId())).thenReturn(userIdentity);
 
     newsActivityListener.onEvent(event);
     verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);

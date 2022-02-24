@@ -11,6 +11,7 @@ import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.jpa.search.ActivitySearchConnector;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -129,7 +130,11 @@ public class NewsESSearchConnectorTest {
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
     lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
-    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "term")
+    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term_query@",
+            ActivitySearchConnector.SEARCH_QUERY_TERM.replace("@term@",
+                    filter.getSearchText())
+                    .replace("@term_query@",
+                            filter.getSearchText()))
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
@@ -157,7 +162,11 @@ public class NewsESSearchConnectorTest {
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
     lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
-    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "term")
+    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term_query@",
+            ActivitySearchConnector.SEARCH_QUERY_TERM.replace("@term@",
+                    filter.getSearchText())
+                    .replace("@term_query@",
+                            filter.getSearchText()))
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");
@@ -194,7 +203,11 @@ public class NewsESSearchConnectorTest {
     Identity identity = mock(Identity.class);
     lenient().when(identity.getId()).thenReturn("1");
     lenient().when(activityStorage.getStreamFeedOwnerIds(eq(identity))).thenReturn(permissions);
-    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term@", "john")
+    String expectedESQuery = FAKE_ES_QUERY.replaceAll("@term_query@",
+            ActivitySearchConnector.SEARCH_QUERY_TERM.replace("@term@",
+                    filter.getSearchText())
+                    .replace("@term_query@",
+                            filter.getSearchText()))
                                           .replaceAll("@permissions@", StringUtils.join(permissions, ","))
                                           .replaceAll("@offset@", "0")
                                           .replaceAll("@limit@", "10");

@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     two-line>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.maxArticle') }}
         </v-list-item-title>
       </v-list-item-content>
@@ -38,47 +38,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showListHeader') }}
         </v-list-item-title>
-        <v-list-item-subtitle>
+        <v-list-item-subtitle class="advancedSettingsLabel">
           {{ $t('news.list.settings.drawer.advancedSettings.displayTextHeader') }}
         </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showHeader"
-          inset
           dense
           :disabled="displaySeeAllButton"
           @change="selectedOption('showHeader', showHeader)"
-          class="my-auto" />
+          class="displaySeeAllButton my-auto" />
       </v-list-item-action>
     </v-list-item>
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showSeeAll') }}
         </v-list-item-title>
-        <v-list-item-subtitle>
+        <v-list-item-subtitle class="advancedSettingsLabel">
           {{ $t('news.list.settings.drawer.advancedSettings.displaySeeAll') }}
         </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showSeeAll"
-          inset
           dense
           :disabled="displayHeaderTitle"
           @change="selectedOption('showSeeAll', showSeeAll)"
-          class="my-auto" />
+          class="displayHeaderTitle my-auto" />
       </v-list-item-action>
     </v-list-item>
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.seeAllButton') }}
         </v-list-item-title>
       </v-list-item-content>
@@ -96,14 +94,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleTitle') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleTitle"
-          inset
           dense
           @change="selectedOption('showArticleTitle', showArticleTitle)"
           class="my-auto" />
@@ -112,14 +109,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleSummary') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleSummary"
-          inset
           dense
           :disabled="displayArticleSummary"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
@@ -129,14 +125,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleImage') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleImage"
-          inset
           dense
           @change="selectedOption('showArticleImage', showArticleImage)"
           class="my-auto" />
@@ -145,14 +140,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleAuthor') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleAuthor"
-          inset
           dense
           :disabled="displayArticleAuthor"
           @change="selectedOption('showArticleAuthor', showArticleAuthor)"
@@ -162,14 +156,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleDate') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleDate"
-          inset
           dense
           @change="selectedOption('showArticleDate', showArticleDate)"
           class="my-auto" />
@@ -178,14 +171,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleSpace') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleSpace"
-          inset
           dense
           @change="selectedOption('showArticleSpace',showArticleSpace)"
           class="my-auto" />
@@ -194,14 +186,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>
+        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
           {{ $t('news.list.settings.drawer.advancedSettings.showArticleReactionsCounter') }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
         <v-switch
           v-model="showArticleReactions"
-          inset
           dense
           @change="selectedOption('showArticleReactions', showArticleReactions)"
           class="my-auto" />

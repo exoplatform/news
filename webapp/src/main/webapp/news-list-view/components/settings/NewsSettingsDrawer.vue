@@ -39,20 +39,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <template slot="content">
       <form ref="form1" class="pa-2 ms-2">
         <div v-if="!showAdvancedSettings" class="d-flex flex-column flex-grow-1">
-          <div class="d-flex flex-row">
-            <label for="name" class="listViewLabel text-subtitle-1 mt-6">
-              {{ $t('news.list.settings.header') }}
-            </label>
+          <div class="d-flex flex-row listViewLabel text-subtitle-1">
+            {{ $t('news.list.settings.information') }}
           </div>
-          <div class="d-flex flex-row">
+          <div class="d-flex flex-row mt-6">
+            <label for="name" class="listViewLabel text-subtitle-1 me-1 my-auto">
+              {{ $t('news.list.settings.header') }}:
+            </label>
             <v-text-field
               v-model="newsHeader"
               type="string"
               name="newsHeader"
-              :placeholder="$t('news.list.settings.namePlaceholder')"
+              :placeholder="$t('news.list.settings.placeHolderName')"
               :error-messages="checkAlphanumeric"
               maxlength="100"
-              class="input-block-level ignore-vuetify-classes"
+              class="input-block-level ignore-vuetify-classes pa-0"
               counter
               required
               outlined
@@ -60,9 +61,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
           <div class="d-flex flex-row">
             <label for="newsTarget" class="listViewLabel text-subtitle-1 mt-6">
-              {{ $t('news.list.settings.newsTarget') }}
+              {{ $t('news.list.settings.newsTarget') }}:
             </label>
           </div>
+          <div class="d-flex flex-row infosLabel font-italic">{{ $t('news.list.settings.newsTargets.description') }}</div>
           <div class="d-flex flex-row">
             <v-select
               id="newsTargets"
@@ -74,6 +76,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               item-value="name"
               dense
               outlined
+              class="pa-0"
               @click.stop>
               <template v-slot:selection="{ item, index }">
                 <span :title="item.toolTipInfo">
@@ -84,9 +87,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
           <div class="d-flex flex-row">
             <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-6">
-              {{ $t('news.list.settings.viewTemplate') }}
+              {{ $t('news.list.settings.viewTemplate') }}:
             </label>
           </div>
+          <div class="d-flex flex-row infosLabel font-italic">{{ $t('news.list.settings.viewTemplate.description') }}</div>
           <div class="d-flex flex-row">
             <v-select
               id="viewTemplates"
@@ -99,6 +103,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               dense
               outlined
               @change="initDefaultValue"
+              class="pa-0"
               @click.stop />
           </div>
           <div class="d-flex flex-row mt-4 mx-8">
@@ -181,7 +186,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {
-      return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
+      return this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
       return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0);

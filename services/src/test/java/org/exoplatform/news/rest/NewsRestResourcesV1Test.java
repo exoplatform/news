@@ -2379,7 +2379,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "", "", 0, 10, false);
+    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "", "", 0,null, 10, false);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -2423,7 +2423,7 @@ public class NewsRestResourcesV1Test {
     setCurrentUser("john");
 
     // When
-    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", -1, 10, false);
+    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", -1,null, 10, false);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -2467,7 +2467,7 @@ public class NewsRestResourcesV1Test {
     setCurrentUser("john");
 
     // When
-    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", 0, -1, false);
+    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", 0,null, -1, false);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -2511,7 +2511,7 @@ public class NewsRestResourcesV1Test {
     setCurrentUser("john");
 
     // When
-    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, text, "", 0, 10, false);
+    Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, text, "", 0,null, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

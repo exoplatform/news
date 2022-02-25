@@ -46,6 +46,11 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
   private static final String   METADATA_DELETED = "social.metadataItem.deleted";
 
+  private static final String   METADATA_TAG = "tags";
+
+  private static final String   METADATA_FAVORITE = "favorite";
+
+
   public NewsMetadataListener(IndexingService indexingService,
                               NewsService newsService,
                               FavoriteService favoriteService,
@@ -82,11 +87,13 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
                                          "",
                                          Long.parseLong(userIdentity.getId()));
         if (event.getEventName().equals(METADATA_CREATED)) {
-          if (!metadataItem.getObjectType().equals(NEWS_METADATA_OBJECT_TYPE)) {
+          if (!metadataItem.getObjectType().equals(NEWS_METADATA_OBJECT_TYPE) && metadataItem.getMetadataTypeName().equals(METADATA_TAG)) {
             updateActivityTags(activity, news);
           }
-          favoriteService.createFavorite(favorite);
-        } else if (event.getEventName().equals(METADATA_DELETED)) {
+          else {
+            favoriteService.createFavorite(favorite);
+          }
+        } else if (event.getEventName().equals(METADATA_DELETED) && metadataItem.getMetadataTypeName().equals(METADATA_FAVORITE)) {
           favoriteService.deleteFavorite(favorite);
         }
         indexingService.reindex(NewsIndexingServiceConnector.TYPE, news.getId());

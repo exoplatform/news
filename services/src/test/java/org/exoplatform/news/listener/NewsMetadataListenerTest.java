@@ -84,6 +84,7 @@ public class NewsMetadataListenerTest {
     lenient().when(event.getData()).thenReturn(metadataItem);
     lenient().when(event.getData().getObjectType()).thenReturn("activity");
     lenient().when(event.getEventName()).thenReturn("social.metadataItem.created");
+    lenient().when(metadataItem.getMetadataTypeName()).thenReturn("favorite");
     lenient().when(metadataItem.getObjectId()).thenReturn("1");
     News news = new News();
     news.setId("1234");

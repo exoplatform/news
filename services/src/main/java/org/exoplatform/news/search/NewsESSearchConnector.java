@@ -21,6 +21,7 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
@@ -29,6 +30,7 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.storage.api.ActivityStorage;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
+import org.exoplatform.social.metadata.tag.TagService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -66,6 +68,21 @@ public class NewsESSearchConnector {
 
   private String                       searchQuery;
 
+  public static final String            SEARCH_QUERY_TERM            = "\"should\": {" +
+          "  \"match_phrase\": {" +
+          "    \"body\": {" +
+          "      \"query\": \"@term@\"," +
+          "      \"boost\": 5" +
+          "    }" +
+          "  }" +
+          "}," +
+          "\"must\":{" +
+          "  \"query_string\":{" +
+          "    \"fields\": [\"body\", \"summary\", \"title\"]," +
+          "    \"query\": \"@term_query@\"" +
+          "  }" +
+          "},";
+
   public NewsESSearchConnector(ConfigurationManager configurationManager,
                                IdentityManager identityManager,
                                ActivityStorage activityStorage,
@@ -99,7 +116,7 @@ public class NewsESSearchConnector {
     if (filter.getLimit() < 0) {
       throw new IllegalArgumentException("Limit must be positive");
     }
-    if (StringUtils.isBlank(filter.getSearchText()) && !filter.isFavorites()) {
+    if (StringUtils.isBlank(filter.getSearchText()) && !filter.isFavorites() && CollectionUtils.isEmpty(filter.getTagNames())) {
       throw new IllegalArgumentException("Filter term is mandatory");
     }
     Set<Long> streamFeedOwnerIds = activityStorage.getStreamFeedOwnerIds(viewerIdentity);
@@ -109,20 +126,10 @@ public class NewsESSearchConnector {
   }
 
   private String buildQueryStatement(Identity viewerIdentity, Set<Long> streamFeedOwnerIds, NewsFilter filter) {
-    String term = removeSpecialCharacters(filter.getSearchText());
-    term = StringUtils.isBlank(term) ? "*:*" : term;
-    List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
-      word = word.trim();
-      if (word.length() > 5) {
-        word = word + "~1";
-      }
-      return word;
-    }).collect(Collectors.toList());
     Map<String, List<String>> metadataFilters = buildMetadatasFilter(filter, viewerIdentity);
     String metadataQuery = buildMetadatasQueryStatement(metadataFilters);
-    String termQuery = termsQuery.isEmpty() ? "*:*" : StringUtils.join(termsQuery, " AND ");
-    return retrieveSearchQuery().replace("@term@", term)
-                                .replace("@term_query@", termQuery)
+    String termQuery = buildTermQueryStatement(filter.getSearchText());
+    return retrieveSearchQuery().replace("@term_query@", termQuery)
                                 .replace("@metadatas_query@", metadataQuery)
                                 .replace("@permissions@", StringUtils.join(streamFeedOwnerIds, ","))
                                 .replace("@offset@", String.valueOf(filter.getOffset()))
@@ -200,7 +207,22 @@ public class NewsESSearchConnector {
     }
     return results;
   }
-
+  private String buildTermQueryStatement(String term) {
+    if (StringUtils.isBlank(term)) {
+      return term;
+    }
+    term = removeSpecialCharacters(term);
+    List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
+      word = word.trim();
+      if (word.length() > 5) {
+        word = word + "~1";
+      }
+      return word;
+    }).collect(Collectors.toList());
+    String termQuery = StringUtils.join(termsQuery, " AND ");
+    return SEARCH_QUERY_TERM.replace("@term@", term)
+            .replace("@term_query@", termQuery);
+  }
   private Long parseLong(JSONObject hitSource, String key) {
     String value = (String) hitSource.get(key);
     return StringUtils.isBlank(value) ? null : Long.parseLong(value);
@@ -242,6 +264,9 @@ public class NewsESSearchConnector {
     Map<String, List<String>> metadataFilters = new HashMap<>();
     if (filter.isFavorites()) {
       metadataFilters.put(FavoriteService.METADATA_TYPE.getName(), Collections.singletonList(viewerIdentity.getId()));
+    }
+    if (CollectionUtils.isNotEmpty(filter.getTagNames())) {
+      metadataFilters.put(TagService.METADATA_TYPE.getName(), filter.getTagNames());
     }
     return metadataFilters;
   }

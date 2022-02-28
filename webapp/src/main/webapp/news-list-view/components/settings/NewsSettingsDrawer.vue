@@ -36,12 +36,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div v-else class="flex flex-column">{{ $t('news.list.settings.title') }}</div>
       </div>
     </template>
+    <template slot="titleIcons">
+      <v-tooltip
+        v-model="showTooltip"
+        max-width="350px"
+        color="grey darken-4"
+        bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on">
+            <v-icon class="iconInfo">mdi-information</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ $t('news.list.settings.information') }}</span>
+      </v-tooltip>
+    </template>
     <template slot="content">
       <form ref="form1" class="pa-2 ms-2">
         <div v-if="!showAdvancedSettings" class="d-flex flex-column flex-grow-1">
-          <div class="d-flex flex-row listViewLabel text-subtitle-1">
-            {{ $t('news.list.settings.information') }}
-          </div>
           <div class="d-flex flex-row mt-6">
             <label for="name" class="listViewLabel text-subtitle-1 me-1 my-auto">
               {{ $t('news.list.settings.header') }}:
@@ -67,8 +81,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div class="d-flex flex-row infosLabel font-italic">{{ $t('news.list.settings.newsTargets.description') }}</div>
           <div class="d-flex flex-row">
             <v-select
-              id="newsTargets"
-              ref="newsTargets"
+              id="newsTargetRefs"
+              ref="newsTargetRefs"
               v-model="newsTarget"
               :items="newsTargets"
               :menu-props="{ bottom: true, offsetY: true}"
@@ -77,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               dense
               outlined
               class="pa-0"
-              @click.stop>
+              @blur="blurSelection">
               <template v-slot:selection="{ item, index }">
                 <span :title="item.toolTipInfo">
                   {{ item.label }}
@@ -86,15 +100,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </v-select>
           </div>
           <div class="d-flex flex-row">
-            <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-6">
+            <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-2">
               {{ $t('news.list.settings.viewTemplate') }}:
             </label>
           </div>
           <div class="d-flex flex-row infosLabel font-italic">{{ $t('news.list.settings.viewTemplate.description') }}</div>
           <div class="d-flex flex-row">
             <v-select
-              id="viewTemplates"
-              ref="viewTemplates"
+              id="viewTemplateRefs"
+              ref="viewTemplateRefs"
               v-model="viewTemplate"
               :items="displayedViewTemplates"
               :menu-props="{ bottom: true, offsetY: true}"
@@ -104,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               outlined
               @change="initDefaultValue"
               class="pa-0"
-              @click.stop />
+              @blur="blurSelection" />
           </div>
           <div class="d-flex flex-row mt-4 mx-8">
             <v-img
@@ -170,6 +184,7 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
+    showTooltip: false,
     seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
   }),
   computed: {
@@ -189,7 +204,7 @@ export default {
       return this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0);
+      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0) || (this.seeAllUrl && this.seeAllUrl.length === 0);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
@@ -220,14 +235,6 @@ export default {
   created() {
     this.disabled = true;
     this.init();
-    $(document).click(() => {
-      if (this.$refs.newsTargets) {
-        this.$refs.newsTargets.blur();
-      }
-      if (this.$refs.viewTemplates) {
-        this.$refs.viewTemplates.blur();
-      }
-    });
   },
   methods: {
     open() {
@@ -385,7 +392,16 @@ export default {
         this.showSeeAll = false;
         this.showHeader = false;
       }
-    }
+    },
+    blurSelection(){
+      if (this.$refs && this.$refs.newsTargetRefs && this.$refs.newsTargetRefs.isFocused) {
+        this.$refs.newsTargetRefs.isFocused = false;
+        this.$refs.newsTargetRefs.isMenuActive = false;
+      } else if (this.$refs && this.$refs.viewTemplateRefs && this.$refs.viewTemplateRefs.isFocused) {
+        this.$refs.viewTemplateRefs.isFocused = false;
+        this.$refs.viewTemplateRefs.isMenuActive = false;
+      }
+    },
   },
 };
 </script>

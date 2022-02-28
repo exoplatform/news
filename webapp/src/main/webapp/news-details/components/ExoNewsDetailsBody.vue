@@ -40,21 +40,26 @@
                 <div class="newsPosted d-flex align-center">
                   <exo-user
                     :profile-id="authorProfile"
-                    class="me-1"
+                    extra-class="me-1"
                     fullname
                     small-font-size
                     link-style
                     popover />
                   <span v-if="!hiddenSpace" class="text-light-color caption"> {{ $t('news.activity.in') }} </span>
-                  <div v-if="!hiddenSpace" class="newsSpace px-1 caption">
-                    <a :href="spaceUrl" class="news-details-information">{{ spaceDisplayName }}</a>
-                  </div>
+                  <exo-space-avatar
+                    v-if="!hiddenSpace"
+                    :space-id="spaceId"
+                    fullname
+                    extra-class="mx-1"
+                    small-font-size
+                    link-style
+                    popover />
                   <template v-if="publicationDate">
                     -
                     <date-format
                       :value="publicationDate"
                       :format="dateFormat"
-                      class="newsInformationValue newsPostedDate news-details-information caption" />
+                      class="newsInformationValue newsPostedDate news-details-information caption ms-1" />
                   </template>
                   <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
@@ -85,7 +90,13 @@
                     </template>
                     <div v-if="notSameUpdater && showUpdateInfo">
                       <span class="text-light-color"> {{ $t('news.activity.by') }} </span>
-                      <a :href="updaterProfileURL" class="newsUpdaterName">{{ updaterFullName }}</a>
+                      <exo-user
+                        :profile-id="newsUpdater"
+                        extra-class="ms-1"
+                        fullname
+                        small-font-size
+                        link-style
+                        popover />
                     </div>
                   </div>
                 </div>
@@ -174,6 +185,9 @@ export default {
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
     },
+    newsUpdater() {
+      return this.news && this.news.updater;
+    },
     publicationDate() {
       return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
     },
@@ -183,11 +197,8 @@ export default {
     newsSummary() {
       return this.news && this.targetBlank(this.news.summary);
     },
-    spaceDisplayName() {
-      return this.news && this.news.spaceDisplayName;
-    },
-    spaceUrl() {
-      return this.news && this.news.spaceUrl;
+    spaceId() {
+      return this.news && this.news.spaceId;
     },
     postedDate() {
       return this.news && this.news.postedDate;

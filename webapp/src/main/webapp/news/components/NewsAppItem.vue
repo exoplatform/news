@@ -56,12 +56,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             small-font-size
             popover />
           <i v-if="!news.hiddenSpace" class="uiIconArrowNext pt-1"></i>
-          <span v-if="!news.hiddenSpace" class="newsSpace">
-            <a :href="news.spaceUrl" class="newsSpaceName caption">
-              <img :src="news.spaceAvatarUrl" role="presentation">
-              <span>{{ news.spaceDisplayName }}</span>
-            </a>
-          </span>
+          <exo-space-avatar
+            v-if="!news.hiddenSpace"
+            :space-id="spaceId"
+            :size="25"
+            extra-class="ps-1"
+            small-font-size
+            popover />
         </div>
         <div v-if="!draftNews" class="newsDate pe-4">
           <i v-if="displayClock" class="uiIconClock"></i>
@@ -152,6 +153,9 @@ export default {
     },
     draftNews() {
       return this.news && this.news.draft;
+    },
+    spaceId() {
+      return this.news && this.news.spaceId;
     },
     newsAuthor() {
       return this.news && this.news.authorProfileURL && this.news.authorProfileURL.split('/').pop();

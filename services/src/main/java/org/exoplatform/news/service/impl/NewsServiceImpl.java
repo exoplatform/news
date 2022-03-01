@@ -452,7 +452,7 @@ public class NewsServiceImpl implements NewsService {
 
     ExoSocialActivity activity = new ExoSocialActivityImpl();
     activity.setTitle("");
-    activity.setBody("");
+    activity.setBody(news.getBody());
     activity.setType("news");
     activity.setUserId(poster.getId());
     activity.isHidden(news.isActivityPosted());

@@ -23,6 +23,8 @@ public class NewsFilter {
 
   private List<String> spaces;
 
+  private List<String> tagNames;
+
   private String       author;
 
   private int          offset;

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
@@ -571,10 +572,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                          @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,
                          @ApiParam(value = "Properties to expand", required = false) @QueryParam("expand") String expand,
                          @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam("offset") int offset,
+                         @ApiParam(value = "Tag names used to search news", required = true) @QueryParam("tags") List<String> tagNames,
                          @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit,
                          @ApiParam(value = "Favorites", required = false, defaultValue = "false") @QueryParam("favorites") boolean favorites) {
 
-    if (StringUtils.isBlank(query) && !favorites) {
+    if (StringUtils.isBlank(query) && !favorites && CollectionUtils.isEmpty(tagNames)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("'query' parameter is mandatory").build();
     }
 
@@ -592,6 +594,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     filter.setFavorites(favorites);
     filter.setLimit(limit);
     filter.setOffset(offset);
+    filter.setTagNames(tagNames);
     List<NewsESSearchResult> searchResults = newsService.search(currentIdentity, filter);
     List<NewsSearchResultEntity> results =
                                          searchResults.stream()

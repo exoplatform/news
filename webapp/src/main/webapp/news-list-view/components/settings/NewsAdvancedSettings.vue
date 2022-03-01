@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showHeader"
           dense
-          :disabled="displaySeeAllButton"
+          :disabled="displaySliderButton"
           @change="selectedOption('showHeader', showHeader)"
           class="displaySeeAllButton my-auto" />
       </v-list-item-action>
@@ -68,7 +68,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showSeeAll"
           dense
-          :disabled="displayHeaderTitle"
+          :disabled="displaySliderButton"
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="displayHeaderTitle my-auto" />
       </v-list-item-action>
@@ -83,11 +83,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-list-item-action>
         <input
           v-model="seeAllUrl"
+          :disabled="disableSeeAllLink"
           type="url"
           id="seeLink"
           name="seeLink"
           required
-          @change="$emit('see-all-url', seeAllUrl)"
+          @keyup="$emit('see-all-url', seeAllUrl)"
           class="seeLink input-block-level ignore-vuetify-classes">
       </v-list-item-action>
     </v-list-item>
@@ -117,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleSummary"
           dense
-          :disabled="displayArticleSummary"
+          :disabled="displayLatestButton"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
@@ -148,7 +149,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleAuthor"
           dense
-          :disabled="displayArticleAuthor"
+          :disabled="displayLatestButton"
           @change="selectedOption('showArticleAuthor', showArticleAuthor)"
           class="my-auto" />
       </v-list-item-action>
@@ -234,16 +235,13 @@ export default {
     limit: null
   }),
   computed: {
-    displaySeeAllButton() {
+    displaySliderButton() {
       return this.viewTemplate === 'NewsSlider';
     },
-    displayHeaderTitle() {
-      return this.viewTemplate === 'NewsSlider';
+    disableSeeAllLink() {
+      return this.viewTemplate === 'NewsSlider' || (this.viewTemplate === 'NewsLatest' && this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0) || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
     },
-    displayArticleSummary() {
-      return this.viewTemplate === 'NewsLatest';
-    },
-    displayArticleAuthor() {
+    displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';
     },
   },

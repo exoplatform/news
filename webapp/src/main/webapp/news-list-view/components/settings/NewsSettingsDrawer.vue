@@ -29,7 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           icon
           text>
           <v-icon
-            @click="showAdvancedSettings = !showAdvancedSettings">
+            @click="switchSettingsDrawer">
             mdi-keyboard-backspace
           </v-icon>
         </v-btn>
@@ -347,9 +347,6 @@ export default {
         return this.$t(label);
       }
     },
-    showAdvancedSettings() {
-      this.showAdvancedSettings = !this.showAdvancedSettings;
-    },
     selectedOption(selectedOption, optionValue) {
       switch (selectedOption) {
       case 'showArticleSpace':
@@ -393,7 +390,7 @@ export default {
         this.showHeader = false;
       }
     },
-    blurSelection(){
+    blurSelection() {
       if (this.$refs && this.$refs.newsTargetRefs && this.$refs.newsTargetRefs.isFocused) {
         this.$refs.newsTargetRefs.isFocused = false;
         this.$refs.newsTargetRefs.isMenuActive = false;
@@ -402,6 +399,10 @@ export default {
         this.$refs.viewTemplateRefs.isMenuActive = false;
       }
     },
+    switchSettingsDrawer() {
+      this.showAdvancedSettings = !this.showAdvancedSettings;
+      this.reset();
+    }
   },
 };
 </script>

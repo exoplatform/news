@@ -89,6 +89,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           name="seeLink"
           required
           @keyup="$emit('see-all-url', seeAllUrl)"
+          @change="$emit('see-all-url', seeAllUrl)"
           class="seeLink input-block-level ignore-vuetify-classes">
       </v-list-item-action>
     </v-list-item>
@@ -223,6 +224,10 @@ export default {
     viewTemplate: {
       type: String,
       default: '',
+    },
+    seeAllUrl: {
+      type: String,
+      default: '',
     }
   },
   data: () => ({
@@ -231,7 +236,6 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
-    seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
     limit: null
   }),
   computed: {
@@ -239,7 +243,7 @@ export default {
       return this.viewTemplate === 'NewsSlider';
     },
     disableSeeAllLink() {
-      return this.viewTemplate === 'NewsSlider' || (this.viewTemplate === 'NewsLatest' && this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0) || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
+      return this.viewTemplate === 'NewsSlider' || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
     },
     displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';

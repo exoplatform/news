@@ -204,7 +204,7 @@ export default {
       return this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0) || (this.seeAllUrl && this.seeAllUrl.length === 0);
+      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0) || (this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {

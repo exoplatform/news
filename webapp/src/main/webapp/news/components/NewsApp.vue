@@ -257,18 +257,6 @@ export default {
       } else {
         this.newsList = result;
       }
-
-      window.require(['SHARED/social-ui-profile'], function (socialProfile) {
-        const labels = {
-          StatusTitle: 'Loading...',
-          Connect: 'Connect',
-          Confirm: 'Confirm',
-          CancelRequest: 'Cancel Request',
-          RemoveConnection: 'Remove Connection',
-          Ignore: 'Ignore'
-        };
-        socialProfile.initUserProfilePopup('newsListItems', labels);
-      });
     },
     fetchNews(append = true) {
       this.loadingNews = true;

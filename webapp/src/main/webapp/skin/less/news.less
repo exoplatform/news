@@ -542,30 +542,7 @@
     }
       .news-header-content {
         display: inline-flex;
-
-        .activityAvatar.avatarCircle {
-          margin: 5px;
-        }
-
         .newsInformation {
-          padding: 5px;
-          justify-content: center;
-          font-size: 12px;
-
-          .newsPosted {
-            display: flex;
-
-            .newsAuthorName {
-              color: black !important;
-              padding-right: 5px ~'; /** orientation=lt */ ';
-              padding-left: 5px ~'; /** orientation=rt */ ';
-            }
-            .newsSpace a {
-              color: #476a9c !important;
-              margin: 0 5px;
-              cursor: pointer;
-            }
-          }
           .newsUpdater {
             display: -webkit-box;
             text-align: -webkit-center;
@@ -576,20 +553,9 @@
             }
           }
 
-        .newsInformationLabel {
-          color: @textLightColor;
-        }
-
         .newsInformationValue {
           color: grey;
         }
-
-          a {
-            color: @grayDark;
-            &:hover {
-              color: @primaryColor;
-            }
-          }
         }
       }
 
@@ -2169,19 +2135,6 @@
         }
 
     .newsInfo {
-      display: flex;
-      align-items: center;
-      padding: 0 0 5px;
-
-      > div {
-        display: flex;
-        padding-right: 20px ~'; /** orientation=lt */ ';
-        padding-left: 20px ~'; /** orientation=rt */ ';
-        margin-bottom: 0;
-        font-style: italic;
-        font-size: 13px;
-      }
-
       .newsDate {
         color: @color-appNews-information;
         .newsTime {
@@ -2214,7 +2167,6 @@
       }
 
       .newsOwner {
-        align-items: center;
 
         &> a {
           color: @color-appNews-information;
@@ -3385,28 +3337,6 @@
   .news-header-content {
     display: flex;
     width: 100%;
-
-    .avatarCircle {
-      background-color: #f9f9f9;
-      background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
-      background-repeat: repeat-x;
-      width: 35px;
-      height: 35px;
-      border-radius: 100px;
-      border: 1px solid #efefef;
-      padding: 0px;
-      position: relative;
-      text-align: center;
-      margin-left: 6px ~'!important; /** orientation=lt */ ';
-      margin-right: 6px ~'!important; /** orientation=rt */ ';
-      margin-top: 12px !important;
-    }
-
-    .avatarCircle img {
-      max-height: 45px;
-      max-width: 45px;
-      margin: -1px;
-    }
   }
 
   .uiIconBack {

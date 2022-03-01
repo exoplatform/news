@@ -27,39 +27,48 @@
             </div>
           </div>
           <div class="newsInformationBackground">
-            <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content">
+            <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content  d-inline-flex align-center">
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
-                <div class="activityAvatar avatarCircle">
-                  <a :href="authorProfileURL">
-                    <img
-                      :src="authorAvatarURL"
-                      class="avatar"
-                      role="presentation">
-                  </a>
-                </div>
+                <exo-user-avatar 
+                  :profile-id="authorProfile"
+                  :size="50"
+                  class="me-1"
+                  popover
+                  avatar />
               </div>
-              <div id="informationNews" class="newsInformation">
-                <div class="newsPosted">
-                  <a :href="authorProfileURL" class="newsInformationValue newsAuthorName news-details-information"> {{ authorFullName }} </a>
-                  <span v-if="!hiddenSpace" class="newsInformationLabel"> {{ $t('news.activity.in') }} </span>
-                  <div v-if="!hiddenSpace" class="newsSpace">
-                    <a :href="spaceUrl" class="newsInformationLabel news-details-information">{{ spaceDisplayName }}</a>
-                  </div>
+              <div id="informationNews" class="newsInformation pa-1">
+                <div class="newsPosted d-flex align-center">
+                  <exo-user-avatar
+                    :profile-id="authorProfile"
+                    extra-class="me-1"
+                    fullname
+                    small-font-size
+                    link-style
+                    popover />
+                  <span v-if="!hiddenSpace" class="text-light-color caption"> {{ $t('news.activity.in') }} </span>
+                  <exo-space-avatar
+                    v-if="!hiddenSpace"
+                    :space-id="spaceId"
+                    fullname
+                    extra-class="mx-1"
+                    small-font-size
+                    link-style
+                    popover />
                   <template v-if="publicationDate">
                     -
                     <date-format
                       :value="publicationDate"
                       :format="dateFormat"
-                      class="newsInformationValue newsPostedDate news-details-information" />
+                      class="newsInformationValue newsPostedDate news-details-information caption ms-1" />
                   </template>
                   <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
-                <div class="newsUpdater">
+                <div class="newsUpdater caption">
                   <div v-if="publicationState !== 'staged' && showUpdateInfo">
-                    <span class="newsInformationLabel">{{ $t('news.activity.lastUpdated') }} </span>
+                    <span class="text-light-color">{{ $t('news.activity.lastUpdated') }} </span>
                   </div>
                   <div v-else-if="publicationState === 'staged'">
-                    <span class="newsInformationLabel">{{ $t('news.details.scheduled') }} </span>
+                    <span class="text-light-color">{{ $t('news.details.scheduled') }} </span>
                   </div>
                   <div>
                     <template v-if="publicationState !== 'staged' && updatedDate && showUpdateInfo">
@@ -80,8 +89,14 @@
                         class="newsInformationValue newsUpdatedDate ml-1 me-1" />
                     </template>
                     <div v-if="notSameUpdater && showUpdateInfo">
-                      <span class="newsInformationLabel"> {{ $t('news.activity.by') }} </span>
-                      <a :href="updaterProfileURL" class="newsInformationValue newsUpdaterName">{{ updaterFullName }}</a>
+                      <span class="text-light-color"> {{ $t('news.activity.by') }} </span>
+                      <exo-user-avatar
+                        :profile-id="newsUpdater"
+                        extra-class="ms-1"
+                        fullname
+                        small-font-size
+                        link-style
+                        popover />
                     </div>
                   </div>
                 </div>
@@ -155,14 +170,8 @@ export default {
     showUpdateInfo() {
       return this.news && this.news.updateDate && this.news.updater !=='__system' && this.news.updateDate !== 'null' && this.news.publicationDate && this.news.publicationDate !== 'null' && this.news.updateDate.time > this.news.publicationDate.time;
     },
-    authorFullName() {
-      return this.news && (this.news.authorFullName || this.news.authorDisplayName);
-    },
-    authorProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.author}`;
-    },
-    authorAvatarURL() {
-      return this.news && (this.news.profileAvatarURL || this.news.authorAvatarUrl);
+    authorProfile() {
+      return this.news && this.news.author;
     },
     hiddenSpace() {
       return this.news && this.news.hiddenSpace;
@@ -176,6 +185,9 @@ export default {
     updaterProfileURL() {
       return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
     },
+    newsUpdater() {
+      return this.news && this.news.updater;
+    },
     publicationDate() {
       return this.news && this.news.publicationDate && this.news.publicationDate.time && new Date(this.news.publicationDate.time);
     },
@@ -185,11 +197,8 @@ export default {
     newsSummary() {
       return this.news && this.targetBlank(this.news.summary);
     },
-    spaceDisplayName() {
-      return this.news && this.news.spaceDisplayName;
-    },
-    spaceUrl() {
-      return this.news && this.news.spaceUrl;
+    spaceId() {
+      return this.news && this.news.spaceId;
     },
     postedDate() {
       return this.news && this.news.postedDate;

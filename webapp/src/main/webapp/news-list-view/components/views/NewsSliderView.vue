@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         dark>
         <v-img
           class="articleImage fill-height"
-          :src="item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'"
+          :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'"
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
@@ -43,13 +43,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <v-icon>mdi-cog</v-icon>
               </v-btn>
             </div>
-            <a :href="item.url" class="flex flex-row flex-grow-1 align-center justify-center slider-header">
+            <a
+              v-if="showArticleTitle"
+              :href="item.url"
+              class="flex flex-row flex-grow-1 align-center justify-center slider-header">
               <span class="articleTitle text-h4 font-weight-medium white--text">
                 {{ item.title }}
               </span>
             </a>
             <div class="flex flex-row flex-grow-1 align-center mx-4 my-2">
-              <span class="white--text articleSummary"> {{ item.summary }}</span>
+              <span v-if="showArticleSummary" class="white--text articleSummary"> {{ item.summary }}</span>
               <news-slider-view-item
                 :author="item.author"
                 :author-display-name="item.authorDisplayName"
@@ -64,6 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :views-count="item.viewsCount"
                 :hidden-space="item.hiddenSpace"
                 :space-member="item.spaceMember"
+                :selected-option="selectedOption"
                 class="d-flex flex-row newsSliderItem align-center justify-center pa-2 ms-2" />
             </div>
           </div>
@@ -96,11 +100,23 @@ export default {
         hour: '2-digit',
         minute: '2-digit',
       },
+      showHeader: false,
+      showSeeAll: false,
+      showArticleTitle: true,
+      showArticleSummary: true,
+      showArticleImage: true,
+      showArticleAuthor: true,
+      showArticleSpace: true,
+      showArticleDate: true,
+      showArticleReactions: true,
+      seeAllUrl: '',
+      selectedOption: null,
     };
   },
   created() {
-    this.getNewsList();
+    this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
+    this.getNewsList();
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
@@ -123,10 +139,42 @@ export default {
           .finally(() => this.initialized = false);
       }
     },
-    refreshNewsViews(selectedTarget){
+    refreshNewsViews(selectedTarget, selectedOption){
+      this.showArticleSummary = selectedOption.showArticleSummary;
+      this.showArticleTitle = selectedOption.showArticleTitle;
+      this.showArticleImage = selectedOption.showArticleImage;
+      this.seeAllUrl = selectedOption.seeAllUrl;
+      this.limit = selectedOption.limit;
+      this.selectedOption = selectedOption;
       this.newsTarget = selectedTarget;
       this.getNewsList();
-    }
+    },
+    reset() {
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showArticleSummary = this.$root.showArticleSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
+      this.showArticleReactions = this.$root.showArticleReactions;
+      this.seeAllUrl = this.$root.seeAllUrl;
+      this.selectedOption = {
+        limit: this.limit,
+        showHeader: this.showHeader,
+        showSeeAll: this.showSeeAll,
+        showArticleTitle: this.showArticleTitle,
+        showArticleSummary: this.showArticleSummary,
+        showArticleAuthor: this.showArticleAuthor,
+        showArticleSpace: this.showArticleSpace,
+        showArticleDate: this.showArticleDate,
+        showArticleReactions: this.showArticleReactions,
+        showArticleImage: this.showArticleImage,
+        seeAllUrl: this.seeAllUrl,
+      };
+    },
   }
 };
 </script>

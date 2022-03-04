@@ -217,9 +217,7 @@ export function canUserCreateNews(spaceId) {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then((resp) => resp.json()).then(resp => {
-    return resp;
-  });
+  }).then((resp) => resp && resp.ok && resp.json());
 }
 
 export function canScheduleNews(spaceId) {
@@ -228,9 +226,7 @@ export function canScheduleNews(spaceId) {
       'Content-Type': 'application/json'
     },
     method: 'GET'
-  }).then((resp) => resp.json()).then(resp => {
-    return resp;
-  });
+  }).then((resp) => resp && resp.ok && resp.json());
 }
 
 export function deleteNews(newsId, isDraft, delay) {

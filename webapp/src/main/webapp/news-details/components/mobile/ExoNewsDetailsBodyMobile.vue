@@ -6,13 +6,11 @@
     <div class="d-flex flex-row pa-2 ms-2">
       <div v-if="news" class="flex-column newsAuthor">
         <exo-user-avatar
-          :username="newsAuthor"
-          :fullname="authorFullName"
+          :profile-id="newsAuthor"
           :size="32"
-          :title="newsAuthor"
-          :retrieve-extra-information="false"
-          :labels="labels"
-          class="align-center my-auto text-truncate flex-grow-0 flex" />
+          class="align-center my-auto text-truncate flex-grow-0 flex"
+          bold-title
+          link-style />
       </div>
       <v-icon>
         mdi-chevron-right
@@ -23,7 +21,6 @@
         <exo-space-avatar
           :space="space"
           :size="32"
-          :labels="labels"
           class="align-center my-auto text-truncate flex-grow-0 flex"
           bold-title
           link-style />
@@ -91,19 +88,6 @@ export default {
     spaceUrl() {
       return this.news && this.news.spaceAvatarUrl;
     },
-    labels() {
-      return {
-        CancelRequest: this.$t('profile.CancelRequest'),
-        Confirm: this.$t('profile.Confirm'),
-        Connect: this.$t('profile.Connect'),
-        Ignore: this.$t('profile.Ignore'),
-        RemoveConnection: this.$t('profile.RemoveConnection'),
-        StatusTitle: this.$t('profile.StatusTitle'),
-        join: this.$t('space.join'),
-        leave: this.$t('space.leave'),
-        members: this.$t('space.members'),
-      };
-    },
     publicationState() {
       return this.news && this.news.publicationState;
     },
@@ -112,9 +96,6 @@ export default {
     },
     newsBody() {
       return this.news && this.targetBlank(this.news.body);
-    },
-    authorFullName() {
-      return this.news && (this.news.authorFullName || this.news.authorDisplayName);
     },
     newsAuthor() {
       return this.news && this.news.author;

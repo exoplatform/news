@@ -537,6 +537,9 @@ export default {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink,selectImage';
       }
+      if (eXo.env.portal.activityTagsEnabled) {
+        extraPlugins = `${extraPlugins},tagSuggester`;
+      }
       CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
       // this line is mandatory when a custom skin is defined
 
@@ -967,7 +970,10 @@ export default {
     },
     onHideAttachmentsDrawer: function(){
       const spanBadge = document.getElementById('badge');
-      spanBadge.innerHTML = String(this.news.attachments.length);
+      if (spanBadge) {
+        const attachmentsLength = this.news && this.news.attachments && this.news.attachments.length || 0;
+        spanBadge.innerHTML = `${attachmentsLength}`;
+      }
     },
     setUploadingCount: function(uploadingCount) {
       this.uploading = uploadingCount > 0;

@@ -62,6 +62,17 @@ export function init(params) {
   const saveSettingsURL = params.saveSettingsURL;
   const newsTarget = params.newsTarget;
   const header = params.header;
+  const limit = params.limit === '' ? '4' : params.limit;
+  const showHeader = viewTemplate === 'NewsSlider' ? false: params.showHeader === 'true';
+  const showSeeAll = viewTemplate === 'NewsSlider' ? false: params.showSeeAll === 'true';
+  const showArticleTitle = params.showArticleTitle === '' ? true : params.showArticleTitle === 'true';
+  const showArticleSummary = viewTemplate === 'NewsLatest' ? false: params.showArticleSummary === 'true';
+  const showArticleImage = params.showArticleImage === '' ? true : params.showArticleImage === 'true';
+  const showArticleAuthor = viewTemplate === 'NewsLatest' ? false: params.showArticleAuthor === 'true';
+  const showArticleSpace = params.showArticleSpace === '' ? true : params.showArticleSpace === 'true';
+  const showArticleReactions = params.showArticleReactions === '' ? true : params.showArticleReactions === 'true';
+  const showArticleDate  = params.showArticleDate === '' ? true : params.showArticleDate === 'true';
+  const seeAllUrl = params.seeAllUrl;
 
   exoi18n.loadLanguageAsync(lang, url).then(i18n => {
     // init Vue app when locale resources are ready
@@ -71,12 +82,34 @@ export function init(params) {
         viewTemplate,
         newsTarget,
         header,
+        limit,
+        showHeader,
+        showSeeAll,
+        showArticleTitle,
+        showArticleSummary,
+        showArticleImage,
+        showArticleAuthor,
+        showArticleSpace,
+        showArticleReactions,
+        showArticleDate,
+        seeAllUrl,
       },
       template: `<news-list-view
                   id="${appId}"
                   :view-template="viewTemplate"
                   :news-target="newsTarget"
-                  :header="header" />`,
+                  :header="header"
+                  :show-article-author="showArticleAuthor"
+                  :show-article-image="showArticleImage"
+                  :show-article-reactions="showArticleReactions"
+                  :show-article-space="showArticleSpace"
+                  :show-article-title="showArticleTitle"
+                  :show-header="showHeader"
+                  :show-see-all="showSeeAll"
+                  :show-article-date="showArticleDate"
+                  :show-article-summary="showArticleSummary"
+                  :limit="limit"
+                  :see-all-url="seeAllUrl"/>`,
       vuetify: Vue.prototype.vuetifyOptions,
       i18n,
     }, `#${appId}`, `News List View - ${viewTemplate}`);

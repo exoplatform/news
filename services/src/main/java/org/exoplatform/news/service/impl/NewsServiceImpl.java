@@ -598,6 +598,7 @@ public class NewsServiceImpl implements NewsService {
       if (post) {
         activity.setUpdated(System.currentTimeMillis());
       }
+      activity.setBody(news.getBody());
       activity.isHidden(news.isActivityPosted());
       activityManager.updateActivity(activity, true);
     }

@@ -89,7 +89,7 @@ export default {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.newsInfo = newsList.news;
+            this.newsInfo = newsList.news.filter(news => news.archived === false);
             if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
               this.getSpaceById(this.newsInfo[0].spaceId);
             }

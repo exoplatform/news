@@ -16,7 +16,7 @@
       :show-delete-button="showDeleteButton"
       :show-publish-button="showPublishButton" />
     <exo-news-favorite-action
-      v-if="publicationState !== 'staged'"
+      v-if="displayFavoriteButton"
       :news="news"
       :activity-id="activityId"
       class="mt-6 pull-right" />
@@ -91,6 +91,9 @@ export default {
     },
     lastVisitedPage(){
       return history && history.length && history.length > 2;
+    },
+    displayFavoriteButton() {
+      return this.showEditButton && this.publicationState !== 'staged';
     }
   },
   methods: {

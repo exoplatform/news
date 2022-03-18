@@ -280,13 +280,14 @@ export default {
       }
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      if ( postDate && scheduleDate){
-        const postDateString = postDate.getFullYear().toString() + postDate.getMonth().toString()+ postDate.getDate().toString();
-        const scheduleDateString = scheduleDate.getFullYear().toString() + scheduleDate.getMonth().toString() + scheduleDate.getDate().toString();
-        if ( !this.isDisabledTime){
-          this.disabled = postDateString=== scheduleDateString;
-        }
-      }
+      
+      const postDateString = postDate.getFullYear().toString() + postDate.getMonth().toString()+ postDate.getDate().toString() ;
+      const scheduleDateString = scheduleDate.getFullYear().toString() + scheduleDate.getMonth().toString() + scheduleDate.getDate().toString();
+      
+      const postTimeString = postDate.getHours().toString() + postDate.getMinutes().toString();
+      const scheduleTimeString = scheduleDate.getHours().toString() + scheduleDate.getMinutes().toString();
+
+      this.disabled = ( (  postDateString ===  scheduleDateString ) && ( postTimeString  === scheduleTimeString  ) ) ;
       postDate.setHours(this.postDateTime.getHours());
       postDate.setMinutes(this.postDateTime.getMinutes());
       postDate.setSeconds(0);
@@ -297,18 +298,6 @@ export default {
         return;
       }
       const newDate = new Date(this.postDate);
-      const newTime = new Date(newVal);
-      const scheduleTime = new Date(this.schedulePostDate);
-      if ( newTime && scheduleTime ){
-        const postTimeString = newTime.getHours().toString() + newTime.getMinutes().toString();
-        const scheduleTimeString = scheduleTime.getHours().toString() + scheduleTime.getMinutes().toString() ;
-        this.disabled = postTimeString === scheduleTimeString;
-        if (!this.disabled){
-          this.isDisabledTime=true;
-        } else {
-          this.isDisabledTime=false;
-        }
-      }
       newDate.setHours(this.postDateTime.getHours());
       newDate.setMinutes(this.postDateTime.getMinutes());
       newDate.setSeconds(0);

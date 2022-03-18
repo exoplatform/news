@@ -39,6 +39,10 @@ export default {
       type: Array,
       default: null,
     },
+    activityType: {
+      type: Array,
+      default: null,
+    },
   },
   computed: {
     link() {
@@ -50,7 +54,7 @@ export default {
       }
     },
     displayButton() {
-      return this.message && this.message.length > this.maxMessageLength;
+      return this.message && this.message.length > this.maxMessageLength && this.activityType && this.activityType.length === 0;
     },
   },
   methods: {

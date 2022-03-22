@@ -258,7 +258,6 @@ export default {
     },
   },
   data: () => ({
-    isDisabledTime: false,
     stepper: 0,
     drawer: false,
     postArticleMode: 'later',
@@ -275,6 +274,7 @@ export default {
   }),
   watch: {
     postDate(newVal, oldVal) {
+      console.log('newVal',newVal ,' oldVal ',new Date(newVal).getTime() );
       if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }

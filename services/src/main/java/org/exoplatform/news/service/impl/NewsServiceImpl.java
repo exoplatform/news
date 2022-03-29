@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +31,7 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
+import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.common.RealtimeListAccess;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
@@ -40,8 +42,10 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.*;
 import org.exoplatform.social.notification.LinkProviderUtils;
+import org.exoplatform.social.rest.api.RestUtils;
 import org.exoplatform.upload.UploadService;
 
 import javax.jcr.ItemNotFoundException;
@@ -57,6 +61,8 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String   NEWS_ID                         = "newsId";
 
+  public static final MetadataType METADATA_TYPE = new MetadataType(5, "archives");
+
   public SpaceService          spaceService;
 
   private ActivityManager       activityManager;
@@ -65,7 +71,9 @@ public class NewsServiceImpl implements NewsService {
 
   private NewsESSearchConnector newsESSearchConnector;
 
-  private IndexingService       indexingService;
+  private IndexingService indexingService;
+
+  private MetadataService metadataService;
 
   private NewsStorage           newsStorage;
 
@@ -83,7 +91,8 @@ public class NewsServiceImpl implements NewsService {
                          IndexingService indexingService,
                          NewsStorage newsStorage,
                          UserACL userACL,
-                         NewsTargetingService newsTargetingService) {
+                         NewsTargetingService newsTargetingService,
+                         MetadataService metadataService) {
     this.spaceService = spaceService;
     this.activityManager = activityManager;
     this.identityManager = identityManager;
@@ -92,6 +101,7 @@ public class NewsServiceImpl implements NewsService {
     this.newsStorage = newsStorage;
     this.userACL = userACL;
     this.newsTargetingService = newsTargetingService;
+    this.metadataService = metadataService;
   }
 
   /**
@@ -141,14 +151,14 @@ public class NewsServiceImpl implements NewsService {
             || spaceService.isMember(space, currentIdentity.getUserId()) && (ArrayUtils.isEmpty(space.getRedactors())
             || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)));
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
-    
-    if (!canEditNews(news, updater)) {  
+
+    if (!canEditNews(news, updater)) {
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
     Set<String> previousMentions = NewsUtils.processMentions(news.getBody());
@@ -167,7 +177,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     newsStorage.updateNews(news);
-    
+
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
       // Send mention notifs
       if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
@@ -207,7 +217,7 @@ public class NewsServiceImpl implements NewsService {
     indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -241,7 +251,7 @@ public class NewsServiceImpl implements NewsService {
     }
     return news;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -254,7 +264,7 @@ public class NewsServiceImpl implements NewsService {
       throw new Exception("An error occurred while retrieving news with id " + newsId, e);
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -275,7 +285,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNewsByTargetName(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
+    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName,newsFilter.isArchivedNews(), newsFilter.getOffset(), newsFilter.getLimit());
     return newsTargetItems.stream().map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
@@ -286,7 +296,7 @@ public class NewsServiceImpl implements NewsService {
       }
     }).collect(Collectors.toList());
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -294,7 +304,7 @@ public class NewsServiceImpl implements NewsService {
   public int getNewsCount(NewsFilter newsFilter) throws Exception {
     return newsStorage.getNewsCount(newsFilter);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -302,7 +312,7 @@ public class NewsServiceImpl implements NewsService {
   public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
     return newsStorage.searchNews(filter, lang);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -336,7 +346,7 @@ public class NewsServiceImpl implements NewsService {
     }
     return getNewsById(newsId, currentIdentity, false);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -365,7 +375,7 @@ public class NewsServiceImpl implements NewsService {
     newsTargetingService.deleteNewsTargets(news.getId());
     return newsStorage.unScheduleNews(news);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -373,7 +383,7 @@ public class NewsServiceImpl implements NewsService {
   public List<NewsESSearchResult> search(Identity currentIdentity, NewsFilter filter) {
     return newsESSearchConnector.search(currentIdentity, filter);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -440,7 +450,7 @@ public class NewsServiceImpl implements NewsService {
 
   /**
    * Post the news activity in the given space
-   * 
+   *
    * @param news The news to post as an activity
    * @throws Exception when error
    */
@@ -463,15 +473,15 @@ public class NewsServiceImpl implements NewsService {
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
     newsStorage.updateNewsActivities(activity.getId(), news);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public void archiveNews(String newsId) throws Exception {
     newsStorage.archiveNews(newsId);
+    this.createMetaDataArchive(newsId ,RestUtils.getCurrentUserIdentityId());
   }
-  
   /**
    * {@inheritDoc}
    */
@@ -510,8 +520,8 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void unarchiveNews(String newsId) throws Exception {
     newsStorage.unarchiveNews(newsId);
+    this.deleteMetaDataArchive(newsId,RestUtils.getCurrentUserIdentityId());
   }
-  
   /**
    * {@inheritDoc}
    */
@@ -519,7 +529,7 @@ public class NewsServiceImpl implements NewsService {
   public boolean canScheduleNews(Space space, org.exoplatform.services.security.Identity currentIdentity) {
     return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -575,7 +585,7 @@ public class NewsServiceImpl implements NewsService {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }
-  
+
   private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
     Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
@@ -591,7 +601,7 @@ public class NewsServiceImpl implements NewsService {
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }
-  
+
   private void updateNewsActivity(News news, boolean post) {
     ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
     if(activity != null) {
@@ -603,7 +613,7 @@ public class NewsServiceImpl implements NewsService {
       activityManager.updateActivity(activity, true);
     }
   }
-  
+
   private boolean canEditNews(News news, String authenticatedUser) {
     String spaceId = news.getSpaceId();
     Space space = spaceId == null ? null : spaceService.getSpaceById(spaceId);
@@ -633,7 +643,7 @@ public class NewsServiceImpl implements NewsService {
     }
     return false;
   }
-  
+
   private boolean canDeleteNews(org.exoplatform.services.security.Identity currentIdentity, String posterId, String spaceId) {
     if (currentIdentity == null) {
       return false;
@@ -643,7 +653,7 @@ public class NewsServiceImpl implements NewsService {
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
         || spaceService.isManager(currentSpace, authenticatedUser);
   }
-  
+
   private boolean isMemberOfsharedInSpaces(News news, String username) {
     for (String sharedInSpaceId : news.getSharedInSpacesList()) {
       Space sharedInSpace = spaceService.getSpaceById(sharedInSpaceId);
@@ -653,4 +663,37 @@ public class NewsServiceImpl implements NewsService {
     }
     return false;
   }
+
+  private void createMetaDataArchive(String newId , long userIdentityId) throws
+                                                 ObjectAlreadyExistsException {
+    MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(),"0",0);
+    MetadataObject metadataObject = new MetadataObject("archives",newId);
+
+    metadataService.createMetadataItem(metadataObject,
+                                       metadataKey,
+                                       userIdentityId);
+  }
+
+  public void deleteMetaDataArchive(String newId ,long userIdentityId) throws ObjectNotFoundException {
+    MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(),"0",0);
+    MetadataObject metadataObject = new MetadataObject("archives",newId);
+
+    List<MetadataItem> archives = metadataService.getMetadataItemsByMetadataAndObject(metadataKey, metadataObject);
+    if (CollectionUtils.isEmpty(archives)) {
+      throw new ObjectNotFoundException("archive entity not found for archives " + archives);
+    }
+    for (MetadataItem archive : archives) {
+      metadataService.deleteMetadataItem(archive.getId(), userIdentityId);
+    }
+  }
+  @Override
+  public boolean isArchived(long userIdentityId,String newId) throws Exception {
+
+    MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(), String.valueOf(userIdentityId), userIdentityId);
+    MetadataObject metadataObject = new MetadataObject("archives",newId);
+    List<MetadataItem> archives = metadataService.getMetadataItemsByMetadataAndObject(metadataKey,metadataObject);
+
+    return !archives.isEmpty();
+  }
+
 }

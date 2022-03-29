@@ -255,7 +255,7 @@ public class NewsTargetingImplTest {
     when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", PublicationDefaultStates.STAGED, String.valueOf(false),0,10)).thenReturn(metadataItems);
 
     // When
-    List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);
+    List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets",false, 0, 10);
 
     // Then
     assertNotNull(newsTargetsItems);

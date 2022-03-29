@@ -11,6 +11,7 @@ import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.upload.UploadService;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,10 +61,12 @@ public class NewsServiceImplTest {
 
     private NewsService newsService;
 
+    private MetadataService metadataService;
+    
     @Before
     public void setUp() {
         this.newsService = new NewsServiceImpl(spaceService, activityManager, identityManager, uploadService,
-                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService);
+                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService, metadataService);
     }
 
     @Test

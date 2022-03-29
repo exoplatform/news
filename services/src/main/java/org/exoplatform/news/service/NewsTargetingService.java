@@ -63,7 +63,7 @@ public interface NewsTargetingService {
    * 
    * @return {@link List} of {@link News} target items by a target name
    */
-  List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit);
+  List<MetadataItem> getNewsTargetItemsByTargetName(String targetName,boolean isArchived, long offset, long limit);
 
   /**
    * Gets the {@link List} of referenced targets from {@link News} list portlets 

@@ -4480,26 +4480,20 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   display: -ms-flexbox;
   display: flex;
 }
-#critical-alert-ticker .ticker-articleTitle {
-  display: inline-block;
-  white-space: nowrap;
-  padding-right: 5px;
-  font-weight: bold;
-}
 #critical-alert-ticker .ticker-articleDate {
-  display: inline-block;
   white-space: nowrap;
-  padding-top: 1px;
-  color: var(--allPagesSecondaryColor,#476a9c);
-  font-size: 13px;
+  color: white;
   letter-spacing: 0;
+  text-transform: capitalize;
 }
 #critical-alert-ticker .ticker-seperator {
-  margin: 0 7px 0 8px;
+  margin: 0 6px 0 7px;
 }
-#critical-alert-ticker .ticker-articleTitle:after {
-  padding-left: 2px;
-  content: ":";
+#critical-alert-ticker .ticker-articleTitle {
+  letter-spacing: 0.1px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #critical-alert-ticker .ticker-articleSummary {
   display: inline-block;

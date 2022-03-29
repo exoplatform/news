@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleSummary"
           dense
-          :disabled="displayLatestButton"
+          :disabled="displayLatestButton || displayAlertsButtons"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
@@ -134,6 +134,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-list-item-action>
         <v-switch
           v-model="showArticleImage"
+          :disabled="displayAlertsButtons"
           dense
           @change="selectedOption('showArticleImage', showArticleImage)"
           class="my-auto" />
@@ -150,7 +151,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleAuthor"
           dense
-          :disabled="displayLatestButton"
+          :disabled="displayLatestButton || displayAlertsButtons"
           @change="selectedOption('showArticleAuthor', showArticleAuthor)"
           class="my-auto" />
       </v-list-item-action>
@@ -195,6 +196,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-list-item-action>
         <v-switch
           v-model="showArticleReactions"
+          :disabled="displayAlertsButtons"
           dense
           @change="selectedOption('showArticleReactions', showArticleReactions)"
           class="my-auto" />
@@ -248,6 +250,9 @@ export default {
     displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';
     },
+    displayAlertsButtons() {
+      return this.viewTemplate === 'NewsAlert';
+    },
   },
   created() {
     this.reset();
@@ -271,6 +276,12 @@ export default {
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
+
+      this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
+      this.showArticleAuthor = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
+      this.showArticleReactions = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleReactions;
+      this.showArticleSummary = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
+
     },
   }
 };

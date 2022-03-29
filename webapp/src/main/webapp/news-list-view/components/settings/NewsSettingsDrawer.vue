@@ -271,6 +271,11 @@ export default {
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
+
+      this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
+      this.showArticleAuthor = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
+      this.showArticleReactions = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleReactions;
+      this.showArticleSummary = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
     },
     init() {
       if (!this.initialized) {
@@ -391,6 +396,11 @@ export default {
       } else if ( this.viewTemplate === 'NewsSlider') {
         this.showSeeAll = false;
         this.showHeader = false;
+      } else if ( this.viewTemplate === 'NewsAlert') {
+        this.showArticleImage = false;
+        this.showArticleAuthor = false;
+        this.showArticleReactions = false;
+        this.showArticleSummary = false;
       }
     },
     blurSelection() {

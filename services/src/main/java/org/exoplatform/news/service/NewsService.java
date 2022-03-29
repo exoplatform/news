@@ -241,14 +241,9 @@ public interface NewsService {
   boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor);
 
   /**
-   * Check if an object identified by its type/id for a user has favorite metadata
-   * or not
+   * isArchive a news
    *
-   * @param newsId {@link News} object that has to define: - objectType
-   *          object type, can be of any type: activity, comment, notes... -
-   *          objectId object technical unique identifier - userIdentityId
-   *          {@link Identity} technical identifier of the user
-   * @throws ObjectNotFoundException when the favorite doesn't exists
+   * @param newsId The id of the news to be archived
    */
-  boolean isArchived(long userIdentityId,String newsId )throws Exception;
+  boolean isArchived(long userIdentityId,String newsId );
 }

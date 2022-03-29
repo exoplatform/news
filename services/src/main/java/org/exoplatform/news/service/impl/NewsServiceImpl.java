@@ -664,10 +664,9 @@ public class NewsServiceImpl implements NewsService {
     return false;
   }
 
-  private void createMetaDataArchive(String newId , long userIdentityId) throws
-                                                 ObjectAlreadyExistsException {
+  private void createMetaDataArchive(String newId , long userIdentityId) throws ObjectAlreadyExistsException {
     MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(),"0",0);
-    MetadataObject metadataObject = new MetadataObject("archives",newId);
+    MetadataObject metadataObject = new MetadataObject(METADATA_TYPE.getName(),newId);
 
     metadataService.createMetadataItem(metadataObject,
                                        metadataKey,
@@ -676,7 +675,7 @@ public class NewsServiceImpl implements NewsService {
 
   public void deleteMetaDataArchive(String newId ,long userIdentityId) throws ObjectNotFoundException {
     MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(),"0",0);
-    MetadataObject metadataObject = new MetadataObject("archives",newId);
+    MetadataObject metadataObject = new MetadataObject(METADATA_TYPE.getName(),newId);
 
     List<MetadataItem> archives = metadataService.getMetadataItemsByMetadataAndObject(metadataKey, metadataObject);
     if (CollectionUtils.isEmpty(archives)) {
@@ -687,10 +686,9 @@ public class NewsServiceImpl implements NewsService {
     }
   }
   @Override
-  public boolean isArchived(long userIdentityId,String newId) throws Exception {
-
+  public boolean isArchived(long userIdentityId,String newId){
     MetadataKey metadataKey = new MetadataKey(METADATA_TYPE.getName(), String.valueOf(userIdentityId), userIdentityId);
-    MetadataObject metadataObject = new MetadataObject("archives",newId);
+    MetadataObject metadataObject = new MetadataObject(METADATA_TYPE.getName(),newId);
     List<MetadataItem> archives = metadataService.getMetadataItemsByMetadataAndObject(metadataKey,metadataObject);
 
     return !archives.isEmpty();

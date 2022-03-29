@@ -5,6 +5,10 @@
 @colorIconPrimary: @primaryColor;
 @color-appNews-information: #676767;
 
+//Alerts color
+@primaryColorDefault: #578dc9;
+@alertHeadingColor: #e14f4f;
+
 //Heading color
 @headingColor: #4d5466;
 
@@ -4416,3 +4420,104 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   opacity: 0.2;
   z-index: 0!important;
 }
+
+#critical-alert-ticker {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-family: arial;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  overflow: hidden;
+  height: 48px;
+  width: auto;
+  background-color: @primaryColorDefault;
+}
+#critical-alert-ticker .ticker-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 100%;
+  background-color: @alertHeadingColor;
+  z-index: 1;
+}
+#critical-alert-ticker .ticker-icon {
+  padding: 0 12px 0 13px;
+}
+#critical-alert-ticker .ticker-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+#critical-alert-ticker .ticker-header span {
+  margin-left: -4px;
+  padding-right: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+#critical-alert-ticker .ticker-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  //position: absolute;
+  overflow: hidden;
+  width: auto;
+  //padding-left: 800px;
+}
+#critical-alert-ticker .articleLink {
+  color: white;
+  text-decoration: none;
+  padding-right: 90px;
+}
+#critical-alert-ticker .ticker-article {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+#critical-alert-ticker .ticker-articleTitle {
+  display: inline-block;
+  white-space: nowrap;
+  padding-right: 5px;
+  font-weight: bold;
+}
+#critical-alert-ticker .ticker-articleDate {
+  display: inline-block;
+  white-space: nowrap;
+  padding-top: 1px;
+  color: var(--allPagesSecondaryColor,#476a9c);
+  font-size: 13px;
+  letter-spacing: 0;
+}
+#critical-alert-ticker .ticker-seperator {
+  margin: 0 7px 0 8px;
+}
+#critical-alert-ticker .ticker-articleTitle:after {
+  padding-left: 2px;
+  content: ":";
+}
+#critical-alert-ticker .ticker-articleSummary {
+  display: inline-block;
+  white-space: nowrap;
+}
+/****** MOBILE VIEW ******/
+@media (max-width: 480px) {
+  /** Hide the header text on mobile **/
+  #critical-alert-ticker .ticker-header span {
+    display: none;
+  }
+}
+
+#critical-alert-ticker .slide-buttons .previous-btn{
+  cursor: pointer;
+  border-radius: 50%;
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+

@@ -211,6 +211,8 @@ export default {
         return '/news/images/latestNews.png';
       } else if ( this.viewTemplate === 'NewsSlider') {
         return '/news/images/sliderNews.png';
+      } else if ( this.viewTemplate === 'NewsAlert') {
+        return '/news/images/alertNews.png';
       } else {
         return '';
       }
@@ -341,6 +343,7 @@ export default {
         });
     },
     getLabel(label, defaultLabel) {
+      console.log(label, defaultLabel);
       if (label === this.$t(label)) {
         return defaultLabel || label;
       } else {

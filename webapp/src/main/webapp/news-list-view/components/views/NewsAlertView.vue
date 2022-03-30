@@ -116,7 +116,6 @@ export default {
     },
   },
   created() {
-    this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -137,42 +136,12 @@ export default {
           .finally(() => this.initialized = false);
       }
     },
-    refreshNewsViews(selectedTarget, selectedOption){
-      this.showArticleSummary = selectedOption.showArticleSummary;
-      this.showArticleTitle = selectedOption.showArticleTitle;
-      this.showArticleImage = selectedOption.showArticleImage;
-      this.seeAllUrl = selectedOption.seeAllUrl;
+    refreshNewsViews(selectedTarget, selectedOption) {
       this.limit = selectedOption.limit;
       this.selectedOption = selectedOption;
       this.newsTarget = selectedTarget;
       this.getNewsList();
-    },
-    reset() {
-      this.limit = this.$root.limit;
-      this.showHeader = this.$root.showHeader;
-      this.showSeeAll = this.$root.showSeeAll;
-      this.showArticleTitle = this.$root.showArticleTitle;
-      this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.$root.showArticleSummary;
-      this.showArticleAuthor = this.$root.showArticleAuthor;
-      this.showArticleSpace = this.$root.showArticleSpace;
-      this.showArticleDate = this.$root.showArticleDate;
-      this.showArticleReactions = this.$root.showArticleReactions;
-      this.seeAllUrl = this.$root.seeAllUrl;
-      this.selectedOption = {
-        limit: this.limit,
-        showHeader: this.showHeader,
-        showSeeAll: this.showSeeAll,
-        showArticleTitle: this.showArticleTitle,
-        showArticleSummary: this.showArticleSummary,
-        showArticleAuthor: this.showArticleAuthor,
-        showArticleSpace: this.showArticleSpace,
-        showArticleDate: this.showArticleDate,
-        showArticleReactions: this.showArticleReactions,
-        showArticleImage: this.showArticleImage,
-        seeAllUrl: this.seeAllUrl,
-      };
-    },
+    }
   }
 };
 </script>

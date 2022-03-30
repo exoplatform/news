@@ -389,7 +389,7 @@ export default {
       }
     },
     initDefaultValue() {
-      if ( this.viewTemplate === 'NewsLatest') {
+      if ( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert') {
         this.showArticleAuthor = false;
         this.showArticleSummary = false;
       } else if ( this.viewTemplate === 'NewsSlider') {
@@ -397,9 +397,7 @@ export default {
         this.showHeader = false;
       } else if ( this.viewTemplate === 'NewsAlert') {
         this.showArticleImage = false;
-        this.showArticleAuthor = false;
         this.showArticleReactions = false;
-        this.showArticleSummary = false;
       }
     },
     blurSelection() {

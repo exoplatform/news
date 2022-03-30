@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div class="alerts-icon">
         <v-icon>warning</v-icon>
       </div>
-      <span v-if="!emptyTemplate">{{ $t('news.alerts.header') }}</span>
+      <span class="d-none d-md-block" v-if="!emptyTemplate">{{ $t('news.alerts.header') }}</span>
     </div>
 
     <div class="alerts-viewer ps-5 flex-grow-1">

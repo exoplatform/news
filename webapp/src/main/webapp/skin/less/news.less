@@ -4421,97 +4421,80 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   z-index: 0!important;
 }
 
-#critical-alert-ticker {
+#critical-alerts-slider {
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   align-items: center;
-  color: #fff;
-  font-family: arial;
+  color: white;
   font-size: 14px;
   letter-spacing: 0.1px;
   overflow: hidden;
   height: 48px;
   width: auto;
   background-color: @primaryColorDefault;
-}
-#critical-alert-ticker .ticker-header {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  height: 100%;
-  background-color: @alertHeadingColor;
-  z-index: 1;
-}
-#critical-alert-ticker .ticker-icon {
-  padding: 0 12px 0 13px;
-}
-#critical-alert-ticker .ticker-icon svg {
-  width: 22px;
-  height: 22px;
-  fill: white;
-}
-#critical-alert-ticker .ticker-header span {
-  margin-left: -4px;
-  padding-right: 15px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-#critical-alert-ticker .ticker-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  //position: absolute;
-  overflow: hidden;
-  width: auto;
-  //padding-left: 800px;
-}
-#critical-alert-ticker .articleLink {
-  color: white;
-  text-decoration: none;
-  padding-right: 90px;
-}
-#critical-alert-ticker .ticker-article {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-}
-#critical-alert-ticker .ticker-articleDate {
-  white-space: nowrap;
-  color: white;
-  letter-spacing: 0;
-  text-transform: capitalize;
-}
-#critical-alert-ticker .ticker-seperator {
-  margin: 0 6px 0 7px;
-}
-#critical-alert-ticker .ticker-articleTitle {
-  letter-spacing: 0.1px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-#critical-alert-ticker .ticker-articleSummary {
-  display: inline-block;
-  white-space: nowrap;
-}
-/****** MOBILE VIEW ******/
-@media (max-width: 480px) {
-  /** Hide the header text on mobile **/
-  #critical-alert-ticker .ticker-header span {
-    display: none;
+
+  .alerts-header {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 100%;
+    background-color: @alertHeadingColor;
+    z-index: 1;
+    span {
+      margin-left: -4px;
+      padding-right: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .alerts-icon {
+      padding: 0 12px 0 13px;
+      i {
+        color: white;
+      }
+    }
+  }
+  
+  .alerts-viewer {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: hidden;
+    width: auto;
+    .article-link {
+      color: white;
+      text-decoration: none;
+      padding-right: 90px;
+      .alerts-article {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        .alerts-article-date {
+          white-space: nowrap;
+          color: white;
+          letter-spacing: 0;
+          text-transform: capitalize;
+        }
+        .alerts-article-seperator {
+          margin: 0 6px 0 7px;
+        }
+        .alerts-article-title {
+          letter-spacing: 0.1px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .slider-buttons {
+    button {
+      color: white;
+    }
   }
 }
-
-#critical-alert-ticker .slide-buttons .previous-btn{
-  cursor: pointer;
-  border-radius: 50%;
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-}
-

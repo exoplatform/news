@@ -348,7 +348,6 @@ export default {
         });
     },
     getLabel(label, defaultLabel) {
-      console.log(label, defaultLabel);
       if (label === this.$t(label)) {
         return defaultLabel || label;
       } else {

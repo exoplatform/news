@@ -15,15 +15,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alert-ticker" :class="canPublishNews ? 'mt-n13' : 'mt-n5'">
-    <div class="ticker-header">
-      <div class="ticker-icon">
-        <v-icon style="color: white">warning</v-icon>
+  <div id="critical-alerts-slider" :class="canPublishNews ? 'mt-n13' : 'mt-n5'">
+    <div class="alerts-header">
+      <div class="alerts-icon">
+        <v-icon>warning</v-icon>
       </div>
       <span v-if="!emptyTemplate">{{ $t('news.alerts.header') }}</span>
     </div>
 
-    <div class="ticker-container ps-5 flex-grow-1">
+    <div class="alerts-viewer ps-5 flex-grow-1">
       <v-carousel
         v-model="slider"
         hide-delimiters
@@ -34,43 +34,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-if="!emptyTemplate">
         <v-carousel-item
           v-for="(item,i) in news"
-          :key="i"
-          :href="item.url">
-          <a class="articleLink flex-grow-2">
-            <div class="ticker-article">
-              <span class="ticker-articleDate">
+          :key="i">
+          <a :href="item.url" class="article-link flex-grow-1">
+            <div class="alerts-article">
+              <span class="alerts-article-date">
                 <date-format
                   :value="new Date(item.publishDate.time)"
                   :format="dateFormat" />
               </span>
-              <span class="ticker-seperator">|</span>
-              <span class="ticker-articleTitle">{{ item.title }} - {{ item.summary }}</span>
+              <span class="alerts-article-seperator">|</span>
+              <span class="alerts-article-title">{{ item.title }} - {{ item.summary }}</span>
             </div>
           </a>
         </v-carousel-item>
       </v-carousel>
     </div>  
 
-    <div class="slide-buttons d-flex pe-2">
+    <div class="slider-buttons d-flex pe-2">
       <v-btn
         @click="slider--"
         icon
-        style="color: white"
         :disabled="emptyTemplate">
         <v-icon>chevron_left</v-icon>
       </v-btn>
       <v-btn
         @click="slider++"
         icon
-        style="color: white"
         :disabled="emptyTemplate">
         <v-icon>chevron_right</v-icon>
       </v-btn>
       <v-btn
         v-if="canPublishNews"
         @click="openDrawer"
-        icon
-        style="color: white">
+        icon>
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>

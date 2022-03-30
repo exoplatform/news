@@ -279,7 +279,11 @@ export default {
       }
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      this.disabled = postDate.getTime() === scheduleDate.getTime();
+      const postDateString = postDate.getFullYear().toString() + postDate.getMonth().toString()+ postDate.getDate().toString() ;
+      const scheduleDateString = scheduleDate.getFullYear().toString() + scheduleDate.getMonth().toString() + scheduleDate.getDate().toString();
+      const postTimeString = postDate.getHours().toString() + postDate.getMinutes().toString();
+      const scheduleTimeString = scheduleDate.getHours().toString() + scheduleDate.getMinutes().toString();
+      this.disabled = ((postDateString === scheduleDateString) && (postTimeString === scheduleTimeString));
       postDate.setHours(this.postDateTime.getHours());
       postDate.setMinutes(this.postDateTime.getMinutes());
       postDate.setSeconds(0);

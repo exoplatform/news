@@ -73,7 +73,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void likeActivity(ActivityLifeCycleEvent event) {
     super.likeActivity(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null) {
+    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
         News news = newsService.getNewsByActivityId(activity.getId(), currentIdentity);
@@ -88,7 +88,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
   public void saveComment(ActivityLifeCycleEvent event) {
     super.saveComment(event);
     ExoSocialActivity activity = event.getActivity();
-    if (activity != null) {
+    if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
         News news = newsService.getNewsByActivityId(activity.getParentId(), currentIdentity);

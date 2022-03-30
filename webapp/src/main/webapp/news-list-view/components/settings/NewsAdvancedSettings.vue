@@ -269,9 +269,9 @@ export default {
       this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
       this.showSeeAll = this.viewTemplate === 'NewsSlider' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
-      this.showArticleImage = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
+      this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
-      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleAuthor;
+      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleReactions;

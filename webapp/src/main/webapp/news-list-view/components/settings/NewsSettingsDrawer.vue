@@ -264,18 +264,13 @@ export default {
       this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
       this.showSeeAll = this.viewTemplate === 'NewsSlider' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
-      this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleSummary;
-      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' ? false : this.$root.showArticleAuthor;
+      this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
+      this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
+      this.showArticleAuthor = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
-      this.showArticleReactions = this.$root.showArticleReactions;
-      this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
-
-      this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
-      this.showArticleAuthor = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
       this.showArticleReactions = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleReactions;
-      this.showArticleSummary = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
+      this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`;
     },
     init() {
       if (!this.initialized) {
@@ -392,12 +387,13 @@ export default {
       if ( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert') {
         this.showArticleAuthor = false;
         this.showArticleSummary = false;
+        if ( this.viewTemplate === 'NewsAlert') {
+          this.showArticleImage = false;
+          this.showArticleReactions = false;
+        }
       } else if ( this.viewTemplate === 'NewsSlider') {
         this.showSeeAll = false;
         this.showHeader = false;
-      } else if ( this.viewTemplate === 'NewsAlert') {
-        this.showArticleImage = false;
-        this.showArticleReactions = false;
       }
     },
     blurSelection() {

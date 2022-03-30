@@ -274,20 +274,16 @@ export default {
   }),
   watch: {
     postDate(newVal, oldVal) {
-      console.log('newVal',newVal ,' oldVal ',new Date(newVal).getTime() );
       if (!this.postDate || !newVal || !oldVal || new Date(newVal).getTime() === new Date(oldVal).getTime()) {
         return;
       }
       const postDate = new Date(this.postDate);
       const scheduleDate = new Date(this.schedulePostDate);
-      
       const postDateString = postDate.getFullYear().toString() + postDate.getMonth().toString()+ postDate.getDate().toString() ;
       const scheduleDateString = scheduleDate.getFullYear().toString() + scheduleDate.getMonth().toString() + scheduleDate.getDate().toString();
-      
       const postTimeString = postDate.getHours().toString() + postDate.getMinutes().toString();
       const scheduleTimeString = scheduleDate.getHours().toString() + scheduleDate.getMinutes().toString();
-
-      this.disabled = ( (  postDateString ===  scheduleDateString ) && ( postTimeString  === scheduleTimeString  ) ) ;
+      this.disabled = ((postDateString === scheduleDateString) && (postTimeString === scheduleTimeString));
       postDate.setHours(this.postDateTime.getHours());
       postDate.setMinutes(this.postDateTime.getMinutes());
       postDate.setSeconds(0);

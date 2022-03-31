@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <div id="article-list-columns-1a">
     <div class="article-container">
       <div
-        v-for="(item, index) of [1,2,3,4,5]"
+        v-for="(item, index) of newsInfo"
         :key="item"
         class="article"
         :id="`articleItem-${index}`">

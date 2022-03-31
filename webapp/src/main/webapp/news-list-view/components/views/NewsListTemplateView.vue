@@ -58,15 +58,15 @@ export default {
     },
     seeAllUrl: '',
     selectedOption: null,
-    showHeader: false,
-    showSeeAll: false,
-    showArticleTitle: false,
-    showArticleSummary: false,
-    showArticleImage: false,
-    showArticleAuthor: false,
-    showArticleSpace: false,
-    showArticleDate: false,
-    showArticleReactions: false,
+    showHeader: true,
+    showSeeAll: true,
+    showArticleTitle: true,
+    showArticleSummary: true,
+    showArticleImage: true,
+    showArticleAuthor: true,
+    showArticleSpace: true,
+    showArticleDate: true,
+    showArticleReactions: true,
   }),
   computed: {
     spaceAvatarUrl() {
@@ -106,7 +106,10 @@ export default {
           }
         });
     },
-    refreshNewsViews(selectedTarget, selectedOption){
+    refreshNewsViews(selectedTarget, selectedOption) {
+      this.showArticleSummary = selectedOption.showArticleSummary;
+      this.showArticleTitle = selectedOption.showArticleTitle;
+      this.showArticleImage = selectedOption.showArticleImage;
       this.selectedOption = selectedOption;
       this.newsHeader = selectedOption.header;
       this.seeAllUrl = selectedOption.seeAllUrl;

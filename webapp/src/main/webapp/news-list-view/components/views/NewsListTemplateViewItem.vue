@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="textArea">
-      <span v-if="showArticleTitle" class="articleTitle">Welcome to your new digital workplace platform! Take this quick tour to discover its features</span>
+      <span v-if="showArticleTitle" class="articleTitle">{{ item.title }}</span>
       <span v-if="showArticleAuthor" class="articlePreTitle">{{ item.authorDisplayName }}</span>
       <div class="articlePostTitle">
         <span class="articleDate me-2">

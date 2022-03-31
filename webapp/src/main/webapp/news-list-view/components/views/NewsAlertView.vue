@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alerts-slider" :class="canPublishNews ? 'mt-n13' : 'mt-n5'">
+  <div id="critical-alerts-slider">
     <div class="alerts-header">
       <div class="alerts-icon">
         <v-icon>warning</v-icon>

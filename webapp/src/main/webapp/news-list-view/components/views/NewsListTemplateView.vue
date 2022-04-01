@@ -15,13 +15,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="article-list-columns-1a">
-    <div class="article-container">
+  <div id="article-list-view">
+    <div class="article-list-container">
       <div
         v-for="(item, index) of newsInfo"
         :key="item"
         class="article"
-        :id="`articleItem-${index}`">
+        :id="`article-item-${index}`">
         <news-list-template-view-item
           :item="item"
           :selected-option="selectedOption"
@@ -40,22 +40,12 @@ export default {
       default: null
     },
   },
-  data: ()=> ({
+  data: () => ({
     initialized: false,
     newsInfo: null,
     limit: 4,
     offset: 0,
     space: null,
-    isHovered: false,
-    commentsSize: 0,
-    likeSize: 0,
-    fullDateFormat: {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    },
     seeAllUrl: '',
     selectedOption: null,
     showHeader: true,
@@ -68,14 +58,6 @@ export default {
     showArticleDate: true,
     showArticleReactions: true,
   }),
-  computed: {
-    spaceAvatarUrl() {
-      return this.space && this.space.avatarUrl;
-    },
-    spaceDisplayName() {
-      return this.space && this.space.displayName;
-    }
-  },
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
@@ -90,21 +72,10 @@ export default {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
             this.newsInfo = newsList.news;
-            if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
-              this.getSpaceById(this.newsInfo[0].spaceId);
-            }
             this.initialized = true;
           })
           .finally(() => this.initialized = false);
       }
-    },
-    getSpaceById(spaceId) {
-      this.$spaceService.getSpaceById(spaceId, 'identity')
-        .then((space) => {
-          if (space && space.identity && space.identity.id) {
-            this.space = space;
-          }
-        });
     },
     refreshNewsViews(selectedTarget, selectedOption) {
       this.showArticleSummary = selectedOption.showArticleSummary;

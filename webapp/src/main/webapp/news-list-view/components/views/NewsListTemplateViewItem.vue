@@ -16,17 +16,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <a
-    class="articleLink"
+    class="article-item-link"
     target="_self"
     :href="item.url">
-    <div class="articleImage">
-      <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+    <div class="article-item-image">
+      <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
-    <div class="textArea">
-      <span v-if="showArticleTitle" class="articleTitle">{{ item.title }}</span>
-      <span v-if="showArticleAuthor" class="articlePreTitle">{{ item.authorDisplayName }}</span>
-      <div class="articlePostTitle">
-        <span class="articleDate me-2">
+    <div class="article-item-content">
+      <span v-if="showArticleTitle" class="article-title">{{ item.title }}</span>
+      <span v-if="showArticleAuthor" class="article-preTitle">{{ item.authorDisplayName }}</span>
+      <div class="article-postTitle">
+        <span class="article-date me-2">
           <div v-if="showArticleDate" class="flex-column">
             <date-format
               :value="displayDate"
@@ -35,13 +35,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </span>
         <div v-if="showArticleReactions" class="reactions">
           <v-icon class="reactions-icon-style me-1" size="12">
-              mdi-thumb-up
-            </v-icon>
-            <div class="likes-count me-2">{{ item.likesCount }}</div>
-            <v-icon class="reactions-icon-style me-1" size="12">
-              mdi-comment
-            </v-icon>
-            <div class="comments-count me-2">{{ item.commentsCount }}</div>
+            mdi-thumb-up
+          </v-icon>
+          <div class="likes-count me-2">{{ item.likesCount }}</div>
+          <v-icon class="reactions-icon-style me-1" size="12">
+            mdi-comment
+          </v-icon>
+          <div class="comments-count me-2">{{ item.commentsCount }}</div>
         </div>
       </div>
     </div>
@@ -80,9 +80,6 @@ export default {
     displayDate() {
       return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
     },
-    isHiddenSpace() {
-      return this.item && !this.item.spaceMember && this.item.hiddenSpace;
-    },
     showArticleImage() {
       return this.selectedOption && this.selectedOption.showArticleImage;
     },
@@ -98,6 +95,9 @@ export default {
     showArticleReactions() {
       return this.selectedOption && this.selectedOption.showArticleReactions;
     },
+    articleImage() {
+      return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL : '/news/images/news.png';
+    }
   },
   created() {
     this.reset();

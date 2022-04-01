@@ -5,6 +5,9 @@
 @colorIconPrimary: @primaryColor;
 @color-appNews-information: #676767;
 
+//Alerts color
+@alertHeadingColor: #e14f4f;
+
 //Heading color
 @headingColor: #4d5466;
 
@@ -4415,4 +4418,82 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   background: @baseColorDefault;
   opacity: 0.2;
   z-index: 0!important;
+}
+
+#critical-alerts-slider {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  overflow: hidden;
+  height: 48px;
+  width: auto;
+  background-color: @primaryColorDefault;
+
+  .alerts-header {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 100%;
+    background-color: @alertHeadingColor;
+    z-index: 1;
+    span {
+      margin-left: -4px;
+      padding-right: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .alerts-icon {
+      padding: 0 12px 0 13px;
+      i {
+        color: white;
+      }
+    }
+  }
+  
+  .alerts-viewer {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: hidden;
+    width: auto;
+    .article-link {
+      color: white;
+      text-decoration: none;
+      padding-right: 90px;
+      .alerts-article {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        .alerts-article-date {
+          white-space: nowrap;
+          color: white;
+          letter-spacing: 0;
+          text-transform: capitalize;
+        }
+        .alerts-article-seperator {
+          margin: 0 6px 0 7px;
+        }
+        .alerts-article-title {
+          letter-spacing: 0.1px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .slider-buttons {
+    button {
+      color: white;
+    }
+  }
 }

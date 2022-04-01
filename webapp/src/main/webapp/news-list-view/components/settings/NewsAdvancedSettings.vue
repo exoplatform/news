@@ -68,7 +68,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showSeeAll"
           dense
-          :disabled="displaySliderButton"
+          :disabled="displaySliderButton || displayAlertsButtons"
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="displayHeaderTitle my-auto" />
       </v-list-item-action>
@@ -245,7 +245,7 @@ export default {
       return this.viewTemplate === 'NewsSlider';
     },
     disableSeeAllLink() {
-      return this.viewTemplate === 'NewsSlider' || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
+      return this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
     },
     displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';
@@ -267,7 +267,7 @@ export default {
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
       this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
-      this.showSeeAll = this.viewTemplate === 'NewsSlider' ? false : this.$root.showSeeAll;
+      this.showSeeAll = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;

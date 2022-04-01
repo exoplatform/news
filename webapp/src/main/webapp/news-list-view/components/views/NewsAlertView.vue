@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div class="alerts-icon">
         <v-icon>warning</v-icon>
       </div>
-      <span class="d-none d-md-block" v-if="!emptyTemplate">{{ $t('news.alerts.header') }}</span>
+      <span class="d-none d-md-block" v-if="!emptyTemplate && showHeader">{{ newsHeader }}</span>
     </div>
 
     <div class="alerts-viewer ps-5 flex-grow-1">
@@ -37,13 +37,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :key="i">
           <a :href="item.url" class="article-link flex-grow-1">
             <div class="alerts-article">
-              <span class="alerts-article-date">
+              <span v-if="showArticleDate" class="alerts-article-date">
                 <date-format
                   :value="new Date(item.publishDate.time)"
                   :format="dateFormat" />
               </span>
-              <span class="alerts-article-seperator">|</span>
-              <span class="alerts-article-title">{{ item.title }} - {{ item.summary }}</span>
+              <span v-if="showArticleDate && showArticleTitle" class="alerts-article-seperator">|</span>
+              <span v-if="showArticleTitle" class="alerts-article-title">{{ item.title }}</span>
             </div>
           </a>
         </v-carousel-item>
@@ -92,16 +92,17 @@ export default {
       limit: 4,
       offset: 0,
 
-      showHeader: false,
+      showHeader: true,
       showSeeAll: false,
       showArticleTitle: true,
-      showArticleSummary: true,
-      showArticleImage: true,
-      showArticleAuthor: true,
+      showArticleSummary: false,
+      showArticleImage: false,
+      showArticleAuthor: false,
       showArticleSpace: true,
       showArticleDate: true,
-      showArticleReactions: true,
+      showArticleReactions: false,
       seeAllUrl: '',
+      newsHeader: '',
       selectedOption: null,
       dateFormat: {
         year: 'numeric',
@@ -116,6 +117,7 @@ export default {
     },
   },
   created() {
+    this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -137,11 +139,43 @@ export default {
       }
     },
     refreshNewsViews(selectedTarget, selectedOption) {
-      this.limit = selectedOption.limit;
+      this.showArticleTitle = selectedOption.showArticleTitle;
+      this.showArticleDate = selectedOption.showArticleDate;
+      this.showHeader = selectedOption.showHeader;
       this.selectedOption = selectedOption;
+      this.newsHeader = selectedOption.header;
+      this.seeAllUrl = selectedOption.seeAllUrl;
+      this.limit = selectedOption.limit;
       this.newsTarget = selectedTarget;
       this.getNewsList();
-    }
+    },
+    reset() {
+      this.limit = this.$root.limit;
+      this.showHeader = this.$root.showHeader;
+      this.newsHeader = this.$root.header;
+      this.showSeeAll = this.$root.showSeeAll;
+      this.showArticleTitle = this.$root.showArticleTitle;
+      this.showArticleImage = this.$root.showArticleImage;
+      this.showArticleSummary = this.$root.showArticleSummary;
+      this.showArticleAuthor = this.$root.showArticleAuthor;
+      this.showArticleSpace = this.$root.showArticleSpace;
+      this.showArticleDate = this.$root.showArticleDate;
+      this.showArticleReactions = this.$root.showArticleReactions;
+      this.seeAllUrl = this.$root.seeAllUrl;
+      this.selectedOption = {
+        limit: this.limit,
+        showHeader: this.showHeader,
+        showSeeAll: this.showSeeAll,
+        showArticleTitle: this.showArticleTitle,
+        showArticleSummary: this.showArticleSummary,
+        showArticleAuthor: this.showArticleAuthor,
+        showArticleSpace: this.showArticleSpace,
+        showArticleDate: this.showArticleDate,
+        showArticleReactions: this.showArticleReactions,
+        showArticleImage: this.showArticleImage,
+        seeAllUrl: this.seeAllUrl,
+      };
+    },
   }
 };
 </script>

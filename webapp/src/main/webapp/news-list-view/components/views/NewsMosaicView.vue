@@ -1,3 +1,19 @@
+<!--
+Copyright (C) 2021 eXo Platform SAS.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
 <template>
   <div id="top-news-mosaic">
     <div class="mosaic-container ma-3">
@@ -12,7 +28,7 @@
           :href="item.url">
           <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
           <div class="titleArea">
-            <div v-if="showArticleDate" class="newsSpace">
+            <div v-if="showArticleDate" class="articleDate">
               <date-format
                 :value="new Date(item.publishDate.time)"
                 :format="dateFormat" />
@@ -38,7 +54,6 @@ export default {
   },
   data () {
     return {
-      canPublishNews: false,
       slider: 0,
       news: [],
       initialized: false,
@@ -64,23 +79,12 @@ export default {
       },
     };
   },
-  computed: {
-    emptyTemplate() {
-      return !(this.news && this.news.length);
-    },
-  },
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
-    openDrawer() {
-      this.$refs.settingsDrawer.open();
-    },
     getNewsList() {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)

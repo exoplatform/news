@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showHeader"
           dense
-          :disabled="displaySliderButton"
+          :disabled="displaySliderButton || displayMosaicButtons"
           @change="selectedOption('showHeader', showHeader)"
           class="displaySeeAllButton my-auto" />
       </v-list-item-action>
@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleSummary"
           dense
-          :disabled="displayLatestButton || displayAlertsButtons"
+          :disabled="displayLatestButton || displayAlertsButtons || displayMosaicButtons"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
@@ -252,6 +252,9 @@ export default {
     },
     displayAlertsButtons() {
       return this.viewTemplate === 'NewsAlert';
+    },
+    displayMosaicButtons() {
+      return this.viewTemplate === 'NewsMosaic';
     },
   },
   created() {

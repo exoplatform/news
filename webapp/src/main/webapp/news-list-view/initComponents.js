@@ -28,6 +28,7 @@ import NewsAdvancedSettings from './components/settings/NewsAdvancedSettings.vue
 import NewsAlertView from './components/views/NewsAlertView.vue';
 import NewsListTemplateView from './components/views/NewsListTemplateView.vue';
 import NewsListTemplateViewItem from './components/views/NewsListTemplateViewItem.vue';
+import NewsMosaicView from './components/views/NewsMosaicView.vue';
 
 
 const components = {
@@ -45,6 +46,7 @@ const components = {
   'news-alert-view': NewsAlertView,
   'news-list-template-view': NewsListTemplateView,
   'news-list-template-view-item': NewsListTemplateViewItem,
+  'news-mosaic-view': NewsMosaicView,
 };
 
 for (const key in components) {

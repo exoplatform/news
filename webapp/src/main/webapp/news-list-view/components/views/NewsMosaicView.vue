@@ -54,7 +54,6 @@ export default {
   },
   data () {
     return {
-      slider: 0,
       news: [],
       initialized: false,
       limit: 4,

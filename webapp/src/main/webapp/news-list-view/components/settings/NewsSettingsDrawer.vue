@@ -386,12 +386,22 @@ export default {
       }
     },
     initDefaultValue() {
+      this.showHeader = true;
+      this.showSeeAll = true;
+      this.showArticleTitle = true;
+      this.showArticleSummary = true;
+      this.showArticleImage = true;
+      this.showArticleAuthor = true;
+      this.showArticleSpace = true;
+      this.showArticleDate = true;
+      this.showArticleReactions = true;
       if ( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert') {
         this.showArticleAuthor = false;
         this.showArticleSummary = false;
         if ( this.viewTemplate === 'NewsAlert') {
           this.showArticleImage = false;
           this.showArticleReactions = false;
+          this.showSeeAll = false;
         }
       } else if ( this.viewTemplate === 'NewsSlider') {
         this.showSeeAll = false;

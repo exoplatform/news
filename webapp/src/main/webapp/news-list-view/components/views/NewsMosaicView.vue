@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div id="top-news-mosaic">
-    <div class="mosaic-container ma-3">
+    <div :class="`mosaic-container ma-3 ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
         :key="index"
@@ -82,6 +82,14 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
+  },
+  computed: {
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
+    smallHeightClass() {
+      return this.isMobile && this.news && this.news.length === 1 && 'small-mosaic-container';
+    }
   },
   methods: {
     getNewsList() {

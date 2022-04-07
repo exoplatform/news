@@ -4826,7 +4826,6 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   font-size: 14px;
   color: #fff;
   line-height: 18px;
-  margin: 20px 0 0 0;  /* <-- adjust this as needed */
 }
 #top-articles-horizontal-cards-2a #cards-container {
   position: relative;
@@ -4958,6 +4957,7 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
     -webkit-box-direction: normal;
     -ms-flex-flow: column;
     flex-flow: column;
+    justify-content: flex-end;
     position: absolute;
     bottom: 0;
     height: 140px;
@@ -5005,16 +5005,17 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   white-space: nowrap;
 }
 #top-articles-horizontal-cards-2a .author-photo {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   min-width: 30px;
   border-radius: 50%;
   -o-object-fit: cover;
      object-fit: cover;
-  padding: 10px;
+  margin: 10px;
 }
-#top-articles-horizontal-cards-2a .date {
-  padding: 10px;
+#top-articles-horizontal-cards-2a .author-date {
+  margin: 10px 10px 10px 0px;
+  color: white;
 }
 #top-articles-horizontal-cards-2a .article-counters {
   font-size: 11px;
@@ -5024,10 +5025,10 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: white;
 }
 #top-articles-horizontal-cards-2a .likes-icon {
-  float: left;
-  margin-right: 3px;
+  color: white;
 }
 #top-articles-horizontal-cards-2a .likes-icon svg {
   width: 12px;
@@ -5045,8 +5046,7 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   max-width: 20px;
 }
 #top-articles-horizontal-cards-2a .comments-icon {
-  float: left;
-  margin-right: 3px;
+  color: white;
 }
 #top-articles-horizontal-cards-2a .comments-icon svg {
   width: 12px;
@@ -5071,8 +5071,10 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   text-overflow: ellipsis;
 }
 #top-articles-horizontal-cards-2a .views-icon {
-  float: left;
-  margin-right: 3px;
+  color: white;
+}
+#top-articles-horizontal-cards-2a .counters-icons {
+  color: white;
 }
 #top-articles-horizontal-cards-2a .views-icon svg {
   width: 16px;

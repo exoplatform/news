@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showHeader"
           dense
-          :disabled="displaySliderButton"
+          :disabled="displaySliderButton || displayMosaicButtons"
           @change="selectedOption('showHeader', showHeader)"
           class="displaySeeAllButton my-auto" />
       </v-list-item-action>
@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showArticleSummary"
           dense
-          :disabled="displayLatestButton || displayAlertsButtons"
+          :disabled="displayLatestButton || displayAlertsButtons || displayMosaicButtons"
           @change="selectedOption('showArticleSummary', showArticleSummary)"
           class="my-auto" />
       </v-list-item-action>
@@ -253,6 +253,9 @@ export default {
     displayAlertsButtons() {
       return this.viewTemplate === 'NewsAlert';
     },
+    displayMosaicButtons() {
+      return this.viewTemplate === 'NewsMosaic';
+    },
   },
   created() {
     this.reset();
@@ -266,11 +269,11 @@ export default {
       this.newsTarget = this.$root.newsTarget;
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
-      this.showHeader = this.viewTemplate === 'NewsSlider' ? false : this.$root.showHeader;
+      this.showHeader = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsMosaic' ? false : this.$root.showHeader;
       this.showSeeAll = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
-      this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleSummary;
+      this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' || this.viewTemplate === 'NewsMosaic' ? false : this.$root.showArticleSummary;
       this.showArticleAuthor = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleAuthor;
       this.showArticleSpace = this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;

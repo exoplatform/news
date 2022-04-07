@@ -55,3 +55,9 @@ extensionRegistry.registerComponent('NewsList', 'views', {
   vueComponent: Vue.options.components['news-list-template-view'],
   rank: 70,
 });
+
+extensionRegistry.registerComponent('NewsList', 'views', {
+  id: 'NewsMosaic',
+  vueComponent: Vue.options.components['news-mosaic-view'],
+  rank: 80,
+});

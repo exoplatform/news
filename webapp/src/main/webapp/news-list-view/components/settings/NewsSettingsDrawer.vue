@@ -413,7 +413,7 @@ export default {
       } else if ( this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ) {
         this.showArticleSummary = false;
         this.showHeader = false;
-        if( this.viewTemplate === 'NewsStories') {
+        if ( this.viewTemplate === 'NewsStories') {
           this.showArticleSpace = false;
         }
       }

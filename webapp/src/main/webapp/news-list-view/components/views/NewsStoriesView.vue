@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="top-articles-horizontal-cards-2a">
+  <div id="top-news-stories">
     <card-carousel v-if="news.length">
       <news-stories-view-item
         v-for="(item, index) in news"
@@ -41,7 +41,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               <path d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M85,190  c-13.785,0-25-11.215-25-25s11.215-25,25-25s25,11.215,25,25S98.785,190,85,190z M165,190c-13.785,0-25-11.215-25-25  s11.215-25,25-25s25,11.215,25,25S178.785,190,165,190z M245,190c-13.785,0-25-11.215-25-25s11.215-25,25-25  c13.785,0,25,11.215,25,25S258.785,190,245,190z"></path>
             </svg>
           </div>
-          <div class="see-all-text">See all articles</div>
+          <div class="see-all-text"> {{ $t('news.published.seeAll') }} </div>
         </div>
       </a>
     </card-carousel>

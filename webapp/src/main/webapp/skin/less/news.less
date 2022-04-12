@@ -4812,3 +4812,195 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
     }
   }
 }
+
+#top-news-stories {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  position: relative;
+  background: transparent;
+  font-size: 14px;
+  color: white;
+  line-height: 18px;
+  .card {
+    position: relative;
+    border-radius: 6px;
+    background: #fff;
+    -webkit-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+    height: 210px;
+    width: 140px;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: 0 10px 0 0;
+    float: left;
+    &:hover {
+      -webkit-box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      .title-container {
+        -webkit-transform: translateY(0);
+            -ms-transform: translateY(0);
+                transform: translateY(0);
+      }
+      .article-img {
+        -webkit-filter: brightness(0.30);
+                filter: brightness(0.30);
+        -webkit-transform: scale(1.08);
+            -ms-transform: scale(1.08);
+                transform: scale(1.08);
+      }
+    }
+  }
+  .articleLink {
+    height: 100%;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  .see-all-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  #see-all {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    &:hover {
+      .see-all-text {
+        color: @primaryColor;
+        -webkit-transition: 0.2s;
+        -o-transition: 0.2s;
+        transition: 0.2s;
+      }
+      .see-all-icon {
+        margin: -2px auto 5px auto;
+        -webkit-transition: 0.2s;
+        -o-transition: 0.2s;
+        transition: 0.2s;
+        svg {
+          width: 44px;
+          height: 44px;
+          fill: @primaryColor;
+          -webkit-transition: 0.2s;
+          -o-transition: 0.2s;
+          transition: 0.2s;
+        }
+      }
+    }
+    .see-all-icon {
+      margin-bottom: 8px;
+      svg {
+        width: 40px;
+        height: 40px;
+        fill: @greyColorLighten1;
+      }
+    }
+    .see-all-text {
+      font-size: 14px;
+      color: @greyColorLighten1;
+      letter-spacing: 0.2px;
+    }
+  }
+  .article-img {
+    max-width: 100%;
+    position: absolute;
+    -o-object-fit: cover;
+       object-fit: cover;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    -webkit-filter: brightness(0.66);
+            filter: brightness(0.66);
+    -webkit-transition: 0.4s;
+    -o-transition: 0.4s;
+    transition: 0.4s;
+  }
+  .title-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
+    flex-flow: column;
+    justify-content: flex-end;
+    position: absolute;
+    bottom: 0;
+    height: 140px;
+    width: 100%;
+    padding: 10px 10px 6px 10px;
+    -webkit-transform: translateY(calc(142px));
+    -ms-transform: translateY(calc(142px));
+    transform: translateY(calc(27px));
+    -webkit-transition: -webkit-transform 0.3s;
+    -o-transition: transform 0.3s;
+    transition: transform 0.3s, -webkit-transform 0.3s;
+    .article-title {
+      font-size: 14px;
+      letter-spacing: 0.1px;
+      color: white;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.86);
+      line-height: 18px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      overflow: hidden;
+      margin-bottom: 15px;
+      -webkit-transition: 0.2s;
+      -o-transition: 0.2s;
+      transition: 0.2s;
+    }
+  }
+  .author-date-container {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: white;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
+    white-space: nowrap;
+    .author-photo {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      border-radius: 50%;
+      -o-object-fit: cover;
+         object-fit: cover;
+      margin: 10px;
+    }
+    .author-date {
+      margin: 10px 10px 10px 0px;
+      color: white;
+    }
+  }
+  .article-counters {
+    font-size: 11px;
+    max-width: 120px;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: white;
+    .counters-icons {
+      color: white;
+    }
+  }
+}

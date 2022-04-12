@@ -15,62 +15,36 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alerts-slider">
-    <div class="alerts-header">
-      <div class="alerts-icon">
-        <v-icon>warning</v-icon>
-      </div>
-      <span class="d-none d-md-block" v-if="!emptyTemplate && showHeader">{{ newsHeader }}</span>
-    </div>
-
-    <div class="alerts-viewer ps-5 flex-grow-1">
-      <v-carousel
-        v-model="slider"
-        hide-delimiters
-        cycle
-        :show-arrows="false"
-        interval="10000"
-        height="20"
-        v-if="!emptyTemplate">
-        <v-carousel-item
-          v-for="(item,i) in news"
-          :key="i">
-          <a :href="item.url" class="article-link flex-grow-1">
-            <div class="alerts-article">
-              <span v-if="showArticleDate" class="alerts-article-date">
-                <date-format
-                  :value="new Date(item.publishDate.time)"
-                  :format="dateFormat" />
-              </span>
-              <span v-if="showArticleDate && showArticleTitle" class="alerts-article-seperator">|</span>
-              <span v-if="showArticleTitle" class="alerts-article-title">{{ item.title }}</span>
-            </div>
-          </a>
-        </v-carousel-item>
-      </v-carousel>
-    </div>  
-
-    <div class="slider-buttons d-flex pe-2">
-      <v-btn
-        @click="slider--"
-        icon
-        :disabled="emptyTemplate">
-        <v-icon>chevron_left</v-icon>
-      </v-btn>
-      <v-btn
-        @click="slider++"
-        icon
-        :disabled="emptyTemplate">
-        <v-icon>chevron_right</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="canPublishNews"
-        @click="openDrawer"
-        icon>
-        <v-icon>mdi-cog</v-icon>
-      </v-btn>
-    </div>
-    <news-settings-drawer ref="settingsDrawer" />
+  <div id="top-news-stories">
+    <card-carousel v-if="news.length">
+      <news-stories-view-item
+        v-for="(item, index) in news"
+        :key="index"
+        :item="item"
+        :selected-option="selectedOption" />
+      <a
+        class="see-all-link"
+        target="_self"
+        :href="seeAllArticles">
+        <div class="card" id="see-all">
+          <div class="see-all-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              version="1.1"
+              id="Layer_1"
+              x="0px"
+              y="0px"
+              viewBox="0 0 330 330"
+              style="enable-background:new 0 0 330 330;"
+              xml:space="preserve">
+              <path d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M85,190  c-13.785,0-25-11.215-25-25s11.215-25,25-25s25,11.215,25,25S98.785,190,85,190z M165,190c-13.785,0-25-11.215-25-25  s11.215-25,25-25s25,11.215,25,25S178.785,190,165,190z M245,190c-13.785,0-25-11.215-25-25s11.215-25,25-25  c13.785,0,25,11.215,25,25S258.785,190,245,190z"></path>
+            </svg>
+          </div>
+          <div class="see-all-text"> {{ $t('news.published.seeAll') }} </div>
+        </div>
+      </a>
+    </card-carousel>
   </div>
 </template>
 
@@ -85,49 +59,35 @@ export default {
   },
   data () {
     return {
-      canPublishNews: false,
-      slider: 0,
       news: [],
       initialized: false,
-      limit: 4,
+      limit: 10,
       offset: 0,
 
-      showHeader: true,
+      showHeader: false,
       showSeeAll: false,
       showArticleTitle: true,
       showArticleSummary: false,
-      showArticleImage: false,
-      showArticleAuthor: false,
-      showArticleSpace: true,
+      showArticleImage: true,
+      showArticleAuthor: true,
+      showArticleSpace: false,
       showArticleDate: true,
-      showArticleReactions: false,
+      showArticleReactions: true,
       seeAllUrl: '',
-      newsHeader: '',
       selectedOption: null,
-      dateFormat: {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      },
     };
-  },
-  computed: {
-    emptyTemplate() {
-      return !(this.news && this.news.length);
-    },
   },
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
+  },
+  computed: {
+    seeAllArticles() {
+      return this.seeAllUrl && `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;
+    }
   },
   methods: {
-    openDrawer() {
-      this.$refs.settingsDrawer.open();
-    },
     getNewsList() {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
@@ -139,20 +99,18 @@ export default {
       }
     },
     refreshNewsViews(selectedTarget, selectedOption) {
+      this.showArticleSummary = selectedOption.showArticleSummary;
       this.showArticleTitle = selectedOption.showArticleTitle;
-      this.showArticleDate = selectedOption.showArticleDate;
-      this.showHeader = selectedOption.showHeader;
-      this.selectedOption = selectedOption;
-      this.newsHeader = selectedOption.header;
+      this.showArticleImage = selectedOption.showArticleImage;
       this.seeAllUrl = selectedOption.seeAllUrl;
       this.limit = selectedOption.limit;
+      this.selectedOption = selectedOption;
       this.newsTarget = selectedTarget;
       this.getNewsList();
     },
     reset() {
       this.limit = this.$root.limit;
       this.showHeader = this.$root.showHeader;
-      this.newsHeader = this.$root.header;
       this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.$root.showArticleImage;

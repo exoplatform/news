@@ -15,12 +15,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alerts-slider">
+  <div id="critical-alerts-slider" v-if="!emptyTemplate">
     <div class="alerts-header">
       <div class="alerts-icon">
         <v-icon>warning</v-icon>
       </div>
-      <span class="d-none d-md-block" v-if="!emptyTemplate && showHeader">{{ newsHeader }}</span>
+      <span class="d-none d-md-block" v-if="showHeader">{{ newsHeader }}</span>
     </div>
 
     <div class="alerts-viewer ps-5 flex-grow-1">
@@ -30,8 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         cycle
         :show-arrows="false"
         interval="10000"
-        height="20"
-        v-if="!emptyTemplate">
+        height="20">
         <v-carousel-item
           v-for="(item,i) in news"
           :key="i">
@@ -53,14 +52,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="slider-buttons d-flex pe-2">
       <v-btn
         @click="slider--"
-        icon
-        :disabled="emptyTemplate">
+        icon>
         <v-icon>chevron_left</v-icon>
       </v-btn>
       <v-btn
         @click="slider++"
-        icon
-        :disabled="emptyTemplate">
+        icon>
         <v-icon>chevron_right</v-icon>
       </v-btn>
       <v-btn

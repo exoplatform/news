@@ -67,3 +67,9 @@ extensionRegistry.registerComponent('NewsList', 'views', {
   vueComponent: Vue.options.components['news-stories-view'],
   rank: 90,
 });
+
+extensionRegistry.registerComponent('NewsList', 'views', {
+  id: 'NewsCards',
+  vueComponent: Vue.options.components['news-cards-view'],
+  rank: 100,
+});

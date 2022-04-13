@@ -219,6 +219,8 @@ export default {
         return '/news/images/mosaicNews.png';
       } else if ( this.viewTemplate === 'NewsStories') {
         return '/news/images/storiesNews.png';
+      } else if ( this.viewTemplate === 'NewsCards') {
+        return '/news/images/cardsNews.png';
       } else {
         return '';
       }

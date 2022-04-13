@@ -9,9 +9,15 @@
     </v-list-item-content>
 
     <v-list-item-action>
-      <v-btn icon>
-        <v-icon class="yellow--text text--darken-2" size="18">fa-star</v-icon>
-      </v-btn>
+      <favorite-button
+        :id="id"
+        :favorite="isFavorite"
+        :top="top"
+        :right="right"
+        type="news"
+        type-label="News"
+        @removed="removed"
+        @remove-error="removeError" />
     </v-list-item-action>
   </v-list-item>
 </template>
@@ -25,14 +31,34 @@ export default {
   },
   data: () => ({
     activityTitle: '',
-    url: ''
+    url: '',
+    isFavorite: true
   }),
   created() {
     this.$newsServices.getNewsById(this.id, false)
       .then(news => {
         this.activityTitle = news.title;
         this.url = news.url;
+        this.news = news;
       });
   },
+  methods: {
+    removed() {
+      this.isFavorite = !this.isFavorite;
+      this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyDeletedFavorite', {0: this.$t('news.label')}));
+      this.$emit('removed');
+      this.$root.$emit('refresh-favorite-list');
+    },
+    removeError() {
+      this.displayAlert(this.$t('Favorite.tooltip.ErrorDeletingFavorite', {0: this.$t('news.label')}), 'error');
+    },
+    displayAlert(message, type) {
+      this.$root.$emit('news-notification-alert', {
+        activityId: this.id,
+        message,
+        type: type || 'success',
+      });
+    },
+  }
 };
 </script>

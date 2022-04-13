@@ -69,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 solo
                 dense
                 @change="updateDraftVisibility()">
-                <template v-slot:selection="{ item }">
+                <template #selection="{ item }">
                   <v-icon
                     v-if="!item.value"
                     size="16"
@@ -170,7 +170,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   {{ $t("news.edit.update") }}
                 </v-btn>
                 <v-tooltip bottom :disabled="!news.activityPosted">
-                  <template v-slot:activator="{ on, attrs }">
+                  <template #activator="{ on, attrs }">
                     <span v-on="on">
                       <v-btn
                         id="newsUpdateAndPost"

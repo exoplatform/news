@@ -4,5 +4,8 @@
   ],
   "globals": {
     "CKEDITOR": true
+  },
+  "rules": {
+    "vue/no-mutating-props": "warn"
   }
 }

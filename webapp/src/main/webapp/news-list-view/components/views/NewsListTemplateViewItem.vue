@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="article-item-link"
     target="_self"
     :href="item.url">
-    <div class="article-item-image">
+    <div v-if="showArticleImage" class="article-item-image">
       <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="article-item-content">
@@ -68,58 +68,29 @@ export default {
       month: 'long',
       day: 'numeric',
     },
-    showArticleTitle: true,
-    showArticleSummary: true,
-    showArticleImage: true,
-    showArticleAuthor: true,
-    showArticleSpace: true,
-    showArticleDate: true,
-    showArticleReactions: true,
   }),
   computed: {
     displayDate() {
-      return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
+      return this.item?.publishDate?.time && new Date(this.item.publishDate.time);
     },
     showArticleImage() {
-      return this.selectedOption && this.selectedOption.showArticleImage;
+      return this.selectedOption?.showArticleImage;
     },
     showArticleAuthor() {
-      return this.selectedOption && this.selectedOption.showArticleAuthor;
+      return this.selectedOption?.showArticleAuthor;
     },
     showArticleSpace() {
-      return this.selectedOption && this.selectedOption.showArticleSpace;
+      return this.selectedOption?.showArticleSpace;
     },
     showArticleDate() {
-      return this.selectedOption && this.selectedOption.showArticleDate;
+      return this.selectedOption?.showArticleDate;
     },
     showArticleReactions() {
-      return this.selectedOption && this.selectedOption.showArticleReactions;
+      return this.selectedOption?.showArticleReactions;
     },
     articleImage() {
-      return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL : '/news/images/news.png';
+      return this.item?.illustrationURL || '/news/images/news.png';
     }
   },
-  created() {
-    this.reset();
-  },
-  methods: {
-    reset() {
-      this.viewTemplate = this.$root.viewTemplate;
-      this.viewExtensions = this.$root.viewExtensions;
-      this.newsTarget = this.$root.newsTarget;
-      this.newsHeader = this.$root.header;
-      this.limit = this.$root.limit;
-      this.showHeader = this.$root.showHeader;
-      this.showSeeAll = this.$root.showSeeAll;
-      this.showArticleTitle = this.$root.showArticleTitle;
-      this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.$root.showArticleSummary;
-      this.showArticleAuthor = this.$root.showArticleAuthor;
-      this.showArticleSpace = this.$root.showArticleSpace;
-      this.showArticleDate = this.$root.showArticleDate;
-      this.showArticleReactions = this.$root.showArticleReactions;
-      this.seeAllUrl = this.$root.seeAllUrl;
-    },
-  }
 };
 </script>

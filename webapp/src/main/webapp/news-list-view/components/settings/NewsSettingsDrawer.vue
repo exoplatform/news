@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         max-width="350px"
         color="grey darken-4"
         bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             icon
             v-bind="attrs"
@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               outlined
               class="pa-0"
               @blur="blurSelection">
-              <template v-slot:selection="{ item, index }">
+              <template #selection="{ item }">
                 <span :title="item.toolTipInfo">
                   {{ item.label }}
                 </span>

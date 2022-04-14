@@ -23,7 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       :href="item.url">
       <div class="imgContainer">
         <img
-          v-if="showArticleImage"
           class="article-illustration-img"
           :src="articleImage"
           :alt="$t('news.latest.alt.articleImage')">
@@ -145,7 +144,7 @@ export default {
       return this.selectedOption && this.selectedOption.showArticleSpace;
     },
     articleImage() {
-      return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL : '/news/images/news.png';
+      return (this.showArticleImage && this.item?.illustrationURL) || '/news/images/news.png';
     },
     isHiddenSpace() {
       return this.item && !this.item.spaceMember && this.item.hiddenSpace;

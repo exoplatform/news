@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="article-item-link"
     target="_self"
     :href="item.url">
-    <div v-if="showArticleImage" class="article-item-image">
+    <div class="article-item-image">
       <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="article-item-content">
@@ -89,8 +89,8 @@ export default {
       return this.selectedOption?.showArticleReactions;
     },
     articleImage() {
-      return this.item?.illustrationURL || '/news/images/news.png';
-    }
+      return (this.showArticleImage && this.item?.illustrationURL) || '/news/images/news.png';
+    },
   },
 };
 </script>

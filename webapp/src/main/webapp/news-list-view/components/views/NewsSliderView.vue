@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       cycle
       show-arrows-on-hover
       interval="10000"
+      height="220"
       hide-delimiter-background
       class="sliderNewsItems fill-height">
       <v-carousel-item

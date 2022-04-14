@@ -23,6 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       :href="item.url">
       <div class="imgContainer">
         <img
+          v-if="showArticleImage"
           class="article-illustration-img"
           :src="articleImage"
           :alt="$t('news.latest.alt.articleImage')">
@@ -44,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <a
           class="articleLink"
           target="_self"
-          href="/portal/dw/activity?id=62">
+          :href="item.url">
           <div v-if="showArticleTitle" class="article-title">{{ item.title }}</div>
           <div class="article-author-date">
             <div v-if="showArticleAuthor" class="author-name">{{ item.authorDisplayName }}</div>
@@ -70,13 +71,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="reactions">
               <v-icon
                 class="counters-icons"
-                size="14"
-                style="color: #a8b3c5">mdi-thumb-up</v-icon>
+                size="14">mdi-thumb-up</v-icon>
               <div class="likes-count">{{ item.likesCount }}</div>
               <v-icon
-                class="counters-icons mt-1"
-                size="14"
-                style="color: #a8b3c5">
+                class="counters-icons mt-1 ml-2"
+                size="14">
                 mdi-comment
               </v-icon>
               <div class="comments-count">{{ item.commentsCount }}</div>
@@ -85,12 +84,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <a
             class="articleLink"
             target="_self"
-            href="/portal/dw/activity?id=62">
+            :href="activityReactionsLink">
             <div class="views">
               <v-icon
                 class="counters-icons"
-                size="16"
-                style="color: #a8b3c5">mdi-eye</v-icon>
+                size="16">mdi-eye</v-icon>
               <div class="views-count">{{ item.viewsCount }}</div>
             </div>
           </a>

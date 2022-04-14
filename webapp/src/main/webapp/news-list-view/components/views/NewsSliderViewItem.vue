@@ -161,27 +161,6 @@ export default {
     showArticleReactions() {
       return this.selectedOption && this.selectedOption.showArticleReactions;
     },
-  },
-  created() {
-    this.reset();
-  },
-  methods: {
-    reset() {
-      this.viewTemplate = this.$root.viewTemplate;
-      this.viewExtensions = this.$root.viewExtensions;
-      this.newsTarget = this.$root.newsTarget;
-      this.newsHeader = this.$root.header;
-      this.limit = this.$root.limit;
-      this.showHeader = this.$root.showHeader;
-      this.showSeeAll = this.$root.showSeeAll;
-      this.showArticleTitle = this.$root.showArticleTitle;
-      this.showArticleImage = this.$root.showArticleImage;
-      this.showArticleSummary = this.$root.showArticleSummary;
-      this.showArticleAuthor = this.$root.showArticleAuthor;
-      this.showArticleSpace = this.$root.showArticleSpace;
-      this.showArticleDate = this.$root.showArticleDate;
-      this.showArticleReactions = this.$root.showArticleReactions;
-    },
   }
 };
 </script>

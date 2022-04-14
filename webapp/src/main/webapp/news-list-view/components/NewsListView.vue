@@ -104,7 +104,7 @@ export default {
         if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
           return sortedViewExtensions[3];
-        } else if (( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsList' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ) && this.newsList.length === 0) {
+        } else if (( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsList' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' || this.viewTemplate === 'NewsCards' ) && this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
           return sortedViewExtensions[4];
         } else {

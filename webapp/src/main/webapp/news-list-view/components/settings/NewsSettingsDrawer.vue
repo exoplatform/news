@@ -249,18 +249,10 @@ export default {
   methods: {
     open() {
       this.reset();
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'block';
-      }
       this.$refs.newsSettingsDrawer.open();
     },
     close() {
       this.$refs.newsSettingsDrawer.close();
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'none';
-      }
       window.setTimeout(() => this.showAdvancedSettings = false, 200);
     },
     reset() {

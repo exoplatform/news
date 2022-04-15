@@ -98,4 +98,10 @@ export function initExtensions() {
     },
   });
 
+
+  extensionRegistry.registerComponent('favorite-news', 'favorite-drawer-item', {
+    id: 'news',
+    vueComponent: Vue.options.components['news-favorite-item'],
+  });
+
 }

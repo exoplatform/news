@@ -85,12 +85,15 @@ export default {
       required: false,
       default: 'snapshotSliderNews'
     },
+    canPublishNews: {
+      type: Boolean,
+      default: false,
+    },
   },
   data () {
     return {
       news: [],
       initialized: false,
-      canPublishNews: false,
       limit: 4,
       offset: 0,
       fullDateFormat: {
@@ -117,9 +120,6 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {

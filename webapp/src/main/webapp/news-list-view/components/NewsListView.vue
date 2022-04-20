@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <v-app class="news-list-view-app position-relative">
     <v-card flat class="list-view-card rounded-0">
       <v-card-text class="pa-0">
-        <news-settings v-if="displayHeader" />
+        <news-settings v-if="displayHeader" :can-publish-news="canPublishNews" />
         <extension-registry-component
           v-if="selectedViewExtension"
           element-class="news-list-view"
@@ -89,6 +89,10 @@ export default {
       type: String,
       default: null,
     },
+    canPublishNews: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     extensionApp: 'NewsList',
@@ -98,7 +102,6 @@ export default {
     loading: false,
     hasMore: false,
     offset: 0,
-    canPublishNews: false,
   }),
   computed: {
     displayHeader() {
@@ -145,6 +148,7 @@ export default {
         showArticleDate: this.showArticleDate,
         seeAllUrl: this.seeAllUrl,
         hasMore: this.hasMore,
+        canPublishNews: this.canPublishNews
       };
     },
   },
@@ -154,9 +158,6 @@ export default {
     },
   },
   created() {
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
       this.seeAllUrl = selectedOptions.seeAllUrl;
       this.showSeeAll = selectedOptions.showSeeAll;

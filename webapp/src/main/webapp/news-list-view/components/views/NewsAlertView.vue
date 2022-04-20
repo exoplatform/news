@@ -81,10 +81,13 @@ export default {
       required: false,
       default: null
     },
+    canPublishNews: {
+      type: Boolean,
+      default: false,
+    },
   },
   data () {
     return {
-      canPublishNews: false,
       slider: 0,
       news: [],
       initialized: false,
@@ -119,9 +122,6 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {

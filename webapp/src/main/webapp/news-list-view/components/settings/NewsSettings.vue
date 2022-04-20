@@ -43,12 +43,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
+  props: {
+    canPublishNews: {
+      type: Boolean,
+      default: false,
+    }
+  },
   data: () => ({
     newsHeader: '',
     seeAllUrl: 'news?filter=pinned',
     showHeader: false,
     showSeeAll: false,
-    canPublishNews: false,
   }),
   created() {
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
@@ -61,9 +66,6 @@ export default {
     this.seeAllUrl = this.$root.seeAllUrl;
     this.showSeeAll = this.$root.showSeeAll;
     this.showHeader = this.$root.showHeader;
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {

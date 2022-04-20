@@ -34,13 +34,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
-  data: () => ({
-    canPublishNews: false,
-  }),
-  created() {
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
+  props: {
+    canPublishNews: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     openDrawer() {

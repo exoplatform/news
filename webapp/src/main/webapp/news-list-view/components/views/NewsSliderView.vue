@@ -75,7 +75,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-container>
       </v-carousel-item>
     </v-carousel>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
@@ -124,11 +123,7 @@ export default {
   },
   methods: {
     openDrawer() {
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'block';
-      }
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
     getNewsList() {
       if (!this.initialized) {

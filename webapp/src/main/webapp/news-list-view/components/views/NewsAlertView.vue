@@ -66,7 +66,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-btn
         v-if="canPublishNews"
         icon
-        @click="$root.$emit('news-settings-drawer-open')">
+        @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>
@@ -118,15 +118,15 @@ export default {
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
-
-    //this.$root.$on('open-settings-drawer', () => this.openDrawer());
-
     this.getNewsList();
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
   },
   methods: {
+    openDrawer() {
+      this.$root.$emit('news-settings-drawer-open');
+    },
     getNewsList() {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)

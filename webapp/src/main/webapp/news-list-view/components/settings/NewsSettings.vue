@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-btn
         v-if="canPublishNews"
         icon
-        @click="$root.$emit('news-settings-drawer-open')">
+        @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>
@@ -51,7 +51,6 @@ export default {
     canPublishNews: false,
   }),
   created() {
-    //this.$root.$on('open-settings-drawer', () => this.openDrawer());
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
       this.newsHeader = selectedOptions.header;
       this.seeAllUrl = selectedOptions.seeAllUrl;
@@ -68,8 +67,7 @@ export default {
   },
   methods: {
     openDrawer() {
-      this.$refs.settingsDrawer.open();
-      //this.$root.$emit('open-settings-drawer');
+      this.$root.$emit('news-settings-drawer-open');
     },
     seeAllNews() {
       window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;

@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <div class="noNewsSlideContent">
     <v-btn
-      v-if="canPublishNews"
+      v-if="$root.canPublishNews"
       icon
       @click="openDrawer"
       class="mt-2 me-4 float-right">
@@ -33,12 +33,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
-  props: {
-    canPublishNews: {
-      type: Boolean,
-      default: false,
-    },
-  },
   methods: {
     openDrawer() {
       this.$root.$emit('news-settings-drawer-open');

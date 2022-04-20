@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div class="flex flex-column carouselNewsInfo">
             <div class="flex flex-row" :class="!canPublishNews ? 'mt-9' : ''">
               <v-btn
-                v-if="canPublishNews"
+                v-if="$root.canPublishNews"
                 icon
                 @click="openDrawer"
                 class="float-right settingNewsButton">
@@ -84,10 +84,6 @@ export default {
       type: String,
       required: false,
       default: 'snapshotSliderNews'
-    },
-    canPublishNews: {
-      type: Boolean,
-      default: false,
     },
   },
   data () {

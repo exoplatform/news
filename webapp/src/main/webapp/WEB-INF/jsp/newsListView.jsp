@@ -62,7 +62,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       currentIdentity = ConversationState.getCurrent().getIdentity();
     }
 
-    Boolean canPublishNews = NewsUtils.canPublishNews(currentIdentity);
+    boolean canPublishNews = NewsUtils.canPublishNews(currentIdentity);
     saveSettingsURL = canPublishNews ? saveSettingsURL : null;
   %>
   <div class="news-list-view-app" id="<%= appId %>">

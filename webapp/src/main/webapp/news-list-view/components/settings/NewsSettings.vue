@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="d-flex flex-column me-2">
       <v-btn
-        v-if="canPublishNews"
+          v-if="$root.canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -43,12 +43,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
-  props: {
-    canPublishNews: {
-      type: Boolean,
-      default: false,
-    }
-  },
   data: () => ({
     newsHeader: '',
     seeAllUrl: 'news?filter=pinned',

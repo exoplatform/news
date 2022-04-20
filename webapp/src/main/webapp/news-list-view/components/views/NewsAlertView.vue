@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-icon>chevron_right</v-icon>
       </v-btn>
       <v-btn
-        v-if="canPublishNews"
+        v-if="$root.canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -80,10 +80,6 @@ export default {
       type: String,
       required: false,
       default: null
-    },
-    canPublishNews: {
-      type: Boolean,
-      default: false,
     },
   },
   data () {

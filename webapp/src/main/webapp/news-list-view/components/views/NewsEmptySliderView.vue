@@ -29,7 +29,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="NewsSliderText">
       <div class="noNewsMsg">{{ $t('news.slider.yourArticleTitleGoesHere') }}</div>
     </div>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
@@ -42,7 +41,7 @@ export default {
   },
   methods: {
     openDrawer() {
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
   }
 };

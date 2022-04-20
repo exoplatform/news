@@ -36,7 +36,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </span>
         </div>
       </v-flex>
-      <news-settings-drawer ref="settingsDrawer" />
     </v-main>
   </v-app>
 </template>
@@ -51,7 +50,7 @@ export default {
   },
   methods: {
     openDrawer() {
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
   }
 };

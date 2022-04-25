@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <v-app class="news-list-view-app position-relative">
     <v-card flat class="list-view-card rounded-0">
       <v-card-text class="pa-0">
-        <news-settings v-if="viewTemplate && (viewTemplate !== 'NewsSlider' && viewTemplate !== 'NewsAlert')" />
+        <news-settings v-if="displayHeader" />
         <extension-registry-component
           v-if="selectedViewExtension"
           element-class="news-list-view"
@@ -26,6 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :params="viewComponentParams" />
       </v-card-text>
     </v-card>
+    <news-settings-drawer v-if="$root.canPublishNews" />
   </v-app>
 </template>
 
@@ -99,6 +100,9 @@ export default {
     offset: 0,
   }),
   computed: {
+    displayHeader() {
+      return this.viewTemplate && (this.viewTemplate !== 'NewsSlider' && this.viewTemplate !== 'NewsAlert');
+    },
     selectedViewExtension() {
       if (this.viewTemplate) {
         if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {

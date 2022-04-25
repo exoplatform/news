@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div class="flex flex-column carouselNewsInfo">
             <div class="flex flex-row" :class="!canPublishNews ? 'mt-9' : ''">
               <v-btn
-                v-if="canPublishNews"
+                v-if="$root.canPublishNews"
                 icon
                 @click="openDrawer"
                 class="float-right settingNewsButton">
@@ -75,7 +75,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-container>
       </v-carousel-item>
     </v-carousel>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
@@ -91,7 +90,6 @@ export default {
     return {
       news: [],
       initialized: false,
-      canPublishNews: false,
       limit: 4,
       offset: 0,
       fullDateFormat: {
@@ -118,17 +116,10 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'block';
-      }
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
     getNewsList() {
       if (!this.initialized) {

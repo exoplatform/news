@@ -220,17 +220,19 @@ public interface NewsService {
    * Archive a news
    *
    * @param newsId The id of the news to be archived
+   * @param currentUserName {@link Identity} of user archiving the news
    * @throws Exception when error
    */
-  void archiveNews(String newsId) throws Exception;
+  void archiveNews(String newsId, String currentUserName) throws Exception;
   
   /**
    * Unarchive a news
    *
    * @param newsId The id of the news to be unarchived
+   * @param currentUserName {@link Identity} of user unarchiving the news
    * @throws Exception when error
    */
-  void unarchiveNews(String newsId) throws Exception;
+  void unarchiveNews(String newsId, String currentUserName) throws Exception;
   
   /**
    * 

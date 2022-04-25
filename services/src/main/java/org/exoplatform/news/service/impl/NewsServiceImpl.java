@@ -163,7 +163,11 @@ public class NewsServiceImpl implements NewsService {
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
     if (publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
       newsTargetingService.deleteNewsTargets(news.getId(), updater);
-      newsTargetingService.saveNewsTarget(news.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), news.getTargets(), updater);
+      newsTargetingService.saveNewsTarget(news.getId(),
+                                          StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED),
+                                          news.isArchived(),
+                                          news.getTargets(),
+                                          updater);
     }
 
     newsStorage.updateNews(news);
@@ -348,7 +352,11 @@ public class NewsServiceImpl implements NewsService {
     }
     if (NewsUtils.canPublishNews(currentIdentity) && news.isPublished() && news.getTargets() != null) {
       newsTargetingService.deleteNewsTargets(news.getId());
-      newsTargetingService.saveNewsTarget(news.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), news.getTargets(), currentIdentity.getUserId());
+      newsTargetingService.saveNewsTarget(news.getId(),
+                                          StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED),
+                                          news.isArchived(),
+                                          news.getTargets(),
+                                          currentIdentity.getUserId());
     }
     return newsStorage.scheduleNews(news);
   }
@@ -409,7 +417,11 @@ public class NewsServiceImpl implements NewsService {
     newsStorage.publishNews(news);
     if(publishedNews.getTargets() != null) {
       newsTargetingService.deleteNewsTargets(publishedNews.getId(), publisher);
-      newsTargetingService.saveNewsTarget(publishedNews.getId(), StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED), publishedNews.getTargets(), publisher);
+      newsTargetingService.saveNewsTarget(publishedNews.getId(),
+                                          StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED),
+                                          news.isArchived(),
+                                          publishedNews.getTargets(),
+                                          publisher);
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
@@ -468,8 +480,18 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void archiveNews(String newsId) throws Exception {
+  public void archiveNews(String newsId, String currentUserName) throws Exception {
     newsStorage.archiveNews(newsId);
+    News news = getNewsById(newsId, false);
+    List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
+    if (newsTargets != null && !newsTargets.isEmpty()) {
+      newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
+      newsTargetingService.saveNewsTarget(news.getId(),
+                                          StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED),
+                                          news.isArchived(),
+                                          newsTargets,
+                                          currentUserName);
+    }
   }
   
   /**
@@ -508,8 +530,24 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void unarchiveNews(String newsId) throws Exception {
+  public void unarchiveNews(String newsId, String currentUserName) throws Exception {
     newsStorage.unarchiveNews(newsId);
+    News news = getNewsById(newsId, false);
+    List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
+    if (newsTargets != null && !newsTargets.isEmpty()) {
+      newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
+      newsTargets.stream().forEach(targetName -> {
+        try {
+          newsTargetingService.saveNewsTarget(news.getId(),
+                  StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED),
+                  news.isArchived(),
+                  newsTargets,
+                  currentUserName);
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
   }
   
   /**

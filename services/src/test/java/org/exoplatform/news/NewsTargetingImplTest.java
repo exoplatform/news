@@ -223,7 +223,7 @@ public class NewsTargetingImplTest {
     properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
 
     // When
-    newsTargetingService.saveNewsTarget(news.getId(), false, false, news.getTargets(), "root");
+    newsTargetingService.saveNewsTarget(news.getId(), properties, news.getTargets(), "root");
 
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root");
@@ -252,13 +252,11 @@ public class NewsTargetingImplTest {
     metadataItem.setMetadata(sliderNews);
     List<MetadataItem> metadataItems = new LinkedList<>();
     metadataItems.add(metadataItem);
-    Map<String, String> properties = new LinkedHashMap<>();
-    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
-    properties.put(PublicationDefaultStates.ARCHIVED, String.valueOf(false));
     when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty("newsTargets",
                                                                                                NewsTargetingService.METADATA_TYPE.getName(),
                                                                                                "news",
-                                                                                               properties,
+                                                                                               "displayed",
+                                                                                               String.valueOf(true),
                                                                                                0,
                                                                                                10)).thenReturn(metadataItems);
 

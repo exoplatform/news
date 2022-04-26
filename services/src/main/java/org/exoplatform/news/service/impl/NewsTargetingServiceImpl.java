@@ -92,7 +92,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public void saveNewsTarget(String newsId, boolean staged, boolean archived, List<String> targets, String currentUserId) throws IllegalAccessException {
+  public void saveNewsTarget(String newsId, Map<String, String> displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
     org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(currentUserId);
     if (!NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalAccessException("User " + currentUserId + " not authorized to save news targets");
@@ -102,10 +102,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     targets.stream().forEach(targetName -> {
       try {
         MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
-        Map<String, String> properties = new LinkedHashMap<>();
-        properties.put(PublicationDefaultStates.STAGED, String.valueOf(staged));
-        properties.put(PublicationDefaultStates.ARCHIVED, String.valueOf(archived));
-        metadataService.createMetadataItem(newsTargetObject, metadataKey, properties, Long.parseLong(currentSocIdentity.getId()));
+        metadataService.createMetadataItem(newsTargetObject, metadataKey, displayed, Long.parseLong(currentSocIdentity.getId()));
       } catch (ObjectAlreadyExistsException e) {
         LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",
                 targetName,
@@ -117,10 +114,13 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   @Override
   public List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit) {
-    Map<String, String> properties = new LinkedHashMap<>();
-    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
-    properties.put(PublicationDefaultStates.ARCHIVED, String.valueOf(false));
-    return metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty(targetName, METADATA_TYPE.getName(), NewsUtils.NEWS_METADATA_OBJECT_TYPE, properties, offset, limit);
+    return metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty(targetName,
+                                                                                                 METADATA_TYPE.getName(),
+                                                                                                 NewsUtils.NEWS_METADATA_OBJECT_TYPE,
+                                                                                                 "displayed",
+                                                                                                 String.valueOf(true),
+                                                                                                 offset,
+                                                                                                 limit);
   }
   
   @Override

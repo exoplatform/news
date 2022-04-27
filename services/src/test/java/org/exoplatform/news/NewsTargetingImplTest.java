@@ -220,10 +220,10 @@ public class NewsTargetingImplTest {
     memberships.add(membershipEntry);
     identity.setMemberships(memberships);
     Map<String, String> properties = new LinkedHashMap<>();
-    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
+    properties.put("displayed", String.valueOf(true));
 
     // When
-    newsTargetingService.saveNewsTarget(news.getId(), properties, news.getTargets(), "root");
+    newsTargetingService.saveNewsTarget(news.getId(), true, news.getTargets(), "root");
 
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root");

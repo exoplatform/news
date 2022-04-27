@@ -92,17 +92,19 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public void saveNewsTarget(String newsId, Map<String, String> displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
+  public void saveNewsTarget(String newsId, boolean displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
     org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(currentUserId);
     if (!NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalAccessException("User " + currentUserId + " not authorized to save news targets");
     }
     NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
     Identity currentSocIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUserId);
+    Map<String, String> properties = new LinkedHashMap<>();
+    properties.put(NewsUtils.DISPLAYED_STATUS, String.valueOf(displayed));
     targets.stream().forEach(targetName -> {
       try {
         MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
-        metadataService.createMetadataItem(newsTargetObject, metadataKey, displayed, Long.parseLong(currentSocIdentity.getId()));
+        metadataService.createMetadataItem(newsTargetObject, metadataKey, properties, Long.parseLong(currentSocIdentity.getId()));
       } catch (ObjectAlreadyExistsException e) {
         LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",
                 targetName,
@@ -117,7 +119,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     return metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty(targetName,
                                                                                                  METADATA_TYPE.getName(),
                                                                                                  NewsUtils.NEWS_METADATA_OBJECT_TYPE,
-                                                                                                 "displayed",
+                                                                                                 NewsUtils.DISPLAYED_STATUS,
                                                                                                  String.valueOf(true),
                                                                                                  offset,
                                                                                                  limit);

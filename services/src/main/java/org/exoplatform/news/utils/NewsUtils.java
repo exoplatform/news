@@ -47,6 +47,8 @@ public class NewsUtils {
 
   public static final String  NEWS_METADATA_OBJECT_TYPE       = "news";
 
+  public static final String  DISPLAYED_STATUS                = "displayed";
+
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";

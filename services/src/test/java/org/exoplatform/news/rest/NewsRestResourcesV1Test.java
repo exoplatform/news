@@ -555,7 +555,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(1)).archiveNews("id123");
+    verify(newsService, times(1)).archiveNews("id123", "john");
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
@@ -604,7 +604,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(1)).unarchiveNews("id123");
+    verify(newsService, times(1)).unarchiveNews("id123", "john");
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
@@ -652,7 +652,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(0)).archiveNews("id123");
+    verify(newsService, times(0)).archiveNews("id123", "john");
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }

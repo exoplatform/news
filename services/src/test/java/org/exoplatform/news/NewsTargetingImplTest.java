@@ -220,10 +220,10 @@ public class NewsTargetingImplTest {
     memberships.add(membershipEntry);
     identity.setMemberships(memberships);
     Map<String, String> properties = new LinkedHashMap<>();
-    properties.put(PublicationDefaultStates.STAGED, String.valueOf(false));
+    properties.put("displayed", String.valueOf(true));
 
     // When
-    newsTargetingService.saveNewsTarget(news.getId(), false, news.getTargets(), "root");
+    newsTargetingService.saveNewsTarget(news.getId(), true, news.getTargets(), "root");
 
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root");
@@ -252,7 +252,13 @@ public class NewsTargetingImplTest {
     metadataItem.setMetadata(sliderNews);
     List<MetadataItem> metadataItems = new LinkedList<>();
     metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty("newsTargets", NewsTargetingService.METADATA_TYPE.getName(),"news", PublicationDefaultStates.STAGED, String.valueOf(false),0,10)).thenReturn(metadataItems);
+    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty("newsTargets",
+                                                                                               NewsTargetingService.METADATA_TYPE.getName(),
+                                                                                               "news",
+                                                                                               "displayed",
+                                                                                               String.valueOf(true),
+                                                                                               0,
+                                                                                               10)).thenReturn(metadataItems);
 
     // When
     List<MetadataItem> newsTargetsItems = newsTargetingService.getNewsTargetItemsByTargetName("newsTargets", 0, 10);

@@ -101,7 +101,7 @@ public class NewsMetadataListenerTest {
 
     newsActivityListener.onEvent(event);
     verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);
-    verify(favoriteService, times(1)).createFavorite(any());
+    verify(favoriteService, times(1)).createFavorite(any(), any());
     verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, news.getId());
   }
 

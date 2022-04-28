@@ -23,6 +23,8 @@ import org.exoplatform.social.metadata.tag.TagService;
 import org.exoplatform.social.metadata.tag.model.TagName;
 import org.exoplatform.social.metadata.tag.model.TagObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class NewsMetadataListener extends Listener<Long, MetadataItem> {
@@ -91,7 +93,9 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
             updateActivityTags(activity, news);
           }
           else {
-            favoriteService.createFavorite(favorite);
+            Map<String, String> favoriteProperties = new HashMap<>();
+            favoriteProperties.put("hidden", "false");
+            favoriteService.createFavorite(favorite,favoriteProperties);
           }
         } else if (event.getEventName().equals(METADATA_DELETED) && metadataItem.getMetadataTypeName().equals(METADATA_FAVORITE)) {
           favoriteService.deleteFavorite(favorite);

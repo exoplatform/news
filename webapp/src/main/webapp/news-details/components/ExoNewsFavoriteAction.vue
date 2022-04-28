@@ -2,6 +2,7 @@
   <favorite-button
     :id="activityId"
     :favorite="isFavorite"
+    :hidden=true
     :absolute="absolute"
     :top="top"
     :right="right"
@@ -65,7 +66,7 @@ export default {
     },
     added() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyAddedAsFavorite', {0: this.$t('news.label')}));
-      this.$favoriteService.addFavorite('news', this.news.id)
+      this.$favoriteService.addFavorite('news', this.news.id, '', true)
         .then(() => {
           this.isFavorite = true;
           this.$emit('added');

@@ -37,7 +37,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-if="!isHiddenSpace && showArticleSpace"
           :href="item.spaceUrl">
           <div class="article-space">
-            <img class="space-icon" :src="item.spaceAvatarUrl" alt="Space icon">
+            <img
+              class="space-icon"
+              :src="item.spaceAvatarUrl"
+              alt="Space icon">
             <div class="space-name">{{ item.spaceDisplayName }}</div>
           </div>
         </a>

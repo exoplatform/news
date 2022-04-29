@@ -27,6 +27,9 @@ const urls = [
 document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
 const appId = 'NewsApp';
 
+//used only in mobile statistics
+eXo.env.portal.mainApplicationName = 'News';
+
 export function init() {
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
     new Vue({

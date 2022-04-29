@@ -175,7 +175,7 @@ export default {
       this.loading = true;
       return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
         .then(newsList => {
-          this.newsList = newsList.news || [];
+          this.newsList = newsList.news.filter(news => !!news) || [];
           this.hasMore = this.newsList.length > this.limit;
         })
         .finally(() => this.loading = false);

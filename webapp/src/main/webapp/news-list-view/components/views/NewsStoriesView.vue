@@ -92,7 +92,7 @@ export default {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.news = newsList.news;
+            this.news = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
           .finally(() => this.initialized = false);

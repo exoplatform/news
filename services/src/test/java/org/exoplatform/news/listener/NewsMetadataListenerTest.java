@@ -84,7 +84,7 @@ public class NewsMetadataListenerTest {
     lenient().when(event.getData()).thenReturn(metadataItem);
     lenient().when(event.getData().getObjectType()).thenReturn("activity");
     lenient().when(event.getEventName()).thenReturn("social.metadataItem.created");
-    lenient().when(metadataItem.getMetadataTypeName()).thenReturn("favorite");
+    lenient().when(metadataItem.getMetadataTypeName()).thenReturn("favorites");
     lenient().when(metadataItem.getObjectId()).thenReturn("1");
     News news = new News();
     news.setId("1234");
@@ -102,6 +102,42 @@ public class NewsMetadataListenerTest {
     newsActivityListener.onEvent(event);
     verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);
     verify(favoriteService, times(1)).createFavorite(any());
+    verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, news.getId());
+  }
+
+  @Test
+  public void testDropindexActivityWhenRemoveNewsFromFavorite() throws Exception {
+    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
+            newsService,
+            favoriteService,
+            identityManager,
+            activityManager,
+            tagService);
+    Identity johnIdentity = new Identity("1", Collections.singletonList(new MembershipEntry("john")));
+    ConversationState.setCurrent(new ConversationState(johnIdentity));
+    MetadataItem metadataItem = mock(MetadataItem.class);
+    Event<Long, MetadataItem> event = mock(Event.class);
+    lenient().when(event.getData()).thenReturn(metadataItem);
+    lenient().when(event.getData().getObjectType()).thenReturn("activity");
+    lenient().when(event.getEventName()).thenReturn("social.metadataItem.deleted");
+    lenient().when(metadataItem.getMetadataTypeName()).thenReturn("favorites");
+    lenient().when(metadataItem.getObjectId()).thenReturn("1");
+    News news = new News();
+    news.setId("1234");
+    ExoSocialActivity activity = new ExoSocialActivityImpl();
+    activity.setType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
+    lenient().when(newsService.getNewsByActivityId("1", johnIdentity)).thenReturn(news);
+    org.exoplatform.social.core.identity.model.Identity userIdentity =
+            new org.exoplatform.social.core.identity.model.Identity(OrganizationIdentityProvider.NAME,
+                    "john");
+    userIdentity.setId("1");
+    lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
+    lenient().when(activityManager.getActivity("1")).thenReturn(activity);
+    lenient().when(activityManager.getActivityStreamOwnerIdentity(activity.getId())).thenReturn(userIdentity);
+
+    newsActivityListener.onEvent(event);
+    verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);
+    verify(favoriteService, times(1)).deleteFavorite(any());
     verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, news.getId());
   }
 

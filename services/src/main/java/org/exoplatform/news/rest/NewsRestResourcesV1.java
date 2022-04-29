@@ -793,9 +793,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }
         news.setArchived(updatedNews.isArchived());
         if (news.isArchived()) {
-          newsService.archiveNews(id);
+          newsService.archiveNews(id, currentIdentity.getUserId());
         } else {
-          newsService.unarchiveNews(id);
+          newsService.unarchiveNews(id, currentIdentity.getUserId());
         }
       }
 

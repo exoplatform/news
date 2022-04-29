@@ -71,7 +71,7 @@ export default {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.newsInfo = newsList.news.filter(news => news !== null);
+            this.newsInfo = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
           .finally(() => this.initialized = false);

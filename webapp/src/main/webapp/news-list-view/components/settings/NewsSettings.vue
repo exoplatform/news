@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="d-flex flex-column me-2">
       <v-btn
-          v-if="$root.canPublishNews"
+        v-if="$root.canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>

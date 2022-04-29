@@ -92,18 +92,18 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public void saveNewsTarget(String newsId, boolean staged, List<String> targets, String currentUserId) throws IllegalAccessException {
+  public void saveNewsTarget(String newsId, boolean displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
     org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(currentUserId);
     if (!NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalAccessException("User " + currentUserId + " not authorized to save news targets");
     }
     NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
     Identity currentSocIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUserId);
+    Map<String, String> properties = new LinkedHashMap<>();
+    properties.put(NewsUtils.DISPLAYED_STATUS, String.valueOf(displayed));
     targets.stream().forEach(targetName -> {
       try {
         MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), targetName, 0);
-        Map<String, String> properties = new LinkedHashMap<>();
-        properties.put(PublicationDefaultStates.STAGED, String.valueOf(staged));
         metadataService.createMetadataItem(newsTargetObject, metadataKey, properties, Long.parseLong(currentSocIdentity.getId()));
       } catch (ObjectAlreadyExistsException e) {
         LOG.warn("Targets with name {} is already associated to object {}. Ignore error since it will not affect result.",
@@ -116,7 +116,13 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   @Override
   public List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit) {
-    return metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty(targetName, METADATA_TYPE.getName(), NewsUtils.NEWS_METADATA_OBJECT_TYPE, PublicationDefaultStates.STAGED, String.valueOf(false), offset, limit);
+    return metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndMetadataItemProperty(targetName,
+                                                                                                 METADATA_TYPE.getName(),
+                                                                                                 NewsUtils.NEWS_METADATA_OBJECT_TYPE,
+                                                                                                 NewsUtils.DISPLAYED_STATUS,
+                                                                                                 String.valueOf(true),
+                                                                                                 offset,
+                                                                                                 limit);
   }
   
   @Override

@@ -24,7 +24,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="article-item-content">
       <span v-if="showArticleTitle" class="article-title">{{ item.title }}</span>
-      <span v-if="showArticleAuthor" class="article-preTitle">{{ item.authorDisplayName }}</span>
+      <span v-if="showArticleSummary" class="article-title">{{ item.summary }}</span>
+      <div class="d-flex">
+        <span v-if="showArticleAuthor" class="article-preTitle">{{ item.authorDisplayName }}</span>
+        <v-icon
+          v-if="showArticleSpace && showArticleAuthor"
+          class="mx-1"
+          small>
+          mdi-chevron-right
+        </v-icon>
+        <span v-if="showArticleSpace" class="article-preTitle">{{ item.spaceDisplayName }}</span>
+      </div>
       <div class="article-postTitle">
         <span class="article-date me-2">
           <div v-if="showArticleDate" class="flex-column">
@@ -84,6 +94,12 @@ export default {
     },
     showArticleDate() {
       return this.selectedOption?.showArticleDate;
+    },
+    showArticleTitle() {
+      return this.selectedOption?.showArticleTitle;
+    },
+    showArticleSummary() {
+      return this.selectedOption?.showArticleSummary;
     },
     showArticleReactions() {
       return this.selectedOption?.showArticleReactions;

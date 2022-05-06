@@ -28,7 +28,7 @@ document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
 const appId = 'NewsApp';
 
 //used only in mobile statistics
-eXo.env.portal.mainApplicationName = 'News';
+eXo.env.portal.mainApplicationName = 'news';
 
 export function init() {
   exoi18n.loadLanguageAsync(lang, urls).then(i18n => {

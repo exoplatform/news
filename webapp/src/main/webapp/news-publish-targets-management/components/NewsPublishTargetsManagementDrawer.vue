@@ -108,7 +108,7 @@ export default {
   }),
   computed: {
     checkAlphanumeric() {
-      return this.targetName && !this.targetName.trim().match(/^[\w\-\s]+$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
+      return this.targetName && !this.targetName.trim().match(/^[a-zA-Z\u00C0-\u00FF ]*$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
       return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;

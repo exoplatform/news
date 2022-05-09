@@ -1,19 +1,13 @@
 package org.exoplatform.news.storage.jcr;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -111,8 +105,12 @@ public class JcrNewsStorage implements NewsStorage {
   
   public static final String       NEWS_NODES_FOLDER                = "News";
   
-  public static final String       PUBLISHED_NEWS_NODES_FOLDER         = "Pinned";
+  public static final String       PUBLISHED_NEWS_NODES_FOLDER      = "Pinned";
   
+  public  static final String      EXO_NEWS_LAST_MODIFIER           = "exo:newsLastModifier";
+
+  public  static final String      NEWS_MODIFICATION_MIXIN          = "mix:newsModification";
+
   public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
   
   private ActivityManager          activityManager;
@@ -246,6 +244,9 @@ public class JcrNewsStorage implements NewsStorage {
       newsDraftNode.addMixin("publication:authoring");
       newsDraftNode.setProperty("publication:lastUser", news.getAuthor());
       newsDraftNode.setProperty("publication:lifecycle", lifecycle.getName());
+    }
+    if (newsDraftNode.canAddMixin(NEWS_MODIFICATION_MIXIN)) {
+      newsDraftNode.addMixin(NEWS_MODIFICATION_MIXIN);
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
     publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
@@ -401,9 +402,9 @@ public class JcrNewsStorage implements NewsStorage {
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
     news.setPublicationDate(getPublicationDate(node));
-    news.setUpdater(getLastUpdater(node));
+    news.setUpdater(getLastUpdater(originalNode));
     news.setUpdateDate(getLastUpdatedDate(node));
-    news.setDraftUpdater(getStringProperty(node, "exo:lastModifier"));
+    news.setDraftUpdater(getStringProperty(originalNode, EXO_NEWS_LAST_MODIFIER));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
     if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)) {
@@ -553,8 +554,55 @@ public class JcrNewsStorage implements NewsStorage {
     }
     return illustrationURL.toString();
   }
+
+  private void updateModifiers(Node newsNode, String currentIdentityId) throws RepositoryException, IOException {
+    boolean exist = false;
+    Value[] newsModifiers = new Value[0];
+    if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
+      newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
+      exist = Arrays.stream(newsModifiers).map(value -> {
+        try {
+          return value.getString();
+        } catch (RepositoryException e) {
+          return null;
+        }
+      }).filter(Objects::nonNull).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
+    }
+    if (!exist) {
+      newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
+      newsNode.save();
+    }
+  }
   
-  public News updateNews(News news) throws Exception {
+  private void updateNewsPublicationState(Node newsNode, News news) throws Exception {
+    if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
+      publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+      if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+        newsNode.removeMixin(MIX_NEWS_MODIFIERS);
+        newsNode.save();
+      }
+    } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+      publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
+      Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
+      String currentIdentityId = currentIdentity.getId();
+      if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
+        newsNode.addMixin(MIX_NEWS_MODIFIERS);
+      }
+      updateModifiers(newsNode, currentIdentityId);
+    }
+  }
+  
+  private void updateNewsName(Session session, Node newsNode, News news) throws RepositoryException {
+    if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
+      String srcPath = newsNode.getPath();
+      String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY
+                                                                    : newsNode.getParent().getPath())
+          + "/" + Utils.cleanName(news.getTitle()).trim();
+      session.getWorkspace().move(srcPath, destPath);
+    }
+  }
+
+  public News updateNews(News news, String updater) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
                                                  repositoryService.getCurrentRepository()
@@ -571,12 +619,11 @@ public class JcrNewsStorage implements NewsStorage {
       news.setBody(processedBody);
       newsNode.setProperty("exo:body", processedBody);
       newsNode.setProperty("exo:dateModified", Calendar.getInstance());
-
+      newsNode.setProperty(EXO_NEWS_LAST_MODIFIER, updater);
       // illustration
       if (StringUtils.isNotEmpty(news.getUploadId())) {
         attachIllustration(newsNode, news.getUploadId());
-      } 
-      else if ("".equals(news.getUploadId())) {
+      }  else if ("".equals(news.getUploadId())) {
         removeIllustration(newsNode);
       }
       //draft visible
@@ -595,44 +642,9 @@ public class JcrNewsStorage implements NewsStorage {
       newsNode.save();
 
       // update name of node
-      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
-        String srcPath = newsNode.getPath();
-        String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY : newsNode.getParent().getPath()) + "/"
-                + Utils.cleanName(news.getTitle()).trim();
-        session.getWorkspace().move(srcPath, destPath);
-      }
+      updateNewsName(session, newsNode, news);
 
-      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
-        publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-        if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-          newsNode.removeMixin(MIX_NEWS_MODIFIERS);
-          newsNode.save();
-        }
-      } 
-      else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
-        publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-        Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
-        String currentIdentityId = currentIdentity.getId();
-        if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-          newsNode.addMixin(MIX_NEWS_MODIFIERS);
-        }
-        Value[] newsModifiers = new Value[0];
-        boolean alreadyExist = false;
-        if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
-          newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
-          alreadyExist = Arrays.stream(newsModifiers).map(value -> {
-            try {
-              return value.getString();
-            } catch (RepositoryException e) {
-              return null;
-            }
-          }).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
-        }
-        if (!alreadyExist) {
-          newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
-          newsNode.save();
-        }
-      }
+      updateNewsPublicationState(newsNode, news);
     }
     return news;
   }
@@ -905,7 +917,7 @@ public class JcrNewsStorage implements NewsStorage {
       return lastUpdatedVersion.getAuthor();
     } 
     else {
-      return getStringProperty(node, "exo:lastModifier");
+      return getStringProperty(node, EXO_NEWS_LAST_MODIFIER);
     }
   }
   

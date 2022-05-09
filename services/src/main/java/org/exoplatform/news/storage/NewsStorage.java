@@ -16,7 +16,7 @@ public interface NewsStorage {
   
   String getNewsIllustration(News news) throws Exception;
   
-  News updateNews(News news) throws Exception;
+  News updateNews(News news, String updater) throws Exception;
   
   void updateNewsActivities(String newsActivityId, News news) throws Exception;
   

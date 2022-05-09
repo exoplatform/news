@@ -48,7 +48,7 @@ public class NewsMetadataListener extends Listener<Long, MetadataItem> {
 
   private static final String   METADATA_TAG = "tags";
 
-  private static final String   METADATA_FAVORITE = "favorite";
+  private static final String   METADATA_FAVORITE = "favorites";
 
 
   public NewsMetadataListener(IndexingService indexingService,

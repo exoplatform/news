@@ -52,6 +52,14 @@ public class NewsESSearchConnector {
 
   private static final String          SEARCH_QUERY_FILE_PATH_PARAM = "query.file.path";
 
+  public static final String           SEARCH_QUERY_TERM            = "\"must\":{" +
+      "  \"query_string\":{" +
+      "    \"fields\": [\"body\", \"posterName\"]," +
+      "    \"default_operator\": \"AND\"," +
+      "    \"query\": \"@term@\"" +
+      "  }" +
+      "},";
+
   private final ConfigurationManager   configurationManager;
 
   private final IdentityManager        identityManager;
@@ -67,21 +75,6 @@ public class NewsESSearchConnector {
   private String                       searchQueryFilePath;
 
   private String                       searchQuery;
-
-  public static final String            SEARCH_QUERY_TERM            = "\"should\": {" +
-          "  \"match_phrase\": {" +
-          "    \"body\": {" +
-          "      \"query\": \"@term@\"," +
-          "      \"boost\": 5" +
-          "    }" +
-          "  }" +
-          "}," +
-          "\"must\":{" +
-          "  \"query_string\":{" +
-          "    \"fields\": [\"body\", \"summary\", \"title\"]," +
-          "    \"query\": \"@term_query@\"" +
-          "  }" +
-          "},";
 
   public NewsESSearchConnector(ConfigurationManager configurationManager,
                                IdentityManager identityManager,
@@ -127,10 +120,12 @@ public class NewsESSearchConnector {
 
   private String buildQueryStatement(Identity viewerIdentity, Set<Long> streamFeedOwnerIds, NewsFilter filter) {
     Map<String, List<String>> metadataFilters = buildMetadatasFilter(filter, viewerIdentity);
-    String metadataQuery = buildMetadatasQueryStatement(metadataFilters);
     String termQuery = buildTermQueryStatement(filter.getSearchText());
+    String favoriteQuery = buildFavoriteQueryStatement(metadataFilters.get(FavoriteService.METADATA_TYPE.getName()));
+    String tagsQuery = buildTagsQueryStatement(metadataFilters.get(TagService.METADATA_TYPE.getName()));
     return retrieveSearchQuery().replace("@term_query@", termQuery)
-                                .replace("@metadatas_query@", metadataQuery)
+                                .replace("@favorite_query@", favoriteQuery)
+                                .replace("@tags_query@", tagsQuery)
                                 .replace("@permissions@", StringUtils.join(streamFeedOwnerIds, ","))
                                 .replace("@offset@", String.valueOf(filter.getOffset()))
                                 .replace("@limit@", String.valueOf(filter.getLimit()));
@@ -212,16 +207,7 @@ public class NewsESSearchConnector {
       return term;
     }
     term = removeSpecialCharacters(term);
-    List<String> termsQuery = Arrays.stream(term.split(" ")).filter(StringUtils::isNotBlank).map(word -> {
-      word = word.trim();
-      if (word.length() > 5) {
-        word = word + "~1";
-      }
-      return word;
-    }).collect(Collectors.toList());
-    String termQuery = StringUtils.join(termsQuery, " AND ");
-    return SEARCH_QUERY_TERM.replace("@term@", term)
-            .replace("@term_query@", termQuery);
+    return SEARCH_QUERY_TERM.replace("@term@", term);
   }
   private Long parseLong(JSONObject hitSource, String key) {
     String value = (String) hitSource.get(key);
@@ -246,18 +232,37 @@ public class NewsESSearchConnector {
     return string;
   }
 
-  private String buildMetadatasQueryStatement(Map<String, List<String>> metadataFilters) {
-    StringBuilder metadataQuerySB = new StringBuilder();
-    Set<Map.Entry<String, List<String>>> metadataFilterEntries = metadataFilters.entrySet();
-    for (Map.Entry<String, List<String>> metadataFilterEntry : metadataFilterEntries) {
-      metadataQuerySB.append("{\"terms\":{\"metadatas.")
-      .append(metadataFilterEntry.getKey())
-      .append(".metadataName.keyword")
-      .append("\": [\"")
-      .append(StringUtils.join(metadataFilterEntry.getValue(), "\",\""))
-      .append("\"]}},");
+  private String buildFavoriteQueryStatement(List<String> values) {
+    if (CollectionUtils.isEmpty(values)) {
+      return "";
     }
-    return metadataQuerySB.toString();
+    return new StringBuilder().append("{\"terms\":{")
+                              .append("\"metadatas.favorites.metadataName.keyword\": [\"")
+                              .append(StringUtils.join(values, "\",\""))
+                              .append("\"]}},")
+                              .toString();
+  }
+
+  private String buildTagsQueryStatement(List<String> values) {
+    if (CollectionUtils.isEmpty(values)) {
+      return "";
+    }
+    List<String> tagsQueryParts = values.stream()
+                                        .map(value -> new StringBuilder().append("{\"term\": {\n")
+                                                                         .append("            \"metadatas.tags.metadataName.keyword\": {\n")
+                                                                         .append("              \"value\": \"")
+                                                                         .append(value)
+                                                                         .append("\",\n")
+                                                                         .append("              \"case_insensitive\":true\n")
+                                                                         .append("            }\n")
+                                                                         .append("          }}")
+                                                                         .toString())
+                                        .collect(Collectors.toList());
+    return new StringBuilder().append(",\"should\": [\n")
+                              .append(StringUtils.join(tagsQueryParts, ","))
+                              .append("      ],\n")
+                              .append("      \"minimum_should_match\": 1")
+                              .toString();
   }
 
   private Map<String, List<String>> buildMetadatasFilter(NewsFilter filter, Identity viewerIdentity) {

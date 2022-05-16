@@ -66,7 +66,6 @@ import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.Lifecy
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
-import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
@@ -118,9 +117,7 @@ public class JcrNewsStorage implements NewsStorage {
   private DataDistributionType     dataDistributionType;
   
   private IdentityManager          identityManager;
-  
-  private HTMLUploadImageProcessor imageProcessor;
-  
+
   private LinkManager              linkManager;
 
   private NewsAttachmentsStorage   newsAttachmentsService;
@@ -150,7 +147,6 @@ public class JcrNewsStorage implements NewsStorage {
                          ActivityManager activityManager,
                          SpaceService spaceService,
                          UploadService uploadService,
-                         HTMLUploadImageProcessor imageProcessor,
                          PublicationService publicationService,
                          PublicationManager publicationManager,
                          NewsAttachmentsStorage newsAttachmentsService,
@@ -161,7 +157,6 @@ public class JcrNewsStorage implements NewsStorage {
     
     this.activityManager = activityManager;
     this.dataDistributionType = dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE);
-    this.imageProcessor = imageProcessor;
     this.identityManager = identityManager;
     this.linkManager = linkManager;
     this.newsAttachmentsService = newsAttachmentsService;
@@ -250,7 +245,7 @@ public class JcrNewsStorage implements NewsStorage {
     }
     publicationService.enrollNodeInLifecycle(newsDraftNode, lifecycleName);
     publicationService.changeState(newsDraftNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-    newsDraftNode.setProperty("exo:body", imageProcessor.processImages(news.getBody(), newsDraftNode.getUUID(), "images"));
+    newsDraftNode.setProperty("exo:body", news.getBody());
     spaceNewsRootNode.save();
 
     if (StringUtils.isNotEmpty(news.getUploadId())) {
@@ -613,12 +608,10 @@ public class JcrNewsStorage implements NewsStorage {
 
     Node newsNode = session.getNodeByUUID(news.getId());
     if (newsNode != null) {
-      String processedBody = imageProcessor.processImages(news.getBody(), newsNode.getUUID(), "images");
       newsNode.setProperty("exo:title", news.getTitle());
       newsNode.setProperty("exo:name", news.getTitle());
       newsNode.setProperty("exo:summary", news.getSummary());
-      news.setBody(processedBody);
-      newsNode.setProperty("exo:body", processedBody);
+      newsNode.setProperty("exo:body", news.getBody());
       newsNode.setProperty("exo:dateModified", Calendar.getInstance());
       newsNode.setProperty(EXO_NEWS_LAST_MODIFIER, updater);
       // illustration

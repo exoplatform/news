@@ -366,6 +366,7 @@ export default {
       loading: true,
       currentSpace: {},
       spaceURL: null,
+      spaceGroupId: null,
       currentUser: eXo.env.portal.userName,
       fullDateFormat: {
         year: 'numeric',
@@ -463,10 +464,11 @@ export default {
     elementNewTop.classList.add('darkComposerEffect');
     document.body.style.overflow = 'hidden';
     autosize(document.querySelector('#newsSummary'));
-    
+
     this.$newsServices.getSpaceById(this.spaceId).then(space => {
       this.currentSpace = space;
       this.spaceURL = this.currentSpace.prettyName;
+      this.spaceGroupId = this.currentSpace.groupId;
       this.displayFormTitle();
 
       this.$newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
@@ -494,7 +496,7 @@ export default {
         this.canScheduleNews = canScheduleNews;
       });
     });
-    
+
     this.$nextTick(() => {
       const attachmentsComposer = JSON.parse(localStorage.getItem('exo-activity-composer-attachments'));
       if (attachmentsComposer) {
@@ -574,6 +576,7 @@ export default {
         allowedContent: true,
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,
+        spaceGroupId : self.spaceGroupId,
         toolbarLocation: 'top',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',

@@ -114,7 +114,7 @@ export default {
       return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
     },
     saveButtonLabel() {
-      return this.saveMode === 'edit' ? 'Update' : this.$t('news.publishTargets.managementDrawer.btn.confirm');
+      return this.saveMode === 'edit' ? this.$t('news.publishTargets.managementDrawer.btn.update') : this.$t('news.publishTargets.managementDrawer.btn.confirm');
     }
   },
   watch: {

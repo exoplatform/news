@@ -20,7 +20,11 @@ public class News {
 
   private String               summary;
 
+  /* sanitizedBody with usernames */
   private String               body;
+
+  /* originalBody with user mentions */
+  private String               originalBody;
 
   private String               author;
 

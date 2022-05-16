@@ -151,7 +151,8 @@ public class NewsServiceImpl implements NewsService {
     if (!canEditNews(news, updater)) {  
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
-    Set<String> previousMentions = NewsUtils.processMentions(news.getBody());
+    News originalNews = newsStorage.getNewsById(news.getId(), false);
+    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
     if (publish != news.isPublished() && news.isCanPublish()) {
       news.setPublished(publish);
       if (news.isPublished()) {

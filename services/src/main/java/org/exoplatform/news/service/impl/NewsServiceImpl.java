@@ -1,12 +1,17 @@
 package org.exoplatform.news.service.impl;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
+import javax.jcr.ItemNotFoundException;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -43,8 +48,6 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
-
-import javax.jcr.ItemNotFoundException;
 
 /**
  * Service managing News and storing them in ECMS
@@ -235,7 +238,12 @@ public class NewsServiceImpl implements NewsService {
       news.setCanPublish(NewsUtils.canPublishNews(currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
       news.setTargets(newsTargetingService.getTargetsByNewsId(newsId));
-      ExoSocialActivity activity = activityManager.getActivity(news.getActivityId());
+      ExoSocialActivity activity = null;
+      try {
+        activity = activityManager.getActivity(news.getActivityId());
+      } catch (Exception e) {
+        LOG.debug("Error getting activity of News with id {}", news.getActivityId(), e);
+      }
       if (activity != null) {
         RealtimeListAccess<ExoSocialActivity> listAccess = activityManager.getCommentsWithListAccess(activity, true);
         news.setCommentsCount(listAccess.getSize());
@@ -354,7 +362,9 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.deleteNewsTargets(news.getId());
       newsTargetingService.saveNewsTarget(news.getId(), displayed, news.getTargets(), currentIdentity.getUserId());
     }
-    return newsStorage.scheduleNews(news);
+    news = newsStorage.scheduleNews(news);
+    NewsUtils.broadcastEvent(NewsUtils.SCHEDULE_NEWS, currentIdentity.getUserId(), news);
+    return news;
   }
 
   /**
@@ -367,9 +377,11 @@ public class NewsServiceImpl implements NewsService {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to unschedule news");
     }
     newsTargetingService.deleteNewsTargets(news.getId());
-    return newsStorage.unScheduleNews(news);
+    news = newsStorage.unScheduleNews(news);
+    NewsUtils.broadcastEvent(NewsUtils.UNSCHEDULE_NEWS, currentIdentity.getUserId(), news);
+    return news;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -457,13 +469,14 @@ public class NewsServiceImpl implements NewsService {
 
     ExoSocialActivity activity = new ExoSocialActivityImpl();
     activity.setTitle("");
-    activity.setBody(news.getBody());
     activity.setType("news");
     activity.setUserId(poster.getId());
     activity.isHidden(news.isActivityPosted());
     Map<String, String> templateParams = new HashMap<>();
     templateParams.put(NEWS_ID, news.getId());
     activity.setTemplateParams(templateParams);
+    activity.setMetadataObjectId(news.getId());
+    activity.setMetadataObjectType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
 
     activityManager.saveActivityNoReturn(spaceIdentity, activity);
     newsStorage.updateNewsActivities(activity.getId(), news);
@@ -482,6 +495,7 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
       newsTargetingService.saveNewsTarget(news.getId(), displayed, newsTargets, currentUserName);
     }
+    NewsUtils.broadcastEvent(NewsUtils.ARCHIVE_NEWS, currentUserName, news);
   }
   
   /**
@@ -529,6 +543,7 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
       newsTargetingService.saveNewsTarget(news.getId(), displayed, newsTargets, currentUserName);
     }
+    NewsUtils.broadcastEvent(NewsUtils.UNARCHIVE_NEWS, currentUserName, news);
   }
   
   /**
@@ -617,8 +632,12 @@ public class NewsServiceImpl implements NewsService {
       if (post) {
         activity.setUpdated(System.currentTimeMillis());
       }
-      activity.setBody(news.getBody());
       activity.isHidden(news.isActivityPosted());
+      Map<String, String> templateParams = activity.getTemplateParams() == null ? new HashMap<>() : activity.getTemplateParams();
+      templateParams.put(NEWS_ID, news.getId());
+      activity.setTemplateParams(templateParams);
+      activity.setMetadataObjectId(news.getId());
+      activity.setMetadataObjectType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
       activityManager.updateActivity(activity, true);
     }
   }
@@ -662,7 +681,7 @@ public class NewsServiceImpl implements NewsService {
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
         || spaceService.isManager(currentSpace, authenticatedUser);
   }
-  
+
   private boolean isMemberOfsharedInSpaces(News news, String username) {
     for (String sharedInSpaceId : news.getSharedInSpacesList()) {
       Space sharedInSpace = spaceService.getSpaceById(sharedInSpaceId);
@@ -672,4 +691,5 @@ public class NewsServiceImpl implements NewsService {
     }
     return false;
   }
+
 }

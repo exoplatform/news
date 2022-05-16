@@ -11,11 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.security.ConversationState;
@@ -27,6 +22,10 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("unchecked")
@@ -43,7 +42,7 @@ public class NewsActivityListenerTest {
 
   @Mock
   private NewsService     newsService;
-  
+
   @Test
   public void testNotShareWhenActivityNotFound() {
     NewsActivityListener newsActivityListener = new NewsActivityListener(activityManager,
@@ -169,7 +168,10 @@ public class NewsActivityListenerTest {
     newsActivityListener.shareActivity(event);
 
     verify(newsService, times(1)).getNewsById(newsId, currentIdentity, false);
-    verify(newsService, never()).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
+    verify(newsService, never()).shareNews(nullable(News.class),
+                                           nullable(Space.class),
+                                           nullable(Identity.class),
+                                           nullable(String.class));
   }
 
   @Test
@@ -204,13 +206,13 @@ public class NewsActivityListenerTest {
 
     String newsId = "newsId";
     when(sharedTemplateParams.get("newsId")).thenReturn(newsId);
-    
+
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
     ConversationState.setCurrent(new ConversationState(currentIdentity));
-    
+
     News news = new News();
     when(newsService.getNewsById(newsId, currentIdentity, false)).thenReturn(news);
-    
+
     newsActivityListener.shareActivity(event);
 
     verify(newsService, times(1)).getNewsById(newsId, currentIdentity, false);

@@ -169,7 +169,7 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.saveNewsTarget(news.getId(), displayed, news.getTargets(), updater);
     }
 
-    newsStorage.updateNews(news);
+    newsStorage.updateNews(news, updater);
     
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
       // Send mention notifs

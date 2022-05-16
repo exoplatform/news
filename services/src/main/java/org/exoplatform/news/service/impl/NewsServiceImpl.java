@@ -188,7 +188,7 @@ public class NewsServiceImpl implements NewsService {
       }
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     }
-    if (post != null) {
+    if (post != null && !PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
       updateNewsActivity(news, post);
     }
     NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news);

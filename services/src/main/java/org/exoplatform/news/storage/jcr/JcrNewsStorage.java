@@ -398,6 +398,7 @@ public class JcrNewsStorage implements NewsStorage {
     String sanitizedBody = HTMLSanitizer.sanitize(body);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
     news.setBody(substituteUsernames(portalOwner, sanitizedBody));
+    news.setOriginalBody(sanitizedBody);
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
     news.setPublicationDate(getPublicationDate(node));

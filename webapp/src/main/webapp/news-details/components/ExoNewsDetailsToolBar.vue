@@ -93,7 +93,7 @@ export default {
       return history && history.length && history.length > 2;
     },
     displayFavoriteButton() {
-      return this.showEditButton && this.publicationState !== 'staged';
+      return this.publicationState !== 'staged';
     }
   },
   methods: {

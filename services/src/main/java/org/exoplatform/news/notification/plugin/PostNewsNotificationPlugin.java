@@ -46,14 +46,8 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<>(String.class, "CURRENT_USER");
 
-  private SpaceService                        spaceService;
-
-  private UserHandler                         userhandler;
-
-  public PostNewsNotificationPlugin(InitParams initParams, SpaceService spaceService, OrganizationService organizationService) {
+  public PostNewsNotificationPlugin(InitParams initParams) {
     super(initParams);
-    this.spaceService = spaceService;
-    this.userhandler = organizationService.getUserHandler();
   }
 
   @Override
@@ -93,7 +87,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
     List<String> receivers = new ArrayList<String>();
     try {
-      receivers = getReceivers(contentSpaceId, currentUserName);
+      receivers = NotificationUtils.getReceivers(contentSpaceId, currentUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
@@ -112,18 +106,5 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
                            .key(getKey())
                            .end();
 
-  }
-
-  private List<String> getReceivers(String contentSpaceId,
-                                    String currentUserName) throws Exception {
-    Space space = spaceService.getSpaceById(contentSpaceId);
-    ListAccess<User> members = userhandler.findUsersByGroupId(space.getGroupId());
-    User[] userArray = members.load(0, members.getSize());
-    List<String> receiverUsers = Arrays.stream(userArray)
-            .filter(u -> !u.getUserName().equals(currentUserName))
-            .distinct()
-            .map(User::getUserName)
-            .collect(Collectors.toList());
-    return receiverUsers;
   }
 }

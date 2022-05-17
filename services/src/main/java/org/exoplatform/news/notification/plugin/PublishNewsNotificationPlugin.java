@@ -9,6 +9,10 @@ import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
 
   private static final Log   LOG = ExoLogger.getLogger(PublishNewsNotificationPlugin.class);
@@ -53,10 +57,17 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String authorAvatarUrl = ctx.value(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL);
     String activityLink = ctx.value(PostNewsNotificationPlugin.ACTIVITY_LINK);
     String newsId = ctx.value(PostNewsNotificationPlugin.NEWS_ID);
+    String contentSpaceId = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE_ID);
+    List<String> receivers = new ArrayList<>();
+    try {
+      receivers = NotificationUtils.getReceivers(contentSpaceId, currentUserName);
+    } catch (Exception e) {
+      LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
+    }
 
     return NotificationInfo.instance()
                            .setFrom(currentUserName)
-                           .setSendAllInternals(true)
+                           .to(receivers)
                            .exclude(currentUserName)
                            .with(NotificationConstants.CONTENT_TITLE, contentTitle)
                            .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)

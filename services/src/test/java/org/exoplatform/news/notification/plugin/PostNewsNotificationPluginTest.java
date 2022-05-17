@@ -15,6 +15,7 @@ import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.idgenerator.IDGeneratorService;
 import org.exoplatform.services.jcr.util.IdGenerator;
 import org.exoplatform.services.organization.OrganizationService;
@@ -34,6 +35,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
@@ -60,7 +63,7 @@ public class PostNewsNotificationPluginTest {
   public void shouldMakeNotificationForPostNewsContext() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams);
 
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
@@ -98,6 +101,7 @@ public class PostNewsNotificationPluginTest {
     when(IdGenerator.generate()).thenReturn("123456");
     mockIdGeneratorService();
     when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
+    when(CommonsUtils.getService(SpaceService.class)).thenReturn(spaceService);
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
@@ -122,12 +126,13 @@ public class PostNewsNotificationPluginTest {
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
   }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
+  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class, NotificationUtils.class })
   @Test
   public void shouldMakeNotificationForPostNewsContextAndDoNotSendNotificationToCreator() throws Exception {
     // Given
+    PowerMockito.mockStatic(NotificationUtils.class);
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams);
 
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
@@ -168,11 +173,16 @@ public class PostNewsNotificationPluginTest {
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
+    List<String> receivers1 = new ArrayList<>();
+    receivers1.add("john");
     when(spaceService.getSpaceById("1")).thenReturn(space);
     ListAccess<User> members = mock(ListAccess.class);
     when(userhandler.findUsersByGroupId("space1")).thenReturn(members);
     when(members.getSize()).thenReturn(2);
     when(members.load(0, 2)).thenReturn(receivers);
+    when(NotificationUtils.getReceivers("1", "root")).thenReturn(receivers1);
+    when(NotificationUtils.getUserFullName("root")).thenReturn("root root");
+
 
     // When
     NotificationInfo notificationInfo = newsPlugin.makeNotification(ctx);
@@ -196,7 +206,7 @@ public class PostNewsNotificationPluginTest {
   public void shouldMakeNotificationForPostNewsContextAndAuthorUserIsNull() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams);
 
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);

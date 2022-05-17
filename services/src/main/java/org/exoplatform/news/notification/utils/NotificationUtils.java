@@ -5,20 +5,37 @@ import javax.jcr.Node;
 import javax.jcr.Session;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.model.News;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.jcr.ext.app.SessionProviderService;
-import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NotificationUtils {
 
+  public static List<String> getReceivers(String contentSpaceId,
+                                    String currentUserName) throws Exception {
+    OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
+    SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+    UserHandler userHandler = organizationService.getUserHandler();
+    Space space = spaceService.getSpaceById(contentSpaceId);
+    ListAccess<User> members =  userHandler.findUsersByGroupId(space.getGroupId());
+    User[] userArray = members.load(0, members.getSize());
+    return Arrays.stream(userArray)
+            .filter(u -> !u.getUserName().equals(currentUserName))
+            .distinct()
+            .map(User::getUserName)
+            .collect(Collectors.toList());
+  }
   public static String getUserFullName(String userName) throws Exception {
     OrganizationService organizationService = CommonsUtils.getService(OrganizationService.class);
     UserHandler userHandler = organizationService.getUserHandler();

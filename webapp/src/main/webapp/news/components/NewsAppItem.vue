@@ -52,13 +52,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <exo-user-avatar
             :profile-id="newsAuthor"
             :size="25"
-            class="align-center my-auto text-truncate flex-grow-0 flex"
+            class="align-center width-full my-auto text-truncate flex-grow-0 flex"
             small-font-size
             popover />
           <i v-if="!news.hiddenSpace" class="uiIconArrowNext pt-1"></i>
           <exo-space-avatar
             v-if="!news.hiddenSpace"
             :space-id="spaceId"
+            class="width-full text-truncate"
             :size="25"
             extra-class="ps-1"
             small-font-size

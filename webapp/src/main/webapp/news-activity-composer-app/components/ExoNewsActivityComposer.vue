@@ -532,12 +532,13 @@ export default {
       CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
       CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,selectImage,suggester,font,justify,widget,video,switchView,attachFile';
+      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile';
+      let removePlugins = 'image,confirmBeforeReload,maximize,resize,embedsemantic';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
         // Disable suggester on smart-phone landscape
-        extraPlugins = 'simpleLink,selectImage';
+        extraPlugins = 'simpleLink';
       }
       if (eXo.env.portal.activityTagsEnabled) {
         extraPlugins = `${extraPlugins},tagSuggester`;
@@ -554,7 +555,7 @@ export default {
           { name: 'switchView', items: ['switchView'] },
           { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
           { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'links', items: [ 'selectImage', 'Video'] },
+          { name: 'links', items: ['Video'] },
           { name: 'attachFile', items: ['attachFile'] },
         );
       } else {
@@ -565,14 +566,29 @@ export default {
           { name: 'fontsize', items: ['FontSize'] },
           { name: 'colors', items: [ 'TextColor' ] },
           { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'selectImage', 'Video'] },
+          { name: 'links', items: [ 'simpleLink', 'Video'] },
         );
+      }
+
+      const ckEditorExtensions = extensionRegistry.loadExtensions('WYSIWYGPlugins', 'image');
+      if (ckEditorExtensions && ckEditorExtensions.length) {
+        ckEditorExtensions.forEach(ckEditorExtension => {
+          if (ckEditorExtension.extraPlugin) {
+            extraPlugins = `${extraPlugins},${ckEditorExtension.extraPlugin}`;
+          }
+          if (ckEditorExtension.removePlugin) {
+            removePlugins = `${extraPlugins},${ckEditorExtension.removePlugin}`;
+          }
+          if (ckEditorExtension.extraToolbarItem) {
+            newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem);
+          }
+        });
       }
 
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,
-        removePlugins: 'image,confirmBeforeReload,maximize,resize,embedsemantic',
+        removePlugins: removePlugins,
         allowedContent: true,
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,

@@ -572,19 +572,18 @@ export default {
 
       const ckEditorExtensions = extensionRegistry.loadExtensions('WYSIWYGPlugins', 'image');
       if (ckEditorExtensions && ckEditorExtensions.length) {
-        ckEditorExtensions.forEach(ckEditorExtension => {
-          if (ckEditorExtension.extraPlugin) {
-            extraPlugins = `${extraPlugins},${ckEditorExtension.extraPlugin}`;
-          }
-          if (ckEditorExtension.removePlugin) {
-            removePlugins = `${extraPlugins},${ckEditorExtension.removePlugin}`;
-          }
-          if (ckEditorExtension.extraToolbarItem) {
-            newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem);
-          }
+        const ckEditorExtraPlugins = ckEditorExtensions.map(ckEditorExtension => ckEditorExtension.extraPlugin).join(',');
+        const ckEditorRemovePlugins = ckEditorExtensions.map(ckEditorExtension => ckEditorExtension.removePlugin).join(',');
+        if (ckEditorExtraPlugins) {
+          extraPlugins = `${extraPlugins},${ckEditorExtraPlugins}`;
+        }
+        if (ckEditorRemovePlugins) {
+          removePlugins = `${extraPlugins},${ckEditorRemovePlugins}`;
+        }
+        ckEditorExtensions.map(function (ckEditorExtension) {
+          newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem);
         });
       }
-
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',
         extraPlugins: extraPlugins,

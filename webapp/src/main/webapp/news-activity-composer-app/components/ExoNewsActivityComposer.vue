@@ -580,9 +580,7 @@ export default {
         if (ckEditorRemovePlugins) {
           removePlugins = `${extraPlugins},${ckEditorRemovePlugins}`;
         }
-        ckEditorExtensions.map(function (ckEditorExtension) {
-          newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem);
-        });
+        ckEditorExtensions.forEach(ckEditorExtension => newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem));
       }
       $('textarea#newsContent').ckeditor({
         customConfig: '/commons-extension/ckeditorCustom/config.js',

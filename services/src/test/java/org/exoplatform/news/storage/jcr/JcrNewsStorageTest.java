@@ -3521,7 +3521,6 @@ public class JcrNewsStorageTest {
                                                   activityManager,
                                                   spaceService,
                                                   uploadService,
-                                                  imageProcessor,
                                                   publicationServiceImpl,
                                                   publicationManagerImpl,
                                                   newsAttachmentsService,

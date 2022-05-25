@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             small-font-size
             popover />
         </div>
-        <div v-if="!draftNews" class="newsDate pe-4">
+        <div class="newsDate pe-4" v-if="news.activityId">
           <i v-if="displayClock" class="uiIconClock"></i>
           <span v-if="news && news.schedulePostDate">
             <date-format
@@ -85,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               class="newsTime caption" />
           </span>
         </div>
-        <div class="newsViews " v-if="!news.draft && !news.scheduled">
+        <div class="newsViews " v-if="!news.scheduled && news.activityId">
           <i class="uiIconWatch"></i>
           <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
         </div>

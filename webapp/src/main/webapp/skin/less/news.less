@@ -4504,15 +4504,11 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   overflow: hidden;
   background: white;
   padding: 15px;
-  .article-list-container {
-    display: flex;
-    grid-gap: 15px;
-    flex-wrap: wrap;
-  }
   .article {
     position: relative;
     height: 70px;
     overflow: hidden;
+    width: 270px;
     &:hover {
       img {
         transform: scale(1.08);
@@ -4639,32 +4635,9 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
     }
   } 
 }
-@media (min-width: 620px) {
-  #article-list-view {
-    .article-list-container {
-      grid-template-columns: 1fr 1fr;
-    }
-  } 
-}
-@media (min-width: 1000px) {
-  #article-list-view {
-    .article-list-container {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-  }
-}
-@media (min-width: 1760px) {
-  #article-list-view {
-    .article-list-container {
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-  }
-}
-@media (min-width: 2140px) {
-  #article-list-view {
-    .article-list-container {
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    }
+@media (max-width: 488px) {
+  .article {
+    width: 100% !important;
   }
 }
 

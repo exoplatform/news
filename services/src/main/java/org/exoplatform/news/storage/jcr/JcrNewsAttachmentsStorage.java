@@ -20,6 +20,7 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.value.StringValue;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.wcm.core.NodetypeConstant;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadResource;
@@ -35,7 +36,9 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
 
   private static final Log LOG = ExoLogger.getLogger(JcrNewsAttachmentsStorage.class);
 
-  public static final String NEWS_ATTACHMENTS_NODES_FOLDER = "News Attachments";
+  public static final String     NEWS_ATTACHMENTS_NODES_FOLDER = "News Attachments";
+
+  private static final String    EXO_SPACE_ID                  = "exo:spaceId";
 
   private SessionProviderService sessionProviderService;
 
@@ -201,6 +204,27 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
     return updatedAttachmentsWithIds;
   }
 
+  public void shareAttachmentFromOtherSpace(Node newsNode, String attachmentId) throws RepositoryException {
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 (repositoryService.getCurrentRepository()
+                                                                   .getConfiguration()
+                                                                   .getDefaultWorkspaceName()),
+                                                 repositoryService.getCurrentRepository());
+    Node attachmentNode = session.getNodeByUUID(attachmentId);
+    if (attachmentNode != null) {
+      String attachmentPath = attachmentNode.getPath();
+      String spaceId = newsNode.getProperty(EXO_SPACE_ID).getString();
+      Space spaceNews = spaceService.getSpaceById(spaceId);
+      if (spaceNews != null && !attachmentPath.contains(spaceNews.getGroupId())
+          && attachmentNode.canAddMixin(NodetypeConstant.EXO_PRIVILEGEABLE)) {
+        attachmentNode.addMixin(NodetypeConstant.EXO_PRIVILEGEABLE);
+        ((ExtendedNode) attachmentNode).setPermission("*:" + spaceNews.getGroupId(), new String[] { PermissionType.READ });
+        attachmentNode.save();
+      }
+    }
+  }
+
   /**
    * Add the resource with the given upload id to the given news node
    * @param newsNode The news node
@@ -214,11 +238,11 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
     if (uploadedResource == null) {
       throw new Exception("Cannot attach uploaded file " + uploadId + ", it may not exist");
     }
-    if(!newsNode.hasProperty("exo:spaceId")) {
+    if(!newsNode.hasProperty(EXO_SPACE_ID)) {
       throw new Exception("Cannot get space id of news " + newsNode.getUUID());
     }
 
-    Node spaceNewsAttachmentsRootNode = getSpaceNewsAttachmentsRootNode(newsNode.getProperty("exo:spaceId").getString(), newsNode.getSession());
+    Node spaceNewsAttachmentsRootNode = getSpaceNewsAttachmentsRootNode(newsNode.getProperty(EXO_SPACE_ID).getString(), newsNode.getSession());
     Node newsAttachmentsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsAttachmentsRootNode, getNodeRelativePath(Calendar.getInstance()));
 
     Node attachmentNode = newsAttachmentsFolderNode.addNode(uploadedResource.getFileName(), "nt:file");
@@ -266,6 +290,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
     } else {
       attachmentsIdsProperty = new Value[0];
     }
+    shareAttachmentFromOtherSpace(newsNode, resourceId);
     newsNode.setProperty("exo:attachmentsIds", ArrayUtils.add(attachmentsIdsProperty, new StringValue(resourceId)));
     newsNode.save();
   }

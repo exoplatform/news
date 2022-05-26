@@ -6,6 +6,7 @@
     :top="top"
     :right="right"
     :template-params="templateParams"
+    :space-id="spaceId"
     type="news"
     type-label="News"
     @removed="removed"
@@ -45,6 +46,9 @@ export default {
   computed: {
     newsId() {
       return this.news?.id;
+    },
+    spaceId() {
+      return this.news?.spaceId;
     },
   },
   created() {

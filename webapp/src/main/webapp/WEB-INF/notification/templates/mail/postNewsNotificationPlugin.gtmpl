@@ -52,8 +52,8 @@ $title
 <p style="margin: 0 0 10px; color: #333333; font-size: 13px; line-height: 18px;">
 <%
 String spaceName = "<span style=\"font-weight: bold;\">" + CONTENT_SPACE + "</span>";
-String creator = "<span style=\"color: #578dc9; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
-String currentUser = "<span style=\"color: #578dc9; font-weight: bold;\">" + CURRENT_USER + "</span>";
+String creator = "<span style=\"color: #476A9C; font-weight: bold;\">" + CONTENT_AUTHOR + "</span>";
+String currentUser = "<span style=\"color: #476A9C; font-weight: bold;\">" + CURRENT_USER + "</span>";
 def notificationDescription = "";
 switch(CONTEXT) {
  case "POST NEWS":

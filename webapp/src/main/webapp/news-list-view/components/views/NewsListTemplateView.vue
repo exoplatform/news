@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <div id="article-list-view">
     <v-row>
       <v-col
+        class="article-col"
         v-for="(item, index) of newsInfo"
         :key="item">
         <div

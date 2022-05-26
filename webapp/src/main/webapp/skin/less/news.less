@@ -4504,11 +4504,14 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
   overflow: hidden;
   background: white;
   padding: 15px;
+  .article-col {
+    flex-grow: 0;
+  }
   .article {
     position: relative;
     height: 70px;
     overflow: hidden;
-    max-width: 270px;
+    width: 270px;
     &:hover {
       img {
         transform: scale(1.08);
@@ -4637,7 +4640,7 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
 }
 @media (max-width: 488px) {
   .article {
-    max-width: 100% !important;
+    width: 100% !important;
   }
 }
 

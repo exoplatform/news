@@ -19,16 +19,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="articleLink"
     target="_self"
     :href="item.url">
-    <div class="articleImage">
+    <div class="articleImage" :style="index > 0 && hasSmallWidthContainer && 'display: none'">
       <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
     </div>
-    <div class="articleInfos">
+    <div :class="`articleInfos ${index > 0 && hasSmallWidthContainer && 'pa-0'}`" :style="index === 0 && hasSmallWidthContainer && 'margin: auto 15px;'">
       <div class="articleSpace" v-if="!isHiddenSpace && showArticleSpace">
         <img
           class="spaceImage"
           :src="item.spaceAvatarUrl"
           :alt="$t('news.latest.alt.spaceImage')">
-        <span class="spaceName">{{ item.spaceDisplayName }}</span>
+        <span class="spaceName flex-shrink-1 text-truncate">{{ item.spaceDisplayName }}</span>
       </div>
       <span v-if="showArticleTitle" class="articleTitle">{{ item.title }}</span>
       <div class="articlePostTitle">
@@ -68,6 +68,16 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    index: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    hasSmallWidthContainer: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     selectedOption: {
       type: Object,

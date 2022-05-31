@@ -15,17 +15,44 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="news-latest-view" class="px-2 pb-2">
-    <div class="article-container">
-      <div
-        v-for="(item, index) of newsInfo"
-        :key="item"
-        class="article"
-        :id="`articleItem-${index}`">
-        <news-latest-view-item
-          :item="item"
-          :selected-option="selectedOption"
-          :key="index" />
+  <div
+    id="news-latest-view"
+    class="px-2 pb-2"
+    ref="newsLatestView">
+    <div v-if="!hasSmallWidthContainer">
+      <div class="article-container">
+        <div
+          v-for="(item, index) of newsInfo"
+          :key="item"
+          class="article"
+          :id="`articleItem-${index}`">
+          <news-latest-view-item
+            :item="item"
+            :selected-option="selectedOption"
+            :index="index"
+            :hasSmallWidthContainer="hasSmallWidthContainer"
+            :key="index" />
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <div class="article-container d-flex " style="height: 620px; flex-direction: column">
+        <v-row
+          v-for="(item, index) of newsInfo"
+          :style="{'min-height': index !== 0 ? 'auto' : '38%'}"
+          :key="index"
+          class="article ma-0"
+          :id="`articleItem-${index}`">
+          <v-col style="min-height:100% !important;" class="pa-0">
+            <news-latest-view-item
+              :item="item"
+              :selected-option="selectedOption"
+              :index="index"
+              :hasSmallWidthContainer="hasSmallWidthContainer"
+              :key="index" />
+          </v-col>
+        </v-row>
       </div>
     </div>
   </div>
@@ -67,6 +94,7 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
+    hasSmallWidthContainer: false
   }),
   computed: {
     spaceAvatarUrl() {
@@ -83,6 +111,9 @@ export default {
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
+    console.log(this.$refs.newsLatestView?.clientWidth, window.screen.width);
+    console.log((this.$refs.newsLatestView?.clientWidth *100 / window.screen.width ))
+    this.hasSmallWidthContainer = (this.$refs.newsLatestView?.clientWidth *100 / window.screen.width ) < 33;
   },
   methods: {
     getNewsList() {

@@ -532,7 +532,7 @@ export default {
       CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
       CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile';
+      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile,googleDocPastePlugin';
       let removePlugins = 'image,confirmBeforeReload,maximize,resize,embedsemantic';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();

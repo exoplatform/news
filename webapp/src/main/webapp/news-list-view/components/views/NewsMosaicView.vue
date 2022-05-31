@@ -15,12 +15,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="top-news-mosaic">
+  <div id="top-news-mosaic" ref="top">
     <div :class="`mosaic-container ma-3 ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
         :key="index"
-        class="article"
+        :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
         :id="`articleItem-${index}`">
         <a
           class="articleLink"
@@ -76,6 +76,7 @@ export default {
         month: 'long',
         day: 'numeric',
       },
+      isSmallWidth: false
     };
   },
   created() {
@@ -83,13 +84,16 @@ export default {
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
   },
+  mounted() {
+    this.isSmallWidth =  this.$refs.top?.clientWidth *100 / window.screen.width  < 33;
+  },
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
     smallHeightClass() {
       return this.isMobile && this.news && this.news.length === 1 && 'small-mosaic-container';
-    }
+    },
   },
   methods: {
     getNewsList() {
@@ -101,6 +105,9 @@ export default {
           })
           .finally(() => this.initialized = false);
       }
+    },
+    minLength(lengthNews){
+      return lengthNews<5 && lengthNews>0 ? 100/lengthNews : 25;
     },
     refreshNewsViews(selectedTarget, selectedOption) {
       this.showArticleTitle = selectedOption.showArticleTitle;

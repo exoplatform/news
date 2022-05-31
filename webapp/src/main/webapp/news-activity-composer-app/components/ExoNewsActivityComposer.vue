@@ -205,7 +205,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div id="newsTop"></div>
       </div>
 
-      <form id="newsForm" class="newsForm" onsubmit="event.preventDefault(); return false;">
+      <form
+        id="newsForm"
+        class="newsForm"
+        onsubmit="event.preventDefault(); return false;">
         <div class="newsFormInput">
           <div id="newsFormAttachment" class="newsFormAttachment">
             <div class="control-group attachments">

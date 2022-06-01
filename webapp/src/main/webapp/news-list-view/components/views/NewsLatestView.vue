@@ -30,26 +30,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             :item="item"
             :selected-option="selectedOption"
             :index="index"
-            :hasSmallWidthContainer="hasSmallWidthContainer"
+            :has-small-width-container="hasSmallWidthContainer"
             :key="index" />
         </div>
       </div>
     </div>
-
     <div v-else>
-      <div class="article-container d-flex " style="height: 620px; flex-direction: column">
+      <div :class="`article-container ${hasSmallWidthContainer && 'd-flex flex-column article-small-container'}`">
         <v-row
           v-for="(item, index) of newsInfo"
           :style="{'min-height': index !== 0 ? 'auto' : '38%'}"
           :key="index"
           class="article ma-0"
           :id="`articleItem-${index}`">
-          <v-col style="min-height:100% !important;" class="pa-0">
+          <v-col class="pa-0">
             <news-latest-view-item
               :item="item"
               :selected-option="selectedOption"
               :index="index"
-              :hasSmallWidthContainer="hasSmallWidthContainer"
+              :has-small-width-container="hasSmallWidthContainer"
               :key="index" />
           </v-col>
         </v-row>
@@ -111,9 +110,7 @@ export default {
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
-    console.log(this.$refs.newsLatestView?.clientWidth, window.screen.width);
-    console.log((this.$refs.newsLatestView?.clientWidth *100 / window.screen.width ))
-    this.hasSmallWidthContainer = (this.$refs.newsLatestView?.clientWidth *100 / window.screen.width ) < 33;
+    this.hasSmallWidthContainer = (this.$refs.newsLatestView?.clientWidth *100 / window.screen.width) < 33;
   },
   methods: {
     getNewsList() {

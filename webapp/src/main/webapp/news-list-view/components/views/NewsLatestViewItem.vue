@@ -1,16 +1,13 @@
 <!--
 Copyright (C) 2021 eXo Platform SAS.
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
@@ -19,10 +16,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="articleLink"
     target="_self"
     :href="item.url">
-    <div class="articleImage" :style="index > 0 && hasSmallWidthContainer && 'display: none'">
+    <div :class="`articleImage ${index > 0 && hasSmallWidthContainer && 'd-none'}`">
       <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
     </div>
-    <div :class="`articleInfos ${index > 0 && hasSmallWidthContainer && 'pa-0'}`" :style="index === 0 && hasSmallWidthContainer && 'margin: auto 15px;'">
+    <div :class="`articleInfos ${index > 0 && hasSmallWidthContainer && 'pa-0'} ${index === 0 && hasSmallWidthContainer && 'articleInfosSmallContainer'}`">
       <div class="articleSpace" v-if="!isHiddenSpace && showArticleSpace">
         <img
           class="spaceImage"

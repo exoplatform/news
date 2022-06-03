@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row" :class="!canPublishNews ? 'mt-9' : ''">
+            <div class="flex flex-row" :class="{'!canPublishNews ? `mt-9` : ``' : !$vuetify.breakpoint.xs}">
               <v-btn
                 v-if="$root.canPublishNews"
                 icon

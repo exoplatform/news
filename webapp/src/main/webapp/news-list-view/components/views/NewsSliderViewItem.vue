@@ -39,7 +39,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           alt="Space icon" />
       </v-avatar>
       <a :href="spaceUrl" class="my-auto">
-        <span class="text-capitalize my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
+        <span class="my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
       </a>
     </div>
     <div v-if="showArticleDate" class="date-container d-flex">

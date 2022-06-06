@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           class="spaceImage"
           :src="item.spaceAvatarUrl"
           :alt="$t('news.latest.alt.spaceImage')">
-        <span class="text-capitalize spaceName">{{ item.spaceDisplayName }}</span>
+        <span class="spaceName">{{ item.spaceDisplayName }}</span>
       </div>
       <span v-if="showArticleTitle" class="articleTitle">{{ item.title }}</span>
       <div class="articlePostTitle">

@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="top-news-mosaic" ref="top">
+  <div id="top-news-mosaic" ref="top-news-mosaic">
     <div :class="`mosaic-container ma-3 ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
         :id="`articleItem-${index}`">
         <a
-          class="articleLink"
+          class="articleLink d-block"
           target="_self"
           :href="item.url">
           <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
@@ -33,7 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :value="new Date(item.publishDate.time)"
                 :format="dateFormat" />
             </div>
-            <div v-if="showArticleTitle" class="articleTitle">
+            <div v-if="showArticleTitle" :class="'text-truncate' + isSmallWidth ? 'articleTitle text-truncate':''">
               {{ item.title }}
             </div>
           </div>
@@ -85,7 +85,7 @@ export default {
     this.getNewsList();
   },
   mounted() {
-    this.isSmallWidth =  this.$refs.top?.clientWidth *100 / window.screen.width  < 33;
+    this.isSmallWidth =  this.$refs && this.$refs['top-news-mosaic'] && this.$refs['top-news-mosaic']?.clientWidth *100 / window.screen.width  < 33;
   },
   computed: {
     isMobile() {

@@ -15,12 +15,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="news-latest-view" class="px-2 pb-2">
-    <div class="article-container">
+  <div id="news-latest-view"  ref="news-latest-view" class="px-2 pb-2">
+    <div :class="hasSmallWidthContainer ? 'article-small-container':'article-container'">
       <div
         v-for="(item, index) of newsInfo"
         :key="item"
-        class="article"
+        :class="hasSmallWidthContainer ? 'hasSmallWidthContainer' : 'article'"
         :id="`articleItem-${index}`">
         <news-latest-view-item
           :item="item"
@@ -67,6 +67,7 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
+    hasSmallWidthContainer: false
   }),
   computed: {
     spaceAvatarUrl() {
@@ -83,6 +84,7 @@ export default {
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
+    this.hasSmallWidthContainer = (this.$refs['news-latest-view']?.clientWidth *100 / window.screen.width) < 33;
   },
   methods: {
     getNewsList() {

@@ -107,7 +107,7 @@ export default {
       }
     },
     minLength(lengthNews){
-      return lengthNews<5 && lengthNews>0 ? 100/lengthNews : 25;
+      return lengthNews < 5 && lengthNews > 0 ? 100 / lengthNews : 25;
     },
     refreshNewsViews(selectedTarget, selectedOption) {
       this.showArticleTitle = selectedOption.showArticleTitle;

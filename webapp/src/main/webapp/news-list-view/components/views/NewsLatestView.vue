@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div
         v-for="(item, index) of newsInfo"
         :key="item"
-        :class="hasSmallWidthContainer ? 'hasSmallWidthContainer' : 'article'"
+        :class="hasSmallWidthContainer ? 'smallWidthContainer' : 'article'"
         :id="`articleItem-${index}`">
         <news-latest-view-item
           :item="item"

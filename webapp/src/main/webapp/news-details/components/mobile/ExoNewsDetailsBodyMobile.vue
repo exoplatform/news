@@ -37,6 +37,18 @@
     <div class="d-flex flex-row pa-4">
       <span v-html="newsBody"></span>
     </div>
+    <div v-show="attachments && attachments.length" class="d-flex flex-row pa-4 newsAttachmentsTitle subtitle-2">
+      {{ $t('news.details.attachments.title') }} ({{ attachments ? attachments.length : 0 }})
+    </div>
+    <div v-show="attachments && attachments.length" class="newsAttachments">
+      <div
+        v-for="attachedFile in attachments"
+        :key="attachedFile.id"
+        class="newsAttachment text-truncate"
+        @click="openPreview(attachedFile)">
+        <exo-attachment-item :file="attachedFile" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -105,6 +117,9 @@ export default {
     newsAuthor() {
       return this.news && this.news.author;
     },
+    attachments() {
+      return this.news && this.news.attachments;
+    },
   },
   methods: {
     targetBlank: function (content) {
@@ -123,6 +138,23 @@ export default {
         }
       }
       return docElement.innerHTML;
+    },
+    openPreview(attachedFile) {
+      const self = this;
+      window.require(['SHARED/documentPreview'], function(documentPreview) {
+        documentPreview.init({
+          doc: {
+            id: attachedFile.id,
+            repository: 'repository',
+            workspace: 'collaboration',
+            title: attachedFile.name,
+            downloadUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/file`,
+            openUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/open`
+          },
+          showComments: false
+        });
+        self.hideDocPreviewComments();
+      });
     },
   }
 };

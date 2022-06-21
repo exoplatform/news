@@ -922,7 +922,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       newsFilter.setSearchText(text);
     }
 
-    newsFilter.setOrder("exo:dateModified");
+    newsFilter.setOrder("exo:dateCreated");
     newsFilter.setLimit(limit);
     newsFilter.setOffset(offset);
 

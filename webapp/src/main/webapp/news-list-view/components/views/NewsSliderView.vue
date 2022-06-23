@@ -47,8 +47,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <a
               v-if="showArticleTitle"
               :href="item.url"
-              class="flex flex-row flex-grow-1 align-center justify-center slider-header">
-              <span class="articleTitle text-h4 font-weight-medium white--text">
+              class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate slider-header">
+              <span class="text-h4 font-weight-medium white--text">
                 {{ item.title }}
               </span>
             </a>

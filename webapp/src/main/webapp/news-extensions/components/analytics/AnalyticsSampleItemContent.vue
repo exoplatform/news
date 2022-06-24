@@ -13,7 +13,7 @@
 -->
 <template>
   <div class="text--secondary">
-    {{ value }}
+    {{ attrValue }}
     (<a
       v-if="contentTitle"
       :title="contentTitle"
@@ -30,7 +30,7 @@
 
 export default {
   props: {
-    value: {
+    attrValue: {
       type: String,
       default: ''
     },
@@ -47,9 +47,9 @@ export default {
     },
   },
   created() {
-    if (this.value) {
+    if (this.attrValue) {
       this.loading = true;
-      this.$newsServices.getNewsById(this.value).then(content => {
+      this.$newsServices.getNewsById(this.attrValue).then(content => {
         this.content = content;
         this.$forceUpdate();
       })

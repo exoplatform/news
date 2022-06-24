@@ -102,7 +102,7 @@ export function initExtensions() {
     type: 'news',
     options: {
       // Rank of executing 'match' method
-      rank: 40,
+      rank: 30,
       // Used Vue component to display cell value
       vueComponent: Vue.options.components['analytics-sample-item-content'],
       match: fieldName => fieldName === 'contentId',

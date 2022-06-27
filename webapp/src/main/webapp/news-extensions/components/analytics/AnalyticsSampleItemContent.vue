@@ -12,32 +12,30 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <v-progress-circular
-    v-if="loading"
-    size="24"
-    color="primary"
-    indeterminate />
-  <div v-else-if="content"><a :href="contentUrl">{{ contentTitle }}</a></div>
-  <div v-else class="d-flex">
-    <i :title="$t('analytics.errorRetrievingDataForValue', {0: value})" class="uiIconColorError my-auto"></i>
-    <span class="text-no-wrap text-sub-title my-auto ml-1">
-      {{ $t('analytics.deletedContent') }}
-    </span>
+  <div class="text--secondary">
+    {{ attrValue }}
+    (<a
+      v-if="contentTitle"
+      :title="contentTitle"
+      :href="contentUrl"
+      class="text-truncate"
+      rel="nofollow"
+      target="_blank">
+      {{ contentTitle }}
+    </a>)
   </div>
 </template>
 
 <script>
+
 export default {
   props: {
-    value: {
-      type: Object,
-      default: function () {
-        return null;
-      },
-    }
+    attrValue: {
+      type: String,
+      default: ''
+    },
   },
   data: () => ({
-    loading: true,
     content: null,
   }),
   computed: {
@@ -49,9 +47,9 @@ export default {
     },
   },
   created() {
-    if (this.value) {
+    if (this.attrValue) {
       this.loading = true;
-      this.$newsServices.getNewsById(this.value).then(content => {
+      this.$newsServices.getNewsById(this.attrValue).then(content => {
         this.content = content;
         this.$forceUpdate();
       })

@@ -17,6 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <div id="news-latest-view"  ref="news-latest-view" class="px-2 pb-2">
     <div :class="hasSmallWidthContainer ? 'article-small-container':'article-container'">
+      <v-progress-circular
+        v-if="loading"
+        :size="50"
+        class="loader"
+        color="primary"
+        indeterminate />
       <div
         v-for="(item, index) of newsInfo"
         :key="item"
@@ -39,10 +45,19 @@ export default {
       required: false,
       default: null
     },
+    newsList: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
   data: ()=> ({
     initialized: false,
-    newsInfo: null,
     limit: 4,
     offset: 0,
     space: null,
@@ -70,44 +85,19 @@ export default {
     hasSmallWidthContainer: false
   }),
   computed: {
-    spaceAvatarUrl() {
-      return this.space && this.space.avatarUrl;
-    },
-    spaceDisplayName() {
-      return this.space && this.space.displayName;
+    newsInfo() {
+      return this.newsList && this.newsList.filter(news => !!news);
     }
   },
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
-    this.getNewsList();
   },
   mounted() {
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
     this.hasSmallWidthContainer = (this.$refs['news-latest-view']?.clientWidth *100 / window.screen.width) < 33;
   },
   methods: {
-    getNewsList() {
-      if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
-          .then(newsList => {
-            this.newsInfo = newsList.news.filter(news => !!news);
-            if (this.newsInfo && this.newsInfo[0] && this.newsInfo[0].spaceId) {
-              this.getSpaceById(this.newsInfo[0].spaceId);
-            }
-            this.initialized = true;
-          })
-          .finally(() => this.initialized = false);
-      }
-    },
-    getSpaceById(spaceId) {
-      this.$spaceService.getSpaceById(spaceId, 'identity')
-        .then((space) => {
-          if (space && space.identity && space.identity.id) {
-            this.space = space;
-          }
-        });
-    },
     refreshNewsViews(selectedTarget, selectedOption){
       this.selectedOption = selectedOption;
       this.newsHeader = selectedOption.header;

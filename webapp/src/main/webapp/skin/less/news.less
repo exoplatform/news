@@ -15,6 +15,15 @@
 /*============== Activity News ====================*/
 
 .VuetifyApp {
+  .headLinesTruncate {
+    color: @baseBackgroundDefault !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 13px !important;
+    font-style: normal !important;
+  }
   #newsDetailApp {
     padding: 10px 8%;
     .articleNotFound {
@@ -226,10 +235,6 @@
 
                 .spaceName {
                   color: @baseBackgroundDefault;
-                  display: -webkit-box;
-                  -webkit-line-clamp: 1;
-                  -webkit-box-orient: vertical;
-                  overflow: hidden;
                   font-size: 13px;
                   font-style: normal;
                 }

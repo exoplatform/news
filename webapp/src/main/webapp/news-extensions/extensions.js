@@ -98,6 +98,17 @@ export function initExtensions() {
     },
   });
 
+  extensionRegistry.registerExtension('AnalyticsSamples', 'SampleItem', {
+    type: 'news',
+    options: {
+      // Rank of executing 'match' method
+      rank: 30,
+      // Used Vue component to display cell value
+      vueComponent: Vue.options.components['analytics-sample-item-content'],
+      match: fieldName => fieldName === 'contentId',
+    },
+  });
+
 
   extensionRegistry.registerComponent('favorite-news', 'favorite-drawer-item', {
     id: 'news',

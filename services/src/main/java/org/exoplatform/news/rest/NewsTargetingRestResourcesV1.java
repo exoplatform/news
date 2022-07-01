@@ -88,8 +88,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   public Response getTargets(@Context HttpServletRequest request) {
     try {
       List<NewsTargetingEntity> targets = newsTargetingService.getTargets();
-      return Response.ok(targets)
-              .build();
+      return Response.ok(targets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news targets", e);
       return Response.serverError().build();

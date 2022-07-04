@@ -85,11 +85,15 @@ export default {
       required: false,
       default: 'snapshotSliderNews'
     },
+    newsList: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
   },
   data () {
     return {
-      news: [],
-      initialized: false,
       limit: 4,
       offset: 0,
       fullDateFormat: {
@@ -115,21 +119,15 @@ export default {
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
-    this.getNewsList();
+  },
+  computed: {
+    news(){
+      return this.newsList && this.newsList.filter(news => !!news);
+    }
   },
   methods: {
     openDrawer() {
       this.$root.$emit('news-settings-drawer-open');
-    },
-    getNewsList() {
-      if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
-          .then(newsList => {
-            this.news = newsList.news.filter(news => !!news);
-            this.initialized = true;
-          })
-          .finally(() => this.initialized = false);
-      }
     },
     refreshNewsViews(selectedTarget, selectedOption){
       this.showArticleSummary = selectedOption.showArticleSummary;

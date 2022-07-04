@@ -291,6 +291,7 @@ public class NewsServiceImpl implements NewsService {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
         news.setPublishDate(new Date(target.getCreatedDate()));
+        news.setIllustration(null);
         return news;
       } catch (Exception e) {
         return null;

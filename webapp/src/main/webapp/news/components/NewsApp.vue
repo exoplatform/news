@@ -221,12 +221,11 @@ export default {
         const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time) : null;
         const newsUpdateDate = new Date(item.updateDate.time);
         const newsIllustration = item.illustrationURL == null ? '/news/images/news.png' : item.illustrationURL;
-        const newsIllustrationUpdatedTime = item.illustrationUpdateDate == null ? '' : item.illustrationUpdateDate.time;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
-          illustrationURL: `${newsIllustration}?${newsIllustrationUpdatedTime}`,
+          illustrationURL: newsIllustration,
           title: item.title,
           updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,

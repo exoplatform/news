@@ -93,7 +93,7 @@ export default {
   data: () => ({
     extensionApp: 'NewsList',
     extensionType: 'views',
-    newsList: ['emptyNews'],
+    newsList: [null],
     viewExtensions: {},
     loading: false,
     hasMore: false,
@@ -144,6 +144,7 @@ export default {
         showArticleDate: this.showArticleDate,
         seeAllUrl: this.seeAllUrl,
         hasMore: this.hasMore,
+        loading: this.loading,
       };
     },
   },

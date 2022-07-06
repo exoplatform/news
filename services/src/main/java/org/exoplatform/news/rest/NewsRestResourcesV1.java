@@ -46,31 +46,42 @@ import io.swagger.jaxrs.PATCH;
 @Api(tags = "v1/news", value = "v1/news", description = "Managing news")
 public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
-  private static final Log         LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
+  private static final Log          LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
 
-  private static final String      PUBLISHER_MEMBERSHIP_NAME       = "publisher";
+  private static final String       PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
-  private final static String      PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+  private final static String       PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
-  private NewsService              newsService;
+  private NewsService               newsService;
 
-  private NewsAttachmentsStorage   newsAttachmentsService;
+  private NewsAttachmentsStorage    newsAttachmentsService;
 
-  private SpaceService             spaceService;
+  private SpaceService              spaceService;
 
-  private IdentityManager          identityManager;
+  private IdentityManager           identityManager;
 
-  private ScheduledExecutorService scheduledExecutor;
+  private ScheduledExecutorService  scheduledExecutor;
 
-  private PortalContainer          container;
+  private PortalContainer           container;
 
-  private FavoriteService          favoriteService;
+  private FavoriteService           favoriteService;
 
-  private Map<String, String>      newsToDeleteQueue               = new HashMap<>();
+  private Map<String, String>       newsToDeleteQueue               = new HashMap<>();
+
+  private static final int          CACHE_DURATION_SECONDS          = 31536000;
+
+  private static final long         CACHE_DURATION_MILLISECONDS     = CACHE_DURATION_SECONDS * 1000L;
+
+  private static final CacheControl ILLUSTRATION_CACHE_CONTROL      = new CacheControl();
+
+  static {
+    ILLUSTRATION_CACHE_CONTROL.setMaxAge(CACHE_DURATION_SECONDS);
+  }
 
   private enum FilterType {
     PINNED, MYPOSTED, ARCHIVED, DRAFTS, SCHEDULED, ALL
   }
+  
 
   public NewsRestResourcesV1(NewsService newsService,
                              NewsAttachmentsStorage newsAttachmentsService,
@@ -690,7 +701,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
   public Response getNewsIllustration(@Context Request rsRequest,
                                       @Context HttpServletRequest request,
-                                      @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+                                      @ApiParam(value = "News id", required = true) @PathParam("id") String id,
+                                      @ApiParam(value = "last modified date") @QueryParam("v") long lastModified) {
     try {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       News news = newsService.getNewsById(id, currentIdentity, false);
@@ -705,14 +717,19 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }
       }
 
-      EntityTag eTag = new EntityTag(String.valueOf(news.getIllustrationUpdateDate().getTime()));
+      long lastUpdated = news.getIllustrationUpdateDate().getTime();
+      EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
       //
-      Response.ResponseBuilder builder = (eTag == null ? null : rsRequest.evaluatePreconditions(eTag));
+      Response.ResponseBuilder builder = rsRequest.evaluatePreconditions(eTag);
       if (builder == null) {
-        builder = Response.ok(news.getIllustration(), "image/png");
+        builder = Response.ok(news.getIllustration(), "image/webp");
         builder.tag(eTag);
+        if (lastModified > 0) {
+          builder.lastModified(new Date(lastUpdated));
+          builder.expires(new Date(System.currentTimeMillis() + CACHE_DURATION_MILLISECONDS));
+          builder.cacheControl(ILLUSTRATION_CACHE_CONTROL);
+        }
       }
-
       return builder.build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);

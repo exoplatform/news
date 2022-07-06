@@ -2299,7 +2299,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsRestResourcesV1.getNewsIllustration(rsRequest, request, "1");
+    Response response = newsRestResourcesV1.getNewsIllustration(rsRequest, request, "1", 2316465L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

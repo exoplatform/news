@@ -15,7 +15,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="news-latest-view"  ref="news-latest-view" class="px-2 pb-2">
+  <div
+    id="news-latest-view"
+    ref="news-latest-view"
+    class="px-2 pb-2">
     <div :class="hasSmallWidthContainer ? 'article-small-container':'article-container'">
       <v-progress-circular
         v-if="loading"

@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         max-width="350px"
         color="grey darken-4"
         bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             icon
             v-bind="attrs"
@@ -92,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               outlined
               class="pa-0"
               @blur="blurSelection">
-              <template v-slot:selection="{ item, index }">
+              <template #selection="{ item }">
                 <span :title="item.toolTipInfo">
                   {{ item.label }}
                 </span>
@@ -201,7 +201,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     checkAlphanumeric() {
-      return this.newsHeader && !this.newsHeader.trim().match(/^[\w\-\s]+$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
+      return this.newsHeader && !this.newsHeader.trim().match(/^[a-zA-Z\u00C0-\u00FF ]*$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
       return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0) || (this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0);
@@ -219,6 +219,8 @@ export default {
         return '/news/images/mosaicNews.png';
       } else if ( this.viewTemplate === 'NewsStories') {
         return '/news/images/storiesNews.png';
+      } else if ( this.viewTemplate === 'NewsCards') {
+        return '/news/images/cardsNews.png';
       } else {
         return '';
       }
@@ -243,22 +245,15 @@ export default {
   created() {
     this.disabled = true;
     this.init();
+    this.$root.$on('news-settings-drawer-open', () => this.open());
   },
   methods: {
     open() {
       this.reset();
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'block';
-      }
       this.$refs.newsSettingsDrawer.open();
     },
     close() {
       this.$refs.newsSettingsDrawer.close();
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'none';
-      }
       window.setTimeout(() => this.showAdvancedSettings = false, 200);
     },
     reset() {

@@ -16,18 +16,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div id="article-list-view">
-    <div class="article-list-container">
-      <div
+    <v-row>
+      <v-col
+        class="flex-grow-0"
         v-for="(item, index) of newsInfo"
-        :key="item"
-        class="article"
-        :id="`article-item-${index}`">
-        <news-list-template-view-item
-          :item="item"
-          :selected-option="selectedOption"
-          :key="index" />
-      </div>  
-    </div>
+        :key="item">
+        <div
+          class="article"
+          :id="`article-item-${index}`">
+          <news-list-template-view-item
+            :item="item"
+            :selected-option="selectedOption"
+            :key="index" />
+        </div>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -71,7 +74,7 @@ export default {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.newsInfo = newsList.news;
+            this.newsInfo = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
           .finally(() => this.initialized = false);

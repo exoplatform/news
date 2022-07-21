@@ -1044,13 +1044,15 @@ public class JcrNewsStorageTest {
     news.setViewsCount((long) 10);
 
     // When
-    jcrNewsStorage.updateNews(news);
+    jcrNewsStorage.updateNews(news, "user");
 
     // Then
     verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
     verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
     verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
     verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+    verify(newsNode, times(1)).setProperty("exo:newsLastModifier", "user");
+
     verify(illustrationNode, times(0)).remove();
   }
 
@@ -1085,13 +1087,14 @@ public class JcrNewsStorageTest {
     news.setViewsCount((long) 10);
 
     // When
-    jcrNewsStorage.updateNews(news);
+    jcrNewsStorage.updateNews(news, "user");
 
     // Then
     verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
     verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
     verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
     verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+    verify(newsNode, times(1)).setProperty("exo:newsLastModifier", "user");
     verify(illustrationNode, times(1)).remove();
   }
 
@@ -3518,7 +3521,6 @@ public class JcrNewsStorageTest {
                                                   activityManager,
                                                   spaceService,
                                                   uploadService,
-                                                  imageProcessor,
                                                   publicationServiceImpl,
                                                   publicationManagerImpl,
                                                   newsAttachmentsService,

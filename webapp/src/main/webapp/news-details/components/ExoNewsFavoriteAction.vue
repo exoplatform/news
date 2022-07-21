@@ -1,12 +1,13 @@
 <template>
   <favorite-button
-    :id="activityId"
+    :id="newsId"
     :favorite="isFavorite"
     :absolute="absolute"
     :top="top"
     :right="right"
     :template-params="templateParams"
-    type="activity"
+    :space-id="spaceId"
+    type="news"
     type-label="News"
     @removed="removed"
     @remove-error="removeError"
@@ -42,6 +43,14 @@ export default {
     isFavorite: false,
     templateParams: {},
   }),
+  computed: {
+    newsId() {
+      return this.news?.id;
+    },
+    spaceId() {
+      return this.news?.spaceId;
+    },
+  },
   created() {
     this.$activityService.getActivityById(this.activityId)
       .then(fullActivity => {
@@ -53,24 +62,14 @@ export default {
   methods: {
     removed() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyDeletedFavorite', {0: this.$t('news.label')}));
-      this.$favoriteService.removeFavorite('news', this.news.id)
-        .then(() => {
-          this.isFavorite = false;
-          this.$emit('removed');
-        })
-        .catch(() => this.$emit('remove-error'));
+      this.$emit('removed');
     },
     removeError() {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorDeletingFavorite', {0: this.$t('news.label')}), 'error');
     },
     added() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyAddedAsFavorite', {0: this.$t('news.label')}));
-      this.$favoriteService.addFavorite('news', this.news.id)
-        .then(() => {
-          this.isFavorite = true;
-          this.$emit('added');
-        })
-        .catch(() => this.$emit('add-error'));
+      this.$emit('added');
     },
     addError() {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorAddingAsFavorite', {0: this.$t('news.label')}), 'error');

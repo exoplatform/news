@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="news">
     <div v-if="archivedNews && !news.canArchive">
       <div class="userNotAuthorized">
         <div class="notAuthorizedIconDiv">

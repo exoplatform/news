@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <v-app class="news-list-view-app position-relative">
     <v-card flat class="list-view-card rounded-0">
       <v-card-text class="pa-0">
-        <news-settings v-if="viewTemplate && (viewTemplate !== 'NewsSlider' && viewTemplate !== 'NewsAlert')" />
+        <news-settings v-if="displayHeader" />
         <extension-registry-component
           v-if="selectedViewExtension"
           element-class="news-list-view"
@@ -26,6 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :params="viewComponentParams" />
       </v-card-text>
     </v-card>
+    <news-settings-drawer v-if="$root.canPublishNews" />
   </v-app>
 </template>
 
@@ -92,19 +93,22 @@ export default {
   data: () => ({
     extensionApp: 'NewsList',
     extensionType: 'views',
-    newsList: ['emptyNews'],
+    newsList: [null],
     viewExtensions: {},
     loading: false,
     hasMore: false,
     offset: 0,
   }),
   computed: {
+    displayHeader() {
+      return this.viewTemplate && (this.viewTemplate !== 'NewsSlider' && this.viewTemplate !== 'NewsAlert');
+    },
     selectedViewExtension() {
       if (this.viewTemplate) {
         if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
           return sortedViewExtensions[3];
-        } else if (( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsList' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ) && this.newsList.length === 0) {
+        } else if (( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsList' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' || this.viewTemplate === 'NewsCards' ) && this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
           return sortedViewExtensions[4];
         } else {
@@ -140,6 +144,7 @@ export default {
         showArticleDate: this.showArticleDate,
         seeAllUrl: this.seeAllUrl,
         hasMore: this.hasMore,
+        loading: this.loading,
       };
     },
   },
@@ -171,7 +176,7 @@ export default {
       this.loading = true;
       return this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
         .then(newsList => {
-          this.newsList = newsList.news || [];
+          this.newsList = newsList.news.filter(news => !!news) || [];
           this.hasMore = this.newsList.length > this.limit;
         })
         .finally(() => this.loading = false);

@@ -1,112 +1,97 @@
 package org.exoplatform.news.listener;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsIndexingServiceConnector;
-import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.listener.Event;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.MembershipEntry;
-import org.exoplatform.social.core.activity.model.ExoSocialActivity;
-import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.ActivityManager;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.metadata.favorite.FavoriteService;
-import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.tag.TagService;
+import org.exoplatform.social.metadata.tag.model.TagName;
+import org.exoplatform.social.metadata.tag.model.TagObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import java.util.Collections;
-
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("unchecked")
 public class NewsMetadataListenerTest {
 
-  private static final String METADATA_TYPE_NAME = "testMetadataListener";
+  private static final String USERNAME = "testuser";
 
   @Mock
   private IndexingService     indexingService;
 
   @Mock
-  private NewsService         newsService;
-
-  @Mock
-  private FavoriteService     favoriteService;
+  private SpaceService        spaceService;
 
   @Mock
   private IdentityManager     identityManager;
 
   @Mock
-  private ActivityManager     activityManager;
-
-  @Mock
   private TagService          tagService;
 
   @Test
-  public void testReindexNewsWhenNewsSetAsFavorite() throws Exception {
-    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
-                                                                         newsService,
-                                                                         favoriteService,
+  public void testCreateNewsTagsWhenNewsSaved() throws Exception {
+    NewsMetadataListener newsMetadataListener = new NewsMetadataListener(indexingService,
+                                                                         spaceService,
                                                                          identityManager,
-                                                                         activityManager,
                                                                          tagService);
-    setCurrentUser("john");
-    MetadataItem metadataItem = mock(MetadataItem.class);
-    Event<Long, MetadataItem> event = mock(Event.class);
-    lenient().when(event.getData()).thenReturn(metadataItem);
-    lenient().when(event.getData().getObjectType()).thenReturn("news");
-    lenient().when(metadataItem.getObjectId()).thenReturn("1");
+    String newsId = "newsId";
+    String spaceId = "spaceId";
+    String content = "Test #tag1 Test #tag2.";
 
-    newsActivityListener.onEvent(event);
+    News news = mock(News.class);
+    when(news.getId()).thenReturn(newsId);
+    when(news.getSpaceId()).thenReturn(spaceId);
+    when(news.getBody()).thenReturn(content);
 
-    verifyNoInteractions(newsService);
-  }
+    Event<String, News> event = mock(Event.class);
+    when(event.getData()).thenReturn(news);
+    when(event.getSource()).thenReturn(USERNAME);
 
-  @Test
-  public void testReindexActivityWhenNewsSetAsFavorite() throws Exception {
-    NewsMetadataListener newsActivityListener = new NewsMetadataListener(indexingService,
-                                                                         newsService,
-                                                                         favoriteService,
-                                                                         identityManager,
-                                                                         activityManager,
-                                                                         tagService);
-    Identity johnIdentity = new Identity("1", Collections.singletonList(new MembershipEntry("john")));
-    ConversationState.setCurrent(new ConversationState(johnIdentity));
-    MetadataItem metadataItem = mock(MetadataItem.class);
-    Event<Long, MetadataItem> event = mock(Event.class);
-    lenient().when(event.getData()).thenReturn(metadataItem);
-    lenient().when(event.getData().getObjectType()).thenReturn("activity");
-    lenient().when(event.getEventName()).thenReturn("social.metadataItem.created");
-    lenient().when(metadataItem.getMetadataTypeName()).thenReturn("favorite");
-    lenient().when(metadataItem.getObjectId()).thenReturn("1");
-    News news = new News();
-    news.setId("1234");
-    ExoSocialActivity activity = new ExoSocialActivityImpl();
-    activity.setType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
-    lenient().when(newsService.getNewsByActivityId("1", johnIdentity)).thenReturn(news);
-    org.exoplatform.social.core.identity.model.Identity userIdentity =
-                                                                     new org.exoplatform.social.core.identity.model.Identity(OrganizationIdentityProvider.NAME,
-                                                                                                                             "john");
-    userIdentity.setId("1");
-    lenient().when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "1")).thenReturn(userIdentity);
-    lenient().when(activityManager.getActivity("1")).thenReturn(activity);
-    lenient().when(activityManager.getActivityStreamOwnerIdentity(activity.getId())).thenReturn(userIdentity);
+    HashSet<TagName> contentTags = new HashSet<>(Arrays.asList(new TagName("tag1"), new TagName("tag2")));
 
-    newsActivityListener.onEvent(event);
-    verify(newsService, times(1)).getNewsByActivityId("1", johnIdentity);
-    verify(favoriteService, times(1)).createFavorite(any());
-    verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, news.getId());
-  }
+    String spacePrettyName = "spacePrettyName";
 
-  private void setCurrentUser(final String name) {
-    ConversationState.setCurrent(new ConversationState(new org.exoplatform.services.security.Identity(name)));
+    Space space = mock(Space.class);
+    when(space.getPrettyName()).thenReturn(spacePrettyName);
+    when(spaceService.getSpaceById(spaceId)).thenReturn(space);
+
+    String spaceIdentityId = "200";
+    Identity spaceIdentity = mock(Identity.class);
+    when(spaceIdentity.getId()).thenReturn(spaceIdentityId);
+
+    when(identityManager.getOrCreateSpaceIdentity(spacePrettyName)).thenReturn(spaceIdentity);
+
+    String userIdentityId = "300";
+    Identity userIdentity = mock(Identity.class);
+    when(userIdentity.getId()).thenReturn(userIdentityId);
+    when(identityManager.getOrCreateUserIdentity(USERNAME)).thenReturn(userIdentity);
+
+    when(tagService.detectTagNames(content)).thenReturn(contentTags);
+
+    newsMetadataListener.onEvent(event);
+
+    verify(indexingService, times(1)).reindex(NewsIndexingServiceConnector.TYPE, newsId);
+    verify(tagService, times(1)).saveTags(new TagObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE,
+                                                        news.getId(),
+                                                        null),
+                                          contentTags,
+                                          Long.parseLong(spaceIdentityId),
+                                          Long.parseLong(userIdentityId));
   }
 
 }

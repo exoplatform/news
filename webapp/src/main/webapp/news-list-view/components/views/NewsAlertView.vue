@@ -61,13 +61,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-icon>chevron_right</v-icon>
       </v-btn>
       <v-btn
-        v-if="canPublishNews"
-        @click="openDrawer"
-        icon>
+        v-if="$root.canPublishNews"
+        icon
+        @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
       </v-btn>
     </div>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 
@@ -82,7 +81,6 @@ export default {
   },
   data () {
     return {
-      canPublishNews: false,
       slider: 0,
       news: [],
       initialized: false,
@@ -117,19 +115,16 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
     getNewsList() {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.news = newsList.news;
+            this.news = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
           .finally(() => this.initialized = false);

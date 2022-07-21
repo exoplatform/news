@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       cycle
       show-arrows-on-hover
       interval="10000"
+      height="220"
       hide-delimiter-background
       class="sliderNewsItems fill-height">
       <v-carousel-item
@@ -34,9 +35,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row" :class="!canPublishNews ? 'mt-9' : ''">
+            <div class="flex flex-row" :class="{'!canPublishNews ? `mt-9` : ``' : !$vuetify.breakpoint.xs}">
               <v-btn
-                v-if="canPublishNews"
+                v-if="$root.canPublishNews"
                 icon
                 @click="openDrawer"
                 class="float-right settingNewsButton">
@@ -74,7 +75,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-container>
       </v-carousel-item>
     </v-carousel>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
@@ -85,12 +85,15 @@ export default {
       required: false,
       default: 'snapshotSliderNews'
     },
+    newsList: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
   },
   data () {
     return {
-      news: [],
-      initialized: false,
-      canPublishNews: false,
       limit: 4,
       offset: 0,
       fullDateFormat: {
@@ -116,28 +119,15 @@ export default {
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
-    this.getNewsList();
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
+  },
+  computed: {
+    news(){
+      return this.newsList && this.newsList.filter(news => !!news);
+    }
   },
   methods: {
     openDrawer() {
-      const overlayElement = document.getElementById('drawers-overlay');
-      if (overlayElement) {
-        overlayElement.style.display = 'block';
-      }
-      this.$refs.settingsDrawer.open();
-    },
-    getNewsList() {
-      if (!this.initialized) {
-        this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
-          .then(newsList => {
-            this.news = newsList.news;
-            this.initialized = true;
-          })
-          .finally(() => this.initialized = false);
-      }
+      this.$root.$emit('news-settings-drawer-open');
     },
     refreshNewsViews(selectedTarget, selectedOption){
       this.showArticleSummary = selectedOption.showArticleSummary;

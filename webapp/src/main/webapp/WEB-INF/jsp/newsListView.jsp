@@ -61,9 +61,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     if (conversationState != null) {
       currentIdentity = ConversationState.getCurrent().getIdentity();
     }
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
-      saveSettingsURL = null;
-    }
+
+    boolean canPublishNews = NewsUtils.canPublishNews(currentIdentity);
+    saveSettingsURL = canPublishNews ? saveSettingsURL : null;
   %>
   <div class="news-list-view-app" id="<%= appId %>">
     <script type="text/javascript">
@@ -84,6 +84,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         showArticleReactions: <%= showArticleReactions == null ? null : "'" + showArticleReactions + "'" %>,
         showArticleDate: <%= showArticleDate == null ? null : "'" + showArticleDate + "'" %>,
         seeAllUrl: <%= seeAllUrl == null ? null : "'" + seeAllUrl + "'" %>,
+        canPublishNews: <%= canPublishNews %>,
       }));
     </script>
   </div>

@@ -34,7 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         dense
         outlined
         @change="addTarget()">
-        <template v-slot:prepend-item>
+        <template #prepend-item>
           <v-list-item
             ripple
             @click.stop="toggleTargetsSelection">
@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </v-list-item-content>
           </v-list-item>
         </template>
-        <template v-slot:selection="{ item, index }">
+        <template #selection="{ item, index }">
           <v-chip
             v-if="index === 0"
             close

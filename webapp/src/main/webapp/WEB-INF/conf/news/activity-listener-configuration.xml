@@ -79,4 +79,43 @@
       <type>org.exoplatform.news.listener.AnalyticsNewsListener</type>
     </component-plugin>
   </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.listener.ListenerService</target-component>
+    <component-plugin>
+      <name>exo.news.postArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.updateArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.shareArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.archiveArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.unarchiveArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.scheduleArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+    <component-plugin>
+      <name>exo.news.unscheduleArticle</name>
+      <set-method>addListener</set-method>
+      <type>org.exoplatform.news.listener.AttachedActivityCacheUpdater</type>
+    </component-plugin>
+  </external-component-plugins>
 </configuration>

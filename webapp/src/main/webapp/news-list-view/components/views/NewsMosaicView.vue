@@ -15,15 +15,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="top-news-mosaic">
+  <div id="top-news-mosaic" ref="top-news-mosaic">
     <div :class="`mosaic-container ma-3 ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
         :key="index"
-        class="article"
+        :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
         :id="`articleItem-${index}`">
         <a
-          class="articleLink"
+          class="articleLink d-block"
           target="_self"
           :href="item.url">
           <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
@@ -33,7 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :value="new Date(item.publishDate.time)"
                 :format="dateFormat" />
             </div>
-            <div v-if="showArticleTitle" class="articleTitle">
+            <div v-if="showArticleTitle" :class="'text-truncate' + isSmallWidth ? 'articleTitle text-truncate':''">
               {{ item.title }}
             </div>
           </div>
@@ -76,6 +76,7 @@ export default {
         month: 'long',
         day: 'numeric',
       },
+      isSmallWidth: false
     };
   },
   created() {
@@ -83,24 +84,30 @@ export default {
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
   },
+  mounted() {
+    this.isSmallWidth =  this.$refs && this.$refs['top-news-mosaic'] && this.$refs['top-news-mosaic']?.clientWidth *100 / window.screen.width  < 33;
+  },
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
     smallHeightClass() {
       return this.isMobile && this.news && this.news.length === 1 && 'small-mosaic-container';
-    }
+    },
   },
   methods: {
     getNewsList() {
       if (!this.initialized) {
         this.$newsListService.getNewsList(this.newsTarget, this.offset, this.limit, true)
           .then(newsList => {
-            this.news = newsList.news;
+            this.news = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
           .finally(() => this.initialized = false);
       }
+    },
+    minLength(lengthNews){
+      return lengthNews < 5 && lengthNews > 0 ? 100 / lengthNews : 25;
     },
     refreshNewsViews(selectedTarget, selectedOption) {
       this.showArticleTitle = selectedOption.showArticleTitle;

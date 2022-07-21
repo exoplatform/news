@@ -52,19 +52,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <exo-user-avatar
             :profile-id="newsAuthor"
             :size="25"
-            class="align-center my-auto text-truncate flex-grow-0 flex"
+            class="align-center width-full my-auto text-truncate flex-grow-0 flex"
             small-font-size
             popover />
           <i v-if="!news.hiddenSpace" class="uiIconArrowNext pt-1"></i>
           <exo-space-avatar
             v-if="!news.hiddenSpace"
             :space-id="spaceId"
+            class="width-full text-truncate"
             :size="25"
             extra-class="ps-1"
             small-font-size
             popover />
         </div>
-        <div v-if="!draftNews" class="newsDate pe-4">
+        <div class="newsDate pe-4" v-if="news.activityId">
           <i v-if="displayClock" class="uiIconClock"></i>
           <span v-if="news && news.schedulePostDate">
             <date-format
@@ -84,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               class="newsTime caption" />
           </span>
         </div>
-        <div class="newsViews " v-if="!news.draft && !news.scheduled">
+        <div class="newsViews " v-if="!news.scheduled && news.activityId">
           <i class="uiIconWatch"></i>
           <span class="viewsCount">{{ news.viewsCount }}  {{ $t('news.app.views') }}</span>
         </div>

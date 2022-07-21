@@ -37,6 +37,10 @@ public class NewsUtils {
 
   public static final String  SHARE_NEWS                      = "exo.news.shareArticle";
 
+  public static final String  ARCHIVE_NEWS                    = "exo.news.archiveArticle";
+
+  public static final String  UNARCHIVE_NEWS                  = "exo.news.unarchiveArticle";
+
   public static final String  COMMENT_NEWS                    = "exo.news.commentArticle";
 
   public static final String  LIKE_NEWS                       = "exo.news.likeArticle";
@@ -45,7 +49,13 @@ public class NewsUtils {
 
   public static final String  UPDATE_NEWS                     = "exo.news.updateArticle";
 
+  public static final String  SCHEDULE_NEWS                   = "exo.news.scheduleArticle";
+
+  public static final String  UNSCHEDULE_NEWS                 = "exo.news.unscheduleArticle";
+
   public static final String  NEWS_METADATA_OBJECT_TYPE       = "news";
+
+  public static final String  DISPLAYED_STATUS                = "displayed";
 
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 

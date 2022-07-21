@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="d-flex flex-column me-2">
       <v-btn
-        v-if="canPublishNews"
+        v-if="$root.canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -39,7 +39,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {{ $t('news.published.seeAll') }}
       </v-btn>
     </div>
-    <news-settings-drawer ref="settingsDrawer" />
   </div>
 </template>
 <script>
@@ -49,7 +48,6 @@ export default {
     seeAllUrl: 'news?filter=pinned',
     showHeader: false,
     showSeeAll: false,
-    canPublishNews: false,
   }),
   created() {
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
@@ -62,13 +60,10 @@ export default {
     this.seeAllUrl = this.$root.seeAllUrl;
     this.showSeeAll = this.$root.showSeeAll;
     this.showHeader = this.$root.showHeader;
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   methods: {
     openDrawer() {
-      this.$refs.settingsDrawer.open();
+      this.$root.$emit('news-settings-drawer-open');
     },
     seeAllNews() {
       window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;

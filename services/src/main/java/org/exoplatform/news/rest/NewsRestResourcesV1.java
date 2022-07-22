@@ -14,7 +14,9 @@ import javax.ws.rs.core.*;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.picocontainer.Startable;
 
@@ -66,6 +68,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private FavoriteService           favoriteService;
 
+  private ThumbnailService          thumbnailService;
+  
   private Map<String, String>       newsToDeleteQueue               = new HashMap<>();
 
   private static final int          CACHE_DURATION_SECONDS          = 31536000;
@@ -88,7 +92,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                              SpaceService spaceService,
                              IdentityManager identityManager,
                              PortalContainer container,
-                             FavoriteService favoriteService) {
+                             FavoriteService favoriteService,
+                             ThumbnailService thumbnailService) {
 
     this.newsService = newsService;
     this.newsAttachmentsService = newsAttachmentsService;
@@ -96,6 +101,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     this.identityManager = identityManager;
     this.container = container;
     this.favoriteService = favoriteService;
+    this.thumbnailService = thumbnailService;
   }
 
   @Override
@@ -702,14 +708,22 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response getNewsIllustration(@Context Request rsRequest,
                                       @Context HttpServletRequest request,
                                       @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                                      @ApiParam(value = "last modified date") @QueryParam("v") long lastModified) {
+                                      @ApiParam(value = "last modified date") @QueryParam("v") long lastModified,
+                                      @ApiParam(value = "resized image size") @QueryParam("size") String size) {
     try {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       News news = newsService.getNewsById(id, currentIdentity, false);
       if (news == null || news.getIllustration() == null || news.getIllustration().length == 0) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-
+      if (size != null) {
+        String[] dimension = size.split("x");
+        byte[] thumbnail = thumbnailService.createCustomThumbnail(news.getIllustration(),
+                                                                  Integer.parseInt(dimension[0]),
+                                                                  Integer.parseInt(dimension[1]));
+        news.setIllustration(thumbnail);
+      }
+      
       if (!news.isPublished()) {//TODO Check if necessary
         Space space = spaceService.getSpaceById(news.getSpaceId());
         if (space == null) {

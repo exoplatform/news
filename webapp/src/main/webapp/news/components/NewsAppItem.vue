@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <div id="newsAppItem">
     <a
       :href="news.url"
-      :style="{ 'background-image': 'url(' + news.illustrationURL + ')' }"
+      :style="{ 'background-image': 'url(' + news.illustrationURL + '&size=300x300)' }"
       class="newsSmallIllustration"
       :target="news.target"></a>
     <div class="newsItemContent">

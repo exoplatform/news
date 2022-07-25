@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bundle>
   <administration>
-    <newsTargets>crwdns7015955:0crwdne7015955:0</newsTargets>
+    <newsTargets>News Targets</newsTargets>
   </administration>
 </bundle>

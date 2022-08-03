@@ -40,7 +40,7 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
 import io.swagger.annotations.*;
-import io.swagger.jaxrs.PATCH;
+import org.exoplatform.services.rest.http.PATCH;
 
 @Path("v1/news")
 @Api(tags = "v1/news", value = "v1/news", description = "Managing news")

@@ -31,6 +31,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.container.ExoContainerContext;
@@ -45,7 +51,7 @@ import org.exoplatform.social.metadata.model.Metadata;
 import org.picocontainer.Startable;
 
 @Path("v1/news/targeting")
-@Api(tags = "v1/news/targeting", value = "v1/news/targeting")
+@Tag(name = "v1/news/targeting", description = "Manage news targeting operations")
 public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startable {
 
   private static final Log         LOG                     = ExoLogger.getLogger(NewsTargetingRestResourcesV1.class);
@@ -80,10 +86,10 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Get all news targets by a giving type", httpMethod = "GET", response = Response.class, produces = "application/json")
+  @Operation(summary = "Get all news targets by a giving type", method = "GET", description = "Get all news targets by a giving type")
   @ApiResponses(value = {
-    @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") 
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response getTargets(@Context HttpServletRequest request) {
     try {
@@ -99,11 +105,11 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Get all news targets by a giving property", httpMethod = "GET", response = Response.class, produces = "application/json")
+  @Operation(summary = "Get all news targets by a giving property", method = "GET", description = "Get all news targets by a giving property")
   @ApiResponses(value = { 
-    @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
-    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation")
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "500", description = "Internal server error"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized operation")
   })
   public Response getReferencedTargets(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
@@ -123,17 +129,17 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Path("{targetName}")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Delete news target", httpMethod = "DELETE", response = Response.class, notes = "This deletes news target", consumes = "application/json")
+  @Operation(summary = "Delete news target", method = "DELETE", description = "This deletes news target")
   @ApiResponses(value = { 
-      @ApiResponse(code = HTTPStatus.OK, message = "News target deleted"),
-      @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-      @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to delete the news target"),
-      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error") 
+      @ApiResponse(responseCode = "200", description = "News target deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to delete the news target"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
   public Response deleteTarget(@Context HttpServletRequest request,
-                               @ApiParam(value = "Target name", required = true)
+                               @Parameter(description = "Target name", required = true)
                                @PathParam("targetName") String targetName,
-                               @ApiParam(value = "Time to effectively delete news target", required = false)
+                               @Parameter(description = "Time to effectively delete news target", required = false)
                                @QueryParam("delay") long delay) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
@@ -172,13 +178,13 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Path("{targetName}/undoDelete")
   @POST
   @RolesAllowed("users")
-  @ApiOperation(value = "Undo deleting news target if not yet effectively deleted.", httpMethod = "POST", response = Response.class)
+  @Operation(summary = "Undo deleting news target if not yet effectively deleted", method = "POST", description = "Undo deleting news target if not yet effectively deleted")
   @ApiResponses( value = {
-    @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-    @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation")
+    @ApiResponse(responseCode = "400", description = "Invalid query input"),
+    @ApiResponse(responseCode = "403", description = "Forbidden operation")
   })
   public Response undoDeleteTarget(@Context HttpServletRequest request,
-                                   @ApiParam(value = "News target name identifier", required = true)
+                                   @Parameter(description = "News target name identifier", required = true)
                                    @PathParam("targetName") String targetName) {
     if (StringUtils.isBlank(targetName)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Target name ist mandatory").build();
@@ -204,15 +210,15 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Create news target", httpMethod = "POST", response = Response.class)
+  @Operation(summary = "Create news target", method = "POST", description = "Create news target")
   @ApiResponses(value = {
-    @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-    @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
-    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "User not authorized to create news target"),
-    @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation") 
+    @ApiResponse(responseCode = "400", description = "Invalid query input"),
+    @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+    @ApiResponse(responseCode = "401", description = "User not authorized to create news target"),
+    @ApiResponse(responseCode = "409", description = "Conflict operation")
   })
   public Response createNewsTarget(@Context HttpServletRequest request,
-                                   @ApiParam(value = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
+                                   @RequestBody(description = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
@@ -234,16 +240,16 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Update an existing news target", httpMethod = "PUT", response = Response.class, consumes = "application/json")
+  @Operation(summary = "Update an existing news target", method = "PUT", description = "Update an existing news target")
   @ApiResponses( value = {
-    @ApiResponse(code = HTTPStatus.NOT_FOUND, message = "Object not found"),
-    @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
-    @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"),
-    @ApiResponse(code = HTTPStatus.CONFLICT, message = "Conflict operation")
+    @ApiResponse(responseCode = "404", description = "Object not found"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+    @ApiResponse(responseCode = "500", description = "Internal server error"),
+    @ApiResponse(responseCode = "409", description = "Conflict operation")
   })
-  public Response updateNewsTarget(@ApiParam(value = "News target to create", required = true)
+  public Response updateNewsTarget(@Parameter(description = "News target to create", required = true)
                                    NewsTargetingEntity newsTargetingEntity,
-                                   @ApiParam(value = "Original news target name", required = true)
+                                   @Parameter(description = "Original news target name", required = true)
                                    @PathParam("originalTargetName") String originalTargetName) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {

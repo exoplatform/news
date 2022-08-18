@@ -12,6 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -41,11 +48,10 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 
-import io.swagger.annotations.*;
 import org.exoplatform.services.rest.http.PATCH;
 
 @Path("v1/news")
-@Api(tags = "v1/news", value = "v1/news", description = "Managing news")
+@Tag(name = "v1/news", description = "Managing news")
 public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   private static final Log          LOG                             = ExoLogger.getLogger(NewsRestResourcesV1.class);
@@ -121,12 +127,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Create a news", httpMethod = "POST", response = Response.class, notes = "This creates the news if the authenticated user is a member of the space or a spaces super manager. The news is created in draft status, unless the publicationState property is set to 'published'.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News created"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to create the news"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response createNews(@Context HttpServletRequest request, @ApiParam(value = "News", required = true) News news) {
+  @Operation(summary = "Create a news", method = "POST", description = "This creates the news if the authenticated user is a member of the space or a spaces super manager. The news is created in draft status, unless the publicationState property is set to 'published'.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News created"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to create the news"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response createNews(@Context HttpServletRequest request, @RequestBody(description = "News object to create", required = true) News news) {
     if (news == null || StringUtils.isEmpty(news.getSpaceId())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -149,14 +155,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("canCreateNews/{spaceId}")
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
-  @ApiOperation(value = "check if the current user can create a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can create a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to create a news is returned"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to create a news"),
-      @ApiResponse(code = 404, message = "Space not found"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "check if the current user can create a news in the given space", method = "GET", description = "This checks if the current user can create a news in the given space")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User ability to create a news is returned"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to create a news"),
+      @ApiResponse(responseCode = "404", description = "Space not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response canCreateNews(@Context HttpServletRequest request,
-                                @ApiParam(value = "space id", required = true) @PathParam("spaceId") String spaceId) {
+                                @Parameter(description = "space id", required = true) @PathParam("spaceId") String spaceId) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       if (StringUtils.isBlank(spaceId)) {
@@ -182,14 +188,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Create a news", httpMethod = "PUT", response = Response.class, notes = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to update the news"),
-      @ApiResponse(code = 500, message = "Internal server error") })
-  public Response updateNews(@ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                             @ApiParam(value = "Post news", required = false) @QueryParam("post") boolean post,
-                             @ApiParam(value = "News", required = true) News updatedNews) {
+  @Operation(summary = "Create a news", method = "PUT", description = "This updates the news if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News updated"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to update the news"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response updateNews(@Parameter(description = "News id", required = true) @PathParam("id") String id,
+                             @Parameter(description = "Post news", required = false) @QueryParam("post") boolean post,
+                             @RequestBody(description = "News object to be updated", required = true) News updatedNews) {
 
     if (updatedNews == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -229,16 +235,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Delete news", httpMethod = "DELETE", response = Response.class, notes = "This deletes the news", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News deleted"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to delete the news"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Delete news", method = "DELETE", description = "This deletes the news")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News deleted"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to delete the news"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response deleteNews(@Context HttpServletRequest request,
-                             @ApiParam(value = "News id", required = true)
+                             @Parameter(description = "News id", required = true)
                              @PathParam("id") String id,
-                             @ApiParam(value = "Is draft to delete", defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
-                             @ApiParam(value = "Time to effectively delete news", required = false)
+                             @Parameter(description = "Is draft to delete") @Schema(defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
+                             @Parameter(description = "Time to effectively delete news", required = false)
                              @QueryParam(
                                      "delay"
                              ) long delay) {
@@ -287,22 +293,22 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("{id}/undoDelete")
   @POST
   @RolesAllowed("users")
-  @ApiOperation(
-      value = "Undo deleting news if not yet effectively deleted.",
-      httpMethod = "POST",
-      response = Response.class
+  @Operation(
+      summary = "Undo deleting news if not yet effectively deleted",
+      method = "POST",
+      description = "Undo deleting news if not yet effectively deleted"
   )
   @ApiResponses(
       value = {
-          @ApiResponse(code = HTTPStatus.NO_CONTENT, message = "Request fulfilled"),
-          @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-          @ApiResponse(code = HTTPStatus.FORBIDDEN, message = "Forbidden operation"),
-          @ApiResponse(code = HTTPStatus.UNAUTHORIZED, message = "Unauthorized operation"),
-          @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), }
+          @ApiResponse(responseCode = "204", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+          @ApiResponse(responseCode = "500", description = "Internal server error"), }
   )
   public Response undoDeleteNews(
                                   @Context HttpServletRequest request,
-                                  @ApiParam(value = "News node identifier", required = true)
+                                  @Parameter(description = "News node identifier", required = true)
                                   @PathParam(
                                     "id"
                                   ) String id) {
@@ -329,14 +335,15 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("{id}")
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get a news", httpMethod = "GET", response = Response.class, notes = "This gets the news with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Get a news", method = "GET", description = "This gets the news with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNewsById(@Context HttpServletRequest request,
-                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                              @ApiParam(value = "fields", required = true) @QueryParam("fields") String fields,
-                              @ApiParam(value = "Is edit mode", defaultValue = "false") @QueryParam("editMode") boolean editMode) {
+                              @Parameter(description = "News id", required = true) @PathParam("id") String id,
+                              @Parameter(description = "fields", required = true) @QueryParam("fields") String fields,
+                              @Parameter(description = "Is edit mode") @Schema(defaultValue = "false") @QueryParam("editMode") boolean editMode) {
     String authenticatedUser = request.getRemoteUser();
     try {
       if (StringUtils.isBlank(id)) {
@@ -374,14 +381,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("markAsRead/{id}")
   @RolesAllowed("users")
   @Produces(MediaType.TEXT_PLAIN)
-  @ApiOperation(value = "mark a news article as read", httpMethod = "POST", response = Response.class, notes = "This marks a news article as read by the user who accessed its details.")
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "Request fulfilled"),
-          @ApiResponse(code = 401, message = "User not authorized to get the news"),
-          @ApiResponse(code = 404, message = "News not found"),
-          @ApiResponse(code = 500, message = "Internal server error")})
+  @Operation(summary = "mark a news article as read", method = "POST", description = "This marks a news article as read by the user who accessed its details.")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Request fulfilled"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+          @ApiResponse(responseCode = "404", description = "News not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")})
 
   public Response markNewsAsRead(@Context HttpServletRequest request,
-                                 @ApiParam(value = "News id", required = true) @PathParam("id") String id) {
+                                 @Parameter(description = "News id", required = true) @PathParam("id") String id) {
     String authenticatedUser = request.getRemoteUser();
     try {
       if (StringUtils.isBlank(id)) {
@@ -406,18 +413,19 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get news list", httpMethod = "GET", response = Response.class, notes = "This gets the list of news with the given search text, of the given author, in the given space or spaces, with the given publication state, with the given pinned state if the authenticated user is a member of the spaces or a super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News list returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news list"),
-      @ApiResponse(code = 404, message = "News list not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Get news list", method = "GET", description = "This gets the list of news with the given search text, of the given author, in the given space or spaces, with the given publication state, with the given pinned state if the authenticated user is a member of the spaces or a super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News list returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news list"),
+      @ApiResponse(responseCode = "404", description = "News list not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNews(@Context HttpServletRequest request,
-                          @ApiParam(value = "News author", required = true) @QueryParam("author") String author,
-                          @ApiParam(value = "News spaces", required = true) @QueryParam("spaces") String spaces,
-                          @ApiParam(value = "News filter", required = true) @QueryParam("filter") String filter,
-                          @ApiParam(value = "search text", required = true) @QueryParam("text") String text,
-                          @ApiParam(value = "News pagination offset", defaultValue = "0") @QueryParam("offset") int offset,
-                          @ApiParam(value = "News pagination limit", defaultValue = "10") @QueryParam("limit") int limit,
-                          @ApiParam(value = "News total size", defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
+                          @Parameter(description = "News author", required = true) @QueryParam("author") String author,
+                          @Parameter(description = "News spaces", required = true) @QueryParam("spaces") String spaces,
+                          @Parameter(description = "News filter", required = true) @QueryParam("filter") String filter,
+                          @Parameter(description = "search text", required = true) @QueryParam("text") String text,
+                          @Parameter(description = "News pagination offset") @Schema(defaultValue = "0") @QueryParam("offset") int offset,
+                          @Parameter(description = "News pagination limit") @Schema(defaultValue = "10") @QueryParam("limit") int limit,
+                          @Parameter(description = "News total size") @Schema(defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
     try {//TODO Move to service layer
       String authenticatedUser = request.getRemoteUser();
       if (StringUtils.isBlank(author) || !authenticatedUser.equals(author)) {
@@ -470,15 +478,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("byTarget/{targetName}")
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get news list", httpMethod = "GET", response = Response.class, notes = "This gets the list of news by the given target.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News list returned"),
-          @ApiResponse(code = 401, message = "User not authorized to get the news list"),
-          @ApiResponse(code = 404, message = "News list not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Get news list", method = "GET", description = "This gets the list of news by the given target.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News list returned"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to get the news list"),
+          @ApiResponse(responseCode = "404", description = "News list not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNewsByTarget(@Context HttpServletRequest request,
-                                  @ApiParam(value = "News target name", required = true) @PathParam("targetName") String targetName,
-                                  @ApiParam(value = "News pagination offset", defaultValue = "0") @QueryParam("offset") int offset,
-                                  @ApiParam(value = "News pagination limit", defaultValue = "10") @QueryParam("limit") int limit,
-                                  @ApiParam(value = "News total size", defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
+                                  @Parameter(description = "News target name", required = true) @PathParam("targetName") String targetName,
+                                  @Parameter(description = "News pagination offset") @Schema(defaultValue = "0") @QueryParam("offset") int offset,
+                                  @Parameter(description = "News pagination limit") @Schema(defaultValue = "10") @QueryParam("limit") int limit,
+                                  @Parameter(description = "News total size") @Schema(defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
     try {
       String authenticatedUser = request.getRemoteUser();
       if (StringUtils.isBlank(authenticatedUser)) {
@@ -514,14 +523,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("byActivity/{activityId}")
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get a news identified by its activity or shared activity identifier", httpMethod = "GET", response = Response.class, notes = "This gets the news with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @Operation(summary = "Get a news identified by its activity or shared activity identifier", method = "GET", description = "This gets the news with the given id if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"),
-      @ApiResponse(code = 500, message = "Internal server error")
+      @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response getNewsByActivityId(@ApiParam(value = "Activity id", required = true) @PathParam("activityId") String activityId) {
+  public Response getNewsByActivityId(@Parameter(description = "Activity id", required = true) @PathParam("activityId") String activityId) {
     if (StringUtils.isBlank(activityId)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -549,13 +558,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Schedule a news", httpMethod = "POST", response = Response.class, notes = "This schedules the news if the authenticated user is a member of the space or a spaces super manager. The news is created in staged status, after reaching a date of publication startPublishedDate, the publicationState property is set to 'published'.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News scheduled"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 401, message = "User not authorized to schedule the news"),
-          @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Schedule a news", method = "POST", description = "This schedules the news if the authenticated user is a member of the space or a spaces super manager. The news is created in staged status, after reaching a date of publication startPublishedDate, the publicationState property is set to 'published'.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News scheduled"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to schedule the news"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response scheduleNews(@Context HttpServletRequest request,
-                               @ApiParam(value = "News", required = true) News scheduledNews) {
+                               @RequestBody(description = "News object to be scheduled", required = true) News scheduledNews) {
     if (scheduledNews == null || StringUtils.isEmpty(scheduledNews.getId())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -580,18 +589,18 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Search the list of news available with query", httpMethod = "GET", response = Response.class, produces = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = HTTPStatus.OK, message = "Request fulfilled"),
-      @ApiResponse(code = HTTPStatus.BAD_REQUEST, message = "Invalid query input"),
-      @ApiResponse(code = HTTPStatus.INTERNAL_ERROR, message = "Internal server error"), })
+  @Operation(summary = "Search the list of news available with query", method = "GET", description = "Search the list of news available with query")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "500", description = "Internal server error"), })
   public Response search(@Context UriInfo uriInfo,
                          @Context HttpServletRequest request,
-                         @ApiParam(value = "Term to search", required = true) @QueryParam("query") String query,
-                         @ApiParam(value = "Properties to expand", required = false) @QueryParam("expand") String expand,
-                         @ApiParam(value = "Offset", required = false, defaultValue = "0") @QueryParam("offset") int offset,
-                         @ApiParam(value = "Tag names used to search news", required = true) @QueryParam("tags") List<String> tagNames,
-                         @ApiParam(value = "Limit", required = false, defaultValue = "20") @QueryParam("limit") int limit,
-                         @ApiParam(value = "Favorites", required = false, defaultValue = "false") @QueryParam("favorites") boolean favorites) {
+                         @Parameter(description = "Term to search", required = true) @QueryParam("query") String query,
+                         @Parameter(description = "Properties to expand") @QueryParam("expand") String expand,
+                         @Parameter(description = "Offset") @Schema(defaultValue = "0") @QueryParam("offset") int offset,
+                         @Parameter(description = "Tag names used to search news", required = true) @QueryParam("tags") List<String> tagNames,
+                         @Parameter(description = "Limit") @Schema(defaultValue = "20") @QueryParam("limit") int limit,
+                         @Parameter(description = "Favorites") @Schema(defaultValue = "false") @QueryParam("favorites") boolean favorites) {
 
     if (StringUtils.isBlank(query) && !favorites && CollectionUtils.isEmpty(tagNames)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("'query' parameter is mandatory").build();
@@ -628,12 +637,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("attachments/{attachmentId}")
   @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get a news attachment", httpMethod = "GET", response = Response.class, notes = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Get a news attachment", method = "GET", description = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNewsAttachmentById(@Context HttpServletRequest request,
-                                        @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+                                        @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
     try {
       NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
       if (attachment == null) {
@@ -650,12 +660,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Path("attachments/{attachmentId}/file")
   @RolesAllowed("users")
-  @ApiOperation(value = "Download a news attachment", httpMethod = "GET", response = Response.class, notes = "This downloads the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Download a news attachment", method = "GET", description = "This downloads the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNewsAttachmentBinaryById(@Context HttpServletRequest request,
-                                              @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+                                              @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
     try {
       NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
       if (attachment == null) {
@@ -677,12 +688,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Path("attachments/{attachmentId}/open")
   @RolesAllowed("users")
-  @ApiOperation(value = "Opens a news attachment", httpMethod = "GET", response = Response.class, notes = "This opens the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Opens a news attachment", method = "GET", description = "This opens the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response openNewsAttachmentById(@Context HttpServletRequest request,
-                                         @ApiParam(value = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
+                                         @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
     try {
       NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
       if (attachment == null) {
@@ -701,15 +713,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @GET
   @Path("{id}/illustration")
   @RolesAllowed("users")
-  @ApiOperation(value = "Get a news illustration", httpMethod = "GET", response = Response.class, notes = "This gets the news illustration with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News returned"),
-      @ApiResponse(code = 401, message = "User not authorized to get the news"),
-      @ApiResponse(code = 404, message = "News not found"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Get a news illustration", method = "GET", description = "This gets the news illustration with the given id if the authenticated user is a member of the space or a spaces super manager.")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
+      @ApiResponse(responseCode = "404", description = "News not found"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response getNewsIllustration(@Context Request rsRequest,
                                       @Context HttpServletRequest request,
-                                      @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                                      @ApiParam(value = "last modified date") @QueryParam("v") long lastModified,
-                                      @ApiParam(value = "resized image size") @QueryParam("size") String size) {
+                                      @Parameter(description = "News id", required = true) @PathParam("id") String id,
+                                      @Parameter(description = "last modified date") @QueryParam("v") long lastModified,
+                                      @Parameter(description = "resized image size") @QueryParam("size") String size) {
     try {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       News news = newsService.getNewsById(id, currentIdentity, false);
@@ -754,12 +767,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @POST
   @Path("{id}/click")
   @RolesAllowed("users")
-  @ApiOperation(value = "Log a click action on a news", httpMethod = "POST", response = Response.class, notes = "This logs a message when the user performs a click on a news")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "Click logged"),
-      @ApiResponse(code = 400, message = "Invalid query input"), @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Log a click action on a news", method = "POST", description = "This logs a message when the user performs a click on a news")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Click logged"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response clickOnNews(@Context UriInfo uriInfo,
-                              @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                              @ApiParam(value = "The clicked element", required = true) String clickedElement) {
+                              @Parameter(description = "News id", required = true) @PathParam("id") String id,
+                              @Parameter(description = "The clicked element", required = true) String clickedElement) {
 
     String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
     Identity currentUser = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, authenticatedUser, false);
@@ -792,14 +806,14 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @ApiOperation(value = "Update a news", httpMethod = "PATCH", response = Response.class, notes = "This updates the sent fields of a news")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "News updated"),
-      @ApiResponse(code = 400, message = "Invalid query input"),
-      @ApiResponse(code = 401, message = "User not authorized to update the news"),
-      @ApiResponse(code = 500, message = "Internal server error") })
+  @Operation(summary = "Update a news", method = "PATCH", description = "This updates the sent fields of a news")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News updated"),
+      @ApiResponse(responseCode = "400", description = "Invalid query input"),
+      @ApiResponse(responseCode = "401", description = "User not authorized to update the news"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response patchNews(@Context HttpServletRequest request,
-                            @ApiParam(value = "News id", required = true) @PathParam("id") String id,
-                            @ApiParam(value = "News", required = true) News updatedNews) {
+                            @Parameter(description = "News id", required = true) @PathParam("id") String id,
+                            @RequestBody(description = "News object", required = true) News updatedNews) {
     if (updatedNews == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -868,13 +882,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("canScheduleNews/{spaceId}")
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
-  @ApiOperation(value = "check if the current user can schedule a news in the given space", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can schedule a news in the given space", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to schedule a news"),
-          @ApiResponse(code = 400, message = "Invalid query input"),
-          @ApiResponse(code = 401, message = "User not authorized to schedule a news"),
-          @ApiResponse(code = 404, message = "Space not found"),
-          @ApiResponse(code = 500, message = "Internal server error") })
-  public Response canScheduleNews(@ApiParam(value = "space id", required = true) @PathParam("spaceId") String spaceId) {
+  @Operation(summary = "check if the current user can schedule a news in the given space", method = "GET", description = "This checks if the current user can schedule a news in the given space")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User ability to schedule a news"),
+          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to schedule a news"),
+          @ApiResponse(responseCode = "404", description = "Space not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response canScheduleNews(@Parameter(description = "space id", required = true) @PathParam("spaceId") String spaceId) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       if (StringUtils.isBlank(spaceId)) {
@@ -896,9 +910,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Path("canPublishNews")
   @Produces(MediaType.TEXT_PLAIN)
   @RolesAllowed("users")
-  @ApiOperation(value = "check if the current user can publish a news to all users", httpMethod = "GET", response = Response.class, notes = "This checks if the current user can publish a news to all users", consumes = "application/json")
-  @ApiResponses(value = { @ApiResponse(code = 200, message = "User ability to publish a news is returned"),
-          @ApiResponse(code = 401, message = "User not authorized to publish a news")})
+  @Operation(summary = "check if the current user can publish a news to all users", method = "GET", description = "This checks if the current user can publish a news to all users")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User ability to publish a news is returned"),
+          @ApiResponse(responseCode = "401", description = "User not authorized to publish a news")})
   public Response canPublishNews(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {

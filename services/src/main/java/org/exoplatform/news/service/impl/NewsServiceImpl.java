@@ -291,6 +291,7 @@ public class NewsServiceImpl implements NewsService {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
         news.setPublishDate(new Date(target.getCreatedDate()));
+        news.setIllustration(null);
         return news;
       } catch (Exception e) {
         return null;
@@ -468,7 +469,7 @@ public class NewsServiceImpl implements NewsService {
     Identity spaceIdentity = identityManager.getOrCreateIdentity(SpaceIdentityProvider.NAME, space.getPrettyName());
 
     ExoSocialActivity activity = new ExoSocialActivityImpl();
-    activity.setTitle("");
+    activity.setTitle(news.getTitle());
     activity.setType("news");
     activity.setUserId(poster.getId());
     activity.isHidden(news.isActivityPosted());

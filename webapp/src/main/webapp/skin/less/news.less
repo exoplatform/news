@@ -13,7 +13,11 @@
 
 
 /*============== Activity News ====================*/
-
+#SliderContainerChildren {
+  .PORTLET-FRAGMENT {
+    max-width:100%;
+  }
+}  
 .VuetifyApp {
   .headLinesTruncate {
     color: @baseBackgroundDefault !important;
@@ -3057,10 +3061,15 @@
           transform: scale(1.06);
         }
     }
+    .loader {
+      margin: auto
+    }
+    .articleLink {
+      position: absolute !important;
+      display: flex !important;
+    }
   }
     .articleLink {
-      position: absolute;
-      display: flex;
       text-decoration: none;
     }
     .articleInfos {
@@ -3129,9 +3138,11 @@
         margin-bottom: 2px;
       }
     }
-    a {
-      height: 100%;
-      width: 100%;
+    #news-latest-view , .newsSlider{
+      a {
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 /*========================= Skeleton CLV ======================*/
@@ -5282,7 +5293,7 @@ input.ignore-vuetify-classes.datePickerText.flex-grow-0 {
         -ms-flex-flow: column;
             flex-flow: column;
     position: absolute;
-    bottom: 40px;
+    bottom: 49px;
     height: 241px;
     width: 100%;
     padding: 10px;

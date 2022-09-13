@@ -75,10 +75,11 @@ export default {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorAddingAsFavorite', {0: this.$t('news.label')}), 'error');
     },
     displayAlert(message, type) {
-      document.dispatchEvent(new CustomEvent('notification-alert', {detail: {
+      this.$root.$emit('news-notification-alert', {
+        activityId: this.activityId,
         message,
         type: type || 'success',
-      }}));
+      });
     },
   },
 };

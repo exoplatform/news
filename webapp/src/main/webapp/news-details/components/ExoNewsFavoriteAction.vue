@@ -80,9 +80,7 @@ export default {
         message,
         type: type || 'success',
       });
-
     },
-
   },
 };
 </script>

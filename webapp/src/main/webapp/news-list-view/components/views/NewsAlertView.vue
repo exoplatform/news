@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alerts-slider" v-if="!emptyTemplate">
+  <div id="critical-alerts-slider" v-show="!emptyTemplate">
     <div class="alerts-header">
       <div class="alerts-icon">
         <v-icon>warning</v-icon>
@@ -81,6 +81,7 @@ export default {
   },
   data () {
     return {
+      containerNewsAlertView: [],
       slider: 0,
       news: [],
       initialized: false,
@@ -117,6 +118,12 @@ export default {
     this.getNewsList();
   },
   methods: {
+    disabledContainerNewsAlertView(element,index){
+      const el = element.querySelector('#critical-alerts-slider');
+      if (el){
+        this.containerNewsAlertView[index].style.display='none';
+      }
+    },
     openDrawer() {
       this.$root.$emit('news-settings-drawer-open');
     },
@@ -127,7 +134,13 @@ export default {
             this.news = newsList.news.filter(news => !!news);
             this.initialized = true;
           })
-          .finally(() => this.initialized = false);
+          .finally(() => {
+            if (this.emptyTemplate) {
+              this.containerNewsAlertView = document.getElementsByClassName('UIWindow DefaultTheme UIDragObject UIResizeObject');
+              this.containerNewsAlertView.forEach((element,index) => this.disabledContainerNewsAlertView(element,index));
+            }
+            this.initialized = false;
+          });
       }
     },
     refreshNewsViews(selectedTarget, selectedOption) {

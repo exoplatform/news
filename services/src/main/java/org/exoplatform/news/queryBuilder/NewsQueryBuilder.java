@@ -3,6 +3,7 @@ package org.exoplatform.news.queryBuilder;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.utils.NewsUtils;
@@ -51,9 +52,9 @@ public class NewsQueryBuilder {
                     .append("')) AND ");
           }
         }
-
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
-          sqlQuery.append("CONTAINS(.,'").append(filter.getSearchText()).append("') AND ");
+          String escapedQuoteSearchText = filter.getSearchText().replace("'", "''").replace("\"", "\"\"");
+          sqlQuery.append("CONTAINS(.,'").append(escapedQuoteSearchText).append("') AND ");
         }
         if (filter.isPublishedNews()) {
           sqlQuery.append("exo:pinned = 'true' AND ");

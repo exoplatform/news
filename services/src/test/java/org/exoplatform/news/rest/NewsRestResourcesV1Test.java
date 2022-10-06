@@ -1522,7 +1522,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
@@ -1575,7 +1575,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     // When
@@ -1627,7 +1627,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
@@ -1809,7 +1809,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
@@ -2058,7 +2058,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
@@ -2094,7 +2094,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     setCurrentUser("john");
@@ -2131,7 +2131,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     setCurrentUser("john");
@@ -2169,7 +2169,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(newsService.getNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     setCurrentUser("john");

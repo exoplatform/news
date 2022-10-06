@@ -311,14 +311,6 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
-    return newsStorage.searchNews(filter, lang);
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public News getNewsByActivityId(String activityId, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException,
                                                                                ObjectNotFoundException {
     ExoSocialActivity activity = activityManager.getActivity(activityId);

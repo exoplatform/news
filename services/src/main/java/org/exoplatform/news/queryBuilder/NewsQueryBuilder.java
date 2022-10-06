@@ -54,7 +54,10 @@ public class NewsQueryBuilder {
         }
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
           String escapedQuoteSearchText = filter.getSearchText().replace("'", "''").replace("\"", "\"\"");
-          sqlQuery.append("CONTAINS(.,'").append(escapedQuoteSearchText).append("') AND ");
+          sqlQuery.append("( exo:title LIKE '%").append(escapedQuoteSearchText).append("%' OR");
+          sqlQuery.append(" exo:author LIKE '%").append(escapedQuoteSearchText).append("%' OR");
+          sqlQuery.append(" exo:summary LIKE '%").append(escapedQuoteSearchText).append("%' OR");
+          sqlQuery.append(" exo:body LIKE '%").append(escapedQuoteSearchText).append("%' ) AND ");
         }
         if (filter.isPublishedNews()) {
           sqlQuery.append("exo:pinned = 'true' AND ");

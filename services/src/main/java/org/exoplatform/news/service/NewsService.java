@@ -142,15 +142,6 @@ public interface NewsService {
   void markAsRead(News news, String userId) throws Exception;
   
   /**
-   * Search news with the given text
-   * 
-   * @param filter news filter
-   * @param lang language
-   * @throws Exception when error
-   */
-  List<News> searchNews(NewsFilter filter, String lang) throws Exception;
-  
-  /**
    * Retrives a news identified by originating Activity identifier or a shared
    * activity identifier
    * 

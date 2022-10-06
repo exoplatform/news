@@ -43,7 +43,4 @@ public interface NewsStorage {
   void archiveNews(String newsId) throws Exception;
   
   void unarchiveNews(String newsId) throws Exception;
-  
-  List<News> searchNews(NewsFilter filter, String lang) throws Exception;
-
 }

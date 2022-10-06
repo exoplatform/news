@@ -7,7 +7,15 @@ import java.text.SimpleDateFormat;
 import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -20,22 +28,18 @@ import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 
-import org.exoplatform.commons.api.search.data.SearchContext;
-import org.exoplatform.commons.api.search.data.SearchResult;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.ecm.jcr.model.VersionNode;
 import org.exoplatform.ecm.utils.text.Text;
-import org.exoplatform.news.connector.NewsSearchConnector;
-import org.exoplatform.news.connector.NewsSearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
@@ -138,8 +142,6 @@ public class JcrNewsStorage implements NewsStorage {
   
   private WCMPublicationService    wCMPublicationService;
   
-  private NewsSearchConnector      newsSearchConnector;
-
   public JcrNewsStorage(RepositoryService repositoryService,
                          SessionProviderService sessionProviderService,
                          NodeHierarchyCreator nodeHierarchyCreator,
@@ -152,7 +154,6 @@ public class JcrNewsStorage implements NewsStorage {
                          NewsAttachmentsStorage newsAttachmentsService,
                          IdentityManager identityManager,
                          LinkManager linkManager,
-                         NewsSearchConnector newsSearchConnector,
                          WCMPublicationService wCMPublicationService) {
     
     this.activityManager = activityManager;
@@ -168,8 +169,6 @@ public class JcrNewsStorage implements NewsStorage {
     this.spaceService = spaceService;
     this.uploadService = uploadService;
     this.wCMPublicationService = wCMPublicationService;
-    this.newsSearchConnector = newsSearchConnector;
-    
   }
   
   /**
@@ -1189,36 +1188,6 @@ public class JcrNewsStorage implements NewsStorage {
     newsNode.save();
   }
   
-  /**
-   * Search news with the given text
-   * 
-   * @param filter news filter
-   * @param lang language
-   * @throws Exception when error
-   */
-  public List<News> searchNews(NewsFilter filter, String lang) throws Exception {
-
-    SearchContext context = new SearchContext(null, null);
-    context.lang(lang);
-    List<News> newsList = new ArrayList<>();
-    List<SearchResult> searchResults = newsSearchConnector.search(filter,
-                                                                  filter.getOffset(),
-                                                                  filter.getLimit(),
-                                                                  "relevancy",
-                                                                  "desc");
-    searchResults.forEach(res -> {
-      try {
-        Node newsNode = ((NewsSearchResult) res).getNode();
-        News news = getNewsById(newsNode.getUUID(), false);
-        newsList.add(news);
-
-      } catch (Exception e) {
-        LOG.error("Error while processing search result in News", e);
-      }
-    });
-    return newsList;
-  }
-  
   @Override
   public void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws IllegalAccessException, ObjectNotFoundException {
     String newsId = news.getId();
@@ -1256,16 +1225,11 @@ public class JcrNewsStorage implements NewsStorage {
   }
   
   public Node getNewsNodeById(String newsId, SessionProvider sessionProvider) throws RepositoryException, ItemNotFoundException {
-    Session session = getSession(sessionProvider);
+    Session session = sessionProvider.getSession(repositoryService.getCurrentRepository()
+                                                 .getConfiguration()
+                                                 .getDefaultWorkspaceName(),
+                                repositoryService.getCurrentRepository());
     Node node = session.getNodeByUUID(newsId);
     return node;
   }
-  
-  private Session getSession(SessionProvider sessionProvider) throws RepositoryException {
-    return sessionProvider.getSession(repositoryService.getCurrentRepository()
-                                                       .getConfiguration()
-                                                       .getDefaultWorkspaceName(),
-                                      repositoryService.getCurrentRepository());
-  }
-  
 }

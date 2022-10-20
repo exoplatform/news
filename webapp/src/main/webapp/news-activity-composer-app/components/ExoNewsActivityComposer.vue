@@ -263,7 +263,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         right
         fab
         x-large
-        @click="openApp()">
+        @click="openAttachmentDrawer()">
         <i class="uiIconAttachment"></i>
         <v-progress-circular
           :class="uploading ? 'uploading' : ''"
@@ -271,12 +271,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           {{ news.attachments.length }}
         </v-progress-circular>
       </v-btn>
-      <exo-attachments
-        ref="attachmentsComponent"
-        :space-id="news.spaceId"
-        v-model="news.attachments"
-        @HideAttachmentsDrawer="onHideAttachmentsDrawer"
-        @uploadingCountChanged="setUploadingCount" />
       <exo-news-notification-alerts name="event-form" />
       <exo-news-draft-visibility-mobile
         ref="selectVisibilityDialog"
@@ -522,7 +516,7 @@ export default {
       this.changeView();
     });
     document.addEventListener('attach-file-plugins', () => {
-      this.openApp();
+      this.openAttachmentDrawer();
     });
     this.$root.$on('update-visibility', this.updateVisibility);
   },
@@ -985,8 +979,20 @@ export default {
         window.open('/', '_self');
       }
     },
-    openApp() {
-      this.$refs.attachmentsComponent.toggleAttachmentsDrawer();
+    openAttachmentDrawer() {
+      const attachmentDrawerParams = {
+        'sourceApp': 'newsApp',
+        'attachToEntity': false,
+        'spaceId': this.news.spaceId,
+        'defaultFolder': 'News Attachments',
+        'attachments': this.news.attachments
+      };
+      if (this.news.attachments.length === 0) {
+        document.dispatchEvent(new CustomEvent('open-attachments-app-drawer', {detail: attachmentDrawerParams}));
+      }
+      else {
+        document.dispatchEvent(new CustomEvent('open-attachments-list-drawer', {detail: attachmentDrawerParams}));
+      }
     },
     onHideAttachmentsDrawer: function(){
       const spanBadge = document.getElementById('badge');

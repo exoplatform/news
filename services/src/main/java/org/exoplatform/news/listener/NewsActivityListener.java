@@ -71,7 +71,7 @@ public class NewsActivityListener extends ActivityListenerPlugin {
 
   @Override
   public void likeActivity(ActivityLifeCycleEvent event) {
-    ExoSocialActivity activity = event.getActivity();
+    ExoSocialActivity activity = activityManager.getActivity(event.getActivity().getId());
     if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
@@ -85,11 +85,11 @@ public class NewsActivityListener extends ActivityListenerPlugin {
 
   @Override
   public void saveComment(ActivityLifeCycleEvent event) {
-    ExoSocialActivity activity = event.getActivity();
+    ExoSocialActivity activity = activityManager.getActivity(event.getActivity().getParentId());
     if (activity != null && activity.getTemplateParams() != null && activity.getTemplateParams().containsKey(NEWS_ID)) {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       try {
-        News news = newsService.getNewsByActivityId(activity.getParentId(), currentIdentity);
+        News news = newsService.getNewsByActivityId(activity.getId(), currentIdentity);
         NewsUtils.broadcastEvent(NewsUtils.COMMENT_NEWS, currentIdentity.getUserId(), news);
       } catch (Exception e) {
         LOG.error("Error broadcast comment news event", e);

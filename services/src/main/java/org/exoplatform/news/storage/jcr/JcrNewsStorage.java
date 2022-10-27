@@ -397,9 +397,9 @@ public class JcrNewsStorage implements NewsStorage {
     news.setOriginalBody(sanitizedBody);
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
-    news.setPublicationDate(getPublicationDate(node));
+    news.setPublicationDate(getPublicationDate(originalNode));
     news.setUpdater(getLastUpdater(originalNode));
-    news.setUpdateDate(getLastUpdatedDate(node));
+    news.setUpdateDate(getLastUpdatedDate(originalNode));
     news.setDraftUpdater(getStringProperty(originalNode, EXO_NEWS_LAST_MODIFIER));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
@@ -469,11 +469,11 @@ public class JcrNewsStorage implements NewsStorage {
     if (node.hasProperty(AuthoringPublicationConstant.START_TIME_PROPERTY)) {
       news.setSchedulePostDate(node.getProperty(AuthoringPublicationConstant.START_TIME_PROPERTY).getString());
     }
-    if (!node.hasProperty("exo:viewsCount")) {
+    if (!originalNode.hasProperty("exo:viewsCount")) {
       news.setViewsCount(0L);
     } 
     else {
-      news.setViewsCount(node.getProperty("exo:viewsCount").getLong());
+      news.setViewsCount(originalNode.getProperty("exo:viewsCount").getLong());
     }
     if (node.hasNode("illustration")) {
       Node illustrationContentNode = node.getNode("illustration").getNode("jcr:content");

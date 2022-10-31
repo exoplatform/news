@@ -19,6 +19,7 @@ public interface NewsService {
    * 
    * @param currentIdentity
    * @param news The news to create
+   * @return created News object
    * @throws Exception when error
    */
   News createNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
@@ -29,16 +30,19 @@ public interface NewsService {
    * exists with this id, the draft is updated and published.
    * 
    * @param news The news to post
+   * @param poster the Poster of the News
+   * @return The posted News
    * @throws Exception when error
    */
   News postNews(News news, String poster) throws Exception;
   
   /**
-   * 
+   * Checks if the user can create a News
+   *
    * @param space
    * @param currentIdentity
-   * @return
-   * @throws Exception
+   * @return boolean true if the user can create the news
+   * @throws Exception if an error occurred
    */
   boolean canCreateNews(Space space, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
   
@@ -51,7 +55,7 @@ public interface NewsService {
    * @param updater user attempting to update news
    * @param post
    * @param publish
-   * @return
+   * @return updated News
    * @throws Exception
    */
   News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception;
@@ -61,7 +65,7 @@ public interface NewsService {
    * 
    * @param id the news id to delete
    * @param currentIdentity user attempting to delete news
-   * @param isDraft
+   * @param isDraft if the News is still draft
    * @throws Exception when error
    */
   void deleteNews(String id, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft) throws Exception;
@@ -70,16 +74,16 @@ public interface NewsService {
    * Publish a news
    *
    * @param news to be published
-   * @param publisher
+   * @param publisher of the News
    * @throws Exception when error
    */
   void publishNews(News news, String publisher) throws Exception;
   
   /**
-   * 
-   * @param newsId
-   * @param publisher
-   * @throws Exception
+   * Unpublish a News
+   * @param newsId the ID of the News
+   * @param publisher the publisher of the News
+   * @throws Exception when an error occurs
    */
   void unpublishNews(String newsId, String publisher) throws Exception;
   
@@ -120,14 +124,14 @@ public interface NewsService {
    * @param targetName
    * @param currentIdentity user attempting to access news
    * @return {@link News} list by target name.
-   * throws Exception when error
+   * @throws Exception when error
    */
   List<News> getNewsByTargetName(NewsFilter filter, String targetName,  org.exoplatform.services.security.Identity currentIdentity) throws Exception;
   
   /**
-   * 
+   * get the count of News after applying a filter
    * @param filter
-   * @return
+   * @return int the number of News
    * @throws Exception
    */
   int getNewsCount(NewsFilter filter) throws Exception;
@@ -147,11 +151,12 @@ public interface NewsService {
    * @param filter news filter
    * @param lang language
    * @throws Exception when error
+   * @return List of News returned by the search
    */
   List<News> searchNews(NewsFilter filter, String lang) throws Exception;
   
   /**
-   * Retrives a news identified by originating Activity identifier or a shared
+   * Retrieves a news item identified by originating Activity identifier or a shared
    * activity identifier
    * 
    * @param activityId {@link ExoSocialActivity} identifier
@@ -165,18 +170,21 @@ public interface NewsService {
   News getNewsByActivityId(String activityId, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException, ObjectNotFoundException;
   
   /**
-   * 
+   * Schedule publishing a News
    * @param news
-   * @return
-   * @throws Exception
+   * @param currentIdentity
+   * @return the published news
+   * @throws Exception when error occurs
    */
   News scheduleNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
   
   /**
-   * 
+   * Un-schedule publishing a News
+   *
    * @param news
-   * @return
-   * @throws Exception
+   * @param currentIdentity
+   * @return unscheduled News
+   * @throws Exception when error occurs
    */
   News unScheduleNews(News news, org.exoplatform.services.security.Identity currentIdentity) throws Exception;
 
@@ -190,14 +198,15 @@ public interface NewsService {
   List<NewsESSearchResult> search(Identity currentIdentity, NewsFilter filter);
   
   /**
-   * 
+   * Checks if the user can schedule publishinga  News
    * @param space
    * @param currentIdentity
-   * @return
+   * @return boolean : true if the user can schedule publishing a News
    */
   boolean canScheduleNews(Space space, org.exoplatform.services.security.Identity currentIdentity);
 
   /**
+   * Checks if the user can view the News
    * @param news {@link News} to check
    * @param authenticatedUser authenticated username
    * @return true if user has access to news, else false
@@ -205,14 +214,13 @@ public interface NewsService {
   boolean canViewNews(News news, String authenticatedUser);
   
   /**
-   * Shares a news into a dedicated space
+   * Shares a news item into a dedicated space
    * 
    * @param news {@link News} to share
    * @param space {@link Space} to share with, the news
    * @param userIdentity {@link Identity} of user making the modification
    * @param sharedActivityId newly generated activity identifier
-   * @throws IllegalAccessException when user doesn't have access to {@link News}
-   * @throws ObjectNotFoundException when {@link News} is not found
+   * @throws Exception when user doesn't have access to {@link News}
    */
   void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws Exception;
   
@@ -235,10 +243,10 @@ public interface NewsService {
   void unarchiveNews(String newsId, String currentUserName) throws Exception;
   
   /**
-   * 
+   * checks if the user can archive the news
    * @param currentIdentity
    * @param newsAuthor
-   * @return
+   * @return boolean : true if user can archive the news
    */
   boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor);
 }

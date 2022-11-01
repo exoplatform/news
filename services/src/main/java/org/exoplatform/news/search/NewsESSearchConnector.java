@@ -52,13 +52,7 @@ public class NewsESSearchConnector {
 
   private static final String          SEARCH_QUERY_FILE_PATH_PARAM = "query.file.path";
 
-  public static final String           SEARCH_QUERY_TERM            = "\"must\":{" +
-      "  \"query_string\":{" +
-      "    \"fields\": [\"body\", \"posterName\"]," +
-      "    \"default_operator\": \"AND\"," +
-      "    \"query\": \"@term@\"" +
-      "  }" +
-      "},";
+  public static final String           SEARCH_QUERY_TERM            = "query: @term@";
 
   private final ConfigurationManager   configurationManager;
 

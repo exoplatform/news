@@ -323,7 +323,7 @@ public class JcrNewsStorage implements NewsStorage {
   /**
    * Publish a news
    *
-   * @param newsId The id of the news to be published
+   * @param news The news to be published
    * @throws Exception when error
    */
   public void publishNews(News news) throws Exception {

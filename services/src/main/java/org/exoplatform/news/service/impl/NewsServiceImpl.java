@@ -462,7 +462,7 @@ public class NewsServiceImpl implements NewsService {
    * @param news The news to post as an activity
    * @throws Exception when error
    */
-  public void postNewsActivity(News news) throws Exception {
+  private void postNewsActivity(News news) throws Exception {
     Identity poster = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, news.getAuthor());
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
@@ -564,7 +564,7 @@ public class NewsServiceImpl implements NewsService {
         || currentIdentity.getUserId().equals(newsAuthor));
   }
 
-  public void sendNotification(String currentUserId, News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
+  private void sendNotification(String currentUserId, News news, NotificationConstants.NOTIFICATION_CONTEXT context) throws Exception {
     String newsId = news.getId();
     String contentAuthor = news.getAuthor();
     String currentUser = currentUserId != null ? currentUserId : contentAuthor;

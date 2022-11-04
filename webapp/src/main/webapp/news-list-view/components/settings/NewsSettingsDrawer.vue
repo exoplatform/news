@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <exo-drawer
+  v-if="showDrawer"
     ref="newsSettingsDrawer"
     id="newsSettingsDrawer"
     right
@@ -165,6 +166,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   data: () => ({
+    showDrawer: false,
     initialized: false,
     initializing: false,
     saving: false,
@@ -236,7 +238,9 @@ export default {
     },
     initializing() {
       if (this.initializing) {
-        this.$refs.newsSettingsDrawer.startLoading();
+        if (this.$refs && this.$refs.newsSettingsDrawer) {
+          this.$refs.newsSettingsDrawer.startLoading();
+        }
       } else {
         this.$refs.newsSettingsDrawer.endLoading();
       }
@@ -244,8 +248,11 @@ export default {
   },
   created() {
     this.disabled = true;
-    this.init();
-    this.$root.$on('news-settings-drawer-open', () => this.open());
+    this.$root.$on('news-settings-drawer-open', () => {
+      this.showDrawer = true;
+      this.init();
+      setTimeout(() => this.open(), 100);
+    });
   },
   methods: {
     open() {
@@ -254,7 +261,11 @@ export default {
     },
     close() {
       this.$refs.newsSettingsDrawer.close();
-      window.setTimeout(() => this.showAdvancedSettings = false, 200);
+      window.setTimeout(() => {
+        this.showAdvancedSettings = false;
+        this.showDrawer = false;
+      }, 200);
+      
     },
     reset() {
       this.viewTemplate = this.$root.viewTemplate;

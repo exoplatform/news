@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <%@page import="org.exoplatform.services.security.ConversationState"%>
 <%@page import="org.exoplatform.services.security.Identity"%>
 <%@ page import="org.exoplatform.news.utils.NewsUtils" %>
+<%@ page import="org.exoplatform.web.PortalHttpServletResponseWrapper" %>
+<%@ page import="org.exoplatform.portal.application.PortalRequestContext" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <portlet:defineObjects />
@@ -44,7 +46,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String viewTemplate = viewTemplateParams == null || viewTemplateParams.length == 0 ? "": viewTemplateParams[0];
     String newsTarget = newsTargetParams == null || newsTargetParams.length == 0 ? "": newsTargetParams[0];
     String header = headerParams == null || headerParams.length == 0 ? "": headerParams[0];
-    String limit = limitParams == null || limitParams.length == 0 ? "": limitParams[0];
+    String limit = limitParams == null || limitParams.length == 0 ? "4": limitParams[0];
     String showHeader = showHeaderParams == null || showHeaderParams.length == 0 ? "true": showHeaderParams[0];
     String showSeeAll = showSeeAllParams == null || showSeeAllParams.length == 0 ? "true": showSeeAllParams[0];
     String showArticleTitle = showArticleTitleParams == null || showArticleTitleParams.length == 0 ? "true": showArticleTitleParams[0];
@@ -64,6 +66,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     boolean canPublishNews = NewsUtils.canPublishNews(currentIdentity);
     saveSettingsURL = canPublishNews ? saveSettingsURL : null;
+
+    PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
+    PortalHttpServletResponseWrapper responseWrapper = ( PortalHttpServletResponseWrapper ) rcontext.getResponse();
+    String newsListUrl = "/portal/rest/v1/news/byTarget/snapshotLatestNews?offset=0&limit="+ limit + "&returnSize=true";
+    responseWrapper.addHeader("Link", "<" + newsListUrl + ">; rel=prefetch; as=fetch; crossorigin=use-credentials", false);
   %>
   <div class="news-list-view-app" id="<%= appId %>">
     <script type="text/javascript">

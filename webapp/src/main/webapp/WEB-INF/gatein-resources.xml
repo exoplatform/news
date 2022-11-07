@@ -23,10 +23,45 @@
 
   <portal-skin>
     <skin-name>Enterprise</skin-name>
-    <skin-module>customModuleNews</skin-module>
-    <css-path>/skin/css/news.css</css-path>
+    <skin-module>newsDetails</skin-module>
+    <css-path>/skin/css/newsDetails.css</css-path>
     <css-priority>11</css-priority>
   </portal-skin>
+
+  <portlet-skin>
+    <application-name>news</application-name>
+    <portlet-name>News</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/newsApp.css</css-path>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>news</application-name>
+    <portlet-name>NewsComposer</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/newsComposer.css</css-path>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>news</application-name>
+    <portlet-name>NewsExtensions</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/newsExtensions.css</css-path>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>news</application-name>
+    <portlet-name>NewsListView</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/newsListView.css</css-path>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>news</application-name>
+    <portlet-name>newsPublishTargetsManagement</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/newsPublishTargetsManagement.css</css-path>
+  </portlet-skin>
 
   <portlet>
     <name>NewsComposer</name>

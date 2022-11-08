@@ -19,8 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="articleLink"
     target="_self"
     :href="item.url">
-    <div class="articleImage">
-      <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+    <div 
+      :id="`image-${item.id}`"
+      class="articleImage">
+      <img :src="showArticleImage && item.illustrationURL !== null 
+        ? $newsListService.illustrationURLResize(item.illustrationURL, `#news-latest-view #image-${item.id}`)
+        : '/news/images/news.png'" 
+        :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="articleInfos">
       <div class="articleSpace" v-if="!isHiddenSpace && showArticleSpace">

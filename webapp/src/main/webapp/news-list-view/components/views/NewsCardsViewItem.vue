@@ -147,7 +147,7 @@ export default {
       return this.selectedOption && this.selectedOption.showArticleSpace;
     },
     articleImage() {
-      return (this.showArticleImage && this.item?.illustrationURL) || '/news/images/news.png';
+      return (this.showArticleImage && this.item?.illustrationURL.concat('&size=235x140').toString()) || '/news/images/news.png';
     },
     isHiddenSpace() {
       return this.item && !this.item.spaceMember && this.item.hiddenSpace;

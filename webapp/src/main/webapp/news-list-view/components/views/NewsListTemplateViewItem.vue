@@ -105,7 +105,7 @@ export default {
       return this.selectedOption?.showArticleReactions;
     },
     articleImage() {
-      return (this.showArticleImage && this.item?.illustrationURL) || '/news/images/news.png';
+      return (this.showArticleImage && this.item?.illustrationURL.concat('&size=70x70').toString()) || '/news/images/news.png';
     },
   },
 };

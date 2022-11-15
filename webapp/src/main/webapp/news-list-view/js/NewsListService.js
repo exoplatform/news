@@ -52,3 +52,11 @@ export function saveSettings(saveSettingsURL, settings) {
     }
   });
 }
+
+export function illustrationURLResize(illustrationURL, querySelector) {
+  const element = querySelector ? document.querySelector(querySelector) : null;
+  if (element && illustrationURL) {
+    return illustrationURL.concat('&size=')
+      .concat(element.clientWidth).concat('x').concat(element.clientHeight).toString();
+  }
+}

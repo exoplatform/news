@@ -69,8 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
     PortalHttpServletResponseWrapper responseWrapper = ( PortalHttpServletResponseWrapper ) rcontext.getResponse();
-    String target = viewTemplate.equals("NewsSlider") ? "snapshotSliderNews" : "snapshotLatestNews";
-    String newsListUrl = "/portal/rest/v1/news/byTarget/"+ target +"?offset=0&limit="+ limit + "&returnSize=true";
+    String newsListUrl = "/portal/rest/v1/news/byTarget/" + newsTarget + "?offset=0&limit=" + limit + "&returnSize=true";
     responseWrapper.addHeader("Link", "<" + newsListUrl + ">; rel=prefetch; as=fetch; crossorigin=use-credentials", false);
   %>
   <div class="news-list-view-app" id="<%= appId %>">

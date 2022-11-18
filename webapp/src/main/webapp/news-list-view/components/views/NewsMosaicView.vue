@@ -21,13 +21,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-for="(item, index) of news"
         :key="index"
         :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
-        :id="`articleItem-${index}`">
+        :id="`articleItem-${item.id}`">
         <a
           class="articleLink d-block"
           target="_self"
           :href="item.url">
           <img :src="showArticleImage && item.illustrationURL !== null ? 
-            $newsListService.illustrationURLResize(item.illustrationURL, `#top-news-mosaic #articleItem-${index}`)
+            $newsListService.illustrationURLResize(item.illustrationURL, `#top-news-mosaic #articleItem-${item.id}`)
             : '/news/images/news.png'" 
             :alt="$t('news.latest.alt.articleImage')">
           <div class="titleArea">

@@ -12,7 +12,7 @@
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="illustrationURL" class="illustration">
           <img
-            :src="illustrationURL"
+            :src="illustrationURL.concat('&size=0x400').toString()"
             class="newsDetailsImage illustrationPicture"
             :alt="newsTitle"
             longdesc="#newsSummary">

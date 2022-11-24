@@ -134,6 +134,9 @@ export default {
         componentOptions: this.selectedViewExtension,
       };
     },
+    isMobile() {
+      return this.$vuetify.breakpoint.width < 651;
+    },
     viewComponentParams() {
       return {
         viewExtension: this.selectedViewExtension,

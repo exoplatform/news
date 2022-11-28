@@ -220,12 +220,10 @@ export default {
       data.forEach((item) => {
         const newsPublicationDate = item.publicationDate != null ? new Date(item.publicationDate.time) : null;
         const newsUpdateDate = new Date(item.updateDate.time);
-        const newsIllustration = item.illustrationURL == null ? '/news/images/news.png' : item.illustrationURL;
         const activityId = item.activities ? item.activities.split(';')[0].split(':')[1] : '';
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
-          illustrationURL: newsIllustration,
           title: item.title,
           updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,

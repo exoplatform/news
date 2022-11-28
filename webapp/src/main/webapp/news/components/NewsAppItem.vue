@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <div id="newsAppItem">
     <a
       :href="news.url"
-      :style="{ 'background-image': 'url(' + news.illustrationURL + '&size=150x150)' }"
+      :style="{ 'background-image': 'url(' + illustrationUrl + ')' }"
       class="newsSmallIllustration"
       :target="news.target"></a>
     <div class="newsItemContent">
@@ -160,7 +160,10 @@ export default {
     },
     newsAuthor() {
       return this.news && this.news.authorProfileURL && this.news.authorProfileURL.split('/').pop();
-    }
+    },
+    illustrationUrl() {
+      return this.news?.illustrationURL ? this.news.illustrationURL.concat('&size=150x150').toString() : '/news/images/news.png';
+    },
   },
   methods: {
     editLink(news) {

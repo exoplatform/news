@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="settings-container d-flex flex-row pa-2">
+  <div v-if="showSettingsContainer" class="settings-container d-flex flex-row px-2 pt-1">
     <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
       <span
         v-if="showHeader"
@@ -50,6 +50,11 @@ export default {
     showHeader: false,
     showSeeAll: false,
   }),
+  computed: {
+    showSettingsContainer(){
+      return this.showHeader || this.showSeeAll || this.$root.canPublishNews ;
+    }
+  },
   created() {
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
       this.newsHeader = selectedOptions.header;

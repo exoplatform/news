@@ -15,14 +15,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="article-list-view">
+  <div id="article-list-view" :class="articleListExtraClass">
     <v-row>
       <v-col
         class="flex-grow-0"
+        :class="extraClass"
+        cols="12"
+        xs="12"
+        md="6"
+        xl="4"
         v-for="(item, index) of newsInfo"
         :key="item">
         <div
-          class="article"
           :id="`article-item-${index}`">
           <news-list-template-view-item
             :item="item"
@@ -61,6 +65,14 @@ export default {
     showArticleDate: true,
     showArticleReactions: true,
   }),
+  computed: {
+    articleListExtraClass() {
+      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'py-0';
+    },
+    extraClass() {
+      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'pt-2';
+    }
+  },
   created() {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);

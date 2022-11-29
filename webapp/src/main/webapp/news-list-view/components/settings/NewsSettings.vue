@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="d-flex flex-row pa-2">
+  <div class="settings-container d-flex flex-row pa-2">
     <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
       <span
         v-if="showHeader"
@@ -24,6 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div class="d-flex flex-column me-2">
       <v-btn
+        class="button-open-settings"
         v-if="$root.canPublishNews"
         icon
         @click="openDrawer">
@@ -34,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-btn
         depressed
         small
-        class="caption text-uppercase grey--text my-auto me-2"
+        class="button-see-all-news caption text-uppercase grey--text my-auto me-2"
         @click="seeAllNews">
         {{ $t('news.published.seeAll') }}
       </v-btn>

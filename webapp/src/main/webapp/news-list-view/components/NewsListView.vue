@@ -16,7 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="news-list-view-app position-relative">
-    <v-card height="100%" flat class="list-view-card rounded-0">
+    <v-card 
+      height="100%"
+      flat
+      :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
+      class="list-view-card rounded-0">
       <v-card-text class="pa-0">
         <news-settings v-if="displayHeader" />
         <extension-registry-component
@@ -104,6 +108,7 @@ export default {
       return this.viewTemplate && 
             this.viewTemplate !== 'NewsSlider' && 
             this.viewTemplate !== 'NewsAlert' && 
+            this.viewTemplate !== 'NewsStories' && 
             (this.viewTemplate !== 'NewsMosaic' || this.isMobile);
     },
     selectedViewExtension() {

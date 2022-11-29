@@ -15,7 +15,11 @@
     min-height: 100%;
     flex: 1 1 auto;
     max-width: 100%;
-
+    
+    .background-transparent {
+      background: transparent !important;
+    }
+    
     .list-view-card {
       height: 100%;
 
@@ -1797,10 +1801,24 @@ p.caption-title:after {
   -ms-flex-direction: column;
   flex-direction: column;
   position: relative;
-  background: transparent;
+  background: transparent !important;
   font-size: 14px;
   color: white;
   line-height: 18px;
+  .theme--light.v-card {
+    background: transparent !important;
+  }
+  .author-photo {
+    margin: 0 0 0 7px !important;
+  }
+  .author-date-container {
+    font-size: 11px !important;
+    position: absolute !important;
+    top: 25px !important;
+    .author-date {
+      margin: auto !important;
+    }
+  }
   .card {
     position: relative;
     border-radius: 6px;
@@ -1814,6 +1832,37 @@ p.caption-title:after {
     overflow: hidden;
     margin: 0 10px 0 0;
     float: left;
+    .settings-container{
+      position: absolute;
+      z-index: 1;
+      padding-bottom: 0 !important;
+      right: 0 !important;
+    }
+    div:has(> .button-see-all-news) {
+      margin-left: 8px !important;
+    }
+    div:has(> .button-open-settings) {
+      margin-right: 0 !important;
+    }
+    .button-see-all-news {
+      height: 18px !important;
+      padding: 0 9px !important;
+      margin-right: -6px !important;
+      span {
+        font-size: 10px !important;
+      }
+    }
+    .button-open-settings {
+      height: 18px;
+      width: 18px;
+      .mdi-cog {
+        height: 18px !important;
+        font-size: 18px !important;
+        width: 18px !important;
+        color: white !important;
+        text-shadow: 2px 2px 4px black;
+      }
+    }
     &:hover {
       -webkit-box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.1);
       box-shadow: 0 3px 20px 0 rgba(0, 0, 0, 0.1);

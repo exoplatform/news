@@ -19,10 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <v-row>
       <v-col
         class="flex-grow-0"
+        cols="12"
+        xs="12"
+        md="6"
+        xl="4"
         v-for="(item, index) of newsInfo"
         :key="item">
         <div
-          class="article"
           :id="`article-item-${index}`">
           <news-list-template-view-item
             :item="item"

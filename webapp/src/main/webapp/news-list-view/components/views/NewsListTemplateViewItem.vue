@@ -23,8 +23,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="article-item-content">
-      <span v-if="showArticleTitle" class="article-title">{{ item.title }}</span>
-      <span v-if="showArticleSummary" class="article-title">{{ item.summary }}</span>
+      <span
+        v-if="showArticleTitle"
+        class="text-color text-body-2"
+        :class="extraClass">{{ item.title }}</span>
+      <span
+        v-if="showArticleSummary"
+        class="text-color text-body-2"
+        :class="extraClass">{{ item.summary }}</span>
       <div class="d-flex">
         <span v-if="showArticleAuthor" class="article-preTitle">{{ item.authorDisplayName }}</span>
         <v-icon
@@ -107,6 +113,9 @@ export default {
     articleImage() {
       return (this.showArticleImage && this.item?.illustrationURL) || '/news/images/news.png';
     },
+    extraClass() {
+      return (!this.showArticleSummary || !this.showArticleTitle) && 'text-truncate-2' || 'article-title' ;
+    }
   },
 };
 </script>

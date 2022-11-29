@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 eXo Platform SAS.
+ * Copyright (C) 2023 eXo Platform SAS.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <gnu.org/licenses>.
  */
+
 package org.exoplatform.news.listener;
 
 import org.exoplatform.news.model.News;

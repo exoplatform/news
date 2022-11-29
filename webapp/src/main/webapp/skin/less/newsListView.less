@@ -1543,11 +1543,19 @@ p.caption-title:after {
 #top-news-mosaic {
   background-color: white;
   overflow: hidden;
+  .settingNewsContainer {
+    position: absolute;
+    z-index: 2;right: 0;
+    i {
+      color: white !important;
+      text-shadow: 2px 2px 4px black;
+    }
+  }
   .mosaic-container {
     display: -ms-grid;
     display: grid;
     gap: 2px;
-    height: 335px;
+    height: 404px;
     overflow: hidden;
   }
   .article {
@@ -1565,6 +1573,12 @@ p.caption-title:after {
         font-weight: 600;
         line-height: 27px;
         -webkit-line-clamp: 5;
+        .articleTitleTruncate {
+          display: -webkit-box !important;
+          -webkit-line-clamp: 5 !important;
+          -webkit-box-orient: vertical !important;
+          overflow: hidden;
+        }
       }
     }
     &:nth-child(2) {
@@ -1574,6 +1588,24 @@ p.caption-title:after {
       -ms-grid-row: 1;
       -ms-grid-row-span: 1;
       grid-row: ~"1/2";
+      .articleTitleTruncate {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden;
+      }
+    }
+    &:nth-child(3) .articleTitleTruncate {
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden;
+    }
+    &:nth-child(4) .articleTitleTruncate {
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden;
     }
     &:nth-child(n + 2) {
       .titleArea {

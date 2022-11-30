@@ -16,7 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div id="top-news-mosaic" ref="top-news-mosaic">
-    <div :class="`mosaic-container ma-3 ${smallHeightClass}`">
+    <news-settings 
+      v-if="!isSmallBreakpoint" 
+      :class="isMobile ? '' : 'settingNewsContainer'"
+      class="mt-3 mr-1"/>
+    <div :class="`mosaic-container ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
         :key="index"
@@ -33,7 +37,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :value="new Date(item.publishDate.time)"
                 :format="dateFormat" />
             </div>
-            <div v-if="showArticleTitle" :class="'text-truncate' + isSmallWidth ? 'articleTitle text-truncate':''">
+            <div v-if="showArticleTitle" 
+              :class="styleArticleTitle()">
               {{ item.title }}
             </div>
           </div>
@@ -91,6 +96,9 @@ export default {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
+    isSmallBreakpoint() {
+      return this.$vuetify.breakpoint.width < 651;
+    },
     smallHeightClass() {
       return this.isMobile && this.news && this.news.length === 1 && 'small-mosaic-container';
     },
@@ -147,6 +155,9 @@ export default {
         seeAllUrl: this.seeAllUrl,
       };
     },
+    styleArticleTitle(){
+      return  (this.isSmallWidth ? 'articleTitle ' : '').concat(this.isSmallBreakpoint ? 'text-truncate' : 'articleTitleTruncate');
+    }
   }
 };
 </script>

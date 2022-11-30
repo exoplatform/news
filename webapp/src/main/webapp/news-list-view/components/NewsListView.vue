@@ -16,7 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="news-list-view-app position-relative">
-    <v-card flat class="list-view-card rounded-0">
+    <v-card 
+      height="100%"
+      flat
+      :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
+      class="list-view-card rounded-0">
       <v-card-text class="pa-0">
         <news-settings v-if="displayHeader" />
         <extension-registry-component
@@ -101,7 +105,11 @@ export default {
   }),
   computed: {
     displayHeader() {
-      return this.viewTemplate && (this.viewTemplate !== 'NewsSlider' && this.viewTemplate !== 'NewsAlert');
+      return this.viewTemplate && 
+            this.viewTemplate !== 'NewsSlider' && 
+            this.viewTemplate !== 'NewsAlert' && 
+            this.viewTemplate !== 'NewsStories' && 
+            (this.viewTemplate !== 'NewsMosaic' || this.isMobile);
     },
     selectedViewExtension() {
       if (this.viewTemplate) {
@@ -125,6 +133,9 @@ export default {
         componentName: this.selectedViewExtension.id,
         componentOptions: this.selectedViewExtension,
       };
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.width < 651;
     },
     viewComponentParams() {
       return {

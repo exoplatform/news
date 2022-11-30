@@ -224,6 +224,7 @@ export default {
         result.push({
           newsId: item.id,
           newsText: this.getNewsText(item.summary, item.body),
+          illustrationURL: item.illustrationURL,
           title: item.title,
           updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,

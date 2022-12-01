@@ -71,8 +71,56 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               {{ $t('news.publishTargets.managementDrawer.sameNewsTargetWarning') }}
             </span>
           </div>
+          <div class="d-flex flex-row mt-6">
+            <label class="text-subtitle-1 font-weight-bold">
+              {{ $t('news.publishTargets.managementDrawer.permissions') }}*
+              <v-tooltip bottom v-if="!isMobile">
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    color="grey darken-2"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                    size="16"
+                    class="px-2 iconStyle">
+                    fa-info-circle
+                  </v-icon>
+                </template>
+                <span>
+                  {{ $t('news.publishTargets.managementDrawer.permissions.tooltip') }}
+                </span>
+              </v-tooltip>
+            </label>
+          </div>
+          <div class="d-flex flex-row">
+            <span class="text-subtitle-6 font-weight-regular">
+              {{ $t('news.publishTargets.managementDrawer.permissions.description') }}
+            </span>
+          </div>
+          <div class="d-flex flex-row">
+            <exo-identity-suggester
+              ref="targetPermissions"
+              :labels="suggesterLabels"
+              v-model="targetPermissions"
+              name="permissions"
+              height="40"
+              :ignore-items="ignoredItems"
+              :group-member="userGroup"
+              :group-type="groupType"
+              :all-groups-for-admin="allGroupsForAdmin"
+              include-spaces
+              include-groups
+              required />
+          </div>
         </div>
       </v-form>
+      <div v-if="permissions.length > 0" class="identitySuggester no-border mx-4">
+        <news-publish-targets-management-permissions
+          v-for="permission in permissions"
+          :key="permission"
+          :permission="permission"
+          @remove-permission="removePermission" />
+      </div>
     </template>
     <template slot="footer">
       <div class="d-flex justify-end">
@@ -96,6 +144,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   data: () => ({
+    targetPermissions: [],
+    allGroupsForAdmin: true,
+    userGroup: '/platform/users',
+    groupType: 'GROUP',
     drawer: false,
     saving: false,
     targetDescriptionTextLength: 1000,
@@ -105,19 +157,47 @@ export default {
     selectedTarget: '',
     originalTargetName: '',
     saveMode: 'creationMode',
+    permissions: [],
   }),
   computed: {
+    ignoredItems() {
+      return this.permissions.map(permission => `${permission.providerId}:${permission.remoteId}`);
+    },
+    suggesterLabels() {
+      return {
+        placeholder: this.$t('news.publishTargets.managementDrawer.placeholder.permissions'),
+        noDataLabel: this.$t('news.publishTargets.managementDrawer.permissions.noData')
+      };
+    },
     checkAlphanumeric() {
       return this.targetName && !this.targetName.trim().match(/^[a-zA-Z\u00C0-\u00FF ]*$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
+      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.permissions.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
     },
     saveButtonLabel() {
       return this.saveMode === 'edit' ? this.$t('news.publishTargets.managementDrawer.btn.update') : this.$t('news.publishTargets.managementDrawer.btn.confirm');
-    }
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
   },
   watch: {
+    targetPermissions() {
+      if (!this.targetPermissions) {
+        this.$nextTick(this.$refs.targetPermissions.$refs.selectAutoComplete.deleteCurrentItem);
+        return;
+      }
+      const found = this.permissions.find(permission => {
+        return permission.remoteId === this.targetPermissions.remoteId
+            && permission.providerId === this.targetPermissions.providerId;
+      });
+      if (!found) {
+        this.permissions.push(this.mapPermission(this.targetPermissions));
+      }
+      this.targetPermissions=null;
+    },
+  
     saving() {
       if (this.saving) {
         this.$refs.newsPublishTargetsManagementDrawer.startLoading();
@@ -142,6 +222,31 @@ export default {
     });
   },
   methods: {
+    removePermission(permission) {
+      const index = this.permissions.findIndex(addedPermission => {
+        return permission.remoteId === addedPermission.remoteId
+        && permission.providerId === addedPermission.providerId;
+      });
+      if (index >= 0) {
+        this.permissions.splice(index, 1);
+      }
+    },
+    mapPermission(permission) {
+      const fullName = permission.profile
+          && permission.profile.fullName
+          && permission.profile.fullName.substring(0, permission.profile.fullName.lastIndexOf(' ('));
+      return {
+        'id': permission.id,
+        'profile': {
+          'fullName': fullName,
+        },
+        'name': permission.displayName || fullName,
+        'remoteId': permission.remoteId,
+        'providerId': permission.providerId,
+        'avatar': permission.profile.avatarUrl
+
+      };
+    },
     open() {
       this.$refs.newsPublishTargetsManagementDrawer.open();
     },
@@ -162,10 +267,17 @@ export default {
         name: '',
         properties: ''
       };
+      let permissions = '';
+      if (this.permissions.length > 0) {
+        this.permissions.forEach(permission => {
+          permissions = `${permissions + permission.remoteId},`;
+        }); 
+      } 
       target.name = this.targetName;
       target.properties = {
         description: this.targetDescription,
-        label: this.targetName
+        label: this.targetName,
+        permissions: permissions,
       };
       this.sameTargetError = false;
       this.$newsTargetingService.createTarget(target)
@@ -208,6 +320,7 @@ export default {
       this.targetDescription = '';
       this.targetName = '';
       this.saveMode = 'creationMode';
+      this.permissions=[];
     },
   },
 };

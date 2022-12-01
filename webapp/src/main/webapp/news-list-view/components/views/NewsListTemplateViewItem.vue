@@ -111,7 +111,14 @@ export default {
       return this.selectedOption?.showArticleReactions;
     },
     articleImage() {
+<<<<<<< HEAD
       return this.item?.illustrationURL?.concat('&size=70x70').toString() || '/news/images/news.png';
+=======
+      return this.showArticleImage && this.item
+                                   && this.item.illustrationURL
+                                   && this.item.illustrationURL.concat('&size=70x70').toString()
+                                   || '/news/images/news.png';
+>>>>>>> 11055ead (fix: News List template: use correct size for illustrations -EXO-60461 (#679))
     },
     extraClass() {
       return (!this.showArticleSummary || !this.showArticleTitle) && 'text-truncate-2' || 'article-title' ;

@@ -87,14 +87,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   </v-icon>
                 </template>
                 <span>
-                  {{ $t('news.publishTargets.managementDrawer.tooltip.permissions') }}
+                  {{ $t('news.publishTargets.managementDrawer.permissions.tooltip') }}
                 </span>
               </v-tooltip>
             </label>
           </div>
           <div class="d-flex flex-row">
             <span class="text-subtitle-6 font-weight-regular">
-              {{ $t('news.publishTargets.managementDrawer.explicativeSentence.permissions') }}
+              {{ $t('news.publishTargets.managementDrawer.permissions.description') }}
             </span>
           </div>
           <div class="d-flex flex-row">
@@ -104,6 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               v-model="targetPermissions"
               name="permissions"
               height="40"
+              :ignore-items="ignoredItems"
               :group-member="userGroup"
               :group-type="groupType"
               :all-groups-for-admin="allGroupsForAdmin"
@@ -159,10 +160,13 @@ export default {
     permissions: [],
   }),
   computed: {
+    ignoredItems() {
+      return this.permissions.map(permission => `${permission.providerId}:${permission.remoteId}`);
+    },
     suggesterLabels() {
       return {
         placeholder: this.$t('news.publishTargets.managementDrawer.placeholder.permissions'),
-        noDataLabel: this.$t('news.publishTargets.managementDrawer.noDataLabel')
+        noDataLabel: this.$t('news.publishTargets.managementDrawer.permissions.noData')
       };
     },
     checkAlphanumeric() {
@@ -177,7 +181,6 @@ export default {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
-    
   },
   watch: {
     targetPermissions() {
@@ -265,13 +268,11 @@ export default {
         properties: ''
       };
       let permissions = '';
-
       if (this.permissions.length > 0) {
         this.permissions.forEach(permission => {
-          permissions = `${permissions + permission.remoteId  },`;
-        });      } 
-        
-      
+          permissions = `${permissions + permission.remoteId},`;
+        }); 
+      } 
       target.name = this.targetName;
       target.properties = {
         description: this.targetDescription,

@@ -18,7 +18,6 @@ import NewsPublishTargetsManagement from './components/NewsPublishTargetsManagem
 import NewsPublishTargetsManagementDrawer from './components/NewsPublishTargetsManagementDrawer.vue';
 import NewsPublishTargetsManagementPermissions from './components/NewsPublishTargetsManagementPermissions.vue';
 
-
 const components = {
   'news-publish-targets-management': NewsPublishTargetsManagement,
   'news-publish-targets-management-drawer': NewsPublishTargetsManagementDrawer,

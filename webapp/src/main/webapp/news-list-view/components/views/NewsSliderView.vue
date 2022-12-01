@@ -31,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         dark>
         <v-img
           class="articleImage fill-height"
-          :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'"
+          :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL.concat('&size=1420x222').toString() : '/news/images/news.png'"
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">

@@ -33,6 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :class="hasSmallWidthContainer ? 'smallWidthContainer' : 'article'"
         :id="`articleItem-${index}`">
         <news-latest-view-item
+          :news = "newsInfo"
           :item="item"
           :selected-option="selectedOption"
           :index="index"

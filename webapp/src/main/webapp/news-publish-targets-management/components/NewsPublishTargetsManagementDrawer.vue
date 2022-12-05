@@ -236,7 +236,7 @@ export default {
           && permission.profile.fullName
           && permission.profile.fullName.substring(0, permission.profile.fullName.lastIndexOf(' ('));
       return {
-        'id': permission.id,
+        'id': permission.providerId === 'space' ? permission.id : permission.spaceId,
         'profile': {
           'fullName': fullName,
         },
@@ -270,7 +270,7 @@ export default {
       let permissions = '';
       if (this.permissions.length > 0) {
         this.permissions.forEach(permission => {
-          permissions = `${permissions + permission.remoteId},`;
+          permissions = `${permissions + permission.id},`;
         }); 
       } 
       target.name = this.targetName;

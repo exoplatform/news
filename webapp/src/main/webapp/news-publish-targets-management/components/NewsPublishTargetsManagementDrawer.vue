@@ -119,6 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-for="permission in permissions"
           :key="permission"
           :permission="permission"
+          :close="true"
           @remove-permission="removePermission" />
       </div>
     </template>

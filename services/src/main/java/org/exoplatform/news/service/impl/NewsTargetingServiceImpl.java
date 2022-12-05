@@ -16,23 +16,30 @@
  */
 package org.exoplatform.news.service.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
@@ -53,13 +60,16 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private IdentityManager     identityManager;
 
-  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager){
+  private SpaceService        spaceService;
+
+  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager, SpaceService spaceService){
     this.metadataService = metadataService;
     this.identityManager = identityManager;
+    this.spaceService = spaceService;
   }
 
   @Override
-  public List<NewsTargetingEntity> getTargets() {
+  public List<NewsTargetingEntity> getTargets(){
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
@@ -185,12 +195,42 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     return metadataService.updateMetadata(storedMetadata, userIdentityId);
   }
 
-  private NewsTargetingEntity toEntity(Metadata metadata) {
+  private NewsTargetingEntity toEntity(Metadata metadata){
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
     if (metadata.getProperties() != null) {
       newsTargetingEntity.setProperties(metadata.getProperties());
     }
+    if (newsTargetingEntity.getProperties().get("permissions") != null) {
+      String permission = newsTargetingEntity.getProperties().get("permissions");
+      List<String> list = List.of(permission.split(","));
+      List<NewsTargetingPermissionsEntity> newsTargetPermissionsList = new ArrayList<>();
+      for (String perm : list) {
+        NewsTargetingPermissionsEntity newsTargetPermissions = new NewsTargetingPermissionsEntity();
+        if (perm.contains("space")) {
+          Space space = spaceService.getSpaceByPrettyName(List.of(perm.split(":")).get(1));
+          newsTargetPermissions.setId(space.getId());
+          newsTargetPermissions.setName(space.getDisplayName());
+          newsTargetPermissions.setProviderId("space");
+          newsTargetPermissions.setRemoteId(space.getPrettyName());
+          newsTargetPermissions.setAvatar(space.getAvatarUrl());
+        } else {
+          try {
+            OrganizationService organizationService = CommonsUtils.getOrganizationService();
+            Group group = organizationService.getGroupHandler().findGroupById(perm);
+            newsTargetPermissions.setId(group.getId());
+            newsTargetPermissions.setName(group.getLabel());
+            newsTargetPermissions.setProviderId("group");
+            newsTargetPermissions.setRemoteId(group.getGroupName());
+          } catch (Exception e) {
+            LOG.error("Could not find group " + perm);
+          }
+        }
+        newsTargetPermissionsList.add(newsTargetPermissions);
+      }
+      newsTargetingEntity.setNewsTargetingPermissionsEntities(newsTargetPermissionsList);
+    }
+
     return newsTargetingEntity;
   }
 

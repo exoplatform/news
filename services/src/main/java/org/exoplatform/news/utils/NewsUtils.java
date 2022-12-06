@@ -57,6 +57,8 @@ public class NewsUtils {
 
   public static final String  DISPLAYED_STATUS                = "displayed";
 
+  public static final String  TARGET_PERMISSIONS              = "permissions";
+
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";

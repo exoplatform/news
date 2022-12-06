@@ -18,7 +18,7 @@
   <div class="d-flex">
     <v-chip
       class="identitySuggesterItem mt-2"
-      close
+      :close="close"
       @click:close="$emit('remove-permission', permission)">
       <v-icon
         v-if="permission.providerId ==='group'"
@@ -54,6 +54,10 @@ export default {
     permission: {
       type: Object,
       default: () => ({}),
+    },
+    close: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

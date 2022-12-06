@@ -19,6 +19,7 @@ package org.exoplatform.news.rest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor
@@ -28,4 +29,6 @@ public class NewsTargetingEntity {
   private String name;
 
   private Map<String, String> properties;
+
+  private List<NewsTargetingPermissionsEntity> permissions;
 }

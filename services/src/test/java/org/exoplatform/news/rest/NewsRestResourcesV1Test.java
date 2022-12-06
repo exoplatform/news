@@ -360,6 +360,14 @@ public class NewsRestResourcesV1Test {
     assertEquals("Updated Summary", returnedNews.getSummary());
     assertEquals("Updated Body", returnedNews.getBody());
     assertEquals(PublicationDefaultStates.PUBLISHED, returnedNews.getPublicationState());
+
+    when(newsRestResourcesV1.updateNews("1", false, updatedNews)).thenThrow(IllegalAccessException.class);
+
+    // When
+    response = newsRestResourcesV1.updateNews("1", false, updatedNews);
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
   // TODO to be moved with newsService tests
@@ -915,6 +923,14 @@ public class NewsRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    when(newsRestResourcesV1.createNews(request, news)).thenThrow(IllegalAccessException.class);
+
+    // When
+    response = newsRestResourcesV1.createNews(request, news);
+
+    // Then
+    assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
 
   @Test

@@ -62,19 +62,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
               </td>
               <td>
-                <div
-                  v-if="props.item.permissions.length > 0"
-                  class="align-center text-truncate d-flex flex-row">
+                <div  v-if="props.item.permissions.length > 0"
+                class="align-center text-truncate d-flex flex-column">
+                <div class="d-flex flex-row">
                   <div class="identitySuggester no-border mx-4">
                     <news-publish-targets-management-permissions
                       :permission="props.item.permissions[0]"
                       :close="false" />
                   </div>
-                  <i class="fas fa-circle permissionsIcon">
+                  <i v-if="props.item.permissions.length > 1"
+                  class="fas fa-circle permissionsIcon mt-5">
                     <span class="permissionsContentIcon">
                       +{{ $t(props.item.permissions.length-1) }}
                     </span>
                   </i>
+                </div>
                 </div>
               </td>
               <td>
@@ -160,10 +162,8 @@ export default {
               name: newsTarget.name,
               label: newsTarget.properties.label,
               description: newsTarget.properties.description,
-              permissions: newsTarget.newsTargetingPermissionsEntities || [],
+              permissions: newsTarget.permissions || [],
             }));
-          
-
             this.initialized = true;
           })
           .finally(() => {

@@ -62,14 +62,17 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private SpaceService        spaceService;
 
-  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager, SpaceService spaceService){
+  private OrganizationService organizationService;
+
+  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager, SpaceService spaceService, OrganizationService organizationService) {
     this.metadataService = metadataService;
     this.identityManager = identityManager;
     this.spaceService = spaceService;
+    this.organizationService = organizationService;
   }
 
   @Override
-  public List<NewsTargetingEntity> getTargets(){
+  public List<NewsTargetingEntity> getTargets() {
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
@@ -195,40 +198,39 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     return metadataService.updateMetadata(storedMetadata, userIdentityId);
   }
 
-  private NewsTargetingEntity toEntity(Metadata metadata){
+  private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
     if (metadata.getProperties() != null) {
       newsTargetingEntity.setProperties(metadata.getProperties());
     }
-    if (newsTargetingEntity.getProperties().get("permissions") != null) {
-      String permission = newsTargetingEntity.getProperties().get("permissions");
-      List<String> list = List.of(permission.split(","));
-      List<NewsTargetingPermissionsEntity> newsTargetPermissionsList = new ArrayList<>();
-      for (String perm : list) {
-        NewsTargetingPermissionsEntity newsTargetPermissions = new NewsTargetingPermissionsEntity();
-        if (perm.contains("space")) {
-          Space space = spaceService.getSpaceByPrettyName(List.of(perm.split(":")).get(1));
-          newsTargetPermissions.setId(space.getId());
-          newsTargetPermissions.setName(space.getDisplayName());
-          newsTargetPermissions.setProviderId("space");
-          newsTargetPermissions.setRemoteId(space.getPrettyName());
-          newsTargetPermissions.setAvatar(space.getAvatarUrl());
+    if (newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS) != null) {
+      String permissions = newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS);
+      List<String> permissionsList = List.of(permissions.split(","));
+      List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
+      for (String permission : permissionsList) {
+        NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
+        if (permission.contains("space")) {
+          Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
+          permissionEntity.setId(space.getId());
+          permissionEntity.setName(space.getDisplayName());
+          permissionEntity.setProviderId("space");
+          permissionEntity.setRemoteId(space.getPrettyName());
+          permissionEntity.setAvatar(space.getAvatarUrl());
         } else {
           try {
-            OrganizationService organizationService = CommonsUtils.getOrganizationService();
-            Group group = organizationService.getGroupHandler().findGroupById(perm);
-            newsTargetPermissions.setId(group.getId());
-            newsTargetPermissions.setName(group.getLabel());
-            newsTargetPermissions.setProviderId("group");
-            newsTargetPermissions.setRemoteId(group.getGroupName());
+            Group group = organizationService.getGroupHandler().findGroupById(permission);
+            permissionEntity.setId(group.getId());
+            permissionEntity.setName(group.getLabel());
+            permissionEntity.setProviderId("group");
+            permissionEntity.setRemoteId(group.getGroupName());
           } catch (Exception e) {
-            LOG.error("Could not find group " + perm);
+            LOG.error("Could not find group from permission" + permission);
           }
         }
-        newsTargetPermissionsList.add(newsTargetPermissions);
+        permissionsEntities.add(permissionEntity);
       }
-      newsTargetingEntity.setNewsTargetingPermissionsEntities(newsTargetPermissionsList);
+      newsTargetingEntity.setPermissions(permissionsEntities);
     }
 
     return newsTargetingEntity;

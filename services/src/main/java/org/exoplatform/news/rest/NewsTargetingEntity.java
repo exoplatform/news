@@ -30,5 +30,5 @@ public class NewsTargetingEntity {
 
   private Map<String, String> properties;
 
-  private List<NewsTargetingPermissionsEntity> newsTargetingPermissionsEntities;
+  private List<NewsTargetingPermissionsEntity> permissions;
 }

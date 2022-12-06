@@ -63,6 +63,8 @@ public class NewsUtils {
 
   private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
+  public static final String TARGET_PERMISSIONS              = "permissions";
+
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);

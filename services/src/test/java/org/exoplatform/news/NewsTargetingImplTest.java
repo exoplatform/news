@@ -1,6 +1,5 @@
 package org.exoplatform.news;
 
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsTargetObject;
@@ -8,7 +7,6 @@ import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
 import org.exoplatform.news.utils.NewsUtils;
-import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.social.core.space.model.*;
 import org.exoplatform.services.security.Authenticator;

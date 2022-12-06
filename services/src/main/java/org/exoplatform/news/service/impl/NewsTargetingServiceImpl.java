@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
@@ -33,7 +32,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.Group;
 import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;

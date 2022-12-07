@@ -208,7 +208,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
-        if (permission.contains("space")) {
+        if (permission.contains("space:")) {
           Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
           permissionEntity.setId("space:" + space.getDisplayName());
           permissionEntity.setName(space.getDisplayName());

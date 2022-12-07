@@ -159,6 +159,7 @@ export default {
     originalTargetName: '',
     saveMode: 'creationMode',
     permissions: [],
+    permissionDisabled: true,
   }),
   computed: {
     ignoredItems() {
@@ -174,7 +175,7 @@ export default {
       return this.targetName && !this.targetName.trim().match(/^[a-zA-Z\u00C0-\u00FF ]*$/) && this.targetName.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
     },
     disabled() {
-      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.permissions.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
+      return (this.selectedTarget.targetName === this.targetName && this.selectedTarget.targetDescription === this.targetDescription && this.permissionDisabled) || this.checkAlphanumeric !== '' || this.targetName.length === 0 || this.permissions.length === 0 || this.sameTargetError || this.targetDescription.length > this.targetDescriptionTextLength;
     },
     saveButtonLabel() {
       return this.saveMode === 'edit' ? this.$t('news.publishTargets.managementDrawer.btn.update') : this.$t('news.publishTargets.managementDrawer.btn.confirm');
@@ -195,6 +196,7 @@ export default {
       });
       if (!found) {
         this.permissions.push(this.mapPermission(this.targetPermissions));
+        this.permissionDisabled = false;
       }
       this.targetPermissions=null;
     },
@@ -216,6 +218,7 @@ export default {
       this.originalTargetName = selectedTarget.targetName;
       this.targetName = selectedTarget.targetName;
       this.targetDescription = selectedTarget.targetDescription;
+      this.permissions = JSON.parse(JSON.stringify(selectedTarget.targetPermissions));
       if ( this.targetName === selectedTarget.targetName && this.targetDescription === selectedTarget.targetDescription) {
         this.sameTargetError = true;
       }
@@ -230,6 +233,7 @@ export default {
       });
       if (index >= 0) {
         this.permissions.splice(index, 1);
+        this.permissionDisabled = false;
       }
     },
     mapPermission(permission) {
@@ -302,10 +306,17 @@ export default {
         type: '',
         properties: ''
       };
+      let permissions = '';
+      if (this.permissions.length > 0) {
+        this.permissions.forEach(permission => {
+          permissions = `${permissions + permission.id},`;
+        }); 
+      } 
       target.name = this.targetName;
       target.properties = {
         description: this.targetDescription,
-        label: this.targetName
+        label: this.targetName,
+        permissions: permissions,
       };
       this.$newsTargetingService.updateTarget(target, this.originalTargetName)
         .then((resp) => {
@@ -322,6 +333,7 @@ export default {
       this.targetName = '';
       this.saveMode = 'creationMode';
       this.permissions=[];
+      this.permissionDisabled= true;
     },
   },
 };

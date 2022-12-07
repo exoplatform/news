@@ -230,7 +230,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       }
       newsTargetingEntity.setPermissions(permissionsEntities);
     }
-
     return newsTargetingEntity;
   }
 

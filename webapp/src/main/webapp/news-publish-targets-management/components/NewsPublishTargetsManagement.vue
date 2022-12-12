@@ -81,7 +81,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   <v-btn
                     icon
                     text
-                    @click="openDrawer(props.item.name, props.item.description)">
+                    @click="openDrawer(props.item.name, props.item.description, props.item.permissions)">
                     <v-icon
                       dark
                       color="primary"
@@ -190,11 +190,12 @@ export default {
       this.selectedTargetName = target;
       this.$refs.deleteConfirmDialog.open();
     },
-    openDrawer(targetName, targetDescription) {
+    openDrawer(targetName, targetDescription, targetPermissions) {
       let selectedTarget = null;
       selectedTarget = {
         targetName: targetName && targetName.trim(),
         targetDescription: targetDescription && targetDescription.trim(),
+        targetPermissions: targetPermissions,
       };
       this.$root.$emit('selected-target', selectedTarget);
       this.$refs.newsPublishTargetsManagementDrawer.open();

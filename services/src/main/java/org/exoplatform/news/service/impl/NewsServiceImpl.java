@@ -141,8 +141,7 @@ public class NewsServiceImpl implements NewsService {
     return space != null
         && (spaceService.isSuperManager(currentIdentity.getUserId()) || spaceService.isManager(space, currentIdentity.getUserId())
             || spaceService.isRedactor(space, currentIdentity.getUserId())
-            || spaceService.isMember(space, currentIdentity.getUserId()) && (ArrayUtils.isEmpty(space.getRedactors())
-            || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)));
+            || spaceService.isMember(space, currentIdentity.getUserId()) && ArrayUtils.isEmpty(space.getRedactors()));
   }
   
   /**

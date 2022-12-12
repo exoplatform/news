@@ -26,6 +26,16 @@ export function getAllTargets() {
     }
   });
 }
+export function getAllowedTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting/allowed`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp && resp.ok) {
+      return resp.json();
+    }
+  });
+}
 
 export function getReferencedTargets() {
   return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {

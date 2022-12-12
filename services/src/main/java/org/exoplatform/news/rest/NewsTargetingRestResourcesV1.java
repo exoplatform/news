@@ -100,6 +100,24 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     }
   }
 
+  @Path("allowed")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @RolesAllowed("users")
+  @Operation(summary = "Get all news allowed targets by username", method = "GET", description = "Get all news allowed targets by username")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response getAllowedTargets(@Context HttpServletRequest request) {
+    org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+    try {
+      List<NewsTargetingEntity> targets = newsTargetingService.getTargetsByUser(currentIdentity.getUserId());
+      return Response.ok(targets).build();
+    } catch (Exception e) {
+      LOG.error("Error when getting the news targets", e);
+      return Response.serverError().build();
+    }
+  }
+
   @Path("referenced")
   @GET
   @Produces(MediaType.APPLICATION_JSON)

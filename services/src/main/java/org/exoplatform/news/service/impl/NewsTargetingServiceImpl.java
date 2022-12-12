@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
@@ -36,6 +37,7 @@ import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.SpaceException;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.MetadataService;
@@ -53,6 +55,10 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   public static final long    LIMIT       = 100;
 
   private static final String REFERENCED  = "referenced";
+
+  private static final String SPACE_PREFIX              = "space:";
+
+  private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private MetadataService     metadataService;
 
@@ -196,6 +202,36 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     return metadataService.updateMetadata(storedMetadata, userIdentityId);
   }
 
+  @Override
+  public List<NewsTargetingEntity> getTargetsByUser(String userName) {
+    org.exoplatform.services.security.Identity identity = NewsUtils.getUserIdentity(userName);
+    List<String> publisherPermissions = new ArrayList<>();
+    List<NewsTargetingEntity> targetingEntities = getTargets();
+    List<String> publisherGroups = identity.getGroups()
+                                           .stream()
+                                           .filter(group -> identity.isMemberOf(String.valueOf(group), PUBLISHER_MEMBERSHIP_NAME))
+                                           .collect(Collectors.toList());
+    publisherPermissions.addAll(publisherGroups);
+    try {
+      List<Space> spaces = spaceService.getAccessibleSpaces(userName);
+      List<String> publisherSpaces = spaces.stream()
+                                           .filter(space -> spaceService.isPublisher(space, userName))
+                                           .map(space -> SPACE_PREFIX + space.getDisplayName())
+                                           .collect(Collectors.toList());
+      publisherPermissions.addAll(publisherSpaces);
+
+    } catch (SpaceException e) {
+      LOG.error("An error occurred when trying to retrieve the list of accessible spaces ", e);
+    }
+
+    targetingEntities = targetingEntities.stream()
+                                       .filter(target -> publisherPermissions.stream()
+                                                                             .anyMatch(target.getProperties()
+                                                                                             .get(NewsUtils.TARGET_PERMISSIONS)::contains))
+                                       .collect(Collectors.toList());
+    return targetingEntities;
+  }
+
   private NewsTargetingEntity toEntity(Metadata metadata) {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(metadata.getName());
@@ -208,9 +244,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
-        if (permission.contains("space:")) {
+        if (permission.contains(SPACE_PREFIX)) {
           Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
-          permissionEntity.setId("space:" + space.getDisplayName());
+          permissionEntity.setId(SPACE_PREFIX + space.getDisplayName());
           permissionEntity.setName(space.getDisplayName());
           permissionEntity.setProviderId("space");
           permissionEntity.setRemoteId(space.getPrettyName());

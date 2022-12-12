@@ -1,4 +1,4 @@
-package org.exoplatform.news;
+package org.exoplatform.news.service.impl;
 
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.model.News;

@@ -70,12 +70,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                       :permission="props.item.permissions[0]"
                       :close="false" />
                   </div>
-                  <i v-if="props.item.permissions.length > 1"
-                  class="fas fa-circle permissionsIcon mt-5">
-                    <span class="permissionsContentIcon">
-                      +{{ $t(props.item.permissions.length-1) }}
-                    </span>
-                  </i>
+                  <span v-if="props.item.permissions.length > 1" 
+                  class="permissionsIcon font-weight-bold mt-5">
+                  +{{ $t(props.item.permissions.length-1) }}</span>
                 </div>
                 </div>
               </td>

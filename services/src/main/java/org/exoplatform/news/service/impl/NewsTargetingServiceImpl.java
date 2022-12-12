@@ -16,6 +16,7 @@
  */
 package org.exoplatform.news.service.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,19 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.social.common.ObjectAlreadyExistsException;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
@@ -53,9 +58,15 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private IdentityManager     identityManager;
 
-  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager){
+  private SpaceService        spaceService;
+
+  private OrganizationService organizationService;
+
+  public NewsTargetingServiceImpl(MetadataService metadataService, IdentityManager identityManager, SpaceService spaceService, OrganizationService organizationService) {
     this.metadataService = metadataService;
     this.identityManager = identityManager;
+    this.spaceService = spaceService;
+    this.organizationService = organizationService;
   }
 
   @Override
@@ -191,6 +202,35 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     if (metadata.getProperties() != null) {
       newsTargetingEntity.setProperties(metadata.getProperties());
     }
+    if (newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS) != null) {
+      String permissions = newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS);
+      List<String> permissionsList = List.of(permissions.split(","));
+      List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
+      for (String permission : permissionsList) {
+        NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
+        if (permission.contains("space:")) {
+          Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
+          permissionEntity.setId("space:" + space.getDisplayName());
+          permissionEntity.setName(space.getDisplayName());
+          permissionEntity.setProviderId("space");
+          permissionEntity.setRemoteId(space.getPrettyName());
+          permissionEntity.setAvatar(space.getAvatarUrl());
+        } else {
+          try {
+            Group group = organizationService.getGroupHandler().findGroupById(permission);
+            permissionEntity.setId(group.getId());
+            permissionEntity.setName(group.getLabel());
+            permissionEntity.setProviderId("group");
+            permissionEntity.setRemoteId(group.getGroupName());
+          } catch (Exception e) {
+            LOG.error("Could not find group from permission" + permission);
+          }
+        }
+        permissionsEntities.add(permissionEntity);
+      }
+      newsTargetingEntity.setPermissions(permissionsEntities);
+    }
+
     return newsTargetingEntity;
   }
 

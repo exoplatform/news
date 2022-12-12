@@ -62,6 +62,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
               </td>
               <td>
+                <div  v-if="props.item.permissions.length > 0"
+                class="align-center text-truncate d-flex flex-column">
+                <div class="d-flex flex-row">
+                  <div class="identitySuggester no-border mx-4">
+                    <news-publish-targets-management-permissions
+                      :permission="props.item.permissions[0]"
+                      :close="false" />
+                  </div>
+                  <span v-if="props.item.permissions.length > 1" 
+                  class="permissionsIcon font-weight-bold mt-5">
+                  +{{ $t(props.item.permissions.length-1) }}</span>
+                </div>
+                </div>
+              </td>
+              <td>
                 <div class="align-center">
                   <v-btn
                     icon
@@ -108,8 +123,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   data: () => ({
+    targetPermissions: [],
     headers: [],
     newsTargets: [],
+    permissions: [],
     itemsPerPage: 10,
     initialized: false,
     loading: true,
@@ -127,6 +144,7 @@ export default {
     this.headers = [
       { text: this.$t('newsTargets.settings.name'), align: 'center' },
       { text: this.$t('newsTargets.settings.description'), align: 'center' },
+      { text: this.$t('news.publishTargets.managementDrawer.permissions'), align: 'center' },
       { text: this.$t('newsTargets.settings.actions'), align: 'center' },
     ];
     this.init();
@@ -141,6 +159,7 @@ export default {
               name: newsTarget.name,
               label: newsTarget.properties.label,
               description: newsTarget.properties.description,
+              permissions: newsTarget.permissions || [],
             }));
             this.initialized = true;
           })

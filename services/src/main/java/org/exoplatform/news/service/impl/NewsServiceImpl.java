@@ -519,9 +519,7 @@ public class NewsServiceImpl implements NewsService {
         return false;
       }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
-          && !(StringUtils.equals(news.getAuthor(), username)
-              || spaceService.isManager(space, username)
-              || spaceService.isRedactor(space, username))) {
+          && !canScheduleNews(space, NewsUtils.getUserIdentity(username))) {
         return false;
       }
     } catch (Exception e) {
@@ -552,7 +550,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public boolean canScheduleNews(Space space, org.exoplatform.services.security.Identity currentIdentity) {
-    return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
+    return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || NewsUtils.canPublishNews(currentIdentity);
   }
   
   /**

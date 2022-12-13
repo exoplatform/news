@@ -210,14 +210,14 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     List<String> publisherGroups = identity.getGroups()
                                            .stream()
                                            .filter(group -> identity.isMemberOf(String.valueOf(group), PUBLISHER_MEMBERSHIP_NAME))
-                                           .collect(Collectors.toList());
+                                           .toList();
     publisherPermissions.addAll(publisherGroups);
     try {
       List<Space> spaces = spaceService.getAccessibleSpaces(userName);
       List<String> publisherSpaces = spaces.stream()
                                            .filter(space -> spaceService.isPublisher(space, userName))
                                            .map(space -> SPACE_TARGET_PERMISSION_PREFIX + space.getDisplayName())
-                                           .collect(Collectors.toList());
+                                           .toList();
       publisherPermissions.addAll(publisherSpaces);
 
     } catch (SpaceException e) {
@@ -228,7 +228,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
                                        .filter(target -> publisherPermissions.stream()
                                                                              .anyMatch(target.getProperties()
                                                                                              .get(NewsUtils.TARGET_PERMISSIONS)::contains))
-                                       .collect(Collectors.toList());
+                                       .toList();
     return targetingEntities;
   }
 

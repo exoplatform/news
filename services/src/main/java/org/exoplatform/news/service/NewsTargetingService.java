@@ -130,9 +130,9 @@ public interface NewsTargetingService {
   Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException, IllegalStateException, IllegalArgumentException;
 
   /**
-   * Gets the {@link List} of {@link News} targets linked to a given username
-   * @param userName attempting to get {@link News} target
-   * @return {@link List} of {@link News} targets by username
+   * Gets the {@link List} of allowed {@link News} targets linked to a given currentIdentity
+   * @param currentIdentity current {@link Identity} attempting to get allowed {@link News} targets
+   * @return {@link List} of allowed {@link News} targets by currentIdentity
    */
-  List<NewsTargetingEntity> getAllowedNewsTargets(String userName);
+  List<NewsTargetingEntity> getAllowedNewsTargets(org.exoplatform.services.security.Identity currentIdentity);
 }

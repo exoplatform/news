@@ -110,7 +110,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   public Response getAllowedNewsTargets(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      List<NewsTargetingEntity> targets = newsTargetingService.getAllowedNewsTargets(currentIdentity.getUserId());
+      List<NewsTargetingEntity> targets = newsTargetingService.getAllowedNewsTargets(currentIdentity);
       return Response.ok(targets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the allowed news targets for user " + currentIdentity.getUserId(), e);

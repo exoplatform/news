@@ -203,33 +203,26 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getAllowedNewsTargets(String userName) {
-    org.exoplatform.services.security.Identity identity = NewsUtils.getUserIdentity(userName);
-    List<String> publisherPermissions = new ArrayList<>();
-    List<NewsTargetingEntity> targetingEntities = getAllNewsTargets();
-    List<String> publisherGroups = identity.getGroups()
-                                           .stream()
-                                           .filter(group -> identity.isMemberOf(String.valueOf(group), PUBLISHER_MEMBERSHIP_NAME))
-                                           .toList();
-    publisherPermissions.addAll(publisherGroups);
-    try {
-      List<Space> spaces = spaceService.getAccessibleSpaces(userName);
-      List<String> publisherSpaces = spaces.stream()
-                                           .filter(space -> spaceService.isPublisher(space, userName))
-                                           .map(space -> SPACE_TARGET_PERMISSION_PREFIX + space.getDisplayName())
-                                           .toList();
-      publisherPermissions.addAll(publisherSpaces);
-
-    } catch (SpaceException e) {
-      LOG.error("An error occurred when trying to retrieve the list of accessible spaces ", e);
+  public List<NewsTargetingEntity> getAllowedNewsTargets(org.exoplatform.services.security.Identity identity) {
+    List<Metadata> allTargets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
+    List<Metadata> allowedTargets = new ArrayList<>();
+    for (Metadata metadata : allTargets) {
+      List<String> permissions = List.of(metadata.getProperties().get("permissions").split(","));
+      for (String permission : permissions) {
+        boolean exist = false;
+        if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
+          Space space = spaceService.getSpaceByDisplayName(permission.replace(SPACE_TARGET_PERMISSION_PREFIX, ""));
+          exist = spaceService.isPublisher(space, identity.getUserId());
+        } else {
+          exist = identity.isMemberOf(permission, PUBLISHER_MEMBERSHIP_NAME);
+        }
+        if (exist) {
+          allowedTargets.add(metadata);
+          break;
+        }
+      }
     }
-
-    targetingEntities = targetingEntities.stream()
-                                       .filter(target -> publisherPermissions.stream()
-                                                                             .anyMatch(target.getProperties()
-                                                                                             .get(NewsUtils.TARGET_PERMISSIONS)::contains))
-                                       .toList();
-    return targetingEntities;
+    return allowedTargets.stream().map(this::toEntity).toList();
   }
 
   private NewsTargetingEntity toEntity(Metadata metadata) {

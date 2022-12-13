@@ -125,7 +125,7 @@ public class NewsUtils {
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return memberSpaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
-                 .collect(Collectors.toList());
+                 .toList();
   }
   
   public static List<Space> getAllowedScheduledNewsSpaces(org.exoplatform.services.security.Identity currentIdentity) throws Exception {
@@ -134,7 +134,7 @@ public class NewsUtils {
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return memberSpaces.stream()
                  .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || canPublishNews(currentIdentity)))
-                 .collect(Collectors.toList());
+                 .toList();
   }
 
   public static boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {

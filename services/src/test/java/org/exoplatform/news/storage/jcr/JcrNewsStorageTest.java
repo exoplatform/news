@@ -8,11 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.jcr.*;
-import javax.jcr.query.QueryManager;
-import javax.jcr.query.QueryResult;
 import javax.jcr.version.*;
 
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,31 +21,14 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.command.NotificationCommand;
-import org.exoplatform.commons.api.notification.command.NotificationExecutor;
-import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.search.data.SearchResult;
-import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.connector.NewsSearchConnector;
-import org.exoplatform.news.connector.NewsSearchResult;
-import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
-import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.search.NewsESSearchConnector;
-import org.exoplatform.news.service.NewsService;
-import org.exoplatform.news.service.impl.NewsServiceImpl;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
-import org.exoplatform.news.storage.jcr.JcrNewsStorage;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.services.cms.documents.TrashService;
 import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -59,25 +39,16 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.ext.distribution.*;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.security.*;
 import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
 import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManagerImpl;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
-import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
-import org.exoplatform.services.wcm.publication.WebpagePublicationPlugin;
-import org.exoplatform.services.wcm.publication.lifecycle.stageversion.StageAndVersionPublicationConstant;
-import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.model.Profile;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
@@ -992,10 +963,11 @@ public class JcrNewsStorageTest {
     doCallRealMethod().when(jcrNewsStorage).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
+    ExtendedNode newsImageNode = mock(ExtendedNode.class);
     when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
 
     String newsId = "newsId";
-    when(jcrNewsStorage.getNewsNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
+    when(jcrNewsStorage.getNodeById(eq(newsId), nullable(SessionProvider.class))).thenReturn(newsNode);
 
 //    String username = "mary";
     String spaceGroup = "spaceGroup";
@@ -1007,10 +979,17 @@ public class JcrNewsStorageTest {
 //    when(identity.getRemoteId()).thenReturn(username);
     when(space.getGroupId()).thenReturn(spaceGroup);
     when(news.getId()).thenReturn(newsId);
+    String newsImageId = "newsImageId";
+    when(jcrNewsStorage.getNodeById(eq(newsImageId), nullable(SessionProvider.class))).thenReturn(newsImageNode);
+
+    String newsBody = "news body <img src=\"/portal/rest/images/session/" + newsImageId + "\" />";
+
+    when(news.getBody()).thenReturn(newsBody);
     //when(newsService.canViewNews(news, username)).thenReturn(true);
 
     jcrNewsStorage.shareNews(news, space, identity, "activityId");
     verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(newsImageNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
   }
 
   @PrepareForTest({ CommonsUtils.class })

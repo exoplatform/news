@@ -24,7 +24,6 @@ import javax.jcr.query.QueryManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 
 import org.exoplatform.commons.api.search.data.SearchContext;
 import org.exoplatform.commons.api.search.data.SearchResult;
@@ -88,7 +87,9 @@ public class JcrNewsStorage implements NewsStorage {
   
   private static final Log         LOG                             = ExoLogger.getLogger(JcrNewsStorage.class);
   
-  private static final Pattern     MENTION_PATTERN                  = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+  private static final Pattern   MENTION_PATTERN                  = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
+
+  private static final Pattern   IMAGE_SRC_PATTERN                = Pattern.compile("src=\"/portal/rest/images/?(.+)?\"");
   
   public static final String       MIX_NEWS_MODIFIERS               = "mix:newsModifiers";
 
@@ -109,6 +110,8 @@ public class JcrNewsStorage implements NewsStorage {
   public  static final String      EXO_NEWS_LAST_MODIFIER           = "exo:newsLastModifier";
 
   public  static final String      NEWS_MODIFICATION_MIXIN          = "mix:newsModification";
+
+  public static final String       EXO_PRIVILEGEABLE                = "exo:privilegeable";
 
   public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
   
@@ -1224,13 +1227,13 @@ public class JcrNewsStorage implements NewsStorage {
     String newsId = news.getId();
     SessionProvider sessionProvider = SessionProvider.createSystemProvider();
     try {
-      ExtendedNode newsNode = (ExtendedNode) getNewsNodeById(newsId, sessionProvider);
+      ExtendedNode newsNode = (ExtendedNode) getNodeById(newsId, sessionProvider);
       if (newsNode == null) {
         throw new ObjectNotFoundException("News with id " + newsId + "wasn't found");
       }
       // Update news node permissions
-      if (newsNode.canAddMixin("exo:privilegeable")) {
-        newsNode.addMixin("exo:privilegeable");
+      if (newsNode.canAddMixin(EXO_PRIVILEGEABLE)) {
+        newsNode.addMixin(EXO_PRIVILEGEABLE);
       }
       if (newsNode.hasProperty("exo:attachmentsIds")) {
         newsAttachmentsService.shareAttachments(newsNode, space);
@@ -1247,6 +1250,7 @@ public class JcrNewsStorage implements NewsStorage {
         }
         newsNode.save();
       }
+      updateNewsImagesPermissions(news, sessionProvider, space);
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
           + userIdentity.getId(), e);
@@ -1255,7 +1259,7 @@ public class JcrNewsStorage implements NewsStorage {
     }
   }
   
-  public Node getNewsNodeById(String newsId, SessionProvider sessionProvider) throws RepositoryException, ItemNotFoundException {
+  public Node getNodeById(String newsId, SessionProvider sessionProvider) throws RepositoryException {
     Session session = getSession(sessionProvider);
     Node node = session.getNodeByUUID(newsId);
     return node;
@@ -1267,5 +1271,20 @@ public class JcrNewsStorage implements NewsStorage {
                                                        .getDefaultWorkspaceName(),
                                       repositoryService.getCurrentRepository());
   }
-  
+
+  private void updateNewsImagesPermissions(News news, SessionProvider sessionProvider, Space space) throws RepositoryException {
+    Matcher matcher = IMAGE_SRC_PATTERN.matcher(news.getBody());
+    while (matcher.find()) {
+      String match = matcher.group(1);
+      String imageUUID = match.substring(match.lastIndexOf("/") + 1);
+      ExtendedNode image = (ExtendedNode) getNodeById(imageUUID, sessionProvider);
+      if (image != null) {
+        if (image.canAddMixin(EXO_PRIVILEGEABLE)) {
+          image.addMixin(EXO_PRIVILEGEABLE);
+        }
+        image.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
+        image.save();
+      }
+    }
+  }
 }

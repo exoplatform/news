@@ -8,7 +8,7 @@
       {{ $t("news.composer.btn.scheduleArticle") }}
     </v-btn>
     <exo-news-details-action-menu
-      v-if="showEditButton && publicationState !== 'staged'"
+      v-if="publicationState !== 'staged' && (showEditButton || showDeleteButton || showPublishButton)"
       class="pull-right"
       :news="news"
       :news-published="newsPublished"

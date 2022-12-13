@@ -111,7 +111,7 @@ public class JcrNewsStorage implements NewsStorage {
 
   public  static final String      NEWS_MODIFICATION_MIXIN          = "mix:newsModification";
 
-  public static final String     EXO_PRIVILEGEABLE                = "exo:privilegeable";
+  public static final String       EXO_PRIVILEGEABLE                = "exo:privilegeable";
 
   public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
   
@@ -1250,7 +1250,7 @@ public class JcrNewsStorage implements NewsStorage {
         }
         newsNode.save();
       }
-      updateNewsImagesPermissions(news , sessionProvider, space);
+      updateNewsImagesPermissions(news, sessionProvider, space);
     } catch (RepositoryException e) {
       throw new IllegalStateException("Error while sharing news with id " + newsId + " to space " + space.getId() + " by user"
           + userIdentity.getId(), e);
@@ -1272,17 +1272,19 @@ public class JcrNewsStorage implements NewsStorage {
                                       repositoryService.getCurrentRepository());
   }
 
-  private  void updateNewsImagesPermissions(News news ,  SessionProvider sessionProvider, Space space  ) throws RepositoryException {
+  private void updateNewsImagesPermissions(News news, SessionProvider sessionProvider, Space space) throws RepositoryException {
     Matcher matcher = IMAGE_SRC_PATTERN.matcher(news.getBody());
     while (matcher.find()) {
       String match = matcher.group(1);
       String imageUUID = match.substring(match.lastIndexOf("/") + 1);
       ExtendedNode image = (ExtendedNode) getNodeById(imageUUID, sessionProvider);
-      if (image.canAddMixin(EXO_PRIVILEGEABLE)) {
-        image.addMixin(EXO_PRIVILEGEABLE);
+      if (image != null) {
+        if (image.canAddMixin(EXO_PRIVILEGEABLE)) {
+          image.addMixin(EXO_PRIVILEGEABLE);
+        }
+        image.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
+        image.save();
       }
-      image.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
-      image.save();
     }
   }
 }

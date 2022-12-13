@@ -963,6 +963,7 @@ public class JcrNewsStorageTest {
     doCallRealMethod().when(jcrNewsStorage).shareNews(nullable(News.class), nullable(Space.class), nullable(Identity.class), nullable(String.class));
 
     ExtendedNode newsNode = mock(ExtendedNode.class);
+    ExtendedNode newsImageNode = mock(ExtendedNode.class);
     when(newsNode.canAddMixin("exo:privilegeable")).thenReturn(true);
 
     String newsId = "newsId";
@@ -978,10 +979,17 @@ public class JcrNewsStorageTest {
 //    when(identity.getRemoteId()).thenReturn(username);
     when(space.getGroupId()).thenReturn(spaceGroup);
     when(news.getId()).thenReturn(newsId);
+    String newsImageId = "newsImageId";
+    when(jcrNewsStorage.getNodeById(eq(newsImageId), nullable(SessionProvider.class))).thenReturn(newsImageNode);
+
+    String newsBody = "news body <img src=\"/portal/rest/images/session/" + newsImageId + "\" />";
+
+    when(news.getBody()).thenReturn(newsBody);
     //when(newsService.canViewNews(news, username)).thenReturn(true);
 
     jcrNewsStorage.shareNews(news, space, identity, "activityId");
     verify(newsNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(newsImageNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
   }
 
   @PrepareForTest({ CommonsUtils.class })

@@ -56,7 +56,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private static final String REFERENCED  = "referenced";
 
-  private static final String SPACE_PREFIX              = "space:";
+  private static final String SPACE_TARGET_PERMISSION_PREFIX = "space:";
 
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
@@ -76,7 +76,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getTargets() {
+  public List<NewsTargetingEntity> getAllNewsTargets() {
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
@@ -203,10 +203,10 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getTargetsByUser(String userName) {
+  public List<NewsTargetingEntity> getAllowedNewsTargets(String userName) {
     org.exoplatform.services.security.Identity identity = NewsUtils.getUserIdentity(userName);
     List<String> publisherPermissions = new ArrayList<>();
-    List<NewsTargetingEntity> targetingEntities = getTargets();
+    List<NewsTargetingEntity> targetingEntities = getAllNewsTargets();
     List<String> publisherGroups = identity.getGroups()
                                            .stream()
                                            .filter(group -> identity.isMemberOf(String.valueOf(group), PUBLISHER_MEMBERSHIP_NAME))
@@ -216,7 +216,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       List<Space> spaces = spaceService.getAccessibleSpaces(userName);
       List<String> publisherSpaces = spaces.stream()
                                            .filter(space -> spaceService.isPublisher(space, userName))
-                                           .map(space -> SPACE_PREFIX + space.getDisplayName())
+                                           .map(space -> SPACE_TARGET_PERMISSION_PREFIX + space.getDisplayName())
                                            .collect(Collectors.toList());
       publisherPermissions.addAll(publisherSpaces);
 
@@ -244,9 +244,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
-        if (permission.contains(SPACE_PREFIX)) {
+        if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
           Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
-          permissionEntity.setId(SPACE_PREFIX + space.getDisplayName());
+          permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getDisplayName());
           permissionEntity.setName(space.getDisplayName());
           permissionEntity.setProviderId("space");
           permissionEntity.setRemoteId(space.getPrettyName());

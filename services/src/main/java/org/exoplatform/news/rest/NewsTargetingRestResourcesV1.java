@@ -90,9 +90,9 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     @ApiResponse(responseCode = "200", description = "Request fulfilled"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response getTargets(@Context HttpServletRequest request) {
+  public Response getAllNewsTargets(@Context HttpServletRequest request) {
     try {
-      List<NewsTargetingEntity> targets = newsTargetingService.getTargets();
+      List<NewsTargetingEntity> targets = newsTargetingService.getAllNewsTargets();
       return Response.ok(targets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news targets", e);
@@ -104,16 +104,16 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(summary = "Get all news allowed targets by username", method = "GET", description = "Get all news allowed targets by username")
+  @Operation(summary = "Get all allowed news targets of the current user", method = "GET", description = "Get all allowed news targets of the current user")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
       @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getAllowedTargets(@Context HttpServletRequest request) {
+  public Response getAllowedNewsTargets(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      List<NewsTargetingEntity> targets = newsTargetingService.getTargetsByUser(currentIdentity.getUserId());
+      List<NewsTargetingEntity> targets = newsTargetingService.getAllowedNewsTargets(currentIdentity.getUserId());
       return Response.ok(targets).build();
     } catch (Exception e) {
-      LOG.error("Error when getting the news targets", e);
+      LOG.error("Error when getting the allowed news targets for user " + currentIdentity.getUserId(), e);
       return Response.serverError().build();
     }
   }

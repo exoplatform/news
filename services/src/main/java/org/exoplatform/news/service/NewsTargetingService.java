@@ -36,7 +36,7 @@ public interface NewsTargetingService {
    *
    * @return {@link List} of all {@link News} targets
    */
-  List<NewsTargetingEntity> getTargets();
+  List<NewsTargetingEntity> getAllNewsTargets();
   
   /**
    * Delete the {@link News} target by a given {@link News} target name
@@ -134,5 +134,5 @@ public interface NewsTargetingService {
    * @param userName attempting to get {@link News} target
    * @return {@link List} of {@link News} targets by username
    */
-  List<NewsTargetingEntity> getTargetsByUser(String userName);
+  List<NewsTargetingEntity> getAllowedNewsTargets(String userName);
 }

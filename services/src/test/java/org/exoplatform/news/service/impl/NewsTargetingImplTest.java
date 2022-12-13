@@ -99,7 +99,7 @@ public class NewsTargetingImplTest {
     when(metadataService.getMetadatas(metadataType.getName(), 100)).thenReturn(newsTargets);
 
     // When
-    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getTargets();
+    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getAllNewsTargets();
 
     // Then
     assertNotNull(newsTargetingEntities);
@@ -331,7 +331,7 @@ public class NewsTargetingImplTest {
     newsTargetingEntity.setName("test1");
     targets.add(newsTargetingEntity);
 
-    when(newsTargetingService.getTargets()).thenReturn(targets);
+    when(newsTargetingService.getAllNewsTargets()).thenReturn(targets);
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     newsTargetingService.deleteTargetByName(targets.get(0).getName(), identity);
 

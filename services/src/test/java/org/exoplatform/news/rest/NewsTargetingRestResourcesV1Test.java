@@ -49,7 +49,7 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getTargets(request);
+    Response response = newsTargetingRestResourcesV1.getAllNewsTargets(request);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -63,15 +63,15 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getAllowedTargets(request);
+    Response response = newsTargetingRestResourcesV1.getAllowedNewsTargets(request);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-    when(newsTargetingRestResourcesV1.getAllowedTargets(request)).thenThrow(RuntimeException.class);
+    when(newsTargetingRestResourcesV1.getAllowedNewsTargets(request)).thenThrow(RuntimeException.class);
 
     // When
-    response = newsTargetingRestResourcesV1.getAllowedTargets(request);
+    response = newsTargetingRestResourcesV1.getAllowedNewsTargets(request);
 
     // Then
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
@@ -112,7 +112,7 @@ public class NewsTargetingRestResourcesV1Test {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName("test1");
     targets.add(newsTargetingEntity);
-    lenient().when(newsTargetingService.getTargets()).thenReturn(targets);
+    lenient().when(newsTargetingService.getAllNewsTargets()).thenReturn(targets);
 
     // When
     Response response = newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0);

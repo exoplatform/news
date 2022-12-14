@@ -83,9 +83,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   public List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity) {
     List<Metadata> allTargetsMetadatas = metadataService.getMetadatas(METADATA_TYPE.getName(), 0);
     return allTargetsMetadatas.stream().filter(targetMetadata -> {
-      return List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(",")).stream().anyMatch(targetMetadataPermission -> {
+      return targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null || List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(",")).stream().anyMatch(targetMetadataPermission -> {
         if (targetMetadataPermission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
-          Space space = spaceService.getSpaceByDisplayName(targetMetadataPermission.replace(SPACE_TARGET_PERMISSION_PREFIX, ""));
+          Space space = spaceService.getSpaceById(targetMetadataPermission.substring(6));
           return space != null && spaceService.isPublisher(space, userIdentity.getUserId());
         }
         return userIdentity.isMemberOf(targetMetadataPermission, PUBLISHER_MEMBERSHIP_NAME);
@@ -227,9 +227,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
         if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
-          Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
+          Space space = spaceService.getSpaceById(permission.substring(6));
           if (space != null) {
-            permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getDisplayName());
+            permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getId());
             permissionEntity.setName(space.getDisplayName());
             permissionEntity.setProviderId("space");
             permissionEntity.setRemoteId(space.getPrettyName());

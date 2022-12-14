@@ -84,7 +84,7 @@ public class NewsTargetingImplTest {
     newsTarget3.setCreatedDate(300);
     HashMap<String, String> testNewsProperties = new HashMap<>();
     testNewsProperties.put("label", "test news");
-    testNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:space1");
+    testNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:1");
     newsTarget3.setProperties(testNewsProperties);
     newsTarget3.setId(3);
     newsTargets.add(newsTarget3);
@@ -95,8 +95,8 @@ public class NewsTargetingImplTest {
     space.setPrettyName("space1");
     space.setAvatarUrl("");
 
-    when(spaceService.getSpaceByPrettyName("space1")).thenReturn(space);
-    when(metadataService.getMetadatas(metadataType.getName(), 100)).thenReturn(newsTargets);
+    when(spaceService.getSpaceById("1")).thenReturn(space);
+    when(metadataService.getMetadatas(metadataType.getName(), 0)).thenReturn(newsTargets);
 
     // When
     List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getAllTargets();
@@ -156,7 +156,7 @@ public class NewsTargetingImplTest {
     sliderNews.setId(1);
     newsTargets.add(sliderNews);
 
-    when(metadataService.getMetadatasByProperty("referenced","true", 100)).thenReturn(newsTargets);
+    when(metadataService.getMetadatasByProperty("referenced","true", 0)).thenReturn(newsTargets);
     List<MembershipEntry> memberships = new LinkedList<>();
     MembershipEntry membershipEntry = new MembershipEntry("/platform/web-contributors", "publisher");
     memberships.add(membershipEntry);

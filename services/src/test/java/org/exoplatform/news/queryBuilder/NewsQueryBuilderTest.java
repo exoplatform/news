@@ -190,7 +190,7 @@ public class NewsQueryBuilderTest {
     spaces.add(space2);
 
     PowerMockito.mockStatic(NewsUtils.class);
-    when(NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId())).thenReturn(spaces);
+    when(NewsUtils.getAllowedScheduledNewsSpaces(currentIdentity)).thenReturn(spaces);
 
     // when
     StringBuilder query = queryBuilder.buildQuery(filter);

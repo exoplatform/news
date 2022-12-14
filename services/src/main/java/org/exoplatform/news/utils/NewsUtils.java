@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
@@ -119,13 +118,22 @@ public class NewsUtils {
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
   }
 
-  public static List<Space> getRedactorOrManagerSpaces(String userId) throws Exception {
+  public static List<Space> getAllowedDraftNewsSpaces(String userId) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userId);
-    List<Space> spaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
-    return spaces.stream()
+    List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
+    return memberSpaces.stream()
                  .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
-                 .collect(Collectors.toList());
+                 .toList();
+  }
+  
+  public static List<Space> getAllowedScheduledNewsSpaces(org.exoplatform.services.security.Identity currentIdentity) throws Exception {
+    SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+    ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(currentIdentity.getUserId());
+    List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
+    return memberSpaces.stream()
+                 .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || canPublishNews(currentIdentity)))
+                 .toList();
   }
 
   public static boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {

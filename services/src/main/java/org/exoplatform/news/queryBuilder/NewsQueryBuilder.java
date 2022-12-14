@@ -77,13 +77,13 @@ public class NewsQueryBuilder {
           sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
           sqlQuery.append(" OR ");
           sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = '')");
-          List<Space> redactorOrManagersSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
-          int redactorOrManagersSpacesSize = redactorOrManagersSpaces.size();
-          if(redactorOrManagersSpacesSize > 0) {
+          List<Space> allowedDraftNewsSpaces = NewsUtils.getAllowedDraftNewsSpaces(currentIdentity.getUserId());
+          int allowedDraftNewsSpacesSize = allowedDraftNewsSpaces.size();
+          if(allowedDraftNewsSpacesSize > 0) {
             sqlQuery.append("OR (");
-            for (int i= 0; i < redactorOrManagersSpacesSize ; i++) {
-              sqlQuery.append(EXO_SPACE_ID).append(" = '").append(redactorOrManagersSpaces.get(i).getId()).append("'");
-              if( i != redactorOrManagersSpacesSize-1) {
+            for (int i= 0; i < allowedDraftNewsSpacesSize; i++) {
+              sqlQuery.append(EXO_SPACE_ID).append(" = '").append(allowedDraftNewsSpaces.get(i).getId()).append("'");
+              if( i != allowedDraftNewsSpacesSize - 1) {
                 sqlQuery.append(" OR ");
               }
             }
@@ -93,7 +93,7 @@ public class NewsQueryBuilder {
             sqlQuery.append(")");
           }
         } else if (filter.isScheduledNews()) {
-          List<Space> allowedScheduledNewsSpaces = NewsUtils.getRedactorOrManagerSpaces(currentIdentity.getUserId());
+          List<Space> allowedScheduledNewsSpaces = NewsUtils.getAllowedScheduledNewsSpaces(currentIdentity);
           sqlQuery.append("publication:currentState = 'staged'");
           sqlQuery.append(" AND (exo:author = '").append(filter.getAuthor()).append("'");
           for (Space space : allowedScheduledNewsSpaces ) {

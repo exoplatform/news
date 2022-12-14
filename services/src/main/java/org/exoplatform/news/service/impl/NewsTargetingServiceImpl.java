@@ -76,13 +76,35 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getAllNewsTargets() {
+  public List<NewsTargetingEntity> getAllTargets() {
     List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
     return targets.stream().map(this::toEntity).collect(Collectors.toList());
   }
   
   @Override
-  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
+  public List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity) {
+    List<Metadata> allTargetsMetadatas = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
+    List<Metadata> allowedTargets = new ArrayList<>();
+    for (Metadata targetMetadata : allTargetsMetadatas) {
+      List<String> targetMetadataPermissions = List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(","));
+      for (String targetMetadataPermission : targetMetadataPermissions) {
+        if (targetMetadataPermission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
+          Space space = spaceService.getSpaceByDisplayName(targetMetadataPermission.replace(SPACE_TARGET_PERMISSION_PREFIX, ""));
+          if (spaceService.isPublisher(space, userIdentity.getUserId())) {
+            allowedTargets.add(targetMetadata);
+            break;
+          }
+        } else if (userIdentity.isMemberOf(targetMetadataPermission, PUBLISHER_MEMBERSHIP_NAME)) {
+          allowedTargets.add(targetMetadata);
+          break;
+        }
+      }
+    }
+    return allowedTargets.stream().map(this::toEntity).toList();
+  }
+  
+  @Override
+  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
     if (currentIdentity != null && !NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId()
           + " not authorized to delete news target with name " + targetName);
@@ -200,29 +222,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " don't make any changes");
     }
     return metadataService.updateMetadata(storedMetadata, userIdentityId);
-  }
-
-  @Override
-  public List<NewsTargetingEntity> getAllowedNewsTargets(org.exoplatform.services.security.Identity identity) {
-    List<Metadata> allTargets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
-    List<Metadata> allowedTargets = new ArrayList<>();
-    for (Metadata metadata : allTargets) {
-      List<String> permissions = List.of(metadata.getProperties().get("permissions").split(","));
-      for (String permission : permissions) {
-        boolean exist = false;
-        if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
-          Space space = spaceService.getSpaceByDisplayName(permission.replace(SPACE_TARGET_PERMISSION_PREFIX, ""));
-          exist = spaceService.isPublisher(space, identity.getUserId());
-        } else {
-          exist = identity.isMemberOf(permission, PUBLISHER_MEMBERSHIP_NAME);
-        }
-        if (exist) {
-          allowedTargets.add(metadata);
-          break;
-        }
-      }
-    }
-    return allowedTargets.stream().map(this::toEntity).toList();
   }
 
   private NewsTargetingEntity toEntity(Metadata metadata) {

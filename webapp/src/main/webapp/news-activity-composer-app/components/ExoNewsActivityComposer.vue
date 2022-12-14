@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </div>
     </div>
     <div
-      v-show="canCreatNews && !loading"
+      v-show="canCreateNews && !loading"
       id="newsActivityComposer"
       class="newsComposer">
       <schedule-news-drawer
@@ -283,7 +283,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :items="items" />
     </div>
 
-    <div v-show="(!canCreatNews && !loading) || unAuthorizedAccess" class="newsComposer">
+    <div v-show="(!canCreateNews && !loading) || unAuthorizedAccess" class="newsComposer">
       <div class="articleNotFound">
         <i class="iconNotFound"></i>
         <h3 class="restrictedAction">{{ $t('news.details.restricted') }}</h3>
@@ -365,7 +365,7 @@ export default {
       attachmentsChanged: false,
       imagesURLs: new Map(),
       uploading: false,
-      canCreatNews: false,
+      canCreateNews: false,
       loading: true,
       currentSpace: {},
       spaceURL: null,
@@ -475,9 +475,9 @@ export default {
       this.displayFormTitle();
 
       this.$newsServices.canUserCreateNews(this.currentSpace.id).then(canCreateNews => {
-        this.canCreatNews = canCreateNews;
+        this.canCreateNews = canCreateNews || this.newsId;
         this.$nextTick(() => {
-          if (this.canCreatNews) {
+          if (this.canCreateNews) {
             if (this.newsId) {
               this.initNewsComposerData(this.newsId);
             } else {

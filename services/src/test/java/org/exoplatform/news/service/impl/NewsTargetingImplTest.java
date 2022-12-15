@@ -1,26 +1,22 @@
 package org.exoplatform.news.service.impl;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.news.model.News;
-import org.exoplatform.news.model.NewsTargetObject;
-import org.exoplatform.news.rest.NewsTargetingEntity;
-import org.exoplatform.news.service.NewsTargetingService;
-import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
-import org.exoplatform.news.utils.NewsUtils;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.social.core.space.model.*;
-import org.exoplatform.services.security.Authenticator;
-import org.exoplatform.services.security.IdentityRegistry;
-import org.exoplatform.services.security.MembershipEntry;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.metadata.MetadataService;
-import org.exoplatform.social.metadata.model.Metadata;
-import org.exoplatform.social.metadata.model.MetadataItem;
-import org.exoplatform.social.metadata.model.MetadataKey;
-import org.exoplatform.social.metadata.model.MetadataType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,10 +25,26 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.news.model.News;
+import org.exoplatform.news.model.NewsTargetObject;
+import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.service.NewsTargetingService;
+import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.Metadata;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataKey;
+import org.exoplatform.social.metadata.model.MetadataType;
 
 
 @RunWith(PowerMockRunner.class)

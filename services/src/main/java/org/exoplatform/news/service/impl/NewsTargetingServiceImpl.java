@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
@@ -105,8 +106,8 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getReferencedTargets(org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
+  public List<NewsTargetingEntity> getReferencedTargets(String spaceId, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
+    if (!NewsUtils.canPublishNews(spaceId, currentIdentity)) {
       throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get referenced news targets");
     }
     List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), 0);
@@ -121,12 +122,12 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public void saveNewsTarget(String newsId, boolean displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
+  public void saveNewsTarget(News news, boolean displayed, List<String> targets, String currentUserId) throws IllegalAccessException {
     org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(currentUserId);
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
+    if (!NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity)) {
       throw new IllegalAccessException("User " + currentUserId + " not authorized to save news targets");
     }
-    NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
+    NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, news.getId(), null);
     Identity currentSocIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, currentUserId);
     Map<String, String> properties = new LinkedHashMap<>();
     properties.put(NewsUtils.DISPLAYED_STATUS, String.valueOf(displayed));
@@ -161,12 +162,12 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public void deleteNewsTargets(String newsId, String currentUserId) throws IllegalAccessException {
+  public void deleteNewsTargets(News news, String currentUserId) throws IllegalAccessException {
     org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(currentUserId);
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
+    if (!NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity)) {
       throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to delete news targets");
     }
-    deleteNewsTargets(newsId);
+    deleteNewsTargets(news.getId());
   }
 
   @Override

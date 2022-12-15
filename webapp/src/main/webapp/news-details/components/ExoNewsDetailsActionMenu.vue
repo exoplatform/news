@@ -98,18 +98,12 @@ export default {
     actionMenu: null,
     showPublishMessage: false,
     publishMessage: '',
-    publishSuccess: true,
-    canPublishNews: null,
+    publishSuccess: true
   }),
   computed: {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
-  },
-  created() {
-    this.$newsServices.canPublishNews().then(canPublishNews => {
-      this.canPublishNews = canPublishNews;
-    });
   },
   mounted() {
     $('#UIPortalApplication').parent().click(() => {

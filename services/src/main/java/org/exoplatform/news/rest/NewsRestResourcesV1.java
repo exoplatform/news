@@ -913,10 +913,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   @Operation(summary = "check if the current user can publish a news to all users", method = "GET", description = "This checks if the current user can publish a news to all users")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "User ability to publish a news is returned"),
           @ApiResponse(responseCode = "401", description = "User not authorized to publish a news")})
-  public Response canPublishNews(@Context HttpServletRequest request) {
+  public Response canPublishNews(@Parameter(description = "space id", required = true) @QueryParam("spaceId") String spaceId) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      return Response.ok(String.valueOf(NewsUtils.canPublishNews(currentIdentity))).build();
+      if (!StringUtils.isBlank(spaceId)) {
+        Space space = spaceService.getSpaceById(spaceId);
+        if (space == null) {
+          return Response.status(Response.Status.NOT_FOUND).build();
+        }
+      }
+      return Response.ok(String.valueOf(NewsUtils.canPublishNews(spaceId, currentIdentity))).build();
     } catch (Exception e) {
       LOG.error("Error when checking if the authenticated user can publish a news to all users", e);
       return Response.serverError().build();

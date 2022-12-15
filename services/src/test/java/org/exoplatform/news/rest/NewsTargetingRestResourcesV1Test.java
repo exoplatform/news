@@ -84,15 +84,15 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getReferencedTargets(request);
+    Response response = newsTargetingRestResourcesV1.getReferencedTargets(null);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-    when(newsTargetingRestResourcesV1.getReferencedTargets(request)).thenThrow(RuntimeException.class);
+    when(newsTargetingRestResourcesV1.getReferencedTargets(null)).thenThrow(RuntimeException.class);
 
     // When
-    response = newsTargetingRestResourcesV1.getReferencedTargets(request);
+    response = newsTargetingRestResourcesV1.getReferencedTargets(null);
 
     // Then
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());

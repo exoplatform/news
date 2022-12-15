@@ -82,25 +82,40 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   @Override
   public List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity) {
     List<Metadata> allTargetsMetadatas = metadataService.getMetadatas(METADATA_TYPE.getName(), 0);
-    return allTargetsMetadatas.stream().filter(targetMetadata -> {
-      return targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null || List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(",")).stream().anyMatch(targetMetadataPermission -> {
-        if (targetMetadataPermission.split(SPACE_TARGET_PERMISSION_PREFIX).length > 1) {
-          String spaceId= targetMetadataPermission.split(SPACE_TARGET_PERMISSION_PREFIX)[1];
-          if (!StringUtils.isBlank(spaceId)) {
-            Space space = spaceService.getSpaceById(spaceId);
-            return space != null && spaceService.isPublisher(space, userIdentity.getUserId());
-          }
-        }
-          Group group = null;
-          try {
-            group = organizationService.getGroupHandler().findGroupById(targetMetadataPermission);
-          } catch (Exception e) {
-            LOG.error("Could not find group from permission" + targetMetadataPermission);
-          }
-          return group != null && userIdentity.isMemberOf(targetMetadataPermission, PUBLISHER_MEMBERSHIP_NAME);
-      });
-    }).map(this::toEntity).toList();
+    List<Metadata> allowedTargetsMetadatas = allTargetsMetadatas.stream().filter(targetMetadata -> targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null ||
+            isAllowed(List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(","))
+                    ,userIdentity)).toList();
+    
+    return allowedTargetsMetadatas.stream().map(this::toEntity).toList();
   }
+  public boolean isAllowed(List<String> permissions, org.exoplatform.services.security.Identity userIdentity){
+    boolean allowed = true;
+    for (String permission : permissions) {
+      if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
+        Space space = spaceService.getSpaceById(permission.split(SPACE_TARGET_PERMISSION_PREFIX)[1]);
+        if (space != null && spaceService.isPublisher(space, userIdentity.getUserId())) {
+          allowed = true;
+          break;
+        } else if (space != null && !spaceService.isPublisher(space, userIdentity.getUserId())) {
+          allowed = false;
+        }
+      } else {
+        Group group = null;
+        try {
+          group = organizationService.getGroupHandler().findGroupById(permission);
+        } catch (Exception e) {
+          LOG.error("Could not find group from permission" + permission);
+        }
+        if (group != null && userIdentity.isMemberOf(permission, PUBLISHER_MEMBERSHIP_NAME)) {
+          allowed = true;
+          break;
+        } else if (!userIdentity.isMemberOf(permission, PUBLISHER_MEMBERSHIP_NAME)) {
+          allowed = false;
+        }
+      }
+    }
+      return allowed;
+    }
   
   @Override
   public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {

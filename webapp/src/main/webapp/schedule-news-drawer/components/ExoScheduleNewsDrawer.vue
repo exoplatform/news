@@ -78,12 +78,16 @@
                   {{ $t('news.composer.publishSection.option') }}
                 </label>
               </div>
-              <div class="d-flex flex-row grey--text ms-2">{{ $t('news.composer.stepper.selectedTarget.description') }}</div>
+              <div class="d-flex flex-row grey--text ms-2">
+                <i v-if="allowedTargets.length === 0" class="fas fa-exclamation-triangle mx-2 mt-3"></i>
+                {{ selectedTargetDescription }}
+              </div>
               <exo-news-targets-selector
                 v-if="publish"
                 id="chooseTargets"
                 ref="chooseTargets"
                 :news="news"
+                :targets="allowedTargets"
                 :publish="publish"
                 @selected-targets="getSelectedTargets" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
@@ -271,6 +275,7 @@ export default {
     news: null,
     isActivityPosted: true,
     selectedTargets: [],
+    allowedTargets: []
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -380,9 +385,13 @@ export default {
     disableTargetOption() {
       return this.publish && this.selectedTargets && this.selectedTargets.length === 0;
     },
+    selectedTargetDescription(){
+      return this.allowedTargets.length === 0 ? this.$t('news.composer.stepper.selectedTarget.noData') : this.$t('news.composer.stepper.selectedTarget.description');
+    }
   },
   created() {
     this.disabled = true;
+    this.getAllowedTargets();
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
@@ -457,6 +466,16 @@ export default {
     },
     getSelectedTargets(selectedTargets) {
       this.selectedTargets = selectedTargets;
+    },
+    getAllowedTargets() {
+      this.$newsTargetingService.getAllowedTargets()
+        .then(targets => {
+          this.allowedTargets = targets.map(target => ({
+            name: target.name,
+            label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
+            tooltipInfo: target.properties && target.properties.label
+          }));
+        });
     },
   }
 };

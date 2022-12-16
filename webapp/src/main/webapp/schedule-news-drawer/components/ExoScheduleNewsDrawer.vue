@@ -441,6 +441,7 @@ export default {
         .then(news => {
           if (news) {
             this.news = news;
+            this.canPublishNews = news.canPublish;
             this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
             this.selectedTargets = news.targets;

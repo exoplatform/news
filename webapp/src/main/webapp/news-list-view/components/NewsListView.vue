@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :params="viewComponentParams" />
       </v-card-text>
     </v-card>
-    <news-settings-drawer v-if="$root.canPublishNews" />
+    <news-settings-drawer v-if="canPublishNews" />
   </v-app>
 </template>
 
@@ -102,6 +102,7 @@ export default {
     loading: false,
     hasMore: false,
     offset: 0,
+    canPublishNews: false,
   }),
   computed: {
     displayHeader() {
@@ -165,6 +166,9 @@ export default {
     },
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
       this.seeAllUrl = selectedOptions.seeAllUrl;
       this.showSeeAll = selectedOptions.showSeeAll;

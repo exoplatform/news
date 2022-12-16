@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.ExoContainerContext;
@@ -132,11 +134,16 @@ public class NewsUtils {
     ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(currentIdentity.getUserId());
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return memberSpaces.stream()
-                 .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || canPublishNews(currentIdentity)))
+                 .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || canPublishNews(space.getId(), currentIdentity)))
                  .toList();
   }
 
-  public static boolean canPublishNews(org.exoplatform.services.security.Identity currentIdentity) {
+  public static boolean canPublishNews(String spaceId, org.exoplatform.services.security.Identity currentIdentity) {
+    if (!StringUtils.isBlank(spaceId)) {
+      SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
+      Space space = spaceService.getSpaceById(spaceId);
+      return currentIdentity != null && space != null && spaceService.isMember(space, currentIdentity.getUserId()) && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) || spaceService.isPublisher(space, currentIdentity.getUserId()));
+    }
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
 

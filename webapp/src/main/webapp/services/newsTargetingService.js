@@ -38,7 +38,7 @@ export function getAllowedTargets() {
 }
 
 export function getReferencedTargets() {
-  return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
+  return fetch(`${newsConstants.NEWS_API}/targeting/referenced/${eXo.env.portal.spaceId}`, {
     credentials: 'include',
     method: 'GET',
   }).then((resp) => {

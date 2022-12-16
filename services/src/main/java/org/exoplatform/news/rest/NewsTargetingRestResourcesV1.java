@@ -25,19 +25,22 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.common.http.HTTPStatus;
+import org.picocontainer.Startable;
+
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -47,7 +50,13 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.metadata.model.Metadata;
-import org.picocontainer.Startable;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("v1/news/targeting")
 @Tag(name = "v1/news/targeting", description = "Manage news targeting operations")
@@ -118,7 +127,7 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     }
   }
 
-  @Path("referenced")
+  @Path("referenced/{spaceId}")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
@@ -128,10 +137,10 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     @ApiResponse(responseCode = "500", description = "Internal server error"),
     @ApiResponse(responseCode = "401", description = "Unauthorized operation")
   })
-  public Response getReferencedTargets(@Context HttpServletRequest request) {
+  public Response getReferencedTargets(@Parameter(description = "space id", required = true) @PathParam("spaceId") String spaceId) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets(currentIdentity);
+      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets(spaceId, currentIdentity);
       return Response.ok(referencedTargets).build();
     } catch (IllegalArgumentException e) {
       LOG.warn("User '{}' is not autorized to get referenced news targets", currentIdentity.getUserId(), e);

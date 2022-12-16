@@ -80,17 +80,29 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   @Override
   public List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity) {
     List<Metadata> allTargetsMetadatas = metadataService.getMetadatas(METADATA_TYPE.getName(), 0);
-    List<Metadata> allowedTargetsMetadatas =
-                                           allTargetsMetadatas.stream()
-                                                              .filter(targetMetadata -> targetMetadata.getProperties()
-                                                                                                      .get(NewsUtils.TARGET_PERMISSIONS) == null
-                                                                  || isTargetAllowed(List.of(targetMetadata.getProperties()
-                                                                                                           .get(NewsUtils.TARGET_PERMISSIONS)
-                                                                                                           .split(",")),
-                                                                                     userIdentity))
-                                                              .toList();
-
-    return allowedTargetsMetadatas.stream().map(this::toEntity).toList();
+    return allTargetsMetadatas.stream().filter(targetMetadata -> {
+      return targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null
+          || List.of(targetMetadata.getProperties().get(NewsUtils.TARGET_PERMISSIONS).split(","))
+                 .stream()
+                 .anyMatch(targetMetadataPermission -> {
+                   if (targetMetadataPermission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
+                     if (targetMetadataPermission.split(SPACE_TARGET_PERMISSION_PREFIX).length > 1) {
+                       Space targetPermissionSpace =
+                                                   spaceService.getSpaceById(targetMetadataPermission.split(SPACE_TARGET_PERMISSION_PREFIX)[1]);
+                       return targetPermissionSpace != null
+                           && spaceService.isPublisher(targetPermissionSpace, userIdentity.getUserId());
+                     }
+                   }
+                   try {
+                     Group targetPermissionGroup = organizationService.getGroupHandler().findGroupById(targetMetadataPermission);
+                     return targetPermissionGroup != null
+                         && userIdentity.isMemberOf(targetMetadataPermission, PUBLISHER_MEMBERSHIP_NAME);
+                   } catch (Exception e) {
+                     LOG.error("Could not find group from permission" + targetMetadataPermission);
+                   }
+                   return false;
+                 });
+    }).map(this::toEntity).toList();
   }
   
   @Override
@@ -265,33 +277,5 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     metadata.setProperties(newsTargetingEntity.getProperties());
     metadata.setCreatorId(0);
     return metadata;
-  }
-  
-  public boolean isTargetAllowed(List<String> targetPermissions, org.exoplatform.services.security.Identity userIdentity) {
-    boolean allowedTarget = true;
-    for (String targetPermission : targetPermissions) {
-      if (targetPermission.split(SPACE_TARGET_PERMISSION_PREFIX).length > 1) {
-        Space targetPermissionSpace = spaceService.getSpaceById(targetPermission.split(SPACE_TARGET_PERMISSION_PREFIX)[1]);
-        if (targetPermissionSpace != null && spaceService.isPublisher(targetPermissionSpace, userIdentity.getUserId())) {
-          allowedTarget = true;
-          break;
-        } else if (targetPermissionSpace != null && !spaceService.isPublisher(targetPermissionSpace, userIdentity.getUserId())) {
-          allowedTarget = false;
-        }
-      } else {
-        try {
-          Group targetPermissionGroup = organizationService.getGroupHandler().findGroupById(targetPermission);
-          if (targetPermissionGroup != null && userIdentity.isMemberOf(targetPermission, PUBLISHER_MEMBERSHIP_NAME)) {
-            allowedTarget = true;
-            break;
-          } else if (targetPermissionGroup != null && !userIdentity.isMemberOf(targetPermission, PUBLISHER_MEMBERSHIP_NAME)) {
-            allowedTarget = false;
-          }
-        } catch (Exception e) {
-          LOG.error("Could not find group from permission" + targetPermission);
-        }
-      }
-    }
-    return allowedTarget;
   }
 }

@@ -61,12 +61,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {{ $t('news.details.editPublishing.option') }}
               </label>
             </div>
+            <div v-if="allowedTargets.length === 0" class="d-flex flex-row grey--text ms-2">
+                <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
+                {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}
+              </div>
             <exo-news-targets-selector
               v-if="publish"
               id="chooseTargets"
               ref="chooseTargets"
               :news="news"
               :publish="publish"
+              :targets="allowedTargets"
               @selected-targets="getSelectedTargets" />
           </div>
         </div>
@@ -108,6 +113,7 @@ export default {
     isActivityPosted: true,
     editingNews: false,
     disabled: false,
+    allowedTargets: [],
   }),
   watch: {
     selected() {
@@ -166,6 +172,7 @@ export default {
     }
   },
   created() {
+    this.getAllowedTargets();
     this.$root.$on('open-edit-publishing-drawer', () => {
       this.openDrawer();
     });
@@ -208,6 +215,16 @@ export default {
     closeDrawer() {
       this.disabled = false;
       this.$refs.postNewsDrawer.close();
+    },
+    getAllowedTargets() {
+      this.$newsTargetingService.getAllowedTargets()
+        .then(targets => {
+          this.allowedTargets = targets.map(target => ({
+            name: target.name,
+            label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
+            tooltipInfo: target.properties && target.properties.label
+          }));
+        });
     },
   }
 };

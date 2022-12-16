@@ -84,10 +84,13 @@ export default {
       required: false,
       default: null
     },
+    targets: {
+      type: Object,
+      default: null
+    },
   },
   data: () =>({
     selectedTargets: [],
-    targets: [],
   }),
   computed: {
     disableTargetOption() {
@@ -112,7 +115,6 @@ export default {
     }
   },
   created() {
-    this.getAllowedTargets();
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
@@ -142,16 +144,6 @@ export default {
     },
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
-    },
-    getAllowedTargets() {
-      this.$newsTargetingService.getAllowedTargets()
-        .then(targets => {
-          this.targets = targets.map(target => ({
-            name: target.name,
-            label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
-            tooltipInfo: target.properties && target.properties.label
-          }));
-        });
     },
   }
 };

@@ -98,9 +98,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
                      return targetPermissionGroup != null
                          && userIdentity.isMemberOf(targetMetadataPermission, PUBLISHER_MEMBERSHIP_NAME);
                    } catch (Exception e) {
-                     LOG.error("Could not find group from permission" + targetMetadataPermission);
+                     LOG.error("Could not find group from permission " + targetMetadataPermission);
+                     return false;
                    }
-                   return false;
                  });
     }).map(this::toEntity).toList();
   }

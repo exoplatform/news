@@ -241,7 +241,7 @@ export default {
           && permission.profile.fullName
           && permission.profile.fullName.substring(0, permission.profile.fullName.lastIndexOf(' ('));
       return {
-        'id': permission.providerId === 'space' ? permission.id : permission.spaceId,
+        'id': permission.providerId === 'space' ? `space:${permission.spaceId}` : permission.spaceId,
         'profile': {
           'fullName': fullName,
         },

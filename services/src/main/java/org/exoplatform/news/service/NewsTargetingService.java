@@ -75,7 +75,7 @@ public interface NewsTargetingService {
   /**
    * Gets the {@link List} of referenced targets from {@link News} list portlets 
    *
-   * @param spaceId {@link Space} identifier for which the news list portlet will be displayed
+   * @param spaceId Space identifier for which the news list portlet will be displayed
    * @param currentIdentity attempting to get referenced {@link News} targets
    *
    * @return {@link List} of referenced targets
@@ -86,7 +86,7 @@ public interface NewsTargetingService {
   /**
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
    *
-   * @param {@link News} for which targets to be saved 
+   * @param news {@link News} for which targets to be saved 
    * @param displayed {@link News} is news displayed in news list portlet
    * @param targets {@link List} of {@link News} targets to be saved
    * @param currentUser current user attempting to save {@link News} targets
@@ -97,7 +97,7 @@ public interface NewsTargetingService {
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
    * 
-   * @param {@link News} for which targets to be deleted
+   * @param news {@link News} for which targets to be deleted
    * @param currentUserId attempting to delete {@link News} target
    * @throws IllegalAccessException when user doesn't have access to delete {@link News} targets of a given {@link News} id
    */

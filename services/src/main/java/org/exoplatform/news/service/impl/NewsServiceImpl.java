@@ -167,8 +167,8 @@ public class NewsServiceImpl implements NewsService {
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
     if (publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
-      newsTargetingService.deleteNewsTargets(news.getId(), updater);
-      newsTargetingService.saveNewsTarget(news.getId(), displayed, news.getTargets(), updater);
+      newsTargetingService.deleteNewsTargets(news, updater);
+      newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), updater);
     }
 
     newsStorage.updateNews(news, updater);
@@ -234,7 +234,7 @@ public class NewsServiceImpl implements NewsService {
       }
       news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
       news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
-      news.setCanPublish(NewsUtils.canPublishNews(currentIdentity));
+      news.setCanPublish(NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
       news.setTargets(newsTargetingService.getTargetsByNewsId(newsId));
       ExoSocialActivity activity = null;
@@ -274,7 +274,7 @@ public class NewsServiceImpl implements NewsService {
     newsList.stream().forEach(news -> {
       news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
       news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
-      news.setCanPublish(NewsUtils.canPublishNews(currentIdentity));
+      news.setCanPublish(NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity));
       news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
     });
     return newsList;
@@ -358,9 +358,9 @@ public class NewsServiceImpl implements NewsService {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to schedule news");
     }
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
-    if (NewsUtils.canPublishNews(currentIdentity) && news.isPublished() && news.getTargets() != null) {
+    if (NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity) && news.isPublished() && news.getTargets() != null) {
       newsTargetingService.deleteNewsTargets(news.getId());
-      newsTargetingService.saveNewsTarget(news.getId(), displayed, news.getTargets(), currentIdentity.getUserId());
+      newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), currentIdentity.getUserId());
     }
     news = newsStorage.scheduleNews(news);
     NewsUtils.broadcastEvent(NewsUtils.SCHEDULE_NEWS, currentIdentity.getUserId(), news);
@@ -425,8 +425,8 @@ public class NewsServiceImpl implements NewsService {
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
     newsStorage.publishNews(news);
     if (publishedNews.getTargets() != null) {
-      newsTargetingService.deleteNewsTargets(publishedNews.getId(), publisher);
-      newsTargetingService.saveNewsTarget(publishedNews.getId(), displayed, publishedNews.getTargets(), publisher);
+      newsTargetingService.deleteNewsTargets(news, publisher);
+      newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
@@ -438,7 +438,8 @@ public class NewsServiceImpl implements NewsService {
   @Override
   public void unpublishNews(String newsId, String publisher) throws Exception {
     newsStorage.unpublishNews(newsId);
-    newsTargetingService.deleteNewsTargets(newsId, publisher);
+    News news = getNewsById(newsId, false);
+    newsTargetingService.deleteNewsTargets(news, publisher);
   }
 
   /**
@@ -492,8 +493,8 @@ public class NewsServiceImpl implements NewsService {
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
     List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
     if (newsTargets != null && !newsTargets.isEmpty()) {
-      newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
-      newsTargetingService.saveNewsTarget(news.getId(), displayed, newsTargets, currentUserName);
+      newsTargetingService.deleteNewsTargets(news, currentUserName);
+      newsTargetingService.saveNewsTarget(news, displayed, newsTargets, currentUserName);
     }
     NewsUtils.broadcastEvent(NewsUtils.ARCHIVE_NEWS, currentUserName, news);
   }
@@ -538,8 +539,8 @@ public class NewsServiceImpl implements NewsService {
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
     List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
     if (newsTargets != null && !newsTargets.isEmpty()) {
-      newsTargetingService.deleteNewsTargets(news.getId(), currentUserName);
-      newsTargetingService.saveNewsTarget(news.getId(), displayed, newsTargets, currentUserName);
+      newsTargetingService.deleteNewsTargets(news, currentUserName);
+      newsTargetingService.saveNewsTarget(news, displayed, newsTargets, currentUserName);
     }
     NewsUtils.broadcastEvent(NewsUtils.UNARCHIVE_NEWS, currentUserName, news);
   }
@@ -549,7 +550,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public boolean canScheduleNews(Space space, org.exoplatform.services.security.Identity currentIdentity) {
-    return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || NewsUtils.canPublishNews(currentIdentity);
+    return spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || NewsUtils.canPublishNews(space.getId(), currentIdentity);
   }
   
   /**

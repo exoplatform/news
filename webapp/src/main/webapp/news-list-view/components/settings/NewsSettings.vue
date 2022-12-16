@@ -25,7 +25,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="d-flex flex-column me-2">
       <v-btn
         class="button-open-settings"
-        v-if="$root.canPublishNews"
+        v-if="canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -49,13 +49,17 @@ export default {
     seeAllUrl: 'news?filter=pinned',
     showHeader: false,
     showSeeAll: false,
+    canPublishNews: false,
   }),
   computed: {
     showSettingsContainer(){
-      return this.showHeader || this.showSeeAll || this.$root.canPublishNews ;
+      return this.showHeader || this.showSeeAll || this.canPublishNews ;
     }
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.$root.$on('saved-news-settings', (newsTarget, selectedOptions) => {
       this.newsHeader = selectedOptions.header;
       this.seeAllUrl = selectedOptions.seeAllUrl;

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -25,6 +27,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainer;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsTargetObject;
@@ -51,21 +55,27 @@ import org.exoplatform.social.metadata.model.MetadataType;
 
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-@PrepareForTest({ ExoContainerContext.class })
+@PowerMockIgnore({ "com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*" })
+@PrepareForTest({ ExoContainerContext.class, CommonsUtils.class })
 public class NewsTargetingImplTest {
 
   @Mock
-  MetadataService  metadataService;
+  MetadataService             metadataService;
 
   @Mock
-  IdentityManager  identityManager;
+  IdentityManager             identityManager;
 
   @Mock
-  IdentityRegistry identityRegistry;
+  IdentityRegistry            identityRegistry;
 
   @Mock
-  SpaceService     spaceService;
+  SpaceService                spaceService;
+
+  @Mock
+  Space                       space;
+
+  @Mock
+  ExoContainer                container;
 
   @Mock
   private OrganizationService organizationService;
@@ -325,6 +335,10 @@ public class NewsTargetingImplTest {
     Authenticator authenticator = mock(Authenticator.class);
     PowerMockito.mockStatic(ExoContainerContext.class);
     when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    when(ExoContainerContext.getCurrentContainer()).thenReturn(container);
+    when(container.getComponentInstanceOfType(SpaceService.class)).thenReturn(spaceService);
+    when(spaceService.getSpaceById("spaceId")).thenReturn(space);
+    when(spaceService.isMember(space, identity.getUserId())).thenReturn(true);
     when(ExoContainerContext.getService(Authenticator.class)).thenReturn(authenticator);
     when(authenticator.createIdentity("root")).thenReturn(identity);
     List<MembershipEntry> memberships = new LinkedList<>();
@@ -335,7 +349,7 @@ public class NewsTargetingImplTest {
     properties.put("displayed", String.valueOf(true));
 
     // When
-    newsTargetingService.saveNewsTarget(news.getId(), true, news.getTargets(), "root");
+    newsTargetingService.saveNewsTarget(news, true, news.getTargets(), "root");
 
     // Then
     verify(identityManager, times(1)).getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root");

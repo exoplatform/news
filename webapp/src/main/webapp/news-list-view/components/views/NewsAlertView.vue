@@ -61,7 +61,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-icon>chevron_right</v-icon>
       </v-btn>
       <v-btn
-        v-if="$root.canPublishNews"
+        v-if="canPublishNews"
         icon
         @click="openDrawer">
         <v-icon>mdi-cog</v-icon>
@@ -105,6 +105,7 @@ export default {
         month: 'long',
         day: 'numeric',
       },
+      canPublishNews: false,
     };
   },
   computed: {
@@ -113,6 +114,9 @@ export default {
     },
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();

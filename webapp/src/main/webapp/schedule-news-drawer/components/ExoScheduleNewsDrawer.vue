@@ -386,7 +386,7 @@ export default {
       return this.publish && this.selectedTargets && this.selectedTargets.length === 0;
     },
     selectedTargetDescription(){
-      return this.allowedTargets.length === 0 ? this.$t('news.composer.stepper.selectedTarget.noData') : this.$t('news.composer.stepper.selectedTarget.description');
+      return this.allowedTargets.length === 0 ? this.$t('news.composer.stepper.selectedTarget.noTargetAllowed') : this.$t('news.composer.stepper.selectedTarget.description');
     }
   },
   created() {

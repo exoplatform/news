@@ -657,9 +657,9 @@ public class NewsServiceImpl implements NewsService {
       return true;
     }
     Space currentSpace = spaceService.getSpaceById(spaceId);
-    // Posted news draft
+    // Posted news
     if ((spaceService.isManager(currentSpace, authenticatedUser) || spaceService.isSuperManager(authenticatedUser)
-        || authenticatedUserIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME))
+        || NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity))
         && news.getActivities() != null) {
       return true;
     }

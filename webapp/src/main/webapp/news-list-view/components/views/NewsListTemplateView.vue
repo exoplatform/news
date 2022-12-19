@@ -15,11 +15,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="article-list-view" :class="articleListExtraClass">
+  <div id="article-list-view" class="py-0">
     <v-row>
       <v-col
         class="flex-grow-0"
-        :class="extraClass"
         cols="12"
         xs="12"
         :md="mdCols"
@@ -66,12 +65,6 @@ export default {
     showArticleReactions: true,
   }),
   computed: {
-    articleListExtraClass() {
-      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'py-0';
-    },
-    extraClass() {
-      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'pt-2';
-    },
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },

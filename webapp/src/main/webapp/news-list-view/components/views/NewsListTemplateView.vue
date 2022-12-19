@@ -22,8 +22,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :class="extraClass"
         cols="12"
         xs="12"
-        md="6"
-        xl="4"
+        :md="mdCols"
+        :xl="lgCols"
         v-for="(item, index) of newsInfo"
         :key="item">
         <div
@@ -71,6 +71,15 @@ export default {
     },
     extraClass() {
       return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'pt-2';
+    },
+    isMobile() {
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+    },
+    lgCols() {
+      return !this.isMobile && document.getElementById('article-list-view').offsetWidth < this.$vuetify.breakpoint?.thresholds.md && 12 || 3;
+    },
+    mdCols() {
+      return !this.isMobile && document.getElementById('article-list-view').offsetWidth < this.$vuetify.breakpoint?.thresholds.md && 12 || 6;
     }
   },
   created() {

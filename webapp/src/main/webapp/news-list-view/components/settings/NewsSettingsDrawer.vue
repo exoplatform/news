@@ -87,6 +87,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               v-model="newsTarget"
               :items="newsTargets"
               :menu-props="{ bottom: true, offsetY: true}"
+              :disabled="newsTargets.length > 0 ? false : true"
               item-text="label"
               item-value="name"
               dense

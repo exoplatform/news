@@ -51,8 +51,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private static final Log    LOG         = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  private static final String REFERENCED  = "referenced";
-
   private static final String SPACE_TARGET_PERMISSION_PREFIX = "space:";
 
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
@@ -119,15 +117,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);
     Metadata targetMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     metadataService.deleteMetadataById(targetMetadata.getId());
-  }
-
-  @Override
-  public List<NewsTargetingEntity> getReferencedTargets(String spaceId, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
-    if (!NewsUtils.canPublishNews(spaceId, currentIdentity)) {
-      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get referenced news targets");
-    }
-    List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), 0);
-    return referencedTargets.stream().map(this::toEntity).toList();
   }
 
   @Override

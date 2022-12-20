@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -18,11 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.GroupHandler;
-import org.exoplatform.services.organization.idm.ExtGroup;
-import org.exoplatform.services.organization.impl.GroupImpl;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +33,10 @@ import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
 import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.impl.GroupImpl;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.services.security.MembershipEntry;
@@ -272,74 +268,12 @@ public class NewsTargetingImplTest {
   }
 
   @Test
-  public void shouldNotReturnReferencedTargetsWhenReferencedIsFalse() throws IllegalAccessException {
-    // Given
-    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
-    org.exoplatform.services.security.Identity identity = new org.exoplatform.services.security.Identity("root");
-    List<Metadata> newsTargets = new LinkedList<>();
-    Metadata sliderNews = new Metadata();
-    sliderNews.setName("sliderNews");
-    sliderNews.setCreatedDate(100);
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("referenced", "false");
-    sliderNews.setProperties(sliderNewsProperties);
-    sliderNews.setId(1);
-    newsTargets.add(sliderNews);
-    List<MembershipEntry> memberships = new LinkedList<>();
-    MembershipEntry membershipEntry = new MembershipEntry("/platform/web-contributors", "publisher");
-    memberships.add(membershipEntry);
-    identity.setMemberships(memberships);
-
-    // When
-    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getReferencedTargets(null, identity);
-
-    // Then
-    assertNotNull(newsTargetingEntities);
-    assertEquals(0, newsTargetingEntities.size());
-
-  }
-
-  @Test
-  public void shouldReturnReferencedTargets() throws IllegalAccessException {
-    // Given
-    NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
-    org.exoplatform.services.security.Identity identity = new org.exoplatform.services.security.Identity("root");
-    List<Metadata> newsTargets = new LinkedList<>();
-    Metadata sliderNews = new Metadata();
-    sliderNews.setName("sliderNews");
-    sliderNews.setCreatedDate(100);
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("referenced", "true");
-    sliderNews.setProperties(sliderNewsProperties);
-    sliderNews.setId(1);
-    newsTargets.add(sliderNews);
-
-    when(metadataService.getMetadatasByProperty("referenced","true", 0)).thenReturn(newsTargets);
-    List<MembershipEntry> memberships = new LinkedList<>();
-    MembershipEntry membershipEntry = new MembershipEntry("/platform/web-contributors", "publisher");
-    memberships.add(membershipEntry);
-    identity.setMemberships(memberships);
-
-    // When
-    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getReferencedTargets(null, identity);
-
-    // Then
-    assertNotNull(newsTargetingEntities);
-    assertEquals(1, newsTargetingEntities.size());
-    assertEquals("sliderNews", newsTargetingEntities.get(0).getName());
-  }
-
-  @Test
   public void testGetTargetsByNewsId() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
-    org.exoplatform.services.security.Identity identity = new org.exoplatform.services.security.Identity("root");
     Metadata sliderNews = new Metadata();
     sliderNews.setName("sliderNews");
     sliderNews.setCreatedDate(100);
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("referenced", "true");
-    sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
 
     List<MetadataItem> metadataItems = new LinkedList<>();
@@ -371,9 +305,6 @@ public class NewsTargetingImplTest {
     Metadata sliderNews = new Metadata();
     sliderNews.setName("sliderNews");
     sliderNews.setCreatedDate(100);
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("referenced", "true");
-    sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
 
     MetadataItem metadataItem = new MetadataItem();
@@ -432,9 +363,6 @@ public class NewsTargetingImplTest {
     Metadata sliderNews = new Metadata();
     sliderNews.setName("newsTargets");
     sliderNews.setCreatedDate(100);
-    HashMap<String, String> sliderNewsProperties = new HashMap<>();
-    sliderNewsProperties.put("referenced", "true");
-    sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
 
     MetadataItem metadataItem = new MetadataItem();

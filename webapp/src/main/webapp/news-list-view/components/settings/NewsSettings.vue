@@ -23,13 +23,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         :title="newsHeader">{{ newsHeader }}</span>
     </div>
     <div class="d-flex flex-column me-2">
-      <v-btn
+      <v-icon
         class="button-open-settings"
         v-if="canPublishNews"
+        size="24"
         icon
-        @click="openDrawer">
-        <v-icon>mdi-cog</v-icon>
-      </v-btn>
+        @click="openDrawer"> mdi-cog
+      </v-icon>
     </div>
     <div v-if="showSeeAll" class="d-flex flex-column my-auto me-2">
       <v-btn

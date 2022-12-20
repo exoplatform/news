@@ -78,6 +78,10 @@
                   <key><string>referenced</string></key>
                   <value><string>true</string></value>
                 </entry>
+                <entry>
+                  <key><string>permissions</string></key>
+                  <value><string>/platform/web-contributors</string></value>
+                </entry>
               </map>
             </field>
           </object>
@@ -114,6 +118,10 @@
                 <entry>
                   <key><string>referenced</string></key>
                   <value><string>true</string></value>
+                </entry>
+                <entry>
+                  <key><string>permissions</string></key>
+                  <value><string>/platform/web-contributors</string></value>
                 </entry>
               </map>
             </field>

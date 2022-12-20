@@ -86,7 +86,7 @@ public class NewsTargetingImplTest {
   private GroupHandler groupHandler;
 
   @Test
-  public void shouldReturnAllTargets() throws Exception {
+  public void testGetAllTargets() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
     MetadataType metadataType = new MetadataType(4, "newsTarget");
@@ -136,14 +136,11 @@ public class NewsTargetingImplTest {
     assertEquals(3, allTargets.size());
     assertEquals("sliderNews", allTargets.get(0).getName());
     assertEquals("latestNews", allTargets.get(1).getName());
-    NewsTargetingEntity newsTargetingEntity = allTargets.get(2);
-    assertEquals("testNews", newsTargetingEntity.getName());
-    assertEquals(1, newsTargetingEntity.getPermissions().size());
-    assertEquals("Space1", newsTargetingEntity.getPermissions().get(0).getName());
+    assertEquals("testNews", allTargets.get(2).getName());
   }
 
   @Test
-  public void shouldReturnAllowedTargets() throws Exception {
+  public void testGetAllowedTargets() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
     org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
@@ -333,7 +330,7 @@ public class NewsTargetingImplTest {
   }
 
   @Test
-  public void shouldReturnNewsTargetsByNewsId() throws Exception {
+  public void testGetTargetsByNewsId() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
     org.exoplatform.services.security.Identity identity = new org.exoplatform.services.security.Identity("root");

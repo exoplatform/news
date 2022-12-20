@@ -50,8 +50,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private static final Log    LOG         = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  private static final String REFERENCED  = "referenced";
-
   private static final String SPACE_TARGET_PERMISSION_PREFIX = "space:";
 
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
@@ -118,15 +116,6 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     MetadataKey targetMetadataKey = new MetadataKey(METADATA_TYPE.getName(), targetName, 0);
     Metadata targetMetadata = metadataService.getMetadataByKey(targetMetadataKey);
     metadataService.deleteMetadataById(targetMetadata.getId());
-  }
-
-  @Override
-  public List<NewsTargetingEntity> getReferencedTargets(org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
-    if (!NewsUtils.canPublishNews(currentIdentity)) {
-      throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get referenced news targets");
-    }
-    List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), 0);
-    return referencedTargets.stream().map(this::toEntity).toList();
   }
 
   @Override
@@ -243,13 +232,15 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
         if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
-          Space space = spaceService.getSpaceById(permission.substring(6));
-          if (space != null) {
-            permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getId());
-            permissionEntity.setName(space.getDisplayName());
-            permissionEntity.setProviderId("space");
-            permissionEntity.setRemoteId(space.getPrettyName());
-            permissionEntity.setAvatar(space.getAvatarUrl());
+          if (permission.split(SPACE_TARGET_PERMISSION_PREFIX).length > 1) {
+            Space space = spaceService.getSpaceById(permission.split(SPACE_TARGET_PERMISSION_PREFIX)[1]);
+            if (space != null) {
+              permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getId());
+              permissionEntity.setName(space.getDisplayName());
+              permissionEntity.setProviderId("space");
+              permissionEntity.setRemoteId(space.getPrettyName());
+              permissionEntity.setAvatar(space.getAvatarUrl());
+            }
           }
         } else {
           try {

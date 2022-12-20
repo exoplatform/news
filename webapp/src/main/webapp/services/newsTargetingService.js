@@ -37,17 +37,6 @@ export function getAllowedTargets() {
   });
 }
 
-export function getReferencedTargets() {
-  return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
-    credentials: 'include',
-    method: 'GET',
-  }).then((resp) => {
-    if (resp && resp.ok) {
-      return resp.json();
-    }
-  });
-}
-
 export function deleteTargetByName(targetName, delay) {
   if (delay > 0) {
     localStorage.setItem('deletedNewsTarget', targetName);

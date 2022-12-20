@@ -76,28 +76,6 @@ public class NewsTargetingRestResourcesV1Test {
     // Then
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
-  @Test
-  public void shouldReturnOkWhenGetReferencedTargets() {
-    // Given
-    NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
-    HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-
-    // When
-    Response response = newsTargetingRestResourcesV1.getReferencedTargets(request);
-
-    // Then
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-    when(newsTargetingRestResourcesV1.getReferencedTargets(request)).thenThrow(RuntimeException.class);
-
-    // When
-    response = newsTargetingRestResourcesV1.getReferencedTargets(request);
-
-    // Then
-    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-
-  }
 
   @Test
   public void shouldReturnOkWhenDeleteNewsTarget() {

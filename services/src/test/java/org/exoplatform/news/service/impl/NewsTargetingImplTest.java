@@ -1,26 +1,22 @@
-package org.exoplatform.news;
+package org.exoplatform.news.service.impl;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.news.model.News;
-import org.exoplatform.news.model.NewsTargetObject;
-import org.exoplatform.news.rest.NewsTargetingEntity;
-import org.exoplatform.news.service.NewsTargetingService;
-import org.exoplatform.news.service.impl.NewsTargetingServiceImpl;
-import org.exoplatform.news.utils.NewsUtils;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.social.core.space.model.*;
-import org.exoplatform.services.security.Authenticator;
-import org.exoplatform.services.security.IdentityRegistry;
-import org.exoplatform.services.security.MembershipEntry;
-import org.exoplatform.social.core.identity.model.Identity;
-import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.metadata.MetadataService;
-import org.exoplatform.social.metadata.model.Metadata;
-import org.exoplatform.social.metadata.model.MetadataItem;
-import org.exoplatform.social.metadata.model.MetadataKey;
-import org.exoplatform.social.metadata.model.MetadataType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,10 +25,26 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.news.model.News;
+import org.exoplatform.news.model.NewsTargetObject;
+import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.news.service.NewsTargetingService;
+import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.security.Authenticator;
+import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.services.security.MembershipEntry;
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.Metadata;
+import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataKey;
+import org.exoplatform.social.metadata.model.MetadataType;
 
 
 @RunWith(PowerMockRunner.class)
@@ -84,7 +96,7 @@ public class NewsTargetingImplTest {
     newsTarget3.setCreatedDate(300);
     HashMap<String, String> testNewsProperties = new HashMap<>();
     testNewsProperties.put("label", "test news");
-    testNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:space1");
+    testNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:1");
     newsTarget3.setProperties(testNewsProperties);
     newsTarget3.setId(3);
     newsTargets.add(newsTarget3);
@@ -95,11 +107,11 @@ public class NewsTargetingImplTest {
     space.setPrettyName("space1");
     space.setAvatarUrl("");
 
-    when(spaceService.getSpaceByPrettyName("space1")).thenReturn(space);
-    when(metadataService.getMetadatas(metadataType.getName(), 100)).thenReturn(newsTargets);
+    when(spaceService.getSpaceById("1")).thenReturn(space);
+    when(metadataService.getMetadatas(metadataType.getName(), 0)).thenReturn(newsTargets);
 
     // When
-    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getTargets();
+    List<NewsTargetingEntity> newsTargetingEntities = newsTargetingService.getAllTargets();
 
     // Then
     assertNotNull(newsTargetingEntities);
@@ -156,7 +168,7 @@ public class NewsTargetingImplTest {
     sliderNews.setId(1);
     newsTargets.add(sliderNews);
 
-    when(metadataService.getMetadatasByProperty("referenced","true", 100)).thenReturn(newsTargets);
+    when(metadataService.getMetadatasByProperty("referenced","true", 0)).thenReturn(newsTargets);
     List<MembershipEntry> memberships = new LinkedList<>();
     MembershipEntry membershipEntry = new MembershipEntry("/platform/web-contributors", "publisher");
     memberships.add(membershipEntry);
@@ -331,7 +343,7 @@ public class NewsTargetingImplTest {
     newsTargetingEntity.setName("test1");
     targets.add(newsTargetingEntity);
 
-    when(newsTargetingService.getTargets()).thenReturn(targets);
+    when(newsTargetingService.getAllTargets()).thenReturn(targets);
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     newsTargetingService.deleteTargetByName(targets.get(0).getName(), identity);
 

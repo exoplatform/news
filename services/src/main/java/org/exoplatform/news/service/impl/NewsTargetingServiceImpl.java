@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.news.model.NewsTargetObject;
 import org.exoplatform.news.rest.NewsTargetingEntity;
 import org.exoplatform.news.rest.NewsTargetingPermissionsEntity;
@@ -50,9 +50,11 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
 
   private static final Log    LOG         = ExoLogger.getLogger(NewsTargetingServiceImpl.class);
 
-  public static final long    LIMIT       = 100;
-
   private static final String REFERENCED  = "referenced";
+
+  private static final String SPACE_TARGET_PERMISSION_PREFIX = "space:";
+
+  private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private MetadataService     metadataService;
 
@@ -70,13 +72,29 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
   }
 
   @Override
-  public List<NewsTargetingEntity> getTargets() {
-    List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), LIMIT);
-    return targets.stream().map(this::toEntity).collect(Collectors.toList());
+  public List<NewsTargetingEntity> getAllTargets() {
+    List<Metadata> targets = metadataService.getMetadatas(METADATA_TYPE.getName(), 0);
+    return targets.stream().map(this::toEntity).toList();
+  }
+
+  @Override
+  public List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity) {
+    List<Metadata> allTargetsMetadatas = metadataService.getMetadatas(METADATA_TYPE.getName(), 0);
+    List<Metadata> allowedTargetsMetadatas =
+                                           allTargetsMetadatas.stream()
+                                                              .filter(targetMetadata -> targetMetadata.getProperties()
+                                                                                                      .get(NewsUtils.TARGET_PERMISSIONS) == null
+                                                                  || isTargetAllowed(List.of(targetMetadata.getProperties()
+                                                                                                           .get(NewsUtils.TARGET_PERMISSIONS)
+                                                                                                           .split(",")),
+                                                                                     userIdentity))
+                                                              .toList();
+
+    return allowedTargetsMetadatas.stream().map(this::toEntity).toList();
   }
   
   @Override
-  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity  currentIdentity) throws IllegalAccessException {
+  public void deleteTargetByName(String targetName, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException {
     if (currentIdentity != null && !NewsUtils.canManageNewsPublishTargets(currentIdentity)) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId()
           + " not authorized to delete news target with name " + targetName);
@@ -91,15 +109,15 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     if (!NewsUtils.canPublishNews(currentIdentity)) {
       throw new IllegalAccessException("User " + currentIdentity.getUserId() + " not authorized to get referenced news targets");
     }
-    List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), LIMIT);
-    return referencedTargets.stream().map(this::toEntity).collect(Collectors.toList());
+    List<Metadata> referencedTargets = metadataService.getMetadatasByProperty(REFERENCED, String.valueOf(true), 0);
+    return referencedTargets.stream().map(this::toEntity).toList();
   }
 
   @Override
   public List<String> getTargetsByNewsId(String newsId) {
     NewsTargetObject newsTargetObject = new NewsTargetObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
     List<MetadataItem> newsTargets = metadataService.getMetadataItemsByMetadataTypeAndObject(METADATA_TYPE.getName(), newsTargetObject);
-    return newsTargets.stream().map(MetadataItem::getMetadata).map(Metadata::getName).collect(Collectors.toList());
+    return newsTargets.stream().map(MetadataItem::getMetadata).map(Metadata::getName).toList();
   }
 
   @Override
@@ -208,25 +226,31 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
       for (String permission : permissionsList) {
         NewsTargetingPermissionsEntity permissionEntity = new NewsTargetingPermissionsEntity();
-        if (permission.contains("space:")) {
-          Space space = spaceService.getSpaceByPrettyName(List.of(permission.split(":")).get(1));
-          permissionEntity.setId("space:" + space.getDisplayName());
-          permissionEntity.setName(space.getDisplayName());
-          permissionEntity.setProviderId("space");
-          permissionEntity.setRemoteId(space.getPrettyName());
-          permissionEntity.setAvatar(space.getAvatarUrl());
+        if (permission.contains(SPACE_TARGET_PERMISSION_PREFIX)) {
+          Space space = spaceService.getSpaceById(permission.substring(6));
+          if (space != null) {
+            permissionEntity.setId(SPACE_TARGET_PERMISSION_PREFIX + space.getId());
+            permissionEntity.setName(space.getDisplayName());
+            permissionEntity.setProviderId("space");
+            permissionEntity.setRemoteId(space.getPrettyName());
+            permissionEntity.setAvatar(space.getAvatarUrl());
+          }
         } else {
           try {
             Group group = organizationService.getGroupHandler().findGroupById(permission);
-            permissionEntity.setId(group.getId());
-            permissionEntity.setName(group.getLabel());
-            permissionEntity.setProviderId("group");
-            permissionEntity.setRemoteId(group.getGroupName());
+            if (group != null) {
+              permissionEntity.setId(group.getId());
+              permissionEntity.setName(group.getLabel());
+              permissionEntity.setProviderId("group");
+              permissionEntity.setRemoteId(group.getGroupName());
+            }
           } catch (Exception e) {
             LOG.error("Could not find group from permission" + permission);
           }
         }
-        permissionsEntities.add(permissionEntity);
+        if (permissionEntity.getId() != null) {
+          permissionsEntities.add(permissionEntity);
+        }
       }
       newsTargetingEntity.setPermissions(permissionsEntities);
     }
@@ -242,5 +266,32 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
     metadata.setCreatorId(0);
     return metadata;
   }
-
+  
+  public boolean isTargetAllowed(List<String> targetPermissions, org.exoplatform.services.security.Identity userIdentity) {
+    boolean allowedTarget = true;
+    for (String targetPermission : targetPermissions) {
+      if (targetPermission.split(SPACE_TARGET_PERMISSION_PREFIX).length > 1) {
+        Space targetPermissionSpace = spaceService.getSpaceById(targetPermission.split(SPACE_TARGET_PERMISSION_PREFIX)[1]);
+        if (targetPermissionSpace != null && spaceService.isPublisher(targetPermissionSpace, userIdentity.getUserId())) {
+          allowedTarget = true;
+          break;
+        } else if (targetPermissionSpace != null && !spaceService.isPublisher(targetPermissionSpace, userIdentity.getUserId())) {
+          allowedTarget = false;
+        }
+      } else {
+        try {
+          Group targetPermissionGroup = organizationService.getGroupHandler().findGroupById(targetPermission);
+          if (targetPermissionGroup != null && userIdentity.isMemberOf(targetPermission, PUBLISHER_MEMBERSHIP_NAME)) {
+            allowedTarget = true;
+            break;
+          } else if (targetPermissionGroup != null && !userIdentity.isMemberOf(targetPermission, PUBLISHER_MEMBERSHIP_NAME)) {
+            allowedTarget = false;
+          }
+        } catch (Exception e) {
+          LOG.error("Could not find group from permission" + targetPermission);
+        }
+      }
+    }
+    return allowedTarget;
+  }
 }

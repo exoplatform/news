@@ -112,7 +112,7 @@ export default {
     }
   },
   created() {
-    this.getAllTargets();
+    this.getAllowedTargets();
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
@@ -143,8 +143,8 @@ export default {
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
     },
-    getAllTargets() {
-      this.$newsTargetingService.getAllTargets()
+    getAllowedTargets() {
+      this.$newsTargetingService.getAllowedTargets()
         .then(targets => {
           this.targets = targets.map(target => ({
             name: target.name,

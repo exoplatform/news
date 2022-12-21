@@ -73,16 +73,6 @@ public interface NewsTargetingService {
   List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit);
 
   /**
-   * Gets the {@link List} of referenced targets from {@link News} list portlets 
-   *
-   * @param currentIdentity attempting to get referenced {@link News} targets
-   *
-   * @return {@link List} of referenced targets
-   * @throws IllegalAccessException when user doesn't have access to  get referenced {@link News} targets
-   */
-  List<NewsTargetingEntity> getReferencedTargets(org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException;
-
-  /**
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
    *
    * @param newsId {@link News} identifier of {@link News} targets to be saved 

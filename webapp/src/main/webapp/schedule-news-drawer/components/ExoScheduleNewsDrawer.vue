@@ -90,6 +90,20 @@
                 :targets="allowedTargets"
                 :publish="publish"
                 @selected-targets="getSelectedTargets" />
+              <div v-if="publish" class="ms-2">
+                <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
+                <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
+                <v-select
+                  class="py-0"
+                  v-model="audience"
+                  :items="audiences"
+                  dense
+                  outlined />
+                <div class="d-flex flex-row grey--text ms-2">
+                  <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+                  {{ selectedAudienceDescription }}
+                </div>
+              </div>
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -262,6 +276,7 @@ export default {
     },
   },
   data: () => ({
+    audience: 'All users',
     stepper: 0,
     drawer: false,
     postArticleMode: 'later',
@@ -275,7 +290,8 @@ export default {
     news: null,
     isActivityPosted: true,
     selectedTargets: [],
-    allowedTargets: []
+    allowedTargets: [],
+    audiences: ['All users','Only space members']
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -360,6 +376,9 @@ export default {
     }
   },
   computed: {
+    selectedAudienceDescription(){
+      return this.audience === 'All users' ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
+    },
     saveButtonLabel() {
       return this.postArticleMode === 'later' ? this.$t('news.composer.schedule'): this.$t('news.composer.post');
     },

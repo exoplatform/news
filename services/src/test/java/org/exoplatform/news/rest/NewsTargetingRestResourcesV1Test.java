@@ -22,8 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsTargetingRestResourcesV1Test {
@@ -50,24 +49,32 @@ public class NewsTargetingRestResourcesV1Test {
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getTargets(request);
+    Response response = newsTargetingRestResourcesV1.getAllTargets(request);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
-  public void shouldReturnOkWhenGetReferencedTargets() {
+  public void shouldReturnOkWhenGetAllowedTargets() {
     // Given
     NewsTargetingRestResourcesV1 newsTargetingRestResourcesV1 = new NewsTargetingRestResourcesV1(newsTargetingService, container);
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("john");
 
     // When
-    Response response = newsTargetingRestResourcesV1.getReferencedTargets(request);
+    Response response = newsTargetingRestResourcesV1.getAllowedTargets(request);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    when(newsTargetingRestResourcesV1.getAllowedTargets(request)).thenThrow(RuntimeException.class);
+
+    // When
+    response = newsTargetingRestResourcesV1.getAllowedTargets(request);
+
+    // Then
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -83,13 +90,21 @@ public class NewsTargetingRestResourcesV1Test {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName("test1");
     targets.add(newsTargetingEntity);
-    lenient().when(newsTargetingService.getTargets()).thenReturn(targets);
+    lenient().when(newsTargetingService.getAllTargets()).thenReturn(targets);
 
     // When
     Response response = newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    when(newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0)).thenThrow(RuntimeException.class);
+
+    // When
+    response = newsTargetingRestResourcesV1.deleteTarget(request, targets.get(0).getName(), 0);
+
+    // Then
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -116,6 +131,16 @@ public class NewsTargetingRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    when(newsTargetingRestResourcesV1.createNewsTarget(request, newsTargetingEntity)).thenThrow(RuntimeException.class);
+
+    // When
+    response = newsTargetingRestResourcesV1.createNewsTarget(request, newsTargetingEntity);
+
+    // Then
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+
+
   }
 
   @Test
@@ -143,6 +168,14 @@ public class NewsTargetingRestResourcesV1Test {
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    when(newsTargetingRestResourcesV1.updateNewsTarget(newsTargetingEntity, originalTargetName)).thenThrow(RuntimeException.class);
+
+    // When
+    response = newsTargetingRestResourcesV1.updateNewsTarget(newsTargetingEntity, originalTargetName);
+
+    // Then
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
 }

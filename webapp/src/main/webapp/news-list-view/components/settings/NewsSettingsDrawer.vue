@@ -100,6 +100,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </template>
             </v-select>
           </div>
+          <div v-if="newsTargets.length === 0" class="d-flex flex-row grey--text ms-2">
+            <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
+            <span> {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}</span>
+          </div>
           <div class="d-flex flex-row">
             <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-2">
               {{ $t('news.list.settings.viewTemplate') }}:
@@ -292,7 +296,8 @@ export default {
             this.newsTargets = newsTargets.map(newsTarget => ({
               name: newsTarget.name,
               label: newsTarget.properties && newsTarget.properties.label && newsTarget.properties.label.length > 35 ? newsTarget.properties.label.substring(0, 35).concat('...'): newsTarget.properties.label,
-              toolTipInfo: newsTarget.properties && newsTarget.properties.label
+              toolTipInfo: newsTarget.properties && newsTarget.properties.label,
+              description: newsTarget.properties && newsTarget.properties.description
             }));
             this.initialized = true;
           })

@@ -85,14 +85,14 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(summary = "Get all news targets by a giving type", method = "GET", description = "Get all news targets by a giving type")
+  @Operation(summary = "Get all news targets", method = "GET", description = "Get all news targets")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Request fulfilled"),
     @ApiResponse(responseCode = "500", description = "Internal server error")
   })
-  public Response getTargets(@Context HttpServletRequest request) {
+  public Response getAllTargets(@Context HttpServletRequest request) {
     try {
-      List<NewsTargetingEntity> targets = newsTargetingService.getTargets();
+      List<NewsTargetingEntity> targets = newsTargetingService.getAllTargets();
       return Response.ok(targets).build();
     } catch (Exception e) {
       LOG.error("Error when getting the news targets", e);
@@ -100,26 +100,20 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
     }
   }
 
-  @Path("referenced")
+  @Path("allowed")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
-  @Operation(summary = "Get all news targets by a giving property", method = "GET", description = "Get all news targets by a giving property")
-  @ApiResponses(value = { 
-    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-    @ApiResponse(responseCode = "500", description = "Internal server error"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized operation")
-  })
-  public Response getReferencedTargets(@Context HttpServletRequest request) {
+  @Operation(summary = "Get all allowed news targets of the current user", method = "GET", description = "Get all allowed news targets of the current user")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response getAllowedTargets(@Context HttpServletRequest request) {
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      List<NewsTargetingEntity> referencedTargets = newsTargetingService.getReferencedTargets(currentIdentity);
-      return Response.ok(referencedTargets).build();
-    } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' is not autorized to get referenced news targets", currentIdentity.getUserId(), e);
-      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+      List<NewsTargetingEntity> allowedTargets = newsTargetingService.getAllowedTargets(currentIdentity);
+      return Response.ok(allowedTargets).build();
     } catch (Exception e) {
-      LOG.error("Error when getting the news referenced targets", e);
+      LOG.error("Error when getting allowed news targets for the user " + currentIdentity.getUserId(), e);
       return Response.serverError().build();
     }
   }

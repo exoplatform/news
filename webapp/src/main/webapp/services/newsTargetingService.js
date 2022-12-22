@@ -26,9 +26,8 @@ export function getAllTargets() {
     }
   });
 }
-
-export function getReferencedTargets() {
-  return fetch(`${newsConstants.NEWS_API}/targeting/referenced`, {
+export function getAllowedTargets() {
+  return fetch(`${newsConstants.NEWS_API}/targeting/allowed`, {
     credentials: 'include',
     method: 'GET',
   }).then((resp) => {

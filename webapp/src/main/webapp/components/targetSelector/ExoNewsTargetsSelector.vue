@@ -51,13 +51,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </v-list-item>
         </template>
         <template #selection="{ item, index }">
-          <v-chip
-            v-if="index === 0"
-            close
-            :title="item.tooltipInfo"
-            @click:close="removeTarget(item)">
-            <span>{{ item.label }}</span>
-          </v-chip>
+          <v-tooltip 
+            bottom>
+            <template #activator="{ on, attrs }">
+              <v-chip
+                v-bind="attrs"
+                v-on="on"
+                v-if="index === 0"
+                close
+                @click:close="removeTarget(item)">
+                <span>{{ item.label }}</span>
+              </v-chip>
+            </template>
+            <span>{{ item.description }}</span>
+          </v-tooltip>
           <span
             v-if="index === 1"
             class="grey--text text-caption">
@@ -112,7 +119,7 @@ export default {
     }
   },
   created() {
-    this.getAllTargets();
+    this.getAllowedTargets();
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
@@ -143,8 +150,8 @@ export default {
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
     },
-    getAllTargets() {
-      this.$newsTargetingService.getAllTargets()
+    getAllowedTargets() {
+      this.$newsTargetingService.getAllowedTargets()
         .then(targets => {
           this.targets = targets.map(target => ({
             name: target.name,

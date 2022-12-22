@@ -17,14 +17,13 @@
 package org.exoplatform.news.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.rest.NewsTargetingEntity;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataType;
-import org.exoplatform.social.core.identity.model.Identity;
 
 
 public interface NewsTargetingService {
@@ -32,11 +31,18 @@ public interface NewsTargetingService {
   public static final MetadataType METADATA_TYPE = new MetadataType(4, "newsTarget");
 
   /**
-   * Gets the {@link List} of all {@link News} targets which can be referenced from {@link News} list portlets
+   * Gets the {@link List} of all targets
    *
-   * @return {@link List} of all {@link News} targets
+   * @return {@link List} of all targets
    */
-  List<NewsTargetingEntity> getTargets();
+  List<NewsTargetingEntity> getAllTargets();
+  
+  /**
+   * Gets the {@link List} of allowed targets for a given currentIdentity
+   * @param userIdentity user {@link Identity} for which targets are allowed
+   * @return {@link List} of allowed targets
+   */
+  List<NewsTargetingEntity> getAllowedTargets(org.exoplatform.services.security.Identity userIdentity);
   
   /**
    * Delete the {@link News} target by a given {@link News} target name
@@ -65,16 +71,6 @@ public interface NewsTargetingService {
    * @return {@link List} of {@link News} target items by a target name
    */
   List<MetadataItem> getNewsTargetItemsByTargetName(String targetName, long offset, long limit);
-
-  /**
-   * Gets the {@link List} of referenced targets from {@link News} list portlets 
-   *
-   * @param currentIdentity attempting to get referenced {@link News} targets
-   *
-   * @return {@link List} of referenced targets
-   * @throws IllegalAccessException when user doesn't have access to  get referenced {@link News} targets
-   */
-  List<NewsTargetingEntity> getReferencedTargets(org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException;
 
   /**
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
@@ -128,5 +124,4 @@ public interface NewsTargetingService {
    * @throws IllegalArgumentException when user tries to update a not changed {@link News} target
    */
   Metadata updateNewsTargets(String originalTargetName, NewsTargetingEntity newsTargetingEntity, org.exoplatform.services.security.Identity currentIdentity) throws IllegalAccessException, IllegalStateException, IllegalArgumentException;
-
 }

@@ -64,9 +64,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       currentIdentity = ConversationState.getCurrent().getIdentity();
     }
 
-    boolean canPublishNews = NewsUtils.canPublishNews(currentIdentity);
-    saveSettingsURL = canPublishNews ? saveSettingsURL : null;
-
     PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
     PortalHttpServletResponseWrapper responseWrapper = ( PortalHttpServletResponseWrapper ) rcontext.getResponse();
     String newsListUrl = "/portal/rest/v1/news/byTarget/" + newsTarget + "?offset=0&limit=" + limit + "&returnSize=true";
@@ -76,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script type="text/javascript">
       require(['PORTLET/news/NewsListView'], app => app.init({
         appId: '<%=appId%>',
-        saveSettingsURL: <%= saveSettingsURL == null ? null : "'" + saveSettingsURL + "'" %>,
+        saveSettingsURL: <%= "'" + saveSettingsURL + "'" %>,
         viewTemplate: <%= viewTemplate == null ? null : "'" + viewTemplate + "'" %>,
         newsTarget: <%= newsTarget == null ? null : "'" + newsTarget + "'" %>,
         header: <%= header == null ? null : "'" + header + "'" %>,
@@ -90,8 +87,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         showArticleSpace: <%= showArticleSpace == null ? null : "'" + showArticleSpace + "'" %>,
         showArticleReactions: <%= showArticleReactions == null ? null : "'" + showArticleReactions + "'" %>,
         showArticleDate: <%= showArticleDate == null ? null : "'" + showArticleDate + "'" %>,
-        seeAllUrl: <%= seeAllUrl == null ? null : "'" + seeAllUrl + "'" %>,
-        canPublishNews: <%= canPublishNews %>,
+        seeAllUrl: <%= seeAllUrl == null ? null : "'" + seeAllUrl + "'" %>
       }));
     </script>
   </div>

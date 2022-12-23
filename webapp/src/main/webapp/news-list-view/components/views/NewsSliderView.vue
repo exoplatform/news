@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <div class="flex flex-column carouselNewsInfo">
             <div class="flex flex-row" :class="{'!canPublishNews ? `mt-9` : ``' : !$vuetify.breakpoint.xs}">
               <v-btn
-                v-if="$root.canPublishNews"
+                v-if="canPublishNews"
                 icon
                 @click="openDrawer"
                 class="float-right settingNewsButton">
@@ -114,9 +114,13 @@ export default {
       showArticleReactions: true,
       seeAllUrl: '',
       selectedOption: null,
+      canPublishNews: false,
     };
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
   },

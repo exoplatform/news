@@ -63,6 +63,7 @@ export default {
     showArticleSpace: true,
     showArticleDate: true,
     showArticleReactions: true,
+    canPublishNews: false,
   }),
   computed: {
     isMobile() {
@@ -76,6 +77,9 @@ export default {
     }
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();

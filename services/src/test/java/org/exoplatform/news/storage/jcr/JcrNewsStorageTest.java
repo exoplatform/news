@@ -1094,6 +1094,7 @@ public class JcrNewsStorageTest {
 
     News news = new News();
     news.setTitle("published title");
+    news.setAudience("All users");
     news.setSummary("published summary");
     news.setBody("published body");
     news.setUploadId(null);

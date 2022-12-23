@@ -75,22 +75,22 @@ public interface NewsTargetingService {
   /**
    * Save a {@link List} of {@link News} targets of a given {@link News} id by the current user
    *
-   * @param newsId {@link News} identifier of {@link News} targets to be saved 
+   * @param news {@link News} for which targets to be saved 
    * @param displayed {@link News} is news displayed in news list portlet
    * @param targets {@link List} of {@link News} targets to be saved
    * @param currentUser current user attempting to save {@link News} targets
    * @throws IllegalAccessException when user doesn't have access to save {@link News} targets of a given {@link News} id
    */ 
-  void saveNewsTarget(String newsId, boolean displayed, List<String> targets, String currentUser) throws IllegalAccessException;
+  void saveNewsTarget(News news, boolean displayed, List<String> targets, String currentUser) throws IllegalAccessException;
 
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id
    * 
-   * @param newsId {@link News} identifier of {@link News} targets to be deleted
+   * @param news {@link News} for which targets to be deleted
    * @param currentUserId attempting to delete {@link News} target
    * @throws IllegalAccessException when user doesn't have access to delete {@link News} targets of a given {@link News} id
    */
-  void deleteNewsTargets(String newsId, String currentUserId) throws IllegalAccessException;
+  void deleteNewsTargets(News news, String currentUserId) throws IllegalAccessException;
   
   /**
    * Delete the {@link List} of {@link News} targets linked to a given {@link News} id

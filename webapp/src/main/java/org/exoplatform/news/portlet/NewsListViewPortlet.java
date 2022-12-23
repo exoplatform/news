@@ -19,51 +19,29 @@ package org.exoplatform.news.portlet;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.portlet.*;
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.news.service.NewsService;
-import org.exoplatform.news.utils.NewsUtils;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
 
 public class NewsListViewPortlet extends GenericDispatchedViewPortlet {
 
-  private NewsService newsService;
-
   @Override
   public void processAction(ActionRequest request, ActionResponse response) throws PortletException, IOException {
-    ConversationState conversationState = ConversationState.getCurrent();
-    Identity currentIdentity = null;
-    if (conversationState != null) {
-      currentIdentity = ConversationState.getCurrent().getIdentity();
-    }
-    if (NewsUtils.canPublishNews(currentIdentity)) {
-      PortletPreferences preferences = request.getPreferences();
-      Enumeration<String> parameterNames = request.getParameterNames();
-      while (parameterNames.hasMoreElements()) {
-        String name = parameterNames.nextElement();
-        if (StringUtils.equals(name, "action") || StringUtils.contains(name, "portal:")) {
-          continue;
-        }
-        String value = request.getParameter(name);
-        preferences.setValue(name, value);
+    PortletPreferences preferences = request.getPreferences();
+    Enumeration<String> parameterNames = request.getParameterNames();
+    while (parameterNames.hasMoreElements()) {
+      String name = parameterNames.nextElement();
+      if (StringUtils.equals(name, "action") || StringUtils.contains(name, "portal:")) {
+        continue;
       }
-      preferences.store();
-    } else {
-      throw new PortletException("Illegal Access to attempt to store News List Portlet preferences for user "
-          + request.getRemoteUser());
+      String value = request.getParameter(name);
+      preferences.setValue(name, value);
     }
+    preferences.store();
   }
-
-  public NewsService getNewsService() {
-    if (newsService == null) {
-      newsService = ExoContainerContext.getService(NewsService.class);
-    }
-    return newsService;
-  }
-
 }

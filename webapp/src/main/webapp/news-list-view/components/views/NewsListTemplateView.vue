@@ -64,13 +64,14 @@ export default {
     showArticleSpace: true,
     showArticleDate: true,
     showArticleReactions: true,
+    canPublishNews: false,
   }),
   computed: {
     articleListExtraClass() {
-      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'py-0';
+      return (!this.showHeader && !this.showSeeAll && !this.canPublishNews ) && ' ' || 'py-0';
     },
     extraClass() {
-      return (!this.showHeader && !this.showSeeAll && !this.$root.canPublishNews ) && ' ' || 'pt-2';
+      return (!this.showHeader && !this.showSeeAll && !this.canPublishNews ) && ' ' || 'pt-2';
     },
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
@@ -83,6 +84,9 @@ export default {
     }
   },
   created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();

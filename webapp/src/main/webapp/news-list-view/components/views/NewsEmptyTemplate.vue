@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-spacer />
         <div class="d-flex flex-row newsSettingButton justify-end">
           <v-btn
-            v-if="$root.canPublishNews"
+            v-if="canPublishNews"
             icon
             @click="openDrawer">
             <v-icon>mdi-cog</v-icon>
@@ -42,6 +42,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <script>
 export default {
+  data () {
+    return {
+      canPublishNews: false,
+    };
+  },
+  created() {
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
+  },
   methods: {
     openDrawer() {
       this.$root.$emit('news-settings-drawer-open');

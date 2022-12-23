@@ -257,7 +257,7 @@ export function undoDeleteNews(newsId) {
 }
 
 export function canPublishNews() {
-  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canPublishNews`, {
+  return fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/news/canPublishNews?spaceId=${eXo.env.portal.spaceId}`, {
     headers: {
       'Content-Type': 'application/json'
     },

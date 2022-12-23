@@ -192,6 +192,7 @@ export default {
     showArticleReactions: false,
     showTooltip: false,
     seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
+    saveSettingsURL: ''
   }),
   computed: {
     viewTemplates() {
@@ -257,6 +258,9 @@ export default {
       this.init();
       setTimeout(() => this.open(), 100);
     });
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.saveSettingsURL = canPublishNews ? this.$root.saveSettingsURL : null;
+    });
   },
   methods: {
     open() {
@@ -307,7 +311,7 @@ export default {
     save() {
       this.saving = true;
       let selectedOptions = null;
-      this.$newsListService.saveSettings(this.$root.saveSettingsURL ,{
+      this.$newsListService.saveSettings(this.saveSettingsURL ,{
         viewTemplate: this.viewTemplate,
         newsTarget: this.newsTarget,
         header: this.newsHeader,

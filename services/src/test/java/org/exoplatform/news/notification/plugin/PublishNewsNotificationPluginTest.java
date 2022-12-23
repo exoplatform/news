@@ -15,7 +15,9 @@ import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.services.idgenerator.IDGeneratorService;
 import org.exoplatform.services.jcr.util.IdGenerator;
+import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
+import org.exoplatform.social.core.space.spi.SpaceService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,6 +37,11 @@ public class PublishNewsNotificationPluginTest {
 
   @Mock
   private InitParams       initParams;
+  @Mock
+  private OrganizationService organizationService;
+  
+  @Mock
+  SpaceService                spaceService;
 
   @Rule
   public ExpectedException exceptionRule = ExpectedException.none();
@@ -43,7 +50,7 @@ public class PublishNewsNotificationPluginTest {
   @Test
   public void shouldMakeNotificationForPublishNewsContext() throws Exception {
     // Given
-    PublishNewsNotificationPlugin newsPlugin = new PublishNewsNotificationPlugin(initParams);
+    PublishNewsNotificationPlugin newsPlugin = new PublishNewsNotificationPlugin(initParams, spaceService, organizationService);
 
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);

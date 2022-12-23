@@ -141,6 +141,9 @@ export default {
       } else {
         this.disabled = true;
       }
+    },
+    audience(){
+      this.disabled = false;
     }
   },
   computed: {
@@ -172,6 +175,7 @@ export default {
     }
   },
   created() {
+    this.audience = this.news.audience;
     this.getAllowedTargets();
     this.$root.$on('open-edit-publishing-drawer', () => {
       this.openDrawer();
@@ -200,7 +204,10 @@ export default {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
-      this.news.targets = this.selectedTargets;
+      if (this.selectedTargets.length > 0) {
+        this.news.targets = this.selectedTargets;
+      }
+      this.news.audience = this.audience;
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         this.$emit('refresh-news', this.news.newsId);

@@ -87,7 +87,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               v-model="newsTarget"
               :items="newsTargets"
               :menu-props="{ bottom: true, offsetY: true}"
-              :disabled="newsTargets.length > 0 ? false : true"
+              :disabled="!newsTargets.length"
+              :background-color="backgroundColor"
               item-text="label"
               item-value="name"
               dense
@@ -101,9 +102,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </template>
             </v-select>
           </div>
-          <div v-if="newsTargets.length === 0" class="d-flex flex-row grey--text ms-2">
-            <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
-            <span> {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}</span>
+          <div v-if="newsTargets.length === 0" class="d-flex flex-row grey--text">
+            <i class="fas fa-exclamation-triangle mt-3"></i>
+            <span class="mx-2"> {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}</span>
           </div>
           <div class="d-flex flex-row">
             <label for="viewTemplate" class="listViewLabel text-subtitle-1 mt-2">
@@ -196,6 +197,9 @@ export default {
     saveSettingsURL: ''
   }),
   computed: {
+    backgroundColor(){
+      return this.newsTargets.length === 0 ? '#E1E8EE': '';
+    },
     viewTemplates() {
       if (this.viewExtensions) {
         return Object.keys(this.viewExtensions).map(name => ({

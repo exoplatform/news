@@ -52,6 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </template>
         <template #selection="{ item, index }">
           <v-tooltip 
+            :disabled="!item.description"
             bottom>
             <template #activator="{ on, attrs }">
               <v-chip

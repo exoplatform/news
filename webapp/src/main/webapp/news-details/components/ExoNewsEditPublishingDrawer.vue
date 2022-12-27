@@ -73,6 +73,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :publish="publish"
               :targets="allowedTargets"
               @selected-targets="getSelectedTargets" />
+              <div v-if="publish" class="ms-2 py-4">
+                <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
+                <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
+                <v-select
+                  class="py-0"
+                  v-model="audience"
+                  :items="audiences"
+                  dense
+                  outlined />
+                <div class="d-flex flex-row grey--text ms-2">
+                  <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+                  {{ selectedAudienceDescription }}
+                </div>
+              </div>
           </div>
         </div>
       </template>
@@ -101,6 +115,8 @@ export default {
     },
   },
   data: () => ({
+    audience: 'All users',
+    audiences: ['All users','Only space members'],
     selectedTargets: [],
     drawer: false,
     allowNotPost: false,
@@ -144,6 +160,9 @@ export default {
     }
   },
   computed: {
+    selectedAudienceDescription(){
+      return this.audience === 'All users' ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
+    },
     selected() {
       return this.news && this.news.published;
     },

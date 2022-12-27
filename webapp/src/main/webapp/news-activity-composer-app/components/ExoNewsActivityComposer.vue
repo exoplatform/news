@@ -394,7 +394,11 @@ export default {
       return this.activityId && this.activityId !== '';
     },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+      if (new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length !== new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length) {
+        return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html');
+      } else {
+        return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+      }
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment
@@ -402,9 +406,12 @@ export default {
         return true;
       }
       // disable update button if a mandatory field is empty
-      if (!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
+      if (!this.news.title || !this.news.title.trim() || !this.news.body.replace(/&nbsp;/g, '').trim() || new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length === new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length && this.news.body === this.originalNews.body) {
         return true;
+      } else if (new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length !== new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length) {
+        return false;
       }
+      
       // disable update button nothing has changed
       if (!this.illustrationChanged && !this.attachmentsChanged
                  && this.news.title === this.originalNews.title
@@ -1006,7 +1013,7 @@ export default {
       return this.$dateUtil.formatDateObjectToDisplay(new Date(time),this.fullDateFormat, eXo.env.portal.language);
     },
     getContent(body) {
-      return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+      return new DOMParser().parseFromString(body, 'text/html');
     },
     setFocus() {
       if (CKEDITOR.instances['newsContent']) {

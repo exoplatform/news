@@ -340,7 +340,7 @@ public class JcrNewsStorage implements NewsStorage {
     Node newsNode = session.getNodeByUUID(news.getId());
 
     // Make News node readable by all users
-    if (news.getAudience().equals("All users")){
+    if (news.getAudience().equals("All users")) {
       Node publishedRootNode = getPublishedNewsFolder(session);
       Calendar newsCreationCalendar = Calendar.getInstance();
       newsCreationCalendar.setTime(news.getCreationDate());

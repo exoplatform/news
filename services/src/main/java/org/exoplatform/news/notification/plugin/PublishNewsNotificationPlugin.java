@@ -1,24 +1,20 @@
 package org.exoplatform.news.notification.plugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
-import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.User;
-import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
 
@@ -28,13 +24,9 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
   
   private SpaceService       spaceService;
   
-  private UserHandler        userhandler;
-
-  public PublishNewsNotificationPlugin(InitParams initParams, SpaceService spaceService, OrganizationService organizationService) {
+  public PublishNewsNotificationPlugin(InitParams initParams, SpaceService spaceService) {
     super(initParams);
     this.spaceService = spaceService;
-    this.userhandler = organizationService.getUserHandler();
-
   }
 
   @Override
@@ -75,46 +67,42 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String audience = ctx.value(PostNewsNotificationPlugin.AUDIENCE);
     List<String> receivers = new ArrayList<String>();
     try {
-      receivers = getReceivers(contentSpaceId, currentUserName, audience);
+      receivers = getReceivers(contentSpaceId, currentUserName);
     } catch (Exception e) {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
+    NotificationInfo notificationInfo = NotificationInfo.instance()
+        .setFrom(currentUserName)
+        .exclude(currentUserName)
+        .with(NotificationConstants.CONTENT_TITLE, contentTitle)
+        .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
+        .with(NotificationConstants.CURRENT_USER, currentUserFullName)
+        .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
+        .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
+        .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
+        .with(NotificationConstants.ACTIVITY_LINK, activityLink)
+        .with(NotificationConstants.CONTEXT, context.getContext())
+        .with(NotificationConstants.NEWS_ID, newsId)
+        .key(getKey())
+        .end();
 
-
-    return NotificationInfo.instance()
-                           .setFrom(currentUserName)
-                           .to(receivers)
-                           .exclude(currentUserName)
-                           .with(NotificationConstants.CONTENT_TITLE, contentTitle)
-                           .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
-                           .with(NotificationConstants.CURRENT_USER, currentUserFullName)
-                           .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
-                           .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
-                           .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
-                           .with(NotificationConstants.ACTIVITY_LINK, activityLink)
-                           .with(NotificationConstants.CONTEXT, context.getContext())
-                           .with(NotificationConstants.NEWS_ID, newsId)
-                           .key(getKey())
-                           .end();
+    if (audience.equals("Only space members")) {
+      notificationInfo.to(receivers);
+    } 
+    else {
+      notificationInfo.setSendAllInternals(true);
+    }
+    return notificationInfo.end();
 
   }
 
   private List<String> getReceivers(String contentSpaceId,
-                                    String currentUserName, String audience) throws Exception {
-    ListAccess<User> members = null;
-    if (audience.equals("Only space members")){
-      Space space = spaceService.getSpaceById(contentSpaceId);
-      members = userhandler.findUsersByGroupId(space.getGroupId());
-    } else {
-      members = userhandler.findUsersByGroupId("/platform/users");
-    }
-    User[] userArray = members.load(0, members.getSize());
-    List<String> receiverUsers = Arrays.stream(userArray)
-            .filter(u -> !u.getUserName().equals(currentUserName))
+                                    String currentUserName) throws Exception {
+    Space space = spaceService.getSpaceById(contentSpaceId);
+    List<String> receivers = Arrays.stream(space.getMembers())
+            .filter(member -> !member.equals(currentUserName))
             .distinct()
-            .map(User::getUserName)
             .collect(Collectors.toList());
-
-    return receiverUsers;
+    return receivers;
   }
 }

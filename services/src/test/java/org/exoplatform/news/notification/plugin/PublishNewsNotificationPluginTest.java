@@ -3,21 +3,6 @@ package org.exoplatform.news.notification.plugin;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.model.NotificationInfo;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
-import org.exoplatform.commons.api.notification.service.storage.NotificationService;
-import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.xml.InitParams;
-import org.exoplatform.news.notification.utils.NotificationConstants;
-import org.exoplatform.services.idgenerator.IDGeneratorService;
-import org.exoplatform.services.jcr.util.IdGenerator;
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.wcm.utils.WCMCoreUtils;
-import org.exoplatform.social.core.space.spi.SpaceService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,7 +13,19 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.Serializable;
+import org.exoplatform.commons.api.notification.NotificationContext;
+import org.exoplatform.commons.api.notification.model.NotificationInfo;
+import org.exoplatform.commons.api.notification.model.PluginKey;
+import org.exoplatform.commons.api.notification.service.NotificationCompletionService;
+import org.exoplatform.commons.api.notification.service.storage.NotificationService;
+import org.exoplatform.commons.notification.impl.NotificationContextImpl;
+import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.news.notification.utils.NotificationConstants;
+import org.exoplatform.services.jcr.util.IdGenerator;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
@@ -37,8 +34,6 @@ public class PublishNewsNotificationPluginTest {
 
   @Mock
   private InitParams       initParams;
-  @Mock
-  private OrganizationService organizationService;
   
   @Mock
   SpaceService                spaceService;
@@ -50,7 +45,7 @@ public class PublishNewsNotificationPluginTest {
   @Test
   public void shouldMakeNotificationForPublishNewsContext() throws Exception {
     // Given
-    PublishNewsNotificationPlugin newsPlugin = new PublishNewsNotificationPlugin(initParams, spaceService, organizationService);
+    PublishNewsNotificationPlugin newsPlugin = new PublishNewsNotificationPlugin(initParams, spaceService);
 
     PowerMockito.mockStatic(CommonsUtils.class);
     when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
@@ -69,7 +64,9 @@ public class PublishNewsNotificationPluginTest {
                                                    .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                            "http://localhost:8080/portal/intranet/activity?id=38")
                                                    .append(PostNewsNotificationPlugin.CONTEXT,
-                                                           NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+                                                           NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)
+                                                  .append(PostNewsNotificationPlugin.AUDIENCE,
+                                                           "All users");
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");

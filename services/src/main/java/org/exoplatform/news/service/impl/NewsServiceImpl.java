@@ -289,7 +289,7 @@ public class NewsServiceImpl implements NewsService {
     return newsTargetItems.stream().map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
-        if (news.getAudience().equals("All users") || news.getAudience().equals("Only space members") && news.isSpaceMember()){
+        if (news.getAudience().equals("All users") || news.isSpaceMember()) {
           news.setPublishDate(new Date(target.getCreatedDate()));
           news.setIllustration(null);
           return news;

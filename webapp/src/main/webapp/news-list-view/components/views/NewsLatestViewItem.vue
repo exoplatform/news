@@ -19,8 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="articleLink"
     target="_self"
     :href="item.url">
-    <div class="articleImage">
-      <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+    <div class="articleImage" v-if="showImage">
+      <img 
+        :src="articleImg"
+        :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="articleInfos">
       <div class="articleSpace" v-if="!isHiddenSpace && showArticleSpace">
@@ -74,6 +76,11 @@ export default {
       required: false,
       default: null
     },
+    index: {
+      type: Number,
+      required: false,
+      default: null
+    },
   },
   data: ()=> ({
     dateFormat: {
@@ -90,6 +97,15 @@ export default {
     showArticleReactions: true,
   }),
   computed: {
+    articleImg(){
+      return this.showImage && this.img ;
+    },
+    showImage(){
+      return  this.showArticleImage || (!this.showArticleImage && !this.index );
+    },
+    img() {
+      return this.item.illustrationURL?.concat('&size=1012x344').toString() || '/news/images/news.png';
+    },
     displayDate() {
       return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
     },

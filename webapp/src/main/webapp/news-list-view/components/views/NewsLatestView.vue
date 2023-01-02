@@ -18,7 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <div
     id="news-latest-view"
     ref="news-latest-view"
-    class="px-2 py-2">
+    class="px-2 py-2"
+    :class="extraClass">
     <div :class="hasSmallWidthContainer ? 'article-small-container':'article-container'">
       <v-progress-circular
         v-if="loading"
@@ -86,15 +87,22 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
-    hasSmallWidthContainer: false
+    hasSmallWidthContainer: false,
+    canPublishNews: false,
   }),
   computed: {
     newsInfo() {
       return this.newsList && this.newsList.filter(news => !!news);
+    },
+    extraClass() {
+      return (!this.showHeader && !this.showSeeAll && !this.canPublishNews ) && 'mt-5' || ' ';
     }
   },
   created() {
     this.reset();
+    this.$newsServices.canPublishNews().then(canPublishNews => {
+      this.canPublishNews = canPublishNews;
+    });
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
   },
   mounted() {

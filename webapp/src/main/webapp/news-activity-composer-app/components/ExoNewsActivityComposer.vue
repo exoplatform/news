@@ -394,7 +394,7 @@ export default {
       return this.activityId && this.activityId !== '';
     },
     postDisabled: function () {
-      if (new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length !== new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length) {
+      if (new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length) {
         return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html');
       } else {
         return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
@@ -1013,7 +1013,7 @@ export default {
       return this.$dateUtil.formatDateObjectToDisplay(new Date(time),this.fullDateFormat, eXo.env.portal.language);
     },
     getContent(body) {
-      return new DOMParser().parseFromString(body, 'text/html');
+      return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     setFocus() {
       if (CKEDITOR.instances['newsContent']) {

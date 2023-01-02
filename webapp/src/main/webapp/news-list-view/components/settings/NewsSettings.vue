@@ -15,7 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div v-if="showSettingsContainer" class="settings-container d-flex flex-row px-2 pt-1">
+  <div v-if="showSettingsContainer" class="settings-container d-flex flex-row px-2 pt-2 pb-1">
     <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
       <span
         v-if="showHeader"

@@ -77,6 +77,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <span v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
       {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
     </span>
+    <div class="ms-2">
+      <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
+      <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
+      <v-select
+        class="py-0"
+        v-model="audience"
+        :items="audiences"
+        dense
+        outlined />
+      <div class="d-flex flex-row grey--text ms-2">
+        <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+        {{ selectedAudienceDescription }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -98,9 +112,16 @@ export default {
     },
   },
   data: () =>({
+    audience: null,
     selectedTargets: [],
   }),
   computed: {
+    selectedAudienceDescription() {
+      return this.audience === 'All users' ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
+    },
+    audiences() {
+      return [this.$t('news.composer.stepper.audienceSection.allUsers'), this.$t('news.composer.stepper.audienceSection.onlySpaceMembers')];
+    }, 
     disableTargetOption() {
       return this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
     },
@@ -123,6 +144,7 @@ export default {
     }
   },
   created() {
+    this.audience = this.$t('news.composer.stepper.audienceSection.allUsers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();

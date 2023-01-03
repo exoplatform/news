@@ -77,7 +77,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <span v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
       {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
     </span>
-    <div class="ms-2">
+    <div v-if="newsTargetingAudiencingFeatureEnabled" class="ms-2">
       <span class="text-subtitle-2 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
       <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
       <div 
@@ -120,6 +120,7 @@ export default {
   data: () =>({
     audience: null,
     selectedTargets: [],
+    newsTargetingAudiencingFeatureEnabled: false,
   }),
   computed: {
     selectedAudienceDescription() {
@@ -150,6 +151,8 @@ export default {
     }
   },
   created() {
+    this.$featureService.isFeatureEnabled('newsTargetingAudiencing')
+      .then(enabled => this.newsTargetingAudiencingFeatureEnabled = enabled);
     this.audience = this.$t('news.composer.stepper.audienceSection.allUsers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {

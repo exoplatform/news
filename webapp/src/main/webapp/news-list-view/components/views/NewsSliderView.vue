@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row" :class="{'!canPublishNews ? `mt-9` : ``' : !$vuetify.breakpoint.xs}">
+            <div class="flex flex-row" >
               <v-btn
                 v-if="canPublishNews"
                 icon
@@ -47,8 +47,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <a
               v-if="showArticleTitle"
               :href="item.url"
-              class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate slider-header">
-              <span class="text-h4 font-weight-medium white--text">
+              class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate" :class="extraClass">
+              <span class="text-h4 font-weight-medium white--text text-truncate-2" >
                 {{ item.title }}
               </span>
             </a>
@@ -117,17 +117,20 @@ export default {
       canPublishNews: false,
     };
   },
+  computed: {
+    news(){
+      return this.newsList && this.newsList.filter(news => !!news);
+    },
+    extraClass() {
+      return this.$vuetify.breakpoint.width > 550 && (!this.canPublishNews && 'mt-7' || ' ') ;
+    }
+  },
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.canPublishNews = canPublishNews;
     });
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
-  },
-  computed: {
-    news(){
-      return this.newsList && this.newsList.filter(news => !!news);
-    }
   },
   methods: {
     openDrawer() {

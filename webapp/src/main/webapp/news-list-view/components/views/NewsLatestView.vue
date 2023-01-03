@@ -34,6 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <news-latest-view-item
           :item="item"
           :selected-option="selectedOption"
+          :index="index"
           :key="index" />
       </div>
     </div>

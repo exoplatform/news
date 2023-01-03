@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     class="article-item-link"
     target="_self"
     :href="item.url">
-    <div class="article-item-image">
+    <div v-if="showArticleImage" class="article-item-image">
       <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
     <div class="article-item-content">
@@ -111,10 +111,7 @@ export default {
       return this.selectedOption?.showArticleReactions;
     },
     articleImage() {
-      return this.showArticleImage && this.item
-                                   && this.item.illustrationURL
-                                   && this.item.illustrationURL.concat('&size=70x70').toString()
-                                   || '/news/images/news.png';
+      return this.item?.illustrationURL?.concat('&size=70x70').toString() || '/news/images/news.png';
     },
     extraClass() {
       return (!this.showArticleSummary || !this.showArticleTitle) && 'text-truncate-2' || 'article-title' ;

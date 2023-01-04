@@ -3,7 +3,6 @@ package org.exoplatform.news.notification.plugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
@@ -65,7 +64,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String newsId = ctx.value(PostNewsNotificationPlugin.NEWS_ID);
     String contentSpaceId = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE_ID);
     String audience = ctx.value(PostNewsNotificationPlugin.AUDIENCE);
-    List<String> receivers = new ArrayList<String>();
+    List<String> receivers = new ArrayList<>();
     try {
       receivers = getReceivers(contentSpaceId, currentUserName);
     } catch (Exception e) {
@@ -86,7 +85,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
         .key(getKey())
         .end();
 
-    if (audience.equals("Only space members")) {
+    if (audience.equals("space")) {
       notificationInfo.to(receivers);
     } 
     else {
@@ -99,10 +98,9 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
   private List<String> getReceivers(String contentSpaceId,
                                     String currentUserName) throws Exception {
     Space space = spaceService.getSpaceById(contentSpaceId);
-    List<String> receivers = Arrays.stream(space.getMembers())
+    return Arrays.stream(space.getMembers())
             .filter(member -> !member.equals(currentUserName))
             .distinct()
-            .collect(Collectors.toList());
-    return receivers;
+            .toList();
   }
 }

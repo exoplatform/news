@@ -66,7 +66,7 @@ public class PublishNewsNotificationPluginTest {
                                                    .append(PostNewsNotificationPlugin.CONTEXT,
                                                            NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)
                                                   .append(PostNewsNotificationPlugin.AUDIENCE,
-                                                           "All users");
+                                                           "all");
 
     PowerMockito.mockStatic(IdGenerator.class);
     when(IdGenerator.generate()).thenReturn("123456");

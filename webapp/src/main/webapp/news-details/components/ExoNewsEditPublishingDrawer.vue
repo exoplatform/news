@@ -72,7 +72,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :news="news"
               :publish="publish"
               :targets="allowedTargets"
-              @selected-targets="getSelectedTargets" />
+              :audience="audience"
+              @selected-targets="getSelectedTargets"
+              @selected-audience="getSelectedAudience" />
           </div>
         </div>
       </template>
@@ -102,6 +104,8 @@ export default {
   },
   data: () => ({
     selectedTargets: [],
+    selectedAudience: null,
+    audience: null,
     drawer: false,
     allowNotPost: false,
     publish: false,
@@ -142,9 +146,6 @@ export default {
         this.disabled = true;
       }
     },
-    audience(){
-      this.disabled = false;
-    }
   },
   computed: {
     selected() {
@@ -175,6 +176,7 @@ export default {
     }
   },
   created() {
+    this.selectedAudience = this.news.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
     this.audience = this.news.audience;
     this.getAllowedTargets();
     this.$root.$on('open-edit-publishing-drawer', () => {
@@ -200,6 +202,10 @@ export default {
     getSelectedTargets(selectedTargets) {
       this.selectedTargets = selectedTargets;
     },
+    getSelectedAudience(selectedAudience) {
+      this.selectedAudience = selectedAudience;
+      this.disabled = false;
+    },
     updateNews() {
       this.editingNews = true;
       this.news.published = this.publish;
@@ -207,7 +213,7 @@ export default {
       if (this.selectedTargets.length > 0) {
         this.news.targets = this.selectedTargets;
       }
-      this.news.audience = this.audience;
+      this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         this.$emit('refresh-news', this.news.newsId);

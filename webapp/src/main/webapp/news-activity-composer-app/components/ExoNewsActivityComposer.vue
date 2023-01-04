@@ -765,11 +765,11 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets, audience) {
+    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets, selectedAudience) {
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
       this.news.targets = selectedTargets;
-      this.news.audience = audience;
+      this.news.audience = selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {

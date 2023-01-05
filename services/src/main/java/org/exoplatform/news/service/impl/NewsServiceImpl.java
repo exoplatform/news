@@ -289,12 +289,15 @@ public class NewsServiceImpl implements NewsService {
     return newsTargetItems.stream().map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
-        news.setPublishDate(new Date(target.getCreatedDate()));
-        news.setIllustration(null);
-        return news;
+        if (news != null && (news.getAudience().equals("all") || news.isSpaceMember())) {
+          news.setPublishDate(new Date(target.getCreatedDate()));
+          news.setIllustration(null);
+          return news;
+        }
       } catch (Exception e) {
         return null;
       }
+      return null;
     }).collect(Collectors.toList());
   }
   
@@ -594,7 +597,8 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
-                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId)
+                                                     .append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
 
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);

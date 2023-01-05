@@ -116,15 +116,19 @@ export default {
       type: Object,
       default: null
     },
+    audience: {
+      type: String,
+      default: null
+    },
   },
   data: () =>({
-    audience: null,
+    selectedAudience: null,
     selectedTargets: [],
     newsTargetingAudiencingFeatureEnabled: false,
   }),
   computed: {
     selectedAudienceDescription() {
-      return this.audience === 'All users' ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
+      return this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
     },
     audiences() {
       return [this.$t('news.composer.stepper.audienceSection.allUsers'), this.$t('news.composer.stepper.audienceSection.onlySpaceMembers')];
@@ -153,7 +157,7 @@ export default {
   created() {
     this.$featureService.isFeatureEnabled('newsTargetingAudiencing')
       .then(enabled => this.newsTargetingAudiencingFeatureEnabled = enabled);
-    this.audience = this.$t('news.composer.stepper.audienceSection.allUsers');
+    this.selectedAudience = this.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
@@ -187,6 +191,9 @@ export default {
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
     },
+    addAudience(){
+      this.$emit('selected-audience', this.selectedAudience);
+    }
   }
 };
 </script>

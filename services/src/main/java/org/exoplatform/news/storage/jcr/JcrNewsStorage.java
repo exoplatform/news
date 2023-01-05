@@ -113,6 +113,8 @@ public class JcrNewsStorage implements NewsStorage {
 
   public static final String       EXO_PRIVILEGEABLE                = "exo:privilegeable";
 
+  public static final String       NEWS_AUDIENCE_PROP  = "exo:audience";
+
   public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
   
   private ActivityManager          activityManager;
@@ -340,18 +342,20 @@ public class JcrNewsStorage implements NewsStorage {
     Node newsNode = session.getNodeByUUID(news.getId());
 
     // Make News node readable by all users
-    Node publishedRootNode = getPublishedNewsFolder(session);
-    Calendar newsCreationCalendar = Calendar.getInstance();
-    newsCreationCalendar.setTime(news.getCreationDate());
-    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(publishedRootNode, getNodeRelativePath(newsCreationCalendar));
-    if (newsNode.canAddMixin("exo:privilegeable")) {
-      newsNode.addMixin("exo:privilegeable");
+    if (news.getAudience().equals("all")) {
+      Node publishedRootNode = getPublishedNewsFolder(session);
+      Calendar newsCreationCalendar = Calendar.getInstance();
+      newsCreationCalendar.setTime(news.getCreationDate());
+      Node newsFolderNode = dataDistributionType.getOrCreateDataNode(publishedRootNode, getNodeRelativePath(newsCreationCalendar));
+      if (newsNode.canAddMixin("exo:privilegeable")) {
+        newsNode.addMixin("exo:privilegeable");
+      }
+      ((ExtendedNode) newsNode).setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
+
+      newsAttachmentsService.makeAttachmentsPublic(newsNode);
+
+      linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
     }
-    ((ExtendedNode) newsNode).setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
-
-    newsAttachmentsService.makeAttachmentsPublic(newsNode);
-
-    linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
 
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
@@ -394,6 +398,7 @@ public class JcrNewsStorage implements NewsStorage {
     news.setTitle(getStringProperty(node, "exo:title"));
     news.setSummary(getStringProperty(node, "exo:summary"));
     String body = getStringProperty(node, "exo:body");
+    String audience = getStringProperty(node, NEWS_AUDIENCE_PROP);
     String sanitizedBody = HTMLSanitizer.sanitize(body);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
     news.setBody(substituteUsernames(portalOwner, sanitizedBody));
@@ -406,6 +411,7 @@ public class JcrNewsStorage implements NewsStorage {
     news.setDraftUpdater(getStringProperty(originalNode, EXO_NEWS_LAST_MODIFIER));
     news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
     news.setPath(getPath(node));
+    news.setAudience(audience);
     if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)) {
       news.setPublicationState(node.getProperty(StageAndVersionPublicationConstant.CURRENT_STATE).getString());
     }
@@ -636,6 +642,7 @@ public class JcrNewsStorage implements NewsStorage {
 
       // attachments
       news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
+      newsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
 
       newsNode.save();
 
@@ -711,6 +718,7 @@ public class JcrNewsStorage implements NewsStorage {
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.setProperty("exo:pinned", news.isPublished());
+        scheduledNewsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
         scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, news.isActivityPosted());
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());

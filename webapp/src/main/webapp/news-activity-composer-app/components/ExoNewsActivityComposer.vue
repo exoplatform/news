@@ -765,10 +765,11 @@ export default {
         this.postNews();
       }
     },
-    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets) {
+    postNews: function (schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets, selectedAudience) {
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
       this.news.targets = selectedTargets;
+      this.news.audience = selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {
@@ -803,6 +804,7 @@ export default {
         schedulePostDate: null,
         timeZoneId: null,
         activityPosted: this.news.activityPosted,
+        audience: this.news.audience,
       };
 
       if (schedulePostDate != null){

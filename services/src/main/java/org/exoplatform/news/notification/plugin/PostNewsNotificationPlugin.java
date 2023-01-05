@@ -42,6 +42,8 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
   public static final ArgumentLiteral<String> NEWS_ID          = new ArgumentLiteral<>(String.class, "NEWS_ID");
 
+  public static final ArgumentLiteral<String> AUDIENCE         = new ArgumentLiteral<>(String.class, "AUDIENCE");
+
   public static final ArgumentLiteral<NotificationConstants.NOTIFICATION_CONTEXT> CONTEXT          = new ArgumentLiteral<>(NotificationConstants.NOTIFICATION_CONTEXT.class, "CONTEXT");
 
   public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<>(String.class, "CURRENT_USER");

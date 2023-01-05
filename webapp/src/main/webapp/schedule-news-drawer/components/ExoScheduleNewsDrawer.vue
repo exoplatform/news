@@ -278,7 +278,7 @@ export default {
     isActivityPosted: true,
     selectedTargets: [],
     allowedTargets: [],
-    audience: 'all',
+    audience: null,
     selectedAudience: null
   }),
   watch: {
@@ -450,6 +450,7 @@ export default {
             this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
             this.selectedTargets = news.targets;
+            this.audience = news.audience ? news.audience : 'all';
           }
         });
     },
@@ -475,6 +476,7 @@ export default {
     },
     getSelectedAudience(selectedAudience) {
       this.selectedAudience = selectedAudience;
+      this.disabled = false;
     },
     getAllowedTargets() {
       this.$newsTargetingService.getAllowedTargets()

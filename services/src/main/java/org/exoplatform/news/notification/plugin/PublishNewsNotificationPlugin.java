@@ -20,9 +20,9 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log   LOG = ExoLogger.getLogger(PublishNewsNotificationPlugin.class);
 
   public static final String ID  = "PublishNewsNotificationPlugin";
-  
+
   private SpaceService       spaceService;
-  
+
   public PublishNewsNotificationPlugin(InitParams initParams, SpaceService spaceService) {
     super(initParams);
     this.spaceService = spaceService;
@@ -71,36 +71,29 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
       LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
     }
     NotificationInfo notificationInfo = NotificationInfo.instance()
-        .setFrom(currentUserName)
-        .exclude(currentUserName)
-        .with(NotificationConstants.CONTENT_TITLE, contentTitle)
-        .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
-        .with(NotificationConstants.CURRENT_USER, currentUserFullName)
-        .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
-        .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
-        .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
-        .with(NotificationConstants.ACTIVITY_LINK, activityLink)
-        .with(NotificationConstants.CONTEXT, context.getContext())
-        .with(NotificationConstants.NEWS_ID, newsId)
-        .key(getKey())
-        .end();
+                                                        .setFrom(currentUserName)
+                                                        .exclude(currentUserName)
+                                                        .with(NotificationConstants.CONTENT_TITLE, contentTitle)
+                                                        .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
+                                                        .with(NotificationConstants.CURRENT_USER, currentUserFullName)
+                                                        .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
+                                                        .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
+                                                        .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
+                                                        .with(NotificationConstants.ACTIVITY_LINK, activityLink)
+                                                        .with(NotificationConstants.CONTEXT, context.getContext())
+                                                        .with(NotificationConstants.NEWS_ID, newsId)
+                                                        .key(getKey());
 
     if (audience.equals("space")) {
       notificationInfo.to(receivers);
-    } 
-    else {
+    } else {
       notificationInfo.setSendAllInternals(true);
     }
     return notificationInfo.end();
-
   }
 
-  private List<String> getReceivers(String contentSpaceId,
-                                    String currentUserName) throws Exception {
+  private List<String> getReceivers(String contentSpaceId, String currentUserName) throws Exception {
     Space space = spaceService.getSpaceById(contentSpaceId);
-    return Arrays.stream(space.getMembers())
-            .filter(member -> !member.equals(currentUserName))
-            .distinct()
-            .toList();
+    return Arrays.stream(space.getMembers()).filter(member -> !member.equals(currentUserName)).distinct().toList();
   }
 }

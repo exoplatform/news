@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           class="articleLink d-block"
           target="_self"
           :href="item.url">
-          <img :src="showArticleImage && item.illustrationURL !== null ? item.illustrationURL.concat('&size=1012x335').toString() : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+          <img :src="showArticleImage && item.illustrationURL !== null ? illustrationURL(item,index) : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
           <div class="titleArea">
             <div v-if="showArticleDate" class="articleDate">
               <date-format
@@ -157,6 +157,17 @@ export default {
     },
     styleArticleTitle(){
       return  (this.isSmallWidth ? 'articleTitle ' : '').concat(this.isSmallBreakpoint ? 'text-truncate' : 'articleTitleTruncate');
+    },
+    illustrationURL(item,index){
+      if (this.news.length > 1) {
+        if (index === 0){
+          return item.illustrationURL.concat('&size=712x404').toString();
+        } else {
+          return item.illustrationURL.concat('&size=712x201').toString();
+        }
+      } else {
+        return item.illustrationURL.concat('&size=1426x404').toString();
+      }
     }
   }
 };

@@ -329,6 +329,7 @@ export default {
         published: false,
         archived: false,
         draftVisible: false,
+        audience: null,
       },
       originalNews: {
         id: '',
@@ -700,6 +701,7 @@ export default {
             this.news.author = fetchedNode.author;
             this.news.draftVisible = fetchedNode.draftVisible;
             this.news.activityPosted = fetchedNode.activityPosted;
+            this.news.audience = fetchedNode.audience;
             this.initCKEditor();
             this.initCKEditorData(fetchedNode.body);
 
@@ -965,6 +967,7 @@ export default {
         publicationState: publicationState,
         draftVisible: this.news.draftVisible,
         activityPosted: this.news.activityPosted,
+        audience: this.news.audience,
       };
       if (this.news.illustration != null && this.news.illustration.length > 0) {
         updatedNews.uploadId = this.news.illustration[0].uploadId;

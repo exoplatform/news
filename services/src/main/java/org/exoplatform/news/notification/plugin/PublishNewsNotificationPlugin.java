@@ -65,11 +65,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String contentSpaceId = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE_ID);
     String audience = ctx.value(PostNewsNotificationPlugin.AUDIENCE);
     List<String> receivers = new ArrayList<>();
-    try {
-      receivers = getReceivers(contentSpaceId, currentUserName);
-    } catch (Exception e) {
-      LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
-    }
+    receivers = getReceivers(contentSpaceId, currentUserName);
     NotificationInfo notificationInfo = NotificationInfo.instance()
                                                         .setFrom(currentUserName)
                                                         .exclude(currentUserName)
@@ -92,7 +88,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     return notificationInfo.end();
   }
 
-  private List<String> getReceivers(String contentSpaceId, String currentUserName) throws Exception {
+  private List<String> getReceivers(String contentSpaceId, String currentUserName) {
     Space space = spaceService.getSpaceById(contentSpaceId);
     return Arrays.stream(space.getMembers()).filter(member -> !member.equals(currentUserName)).distinct().toList();
   }

@@ -1,6 +1,5 @@
 package org.exoplatform.news.notification.plugin;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,8 +63,6 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String newsId = ctx.value(PostNewsNotificationPlugin.NEWS_ID);
     String contentSpaceId = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE_ID);
     String audience = ctx.value(PostNewsNotificationPlugin.AUDIENCE);
-    List<String> receivers = new ArrayList<>();
-    receivers = getReceivers(contentSpaceId, currentUserName);
     NotificationInfo notificationInfo = NotificationInfo.instance()
                                                         .setFrom(currentUserName)
                                                         .exclude(currentUserName)
@@ -81,6 +78,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
                                                         .key(getKey());
 
     if (audience.equals("space")) {
+      List<String> receivers = getReceivers(contentSpaceId, currentUserName);
       notificationInfo.to(receivers);
     } else {
       notificationInfo.setSendAllInternals(true);

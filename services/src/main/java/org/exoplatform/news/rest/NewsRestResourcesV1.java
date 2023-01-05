@@ -3,31 +3,39 @@ package org.exoplatform.news.rest;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.news.utils.NewsUtils;
-import org.exoplatform.services.cms.thumbnail.ThumbnailService;
-import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.picocontainer.Startable;
 
-import org.exoplatform.common.http.HTTPStatus;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
@@ -38,8 +46,11 @@ import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
+import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.rest.http.PATCH;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -47,8 +58,15 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.favorite.FavoriteService;
 
-import org.exoplatform.services.rest.http.PATCH;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("v1/news")
 @Tag(name = "v1/news", description = "Managing news")
@@ -217,6 +235,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setDraftVisible(updatedNews.isDraftVisible());
       news.setActivityPosted(updatedNews.isActivityPosted());
       news.setTargets(updatedNews.getTargets());
+      news.setAudience(updatedNews.getAudience());
 
 
       news = newsService.updateNews(news, currentIdentity.getUserId(), post, updatedNews.isPublished());

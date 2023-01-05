@@ -65,6 +65,8 @@ public class News {
   private Date                 publishDate;
 
   private boolean              published;
+  
+  private String               audience;
 
   private boolean              archived;
 

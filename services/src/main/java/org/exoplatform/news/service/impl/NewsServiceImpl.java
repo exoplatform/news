@@ -149,20 +149,36 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
-    
+
     if (!canEditNews(news, updater)) {  
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
-    News originalNews = newsStorage.getNewsById(news.getId(), false);
+    org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
+    News originalNews = getNewsById(news.getId(), updaterIdentity, false);
     Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
-    if (publish != news.isPublished() && news.isCanPublish()) {
-      news.setPublished(publish);
-      if (news.isPublished()) {
-        publishNews(news, updater);
-      } else {
+    try {
+      // edit case
+      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(originalNews.getTitle())
+          && !news.getPublicationState().equals("draft") && originalNews.isPublished()) {
         unpublishNews(news.getId(), updater);
+        if (!publish) {
+          news.setTargets(originalNews.getTargets());
+          publishNews(news, updater);
+        }
       }
+      // publish & unpublish cases
+      if (!publish && (originalNews.getTargets() != null && !originalNews.getTargets().isEmpty())) {
+        unpublishNews(news.getId(), updater);
+      } else if (publish && news.isCanPublish() && !news.getPublicationState().equals("draft")) {
+        if (news.getTargets() == null || news.getTargets().isEmpty()) {
+          news.setTargets(originalNews.getTargets());
+        }
+        publishNews(news, updater);
+      }
+    } catch (Exception e) {
+      throw new Exception("error while publish/unpublish news", e);
     }
+    news.setPublished(publish);
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());

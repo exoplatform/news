@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <news-settings 
       v-if="!isSmallBreakpoint" 
       :class="isMobile ? '' : 'settingNewsContainer'"
-      class="mt-3 mr-1"/>
+      class="mt-3 mr-1" />
     <div :class="`mosaic-container ${smallHeightClass}`">
       <div 
         v-for="(item, index) of news"
@@ -37,7 +37,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 :value="new Date(item.publishDate.time)"
                 :format="dateFormat" />
             </div>
-            <div v-if="showArticleTitle" 
+            <div
+              v-if="showArticleTitle" 
               :class="styleArticleTitle()">
               {{ item.title }}
             </div>

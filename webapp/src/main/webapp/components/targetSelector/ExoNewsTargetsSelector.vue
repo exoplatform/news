@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <div class="targetsSelector">
     <div
-      class="d-flex flex-row selectTarget ms-2"
+      class="d-flex flex-row selectTarget ms-2 mr-3"
       @click.stop>
       <v-select
         id="chooseTargets"
@@ -81,7 +81,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
       <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
       <div 
-        @click.stop>
+        @click.stop
+        class="mr-3">
         <v-select
           id="chooseAudience"
           ref="chooseAudience"

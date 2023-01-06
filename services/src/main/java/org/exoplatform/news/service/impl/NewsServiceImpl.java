@@ -149,24 +149,42 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
-    
+
     if (!canEditNews(news, updater)) {  
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
-    News originalNews = newsStorage.getNewsById(news.getId(), false);
-    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
-    if (publish != news.isPublished() && news.isCanPublish()) {
-      news.setPublished(publish);
-      if (news.isPublished()) {
-        publishNews(news, updater);
-      } else {
-        unpublishNews(news.getId(), updater);
-      }
-    }
+    News originalNews = getNewsById(news.getId(), false);
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
+    org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
+    boolean canPublish = NewsUtils.canPublishNews(news.getSpaceId(), updaterIdentity);
+    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
+    try {
+      // edit title case
+      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(originalNews.getTitle())
+          && !news.getPublicationState().equals("draft") && originalNews.isPublished()) {
+        unpublishNews(news.getId(), updater);
+        if (news.getTargets() == null || news.getTargets().isEmpty()) {
+          news.setTargets(oldTargets);
+        }
+        publishNews(news, updater);
+      }
+      // publish & unpublish cases without editing title
+      else if (!publish && (oldTargets != null && !oldTargets.isEmpty())) {
+        unpublishNews(news.getId(), updater);
+      } else if (publish && canPublish && !news.getPublicationState().equals("draft")) {
+        if (news.getTargets() == null || news.getTargets().isEmpty()) {
+          news.setTargets(oldTargets);
+        }
+        publishNews(news, updater);
+      }
+    } catch (Exception e) {
+      throw new Exception("error while publish/unpublish news", e);
+    }
+    news.setPublished(publish);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
-    if (publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+    if (publish == news.isPublished() && news.isPublished() && canPublish && news.getTargets() != null
+        && (oldTargets == null || !oldTargets.equals(news.getTargets()))) {
       newsTargetingService.deleteNewsTargets(news, updater);
       newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), updater);
     }
@@ -429,7 +447,11 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
-    sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    try {
+      sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    } catch (Error | Exception e) {
+      LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
+    }
   }
 
   /**

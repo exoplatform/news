@@ -28,7 +28,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-if="canPublishNews"
         size="24"
         icon
-        @click="openDrawer"> mdi-cog
+        @click="openDrawer">
+        mdi-cog
       </v-icon>
     </div>
     <div v-if="showSeeAll" class="d-flex flex-column my-auto me-2">

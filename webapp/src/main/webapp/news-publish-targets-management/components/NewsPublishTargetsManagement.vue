@@ -62,18 +62,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
               </td>
               <td>
-                <div  v-if="props.item.permissions.length > 0"
-                class="align-center text-truncate d-flex flex-column">
-                <div class="d-flex flex-row">
-                  <div class="identitySuggester no-border mx-4">
-                    <news-publish-targets-management-permissions
-                      :permission="props.item.permissions[0]"
-                      :close="false" />
+                <div
+                  v-if="props.item.permissions.length > 0"
+                  class="align-center text-truncate d-flex flex-column">
+                  <div class="d-flex flex-row">
+                    <div class="identitySuggester no-border mx-4">
+                      <news-publish-targets-management-permissions
+                        :permission="props.item.permissions[0]"
+                        :close="false" />
+                    </div>
+                    <span
+                      v-if="props.item.permissions.length > 1" 
+                      class="permissionsIcon font-weight-bold mt-5">
+                      +{{ $t(props.item.permissions.length-1) }}</span>
                   </div>
-                  <span v-if="props.item.permissions.length > 1" 
-                  class="permissionsIcon font-weight-bold mt-5">
-                  +{{ $t(props.item.permissions.length-1) }}</span>
-                </div>
                 </div>
               </td>
               <td>

@@ -71,6 +71,7 @@
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
+                  :disabled="!allowedTargets.length"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -83,7 +84,7 @@
                 {{ selectedTargetDescription }}
               </div>
               <exo-news-targets-selector
-                v-if="publish"
+                v-if="publish && allowedTargets.length"
                 id="chooseTargets"
                 ref="chooseTargets"
                 :news="news"

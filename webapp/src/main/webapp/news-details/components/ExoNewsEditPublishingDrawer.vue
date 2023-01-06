@@ -53,6 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="d-flex flex-row pa-4">
               <v-switch
                 v-model="publish"
+                :disabled="!allowedTargets.length"
                 inset
                 dense
                 class="my-auto"
@@ -66,7 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}
             </div>
             <exo-news-targets-selector
-              v-if="publish"
+              v-if="publish && allowedTargets.length"
               id="chooseTargets"
               ref="chooseTargets"
               :news="news"

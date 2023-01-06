@@ -81,17 +81,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
       <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
       <div 
-      @click.stop>
-      <v-select
-        id="chooseAudience"
-        ref="chooseAudience"
-        class="py-0"
-        v-model="selectedAudience"
-        :items="audiences"
-        dense
-        outlined 
-        @change="addAudience()"/>
-    </div>
+        @click.stop>
+        <v-select
+          id="chooseAudience"
+          ref="chooseAudience"
+          class="py-0"
+          v-model="selectedAudience"
+          :items="audiences"
+          dense
+          outlined 
+          @change="addAudience()" />
+      </div>
       <div class="d-flex flex-row grey--text ms-2">
         <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
         {{ selectedAudienceDescription }}

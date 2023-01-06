@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <exo-drawer
-  v-if="showDrawer"
+    v-if="showDrawer"
     ref="newsSettingsDrawer"
     id="newsSettingsDrawer"
     right

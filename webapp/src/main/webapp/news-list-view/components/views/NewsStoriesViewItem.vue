@@ -108,7 +108,7 @@ export default {
       return this.selectedOption && this.selectedOption.showArticleImage;
     },
     articleImage() {
-      return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL : '/news/images/news.png';
+      return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL.concat('&size=140x210').toString() : '/news/images/news.png';
     }
   }
 };

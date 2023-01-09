@@ -66,6 +66,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 export default {
   props: {
+    news: {
+      type: Object,
+      required: false,
+      default: null
+    },
     item: {
       type: Object,
       required: false,
@@ -104,7 +109,7 @@ export default {
       return  this.showArticleImage || (!this.showArticleImage && !this.index );
     },
     img() {
-      return this.item.illustrationURL?.concat('&size=1012x344').toString() || '/news/images/news.png';
+      return this.illustrationURL() || '/news/images/news.png';
     },
     displayDate() {
       return this.item.publishDate && this.item.publishDate.time && new Date(this.item.publishDate.time);
@@ -134,6 +139,17 @@ export default {
       this.showArticleReactions = this.$root.showArticleReactions;
       this.seeAllUrl = this.$root.seeAllUrl;
     },
+    illustrationURL(){
+      if (this.news.length > 1) {
+        if (this.index === 0){
+          return this.item.illustrationURL?.concat('&size=700x344').toString();
+        } else {
+          return this.item.illustrationURL?.concat('&size=107x107').toString();
+        }
+      } else {
+        return this.item.illustrationURL?.concat('&size=1410x344').toString();
+      }
+    }
   }
 };
 </script>

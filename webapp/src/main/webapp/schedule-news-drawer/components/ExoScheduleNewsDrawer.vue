@@ -280,7 +280,8 @@ export default {
     selectedTargets: [],
     allowedTargets: [],
     audience: null,
-    selectedAudience: null
+    selectedAudience: null,
+    disabled: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -477,7 +478,9 @@ export default {
     },
     getSelectedAudience(selectedAudience) {
       this.selectedAudience = selectedAudience;
-      this.disabled = false;
+      if (this.editScheduledNews ==='editScheduledNews') {
+        this.disabled = false;
+      }
     },
     getAllowedTargets() {
       this.$newsTargetingService.getAllowedTargets()

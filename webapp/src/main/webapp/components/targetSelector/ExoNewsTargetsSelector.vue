@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
     </span>
     <div v-if="newsTargetingAudiencingFeatureEnabled" class="ms-2">
-      <span class="text-subtitle-1 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
+      <span class="text-subtitle-2 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
       <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
       <div 
         @click.stop
@@ -86,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-select
           id="chooseAudience"
           ref="chooseAudience"
-          class="py-0"
+          class="text-subtitle-2 py-0"
           v-model="selectedAudience"
           :items="audiences"
           dense

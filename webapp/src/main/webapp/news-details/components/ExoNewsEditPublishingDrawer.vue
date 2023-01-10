@@ -61,6 +61,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {{ $t('news.details.editPublishing.option') }}
               </label>
             </div>
+
+            <div v-if="allowedTargets.length === 0" class="d-flex flex-row grey--text ms-2">
+              <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
+              {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}
+            </div>
+
             <exo-news-targets-selector
               v-if="publish"
               id="chooseTargets"
@@ -196,11 +202,24 @@ export default {
       this.news.targets = this.selectedTargets;
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
+        const message = this.$t('news.composer.alert.success.UpdateTargets');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+        });
         this.$emit('refresh-news', this.news.newsId);
         window.setTimeout(() => {
           this.drawer = false;
         }, 400);
-      });
+      })
+        .catch(() => {
+          this.editingNews = false;
+          const message = this.$t('news.composer.alert.error.UpdateTargets');
+          this.$root.$emit('news-notification-alert', {
+            message,
+            type: 'error',
+          });
+        });
     },
     removeTargets() {
       this.selectedTargets = [];

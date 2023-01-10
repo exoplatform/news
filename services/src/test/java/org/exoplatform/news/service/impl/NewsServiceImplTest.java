@@ -146,7 +146,8 @@ public class NewsServiceImplTest {
         space.setGroupId("/spaces/test_space");
         space.setPrettyName("space_test");
 
-        
+        doNothing().when(newsTargetingService).deleteNewsTargets(anyString(), anyString());
+        doNothing().when(newsTargetingService).saveNewsTarget(anyString(), anyBoolean(), anyList(), anyString());
         when(newsTargetingService.getTargetsByNewsId(news.getId())).thenReturn(Collections.emptyList());
         when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
         when(newsStorage.updateNews(any(News.class), anyString())).thenReturn(originalNews);

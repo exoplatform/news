@@ -185,7 +185,7 @@ public class NewsServiceImpl implements NewsService {
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
 
-        if (publish == news.isPublished() && canPublish && news.getTargets() != null
+        if (publish == news.isPublished() && news.isPublished() && canPublish && news.getTargets() != null
         && (oldTargets == null || !oldTargets.equals(news.getTargets()))) {
       newsTargetingService.deleteNewsTargets(news.getId(), updater);
       newsTargetingService.saveNewsTarget(news.getId(), displayed, news.getTargets(), updater);

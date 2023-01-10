@@ -1104,7 +1104,7 @@ public class JcrNewsStorage implements NewsStorage {
     if (newsFolderNode == null) {
       throw new Exception("Unable to find the parent node of the current published node");
     }
-    Node publishedNode = newsFolderNode.getNode(news.getTitle());
+    Node publishedNode = newsFolderNode.getNode(Utils.cleanName(news.getTitle()).trim());
     if (publishedNode == null) {
       throw new Exception("Unable to find the current published node");
     }

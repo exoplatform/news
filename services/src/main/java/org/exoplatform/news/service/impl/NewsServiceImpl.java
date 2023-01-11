@@ -451,6 +451,7 @@ public class NewsServiceImpl implements NewsService {
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
+      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
       sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
     } catch (Error | Exception e) {
       LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
@@ -543,6 +544,9 @@ public class NewsServiceImpl implements NewsService {
               || isMemberOfsharedInSpaces(news, username))) {
         return false;
       }
+      if (news.isPublished() && news.getAudience().equals("space") && !spaceService.isMember(space, username)) {
+        return false;
+      }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
           && !canScheduleNews(space, NewsUtils.getUserIdentity(username))) {
         return false;
@@ -619,8 +623,7 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
-                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId)
-                                                     .append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
 
     if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS)) {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
@@ -631,6 +634,9 @@ public class NewsServiceImpl implements NewsService {
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+      if (news.getAudience() != null) {
+        ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+      }
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }

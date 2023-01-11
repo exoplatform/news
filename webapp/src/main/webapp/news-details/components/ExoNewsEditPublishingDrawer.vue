@@ -214,7 +214,12 @@ export default {
       if (this.selectedTargets.length > 0) {
         this.news.targets = this.selectedTargets;
       }
-      this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      if (this.publish) {
+        this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      }
+      else {
+        this.news.audience = null;
+      }
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         const message = this.$t('news.composer.alert.success.UpdateTargets');

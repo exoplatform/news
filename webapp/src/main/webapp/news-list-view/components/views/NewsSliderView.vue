@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           eager />
         <v-container class="slide-text-container d-flex text-center body-2">
           <div class="flex flex-column carouselNewsInfo">
-            <div class="flex flex-row" >
+            <div class="flex flex-row">
               <v-btn
                 v-if="canPublishNews"
                 icon
@@ -47,8 +47,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <a
               v-if="showArticleTitle"
               :href="item.url"
-              class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate" :class="extraClass">
-              <span class="text-h4 font-weight-medium white--text text-truncate-2" >
+              class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate"
+              :class="extraClass">
+              <span class="text-h4 font-weight-medium white--text text-truncate-2">
                 {{ item.title }}
               </span>
             </a>

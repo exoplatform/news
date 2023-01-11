@@ -275,7 +275,7 @@ export default {
     news: null,
     isActivityPosted: true,
     selectedTargets: [],
-    allowedTargets: []
+    allowedTargets: [],
   }),
   watch: {
     postDate(newVal, oldVal) {

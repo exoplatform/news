@@ -307,12 +307,15 @@ public class NewsServiceImpl implements NewsService {
     return newsTargetItems.stream().map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
-        news.setPublishDate(new Date(target.getCreatedDate()));
-        news.setIllustration(null);
-        return news;
+        if (news != null && (news.getAudience().equals("") || news.getAudience().equals("all") || news.isSpaceMember())) {
+          news.setPublishDate(new Date(target.getCreatedDate()));
+          news.setIllustration(null);
+          return news;
+        }
       } catch (Exception e) {
         return null;
       }
+      return null;
     }).collect(Collectors.toList());
   }
   
@@ -448,6 +451,7 @@ public class NewsServiceImpl implements NewsService {
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
+      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
       sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
     } catch (Error | Exception e) {
       LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
@@ -540,6 +544,9 @@ public class NewsServiceImpl implements NewsService {
               || isMemberOfsharedInSpaces(news, username))) {
         return false;
       }
+      if (news.isPublished() && news.getAudience().equals("space") && !spaceService.isMember(space, username)) {
+        return false;
+      }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
           && !canScheduleNews(space, NewsUtils.getUserIdentity(username))) {
         return false;
@@ -627,6 +634,9 @@ public class NewsServiceImpl implements NewsService {
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+      if (news.getAudience() != null) {
+        ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+      }
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }

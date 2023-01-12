@@ -72,7 +72,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :news="news"
               :publish="publish"
               :targets="allowedTargets"
-              @selected-targets="getSelectedTargets" />
+              :audience="audience"
+              @selected-targets="getSelectedTargets"
+              @selected-audience="getSelectedAudience" />
           </div>
         </div>
       </template>
@@ -102,6 +104,8 @@ export default {
   },
   data: () => ({
     selectedTargets: [],
+    selectedAudience: null,
+    audience: null,
     drawer: false,
     allowNotPost: false,
     publish: false,
@@ -141,7 +145,7 @@ export default {
       } else {
         this.disabled = true;
       }
-    }
+    },
   },
   computed: {
     selected() {
@@ -172,6 +176,8 @@ export default {
     }
   },
   created() {
+    this.selectedAudience = this.news.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
+    this.audience = this.news.audience;
     this.getAllowedTargets();
     this.$root.$on('open-edit-publishing-drawer', () => {
       this.openDrawer();
@@ -196,11 +202,23 @@ export default {
     getSelectedTargets(selectedTargets) {
       this.selectedTargets = selectedTargets;
     },
+    getSelectedAudience(selectedAudience) {
+      this.selectedAudience = selectedAudience;
+      this.disabled = false;
+    },
     updateNews() {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
-      this.news.targets = this.selectedTargets;
+      if (this.selectedTargets.length > 0) {
+        this.news.targets = this.selectedTargets;
+      }
+      if (this.publish) {
+        this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      }
+      else {
+        this.news.audience = null;
+      }
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
         const message = this.$t('news.composer.alert.success.UpdateTargets');

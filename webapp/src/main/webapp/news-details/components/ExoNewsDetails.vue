@@ -147,11 +147,15 @@ export default {
         }
       }, redirectionTime);
     },
-    postNews(schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets) {
+
+    postNews(schedulePostDate, postArticleMode, publish, isActivityPosted, selectedTargets, selectedAudience) {
       this.news.timeZoneId = USER_TIMEZONE_ID;
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
       this.news.targets = selectedTargets;
+      if (selectedAudience !== null) {
+        this.news.audience = selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      }
       if (postArticleMode === 'later') {
         this.news.schedulePostDate = schedulePostDate;
         this.$newsServices.scheduleNews(this.news).then((scheduleNews) => {

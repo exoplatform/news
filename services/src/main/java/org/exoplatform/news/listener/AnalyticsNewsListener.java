@@ -95,6 +95,9 @@ public class AnalyticsNewsListener extends Listener<String, News> {
     statisticData.addParameter("contentUpdatedDate", news.getUpdateDate());
     statisticData.addParameter("contentCreationDate", news.getCreationDate());
     statisticData.addParameter("contentPublication", news.isPublished() ? "Yes" : "No");
+    if (news.isPublished() && (operation.equals(CREATE_CONTENT_OPERATION_NAME) || operation.equals(UPDATE_CONTENT_OPERATION_NAME))) {
+      statisticData.addParameter("contentPublicationAudience", news.getAudience().equals("all") ? "All users" : "Only space members");
+    }
     Space space = getSpaceService().getSpaceById(news.getSpaceId());
     if (space != null) {
       addSpaceStatistics(statisticData, space);

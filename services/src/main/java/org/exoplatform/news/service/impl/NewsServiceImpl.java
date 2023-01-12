@@ -303,20 +303,24 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNewsByTargetName(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
-    return newsTargetItems.stream().map(target -> {
+    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), 0);
+    return newsTargetItems.stream().filter(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
-        if (news != null && (news.getAudience().equals("") || news.getAudience().equals("all") || news.isSpaceMember())) {
-          news.setPublishDate(new Date(target.getCreatedDate()));
-          news.setIllustration(null);
-          return news;
-        }
+        return news != null && (news.getAudience().equals("") || news.getAudience().equals("all") || news.isSpaceMember());
+      } catch (Exception e) {
+        return false;
+      }
+    }).map(target -> {
+      try {
+        News news = getNewsById(target.getObjectId(), currentIdentity, false);
+        news.setPublishDate(new Date(target.getCreatedDate()));
+        news.setIllustration(null);
+        return news;
       } catch (Exception e) {
         return null;
       }
-      return null;
-    }).collect(Collectors.toList());
+    }).limit(newsFilter.getLimit()).toList();
   }
   
   /**

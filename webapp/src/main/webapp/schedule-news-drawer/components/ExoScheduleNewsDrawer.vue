@@ -71,6 +71,7 @@
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
+                  :disabled="!allowedTargets.length"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -83,7 +84,7 @@
                 {{ selectedTargetDescription }}
               </div>
               <exo-news-targets-selector
-                v-if="publish"
+                v-if="publish && allowedTargets.length"
                 id="chooseTargets"
                 ref="chooseTargets"
                 :news="news"
@@ -279,7 +280,8 @@ export default {
     selectedTargets: [],
     allowedTargets: [],
     audience: null,
-    selectedAudience: null
+    selectedAudience: null,
+    disabled: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -476,7 +478,9 @@ export default {
     },
     getSelectedAudience(selectedAudience) {
       this.selectedAudience = selectedAudience;
-      this.disabled = false;
+      if (this.editScheduledNews ==='editScheduledNews') {
+        this.disabled = false;
+      }
     },
     getAllowedTargets() {
       this.$newsTargetingService.getAllowedTargets()

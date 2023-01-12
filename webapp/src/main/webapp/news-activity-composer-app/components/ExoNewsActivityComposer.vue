@@ -771,7 +771,9 @@ export default {
       this.news.activityPosted = isActivityPosted;
       this.news.published = publish;
       this.news.targets = selectedTargets;
-      this.news.audience = selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      if (selectedAudience !== null) {
+        this.news.audience = selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      }
       this.doPostNews(schedulePostDate);
     },
     doPostNews: function (schedulePostDate) {

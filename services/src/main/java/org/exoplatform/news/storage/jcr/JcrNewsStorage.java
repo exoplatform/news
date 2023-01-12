@@ -341,22 +341,12 @@ public class JcrNewsStorage implements NewsStorage {
 
     Node newsNode = session.getNodeByUUID(news.getId());
 
-    // Make News node readable by all users
-    if (news.getAudience().equals("all")) {
-      Node publishedRootNode = getPublishedNewsFolder(session);
-      Calendar newsCreationCalendar = Calendar.getInstance();
-      newsCreationCalendar.setTime(news.getCreationDate());
-      Node newsFolderNode = dataDistributionType.getOrCreateDataNode(publishedRootNode, getNodeRelativePath(newsCreationCalendar));
-      if (newsNode.canAddMixin("exo:privilegeable")) {
-        newsNode.addMixin("exo:privilegeable");
-      }
-      ((ExtendedNode) newsNode).setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
-
-      newsAttachmentsService.makeAttachmentsPublic(newsNode);
-
-      linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
-    }
-
+    Node publishedRootNode = getPublishedNewsFolder(session);
+    Calendar newsCreationCalendar = Calendar.getInstance();
+    newsCreationCalendar.setTime(news.getCreationDate());
+    Node newsFolderNode = dataDistributionType.getOrCreateDataNode(publishedRootNode, getNodeRelativePath(newsCreationCalendar));
+    
+    linkManager.createLink(newsFolderNode, Utils.EXO_SYMLINK, newsNode, null);
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
   }
@@ -598,6 +588,24 @@ public class JcrNewsStorage implements NewsStorage {
     }
   }
   
+  private void updateNewAudience(Node newsNode, News news) throws Exception {
+    newsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
+    // Make News node readable by all users
+    if (news.getAudience().equals("all")) {
+      if (newsNode.canAddMixin("exo:privilegeable")) {
+        newsNode.addMixin("exo:privilegeable");
+      }
+      ((ExtendedNode) newsNode).setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
+      newsAttachmentsService.makeAttachmentsPublic(newsNode);
+    }
+    else {
+      if(newsNode.isNodeType("exo:privilegeable")) {
+        ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+      }
+      newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
+    }
+  }
+  
   private void updateNewsName(Session session, Node newsNode, News news) throws RepositoryException {
     if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
       String srcPath = newsNode.getPath();
@@ -642,7 +650,9 @@ public class JcrNewsStorage implements NewsStorage {
 
       // attachments
       news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
-      newsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
+      if (news.isPublished() && news.getAudience() != null) {
+        updateNewAudience(newsNode, news);
+      }
 
       newsNode.save();
 
@@ -1097,6 +1107,7 @@ public class JcrNewsStorage implements NewsStorage {
     if(newsNode.isNodeType("exo:privilegeable")) {
       ((ExtendedNode) newsNode).removePermission("*:/platform/users");
     }
+    newsNode.getProperty(NEWS_AUDIENCE_PROP).remove();
     newsNode.save();
 
     newsAttachmentsService.unmakeAttachmentsPublic(newsNode);

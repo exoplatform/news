@@ -86,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           id="chooseAudience"
           ref="chooseAudience"
           class="text-subtitle-2 py-0"
-          v-model="audience"
+          v-model="selectedAudience"
           :items="audiences"
           dense
           outlined 

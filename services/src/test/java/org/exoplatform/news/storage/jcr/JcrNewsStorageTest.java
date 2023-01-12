@@ -1129,9 +1129,6 @@ public class JcrNewsStorageTest {
     // Then
     verify(newsNode, times(1)).save();
     verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(true));
-    verify(newsNode, times(1)).addMixin(eq("exo:privilegeable"));
-    verify(linkManager, times(1)).createLink(newsFolderNode, "exo:symlink", newsNode, null);
-
   }
 
   @Test

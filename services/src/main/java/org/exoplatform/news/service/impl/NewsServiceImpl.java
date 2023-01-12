@@ -303,7 +303,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNewsByTargetName(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(),0);
+    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), 0);
     return newsTargetItems.stream().filter(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
@@ -320,7 +320,7 @@ public class NewsServiceImpl implements NewsService {
       } catch (Exception e) {
         return null;
       }
-    }).limit(newsFilter.getLimit()).collect(Collectors.toList());
+    }).limit(newsFilter.getLimit()).toList();
   }
   
   /**

@@ -748,14 +748,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null || news.getIllustration() == null || news.getIllustration().length == 0) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
-      if (size != null) {
-        String[] dimension = size.split("x");
-        byte[] thumbnail = thumbnailService.createCustomThumbnail(news.getIllustration(),
-                                                                  Integer.parseInt(dimension[0]),
-                                                                  Integer.parseInt(dimension[1]));
-        news.setIllustration(thumbnail);
-      }
-      
+
       if (!news.isPublished()) {//TODO Check if necessary
         Space space = spaceService.getSpaceById(news.getSpaceId());
         if (space == null) {
@@ -764,18 +757,28 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
 
       long lastUpdated = news.getIllustrationUpdateDate().getTime();
-      EntityTag eTag = new EntityTag(String.valueOf(lastUpdated));
-      //
+      EntityTag eTag = (size == null || size.isBlank()) ? new EntityTag(String.valueOf(lastUpdated)) : new EntityTag(lastUpdated+"-"+size);
       Response.ResponseBuilder builder = rsRequest.evaluatePreconditions(eTag);
       if (builder == null) {
-        builder = Response.ok(news.getIllustration(), "image/webp");
-        builder.tag(eTag);
-        if (lastModified > 0) {
-          builder.lastModified(new Date(lastUpdated));
-          builder.expires(new Date(System.currentTimeMillis() + CACHE_DURATION_MILLISECONDS));
-          builder.cacheControl(ILLUSTRATION_CACHE_CONTROL);
+        if (size != null) {
+          //if there is no cache (browser cache or server cache with the etag), the image is resized
+          //it can be improved a little by storing the thumbnail in the news.
+          //in this case we need to add a security mechanism to prevent a user to generate one image for each (width,height) combination
+          String[] dimension = size.split("x");
+          byte[] thumbnail = thumbnailService.createCustomThumbnail(news.getIllustration(),
+                                                                    Integer.parseInt(dimension[0]),
+                                                                    Integer.parseInt(dimension[1]));
+          news.setIllustration(thumbnail);
         }
+        builder = Response.ok(news.getIllustration(), news.getIllustrationMimeType());
       }
+
+      if (lastModified > 0) {
+        builder.lastModified(new Date(lastUpdated));
+        builder.expires(new Date(System.currentTimeMillis() + CACHE_DURATION_MILLISECONDS));
+        builder.cacheControl(ILLUSTRATION_CACHE_CONTROL);
+      }
+      builder.tag(eTag);
       return builder.build();
     } catch (Exception e) {
       LOG.error("Error when getting the news " + id, e);

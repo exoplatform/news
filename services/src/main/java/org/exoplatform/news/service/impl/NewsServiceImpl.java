@@ -387,6 +387,9 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.deleteNewsTargets(news.getId());
       newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), currentIdentity.getUserId());
     }
+    if (!news.isPublished()) {
+      newsTargetingService.deleteNewsTargets(news.getId());
+    }
     news = newsStorage.scheduleNews(news);
     NewsUtils.broadcastEvent(NewsUtils.SCHEDULE_NEWS, currentIdentity.getUserId(), news);
     return news;

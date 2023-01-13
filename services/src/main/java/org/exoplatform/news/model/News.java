@@ -52,6 +52,8 @@ public class News {
 
   private Date                 illustrationUpdateDate;
 
+  private String                 illustrationMimeType;
+
   private String               illustrationURL;
 
   private Date                 creationDate;

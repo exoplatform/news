@@ -406,11 +406,11 @@ export default {
         return true;
       }
       // disable update button if a mandatory field is empty
-      if (!this.news.title || !this.news.title.trim() || !this.news.body.replace(/&nbsp;/g, '').trim() || new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length === new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length && this.news.body === this.originalNews.body) {
+      if (!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
         return true;
-      } else if (new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.querySelectorAll('img').length !== new DOMParser().parseFromString(this.originalNews.body, 'text/html').documentElement.querySelectorAll('img').length) {
+      } else if (this.news.body.replace(/&nbsp;|<div>|<\/div>|<p>|<\/p>|\s+/g, '') !== this.originalNews.body.replace(/&nbsp;|<div>|<\/div>|<p>|<\/p>|\s+/g, '').replace(/\/>/g, '>').replace(/&#61;/g, '=')) {
         return false;
-      }
+      } 
       
       // disable update button nothing has changed
       if (!this.illustrationChanged && !this.attachmentsChanged

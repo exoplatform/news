@@ -53,6 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="d-flex flex-row pa-4">
               <v-switch
                 v-model="publish"
+                :disabled="!allowedTargets.length"
                 inset
                 dense
                 class="my-auto"
@@ -62,17 +63,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </label>
             </div>
             <div v-if="allowedTargets.length === 0" class="d-flex flex-row grey--text ms-2">
-                <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
-                {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}
-              </div>
+              <i class="fas fa-exclamation-triangle mx-2 mt-3"></i>
+              {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}
+            </div>
             <exo-news-targets-selector
-              v-if="publish"
+              v-if="publish && allowedTargets.length"
               id="chooseTargets"
               ref="chooseTargets"
               :news="news"
               :publish="publish"
               :targets="allowedTargets"
-              @selected-targets="getSelectedTargets" />
+              :audience="audience"
+              @selected-targets="getSelectedTargets"
+              @selected-audience="getSelectedAudience" />
           </div>
         </div>
       </template>
@@ -102,6 +105,8 @@ export default {
   },
   data: () => ({
     selectedTargets: [],
+    selectedAudience: null,
+    audience: null,
     drawer: false,
     allowNotPost: false,
     publish: false,
@@ -141,7 +146,7 @@ export default {
       } else {
         this.disabled = true;
       }
-    }
+    },
   },
   computed: {
     selected() {
@@ -172,6 +177,8 @@ export default {
     }
   },
   created() {
+    this.selectedAudience = this.news.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
+    this.audience = this.news.audience;
     this.getAllowedTargets();
     this.$root.$on('open-edit-publishing-drawer', () => {
       this.openDrawer();
@@ -196,18 +203,43 @@ export default {
     getSelectedTargets(selectedTargets) {
       this.selectedTargets = selectedTargets;
     },
+    getSelectedAudience(selectedAudience) {
+      this.selectedAudience = selectedAudience;
+      this.disabled = false;
+    },
     updateNews() {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
-      this.news.targets = this.selectedTargets;
+      if (this.selectedTargets.length > 0) {
+        this.news.targets = this.selectedTargets;
+      }
+      if (this.publish) {
+        this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
+      }
+      else {
+        this.news.audience = null;
+      }
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
+        const message = this.$t('news.composer.alert.success.UpdateTargets');
+        this.$root.$emit('news-notification-alert', {
+          message,
+          type: 'success',
+        });
         this.$emit('refresh-news', this.news.newsId);
         window.setTimeout(() => {
           this.drawer = false;
         }, 400);
-      });
+      })
+        .catch(() => {
+          this.editingNews = false;
+          const message = this.$t('news.composer.alert.error.UpdateTargets');
+          this.$root.$emit('news-notification-alert', {
+            message,
+            type: 'error',
+          });
+        });
     },
     removeTargets() {
       this.selectedTargets = [];

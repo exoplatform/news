@@ -149,24 +149,42 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
-    
+
     if (!canEditNews(news, updater)) {  
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
-    News originalNews = newsStorage.getNewsById(news.getId(), false);
-    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
-    if (publish != news.isPublished() && news.isCanPublish()) {
-      news.setPublished(publish);
-      if (news.isPublished()) {
-        publishNews(news, updater);
-      } else {
-        unpublishNews(news.getId(), updater);
-      }
-    }
+    News originalNews = getNewsById(news.getId(), false);
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
+    org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
+    boolean canPublish = NewsUtils.canPublishNews(news.getSpaceId(), updaterIdentity);
+    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
+    try {
+      // edit title case
+      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(originalNews.getTitle())
+          && !news.getPublicationState().equals("draft") && originalNews.isPublished()) {
+        unpublishNews(news.getId(), updater);
+        if (news.getTargets() == null || news.getTargets().isEmpty()) {
+          news.setTargets(oldTargets);
+        }
+        publishNews(news, updater);
+      }
+      // publish & unpublish cases without editing title
+      else if (!publish && (oldTargets != null && !oldTargets.isEmpty())) {
+        unpublishNews(news.getId(), updater);
+      } else if (publish && canPublish && !news.getPublicationState().equals("draft")) {
+        if (news.getTargets() == null || news.getTargets().isEmpty()) {
+          news.setTargets(oldTargets);
+        }
+        publishNews(news, updater);
+      }
+    } catch (Exception e) {
+      throw new Exception("error while publish/unpublish news", e);
+    }
+    news.setPublished(publish);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
-    if (publish == news.isPublished() && news.isPublished() && news.isCanPublish() && news.getTargets() != null && !oldTargets.equals(news.getTargets())) {
+    if (publish == news.isPublished() && news.isPublished() && canPublish && news.getTargets() != null
+        && (oldTargets == null || !oldTargets.equals(news.getTargets()))) {
       newsTargetingService.deleteNewsTargets(news, updater);
       newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), updater);
     }
@@ -285,8 +303,15 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public List<News> getNewsByTargetName(NewsFilter newsFilter, String targetName, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), newsFilter.getLimit());
-    return newsTargetItems.stream().map(target -> {
+    List<MetadataItem> newsTargetItems = newsTargetingService.getNewsTargetItemsByTargetName(targetName, newsFilter.getOffset(), 0);
+    return newsTargetItems.stream().filter(target -> {
+      try {
+        News news = getNewsById(target.getObjectId(), currentIdentity, false);
+        return news != null && (news.getAudience().equals("") || news.getAudience().equals("all") || news.isSpaceMember());
+      } catch (Exception e) {
+        return false;
+      }
+    }).map(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
         news.setPublishDate(new Date(target.getCreatedDate()));
@@ -295,7 +320,7 @@ public class NewsServiceImpl implements NewsService {
       } catch (Exception e) {
         return null;
       }
-    }).collect(Collectors.toList());
+    }).limit(newsFilter.getLimit()).toList();
   }
   
   /**
@@ -429,7 +454,12 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
-    sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    try {
+      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
+      sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+    } catch (Error | Exception e) {
+      LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
+    }
   }
 
   /**
@@ -516,6 +546,9 @@ public class NewsServiceImpl implements NewsService {
           && !(spaceService.isSuperManager(username)
               || spaceService.isMember(space, username)
               || isMemberOfsharedInSpaces(news, username))) {
+        return false;
+      }
+      if (news.isPublished() && news.getAudience().equals("space") && !spaceService.isMember(space, username)) {
         return false;
       }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
@@ -605,6 +638,9 @@ public class NewsServiceImpl implements NewsService {
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+      if (news.getAudience() != null) {
+        ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+      }
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }
   }

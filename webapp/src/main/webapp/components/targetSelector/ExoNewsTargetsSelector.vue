@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <div class="targetsSelector">
     <div
-      class="d-flex flex-row selectTarget ms-2"
+      class="d-flex flex-row selectTarget ms-2 mr-3"
       @click.stop>
       <v-select
         id="chooseTargets"
@@ -52,6 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </template>
         <template #selection="{ item, index }">
           <v-tooltip 
+            :disabled="!item.description"
             bottom>
             <template #activator="{ on, attrs }">
               <v-chip
@@ -76,6 +77,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <span v-if="showTargetInformation" class="d-flex flex-row error--text ms-2">
       {{ $t('news.composer.stepper.chooseTarget.mandatory') }}
     </span>
+    <div v-if="newsTargetingAudiencingFeatureEnabled" class="ms-2">
+      <span class="text-subtitle-2 font-weight-bold"> {{ $t('news.composer.stepper.audienceSection.title') }} </span>
+      <p>{{ $t('news.composer.stepper.audienceSection.description') }}</p>
+      <div 
+        @click.stop
+        class="mr-3">
+        <v-select
+          id="chooseAudience"
+          ref="chooseAudience"
+          class="text-subtitle-2 py-0"
+          v-model="selectedAudience"
+          :items="audiences"
+          dense
+          outlined 
+          @change="addAudience()" />
+      </div>
+      <div class="d-flex flex-row grey--text ms-2">
+        <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+        {{ selectedAudienceDescription }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -95,11 +117,23 @@ export default {
       type: Object,
       default: null
     },
+    audience: {
+      type: String,
+      default: null
+    },
   },
   data: () =>({
+    selectedAudience: null,
     selectedTargets: [],
+    newsTargetingAudiencingFeatureEnabled: false,
   }),
   computed: {
+    selectedAudienceDescription() {
+      return this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? this.$t('news.composer.stepper.audienceSection.allUsers.description') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers.description');
+    },
+    audiences() {
+      return [this.$t('news.composer.stepper.audienceSection.allUsers'), this.$t('news.composer.stepper.audienceSection.onlySpaceMembers')];
+    }, 
     disableTargetOption() {
       return this.selectedTargets && this.selectedTargets.length === 0 && this.publish;
     },
@@ -122,9 +156,15 @@ export default {
     }
   },
   created() {
+    this.$featureService.isFeatureEnabled('newsTargetingAudiencing')
+      .then(enabled => this.newsTargetingAudiencingFeatureEnabled = enabled);
+    this.selectedAudience = this.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();
+      }
+      if (this.$refs.chooseAudience && this.$refs.chooseAudience.isMenuActive) {
+        this.$refs.chooseAudience.blur();
       }
     });
     this.selectedTargets = this.news.targets;
@@ -152,6 +192,9 @@ export default {
     addTarget() {
       this.$emit('selected-targets', this.selectedTargets);
     },
+    addAudience(){
+      this.$emit('selected-audience', this.selectedAudience);
+    }
   }
 };
 </script>

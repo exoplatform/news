@@ -71,6 +71,7 @@
               <div class="d-flex flex-row">
                 <v-switch
                   v-model="publish"
+                  :disabled="!allowedTargets.length"
                   inset
                   dense
                   class="my-0 ms-3" />
@@ -83,13 +84,15 @@
                 {{ selectedTargetDescription }}
               </div>
               <exo-news-targets-selector
-                v-if="publish"
+                v-if="publish && allowedTargets.length"
                 id="chooseTargets"
                 ref="chooseTargets"
                 :news="news"
                 :targets="allowedTargets"
                 :publish="publish"
-                @selected-targets="getSelectedTargets" />
+                :audience="audience"
+                @selected-targets="getSelectedTargets"
+                @selected-audience="getSelectedAudience" />
               <v-card-actions class="d-flex flex-row mt-4 ms-2 px-0">
                 <v-btn class="btn" @click="previousStep">
                   <v-icon size="18" class="me-2">
@@ -275,7 +278,10 @@ export default {
     news: null,
     isActivityPosted: true,
     selectedTargets: [],
-    allowedTargets: []
+    allowedTargets: [],
+    audience: null,
+    selectedAudience: null,
+    disabled: true,
   }),
   watch: {
     postDate(newVal, oldVal) {
@@ -390,6 +396,7 @@ export default {
     }
   },
   created() {
+    this.selectedAudience= this.$t('news.composer.stepper.audienceSection.allUsers');
     this.disabled = true;
     this.getAllowedTargets();
     this.$newsServices.canPublishNews().then(canPublishNews => {
@@ -445,11 +452,12 @@ export default {
             this.isActivityPosted = !news.activityPosted;
             this.schedulePostDate = news.schedulePostDate;
             this.selectedTargets = news.targets;
+            this.audience = news.audience ? news.audience : 'all';
           }
         });
     },
     postArticle() {
-      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted, this.selectedTargets);
+      this.$emit('post-article', this.postArticleMode !== 'later' ? null : this.$newsUtils.convertDate(this.postDate), this.postArticleMode, this.publish, !this.isActivityPosted, this.selectedTargets, this.publish ? this.selectedAudience : null);
     },
     closeDrawer() {
       if (this.news) {
@@ -467,6 +475,12 @@ export default {
     },
     getSelectedTargets(selectedTargets) {
       this.selectedTargets = selectedTargets;
+    },
+    getSelectedAudience(selectedAudience) {
+      this.selectedAudience = selectedAudience;
+      if (this.editScheduledNews ==='editScheduledNews') {
+        this.disabled = false;
+      }
     },
     getAllowedTargets() {
       this.$newsTargetingService.getAllowedTargets()

@@ -325,6 +325,9 @@ export default {
       }
     },
     selectedTargets(newVal, oldVal) {
+      if (!this.canPublishNews) {
+        return ;
+      }
       if (this.editScheduledNews ==='editScheduledNews' && this.publish) {
         if (newVal.length !== oldVal.length) {
           this.disabled = false;

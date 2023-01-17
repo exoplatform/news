@@ -479,6 +479,7 @@ public class JcrNewsStorage implements NewsStorage {
       byte[] bytes = IOUtils.toByteArray(illustrationContentNode.getProperty("jcr:data").getStream());
       news.setIllustration(bytes);
       news.setIllustrationUpdateDate(illustrationContentNode.getProperty("exo:dateModified").getDate().getTime());
+      news.setIllustrationMimeType(illustrationContentNode.getProperty("jcr:mimeType").getString());
       long lastModified = news.getIllustrationUpdateDate().getTime();
       news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration?v=" + lastModified);
     }

@@ -160,8 +160,7 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(1, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
+    assertEquals(0, allowedTargets.size());
 
     // Given
     Metadata latestNews = new Metadata();
@@ -189,8 +188,7 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(1, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
+    assertEquals(0, allowedTargets.size());
 
     // Given
     when(spaceService.isPublisher(space, identity.getUserId())).thenReturn(true);
@@ -200,9 +198,8 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(2, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
-    assertEquals("latestNews", allowedTargets.get(1).getName());
+    assertEquals(1, allowedTargets.size());
+    assertEquals("latestNews", allowedTargets.get(0).getName());
 
     // Given
     Metadata testNews = new Metadata();
@@ -228,9 +225,8 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(2, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
-    assertEquals("latestNews", allowedTargets.get(1).getName());
+    assertEquals(1, allowedTargets.size());
+    assertEquals("latestNews", allowedTargets.get(0).getName());
 
     // Given
     when(identity.isMemberOf("/platform/administrators", "publisher")).thenReturn(true);
@@ -240,10 +236,9 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(3, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
-    assertEquals("latestNews", allowedTargets.get(1).getName());
-    assertEquals("testNews", allowedTargets.get(2).getName());
+    assertEquals(2, allowedTargets.size());
+    assertEquals("latestNews", allowedTargets.get(0).getName());
+    assertEquals("testNews", allowedTargets.get(1).getName());
 
     // Given
     when(spaceService.getSpaceById("1")).thenReturn(null);
@@ -253,9 +248,8 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(2, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
-    assertEquals("testNews", allowedTargets.get(1).getName());
+    assertEquals(1, allowedTargets.size());
+    assertEquals("testNews", allowedTargets.get(0).getName());
     
     // Given
     when(groupHandler.findGroupById("/platform/administrators")).thenReturn(null);
@@ -265,8 +259,7 @@ public class NewsTargetingImplTest {
 
     // Then
     assertNotNull(allowedTargets);
-    assertEquals(1, allowedTargets.size());
-    assertEquals("sliderNews", allowedTargets.get(0).getName());
+    assertEquals(0, allowedTargets.size());
   }
 
   @Test

@@ -62,18 +62,6 @@
     </init-params>
   </component>
   
-  <component>
-    <key>NewsFeatureProperties</key>
-    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
-    <init-params>
-      <properties-param>
-        <name>NewsFeatureProperties</name>
-        <description>News Feature enablement flag</description>
-        <property name="exo.feature.newsTargetingAudiencing.enabled" value="${exo.feature.newsTargetingAudiencing.enabled:false}"/>
-      </properties-param>
-    </init-params>
-  </component>
-
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
     <component-plugin>

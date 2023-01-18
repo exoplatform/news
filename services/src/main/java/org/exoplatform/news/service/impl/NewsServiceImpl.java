@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import javax.jcr.ItemNotFoundException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.PluginKey;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -205,10 +205,12 @@ public class NewsServiceImpl implements NewsService {
       }
       indexingService.reindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     }
-    if (post != null && !PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
-      updateNewsActivity(news, post);
+    if (!news.getPublicationState().isEmpty() && !PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+      if (post != null) {
+        updateNewsActivity(news, post);
+      }
+      NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news); 
     }
-    NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news);
     return news;
   }
 
@@ -729,5 +731,4 @@ public class NewsServiceImpl implements NewsService {
     }
     return false;
   }
-
 }

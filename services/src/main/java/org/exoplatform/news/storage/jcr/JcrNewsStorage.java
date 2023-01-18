@@ -729,7 +729,11 @@ public class JcrNewsStorage implements NewsStorage {
         scheduledNewsNode.setProperty(AuthoringPublicationConstant.START_TIME_PROPERTY, startPublishedDate);
         scheduledNewsNode.setProperty(LAST_PUBLISHER, getCurrentUserId());
         scheduledNewsNode.setProperty("exo:pinned", news.isPublished());
-        scheduledNewsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
+        if (!news.isPublished() && scheduledNewsNode.hasProperty(NEWS_AUDIENCE_PROP)) {
+          scheduledNewsNode.getProperty(NEWS_AUDIENCE_PROP).remove();
+        } else {
+          scheduledNewsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
+        }
         scheduledNewsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, news.isActivityPosted());
         scheduledNewsNode.save();
         publicationService.changeState(scheduledNewsNode, PublicationDefaultStates.STAGED, new HashMap<>());

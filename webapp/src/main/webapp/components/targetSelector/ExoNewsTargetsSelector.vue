@@ -155,7 +155,7 @@ export default {
     }
   },
   created() {
-    this.selectedAudience = this.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
+    this.selectedAudience = !this.audience || this.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
         this.$refs.chooseTargets.blur();

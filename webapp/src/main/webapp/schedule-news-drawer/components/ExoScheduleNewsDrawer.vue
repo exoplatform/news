@@ -329,7 +329,7 @@ export default {
         return ;
       }
       if (this.editScheduledNews ==='editScheduledNews' && this.publish) {
-        if (newVal.length !== oldVal.length) {
+        if (this.selectedTargets.length > 0 && newVal.length !== oldVal.length) {
           this.disabled = false;
         } else {
           this.disabled = true;

@@ -1,7 +1,18 @@
 <template>
   <v-list-item class="clickable" :href="url">
     <v-list-item-icon class="me-3 my-auto">
-      <v-icon size="22" class="icon-default-color"> fas fa-newspaper </v-icon>
+      <v-avatar
+        tile
+        size="25">
+        <img
+          v-if="news.illustrationURL"
+          :alt="activityTitle"
+          :src="`${news.illustrationURL}&size=25x25`">
+        <img
+          v-else
+          :alt="activityTitle"
+          src="/news/images/news.png">
+      </v-avatar>
     </v-list-item-icon>
 
     <v-list-item-content>

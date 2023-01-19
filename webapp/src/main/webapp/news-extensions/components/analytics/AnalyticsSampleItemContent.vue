@@ -13,16 +13,18 @@
 -->
 <template>
   <div class="text--secondary">
-    {{ attrValue }}
-    (<a
+    <a
       v-if="contentTitle"
       :title="contentTitle"
       :href="contentUrl"
       class="text-truncate"
       rel="nofollow"
       target="_blank">
-      {{ contentTitle }}
-    </a>)
+    {{ contentTitle }}
+    </a>
+    <p>
+    ({{ attrValue }})
+    </p>
   </div>
 </template>
 

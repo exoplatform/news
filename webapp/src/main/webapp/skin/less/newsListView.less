@@ -351,7 +351,7 @@
           overflow: hidden;
           display: -webkit-box;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 5;
+          -webkit-line-clamp:  2;
         }
       }
       &:nth-child(n + 2) {
@@ -467,7 +467,7 @@
           }
         }
         .articleTitle {
-          margin-bottom: 14px;
+          margin-bottom: 3px;
         }
       }
       &:nth-child(1) {
@@ -485,11 +485,14 @@
         .articleTitle {
           font-size: 18px;
           line-height: 32px;
-          color: @baseBackgroundDefault;
+          color: @baseBackgroundDefault !important;
           overflow: hidden;
           display: -webkit-box;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 1;
+          -webkit-line-clamp: 2;
+        }
+        .spaceName{
+          color: @baseBackgroundDefault !important;
         }
       }
       &:nth-child(n + 2) {
@@ -722,7 +725,7 @@
         overflow: hidden !important;
         display: -webkit-box !important;
         -webkit-box-orient: vertical !important;
-        -webkit-line-clamp: 3 !important;
+        -webkit-line-clamp: 2 !important;
       }
     }
   }

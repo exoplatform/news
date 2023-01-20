@@ -28,7 +28,7 @@ const newsActivityTypeExtensionOptions = {
   hideOnDelete: true,
   supportsThumbnail: true,
   windowTitlePrefixKey: 'news.window.title',
-  getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL && `${activity.news.illustrationURL}&size=250x150`|| '/news/images/news.png',
+  getThumbnail: (activity) => activity && activity.news && activity.news.illustrationURL && `${activity.news.illustrationURL}&size=305x285`|| '/news/images/news.png',
   getThumbnailProperties: (activity) => !(activity && activity.news && activity.news.illustrationURL) && {
     height: '90px',
     width: '90px',

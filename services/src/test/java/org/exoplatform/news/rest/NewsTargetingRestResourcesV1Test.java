@@ -2,6 +2,7 @@ package org.exoplatform.news.rest;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.service.NewsTargetingService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,10 +122,21 @@ public class NewsTargetingRestResourcesV1Test {
     sliderNews.setCreatedDate(100);
     HashMap<String, String> sliderNewsProperties = new HashMap<>();
     sliderNewsProperties.put("label", "slider news");
+    sliderNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:1");
     sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(sliderNews.getName());
+    newsTargetingEntity.setProperties(sliderNewsProperties);
+//    List<NewsTargetingPermissionsEntity> newsTargetingPermissionsEntities = new ArrayList<NewsTargetingPermissionsEntity>();
+//    NewsTargetingPermissionsEntity newsTargetingPermissionsEntity = new NewsTargetingPermissionsEntity();
+//    newsTargetingPermissionsEntity.setId("space:1");
+//    newsTargetingPermissionsEntity.setName("test space");
+//    newsTargetingPermissionsEntity.setProviderId("space");
+//    newsTargetingPermissionsEntity.setRemoteId("testSpace");
+//    newsTargetingPermissionsEntity.setAvatar("");
+//    newsTargetingPermissionsEntities.add(newsTargetingPermissionsEntity);
+//    newsTargetingEntity.setPermissions(newsTargetingPermissionsEntities);
     lenient().when(newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 
     // When
@@ -156,10 +169,21 @@ public class NewsTargetingRestResourcesV1Test {
     sliderNews.setCreatedDate(100);
     HashMap<String, String> sliderNewsProperties = new HashMap<>();
     sliderNewsProperties.put("label", "slider news");
+    sliderNewsProperties.put(NewsUtils.TARGET_PERMISSIONS, "space:1");
     sliderNews.setProperties(sliderNewsProperties);
     sliderNews.setId(1);
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(sliderNews.getName());
+    newsTargetingEntity.setProperties(sliderNewsProperties);
+//    List<NewsTargetingPermissionsEntity> newsTargetingPermissionsEntities = new ArrayList<NewsTargetingPermissionsEntity>();
+//    NewsTargetingPermissionsEntity newsTargetingPermissionsEntity = new NewsTargetingPermissionsEntity();
+//    newsTargetingPermissionsEntity.setId("space:1");
+//    newsTargetingPermissionsEntity.setName("test space");
+//    newsTargetingPermissionsEntity.setProviderId("space");
+//    newsTargetingPermissionsEntity.setRemoteId("testSpace");
+//    newsTargetingPermissionsEntity.setAvatar("");
+//    newsTargetingPermissionsEntities.add(newsTargetingPermissionsEntity);
+//    newsTargetingEntity.setPermissions(newsTargetingPermissionsEntities);
     String originalTargetName = "sliderNews";
     lenient().when(newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 

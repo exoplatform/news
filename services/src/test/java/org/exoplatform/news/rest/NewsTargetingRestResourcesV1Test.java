@@ -128,15 +128,6 @@ public class NewsTargetingRestResourcesV1Test {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(sliderNews.getName());
     newsTargetingEntity.setProperties(sliderNewsProperties);
-//    List<NewsTargetingPermissionsEntity> newsTargetingPermissionsEntities = new ArrayList<NewsTargetingPermissionsEntity>();
-//    NewsTargetingPermissionsEntity newsTargetingPermissionsEntity = new NewsTargetingPermissionsEntity();
-//    newsTargetingPermissionsEntity.setId("space:1");
-//    newsTargetingPermissionsEntity.setName("test space");
-//    newsTargetingPermissionsEntity.setProviderId("space");
-//    newsTargetingPermissionsEntity.setRemoteId("testSpace");
-//    newsTargetingPermissionsEntity.setAvatar("");
-//    newsTargetingPermissionsEntities.add(newsTargetingPermissionsEntity);
-//    newsTargetingEntity.setPermissions(newsTargetingPermissionsEntities);
     lenient().when(newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 
     // When
@@ -175,15 +166,6 @@ public class NewsTargetingRestResourcesV1Test {
     NewsTargetingEntity newsTargetingEntity = new NewsTargetingEntity();
     newsTargetingEntity.setName(sliderNews.getName());
     newsTargetingEntity.setProperties(sliderNewsProperties);
-//    List<NewsTargetingPermissionsEntity> newsTargetingPermissionsEntities = new ArrayList<NewsTargetingPermissionsEntity>();
-//    NewsTargetingPermissionsEntity newsTargetingPermissionsEntity = new NewsTargetingPermissionsEntity();
-//    newsTargetingPermissionsEntity.setId("space:1");
-//    newsTargetingPermissionsEntity.setName("test space");
-//    newsTargetingPermissionsEntity.setProviderId("space");
-//    newsTargetingPermissionsEntity.setRemoteId("testSpace");
-//    newsTargetingPermissionsEntity.setAvatar("");
-//    newsTargetingPermissionsEntities.add(newsTargetingPermissionsEntity);
-//    newsTargetingEntity.setPermissions(newsTargetingPermissionsEntities);
     String originalTargetName = "sliderNews";
     lenient().when(newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity)).thenReturn(sliderNews);
 

@@ -45,6 +45,7 @@ import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.news.service.NewsTargetingService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -213,23 +214,31 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @Operation(summary = "Create news target", method = "POST", description = "Create news target")
-  @ApiResponses(value = {
-    @ApiResponse(responseCode = "400", description = "Invalid query input"),
-    @ApiResponse(responseCode = "403", description = "Forbidden operation"),
-    @ApiResponse(responseCode = "401", description = "User not authorized to create news target"),
-    @ApiResponse(responseCode = "409", description = "Conflict operation")
-  })
-  public Response createNewsTarget(@Context HttpServletRequest request,
-                                   @RequestBody(description = "News target to create", required = true) NewsTargetingEntity newsTargetingEntity) {
+  @ApiResponses(value = { @ApiResponse(responseCode = "401", description = "User not authorized to create news target"),
+      @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+      @ApiResponse(responseCode = "409", description = "Conflict operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public Response createNewsTarget(@Context
+  HttpServletRequest request, @RequestBody(description = "News target to create", required = true)
+  NewsTargetingEntity newsTargetingEntity) {
+    if (newsTargetingEntity.getProperties() == null
+        || newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null
+        || newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS).isEmpty()) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata addedNewsTarget = newsTargetingService.createNewsTarget(newsTargetingEntity, currentIdentity);
       return Response.ok(addedNewsTarget).build();
     } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to create a news target with name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      LOG.warn("User '{}' is not authorized to create a news target with name " + newsTargetingEntity.getName(),
+               currentIdentity.getUserId(),
+               e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
-      LOG.warn("User '{}' can't create a news target with the same name " + newsTargetingEntity.getName(), currentIdentity.getUserId(), e);
+      LOG.warn("User '{}' can't create a news target with the same name " + newsTargetingEntity.getName(),
+               currentIdentity.getUserId(),
+               e);
       return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
     } catch (Exception e) {
       LOG.error("Error when creating a news target with name " + newsTargetingEntity.getName(), e);
@@ -243,22 +252,30 @@ public class NewsTargetingRestResourcesV1 implements ResourceContainer, Startabl
   @Produces(MediaType.APPLICATION_JSON)
   @RolesAllowed("users")
   @Operation(summary = "Update an existing news target", method = "PUT", description = "Update an existing news target")
-  @ApiResponses( value = {
-    @ApiResponse(responseCode = "404", description = "Object not found"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-    @ApiResponse(responseCode = "500", description = "Internal server error"),
-    @ApiResponse(responseCode = "409", description = "Conflict operation")
-  })
+  @ApiResponses(value = { @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+      @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+      @ApiResponse(responseCode = "404", description = "Object not found"),
+      @ApiResponse(responseCode = "409", description = "Conflict operation"),
+      @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response updateNewsTarget(@Parameter(description = "News target to create", required = true)
-                                   NewsTargetingEntity newsTargetingEntity,
+  NewsTargetingEntity newsTargetingEntity,
                                    @Parameter(description = "Original news target name", required = true)
-                                   @PathParam("originalTargetName") String originalTargetName) {
+                                   @PathParam("originalTargetName")
+                                   String originalTargetName) {
+    if (newsTargetingEntity.getProperties() == null
+        || newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS) == null
+        || newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS).isEmpty()) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
       Metadata metadata = newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
       return Response.ok(metadata).build();
     } catch (IllegalAccessException e) {
-      LOG.warn("User '{}' is not authorized to update news target with name '{}'", currentIdentity.getUserId(), originalTargetName, e);
+      LOG.warn("User '{}' is not authorized to update news target with name '{}'",
+               currentIdentity.getUserId(),
+               originalTargetName,
+               e);
       return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
     } catch (IllegalArgumentException e) {
       LOG.warn("User '{}' can't update news target with name '{}'", currentIdentity.getUserId(), originalTargetName, e);

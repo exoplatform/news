@@ -166,6 +166,23 @@
   </external-component-plugins>
 
   <external-component-plugins>
+    <target-component>org.exoplatform.social.notification.service.SpaceWebNotificationService</target-component>
+    <component-plugin>
+      <name>NewsSpaceWebNotificationPlugin</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.news.notification.plugin.NewsSpaceWebNotificationPlugin</type>
+      <init-params>
+        <values-param>
+          <name>notification.plugin.ids</name>
+          <value>PublishNewsNotificationPlugin</value>
+          <value>MentionInNewsNotificationPlugin</value>
+          <value>PostNewsNotificationPlugin</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+  <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
     <component-plugin>
       <name>web.channel.content</name>
@@ -178,11 +195,6 @@
         </value-param>
       </init-params>
     </component-plugin>
-  </external-component-plugins>
-
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
     <component-plugin>
       <name>web.channel.content</name>
       <set-method>registerTemplateProvider</set-method>
@@ -194,10 +206,6 @@
         </value-param>
       </init-params>
     </component-plugin>
-  </external-component-plugins>
-
-  <external-component-plugins>
-    <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
     <component-plugin>
       <name>web.channel.content</name>
       <set-method>registerTemplateProvider</set-method>
@@ -206,6 +214,17 @@
         <value-param>
           <name>channel-id</name>
           <value>PUSH_CHANNEL</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>web.channel.content</name>
+      <set-method>registerTemplateProvider</set-method>
+      <type>org.exoplatform.news.notification.provider.PushTemplateProvider</type>
+      <init-params>
+        <value-param>
+          <name>channel-id</name>
+          <value>SPACE_WEB_CHANNEL</value>
         </value-param>
       </init-params>
     </component-plugin>

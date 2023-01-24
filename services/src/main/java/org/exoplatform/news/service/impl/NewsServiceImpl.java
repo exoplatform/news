@@ -638,10 +638,10 @@ public class NewsServiceImpl implements NewsService {
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PostNewsNotificationPlugin.ID))).execute(ctx);
       Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(contentBody);
       if(matcher.find()) {
-        sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+        sendMentionInNewsNotification(newsId, contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
-      sendMentionInNewsNotification(contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
+      sendMentionInNewsNotification(newsId, contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
       if (news.getAudience() != null) {
         ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
@@ -650,7 +650,7 @@ public class NewsServiceImpl implements NewsService {
     }
   }
   
-  private void sendMentionInNewsNotification(String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
+  private void sendMentionInNewsNotification(String newsId, String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
     Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
@@ -662,7 +662,8 @@ public class NewsServiceImpl implements NewsService {
             .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
             .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
             .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
-            .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds);
+            .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds)
+            .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
     mentionNotificationCtx.getNotificationExecutor().with(mentionNotificationCtx.makeCommand(PluginKey.key(MentionInNewsNotificationPlugin.ID))).execute(mentionNotificationCtx);
   }
   

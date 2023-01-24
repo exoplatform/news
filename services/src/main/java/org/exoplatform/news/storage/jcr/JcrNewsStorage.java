@@ -40,6 +40,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.news.storage.NewsStorage;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
 import org.exoplatform.services.cms.link.LinkManager;
@@ -592,7 +593,7 @@ public class JcrNewsStorage implements NewsStorage {
   private void updateNewAudience(Node newsNode, News news) throws Exception {
     newsNode.setProperty(NEWS_AUDIENCE_PROP, news.getAudience());
     // Make News node readable by all users
-    if (news.getAudience().equals("all")) {
+    if (news.getAudience().equals(NewsUtils.ALL_NEWS_AUDIENCE)) {
       if (newsNode.canAddMixin("exo:privilegeable")) {
         newsNode.addMixin("exo:privilegeable");
       }

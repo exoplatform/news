@@ -59,13 +59,17 @@ public class NewsUtils {
   public static final String  DISPLAYED_STATUS                = "displayed";
 
   public static final String  TARGET_PERMISSIONS              = "permissions";
-
+  
+  public static final String SPACE_NEWS_AUDIENCE = "space";
+  
+  public static final String ALL_NEWS_AUDIENCE = "all";
+  
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
-
+  
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);

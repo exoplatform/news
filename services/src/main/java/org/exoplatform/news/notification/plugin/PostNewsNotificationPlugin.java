@@ -92,6 +92,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     String illustrationUrl = ctx.value(ILLUSTRATION_URL);
     String authorAvatarUrl = ctx.value(AUTHOR_AVATAR_URL);
     String activityLink = ctx.value(ACTIVITY_LINK);
+    String newsId = ctx.value(NEWS_ID);
 
     List<String> receivers = new ArrayList<String>();
     try {
@@ -111,6 +112,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
                            .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
                            .with(NotificationConstants.ACTIVITY_LINK, activityLink)
                            .with(NotificationConstants.CONTEXT, context.getContext())
+                           .with(NotificationConstants.NEWS_ID, newsId)
                            .key(getKey())
                            .end();
 

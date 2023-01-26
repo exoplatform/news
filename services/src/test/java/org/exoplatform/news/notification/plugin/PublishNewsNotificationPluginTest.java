@@ -64,7 +64,7 @@ public class PublishNewsNotificationPluginTest {
                                                    .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                            "http://localhost:8080/portal/intranet/activity?id=38")
                                                    .append(PostNewsNotificationPlugin.CONTEXT,
-                                                           NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)
+                                                           NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS)
                                                   .append(PostNewsNotificationPlugin.AUDIENCE,
                                                            "all");
 

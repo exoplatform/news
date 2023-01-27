@@ -183,10 +183,14 @@ public class NewsServiceImpl implements NewsService {
     news.setPublished(publish);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
-    if (publish == news.isPublished() && news.isPublished() && canPublish && news.getTargets() != null
-        && (oldTargets == null || !oldTargets.equals(news.getTargets()))) {
-      newsTargetingService.deleteNewsTargets(news, updater);
-      newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), updater);
+    if (publish == news.isPublished() && news.isPublished() && canPublish) {
+      if (news.getTargets() != null && (oldTargets == null || !oldTargets.equals(news.getTargets()))) {
+        newsTargetingService.deleteNewsTargets(news, updater);
+        newsTargetingService.saveNewsTarget(news, displayed, news.getTargets(), updater);
+      }
+      if (news.getAudience() != null && news.getAudience().equals(NewsUtils.ALL_NEWS_AUDIENCE) && originalNews.getAudience() != null && originalNews.getAudience().equals(NewsUtils.SPACE_NEWS_AUDIENCE)) {
+        sendNotification(updater, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
+      }
     }
 
     newsStorage.updateNews(news, updater);
@@ -309,7 +313,7 @@ public class NewsServiceImpl implements NewsService {
     return newsTargetItems.stream().filter(target -> {
       try {
         News news = getNewsById(target.getObjectId(), currentIdentity, false);
-        return news != null && (news.getAudience().equals("") || news.getAudience().equals("all") || news.isSpaceMember());
+        return news != null && (news.getAudience().equals("") || news.getAudience().equals(NewsUtils.ALL_NEWS_AUDIENCE) || news.isSpaceMember());
       } catch (Exception e) {
         return false;
       }
@@ -461,7 +465,7 @@ public class NewsServiceImpl implements NewsService {
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
       news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
-      sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS);
+      sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
     } catch (Error | Exception e) {
       LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
     }
@@ -553,7 +557,7 @@ public class NewsServiceImpl implements NewsService {
               || isMemberOfsharedInSpaces(news, username))) {
         return false;
       }
-      if (news.isPublished() && news.getAudience().equals("space") && !spaceService.isMember(space, username)) {
+      if (news.isPublished() && news.getAudience().equals(NewsUtils.SPACE_NEWS_AUDIENCE) && !spaceService.isMember(space, username)) {
         return false;
       }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
@@ -642,9 +646,15 @@ public class NewsServiceImpl implements NewsService {
       }
     } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)) {
       sendMentionInNewsNotification(newsId, contentAuthor, currentUser, contentTitle, contentBody, contentSpaceId, illustrationURL, authorAvatarUrl, activityLink, contentSpaceName);
-    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS)) {
+    } else if (context.equals(NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS)) {
       if (news.getAudience() != null) {
-        ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+        News originalNews = getNewsById(news.getId(), false);
+        if (news.getAudience().equals(NewsUtils.ALL_NEWS_AUDIENCE) && originalNews.getAudience() != null && originalNews.getAudience().equals(NewsUtils.SPACE_NEWS_AUDIENCE)) {
+          ctx.append(PostNewsNotificationPlugin.AUDIENCE, "excludeSpaceMembers"); // Notification will not be sent to news space members when news audience is changed from "space" to "all"
+        }
+        else {
+          ctx.append(PostNewsNotificationPlugin.AUDIENCE, news.getAudience());
+        }
       }
       ctx.getNotificationExecutor().with(ctx.makeCommand(PluginKey.key(PublishNewsNotificationPlugin.ID))).execute(ctx);
     }

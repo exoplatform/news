@@ -20,6 +20,7 @@ import org.exoplatform.analytics.model.StatisticData;
 import org.exoplatform.analytics.utils.AnalyticsUtils;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.listener.*;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -96,7 +97,7 @@ public class AnalyticsNewsListener extends Listener<String, News> {
     statisticData.addParameter("contentCreationDate", news.getCreationDate());
     statisticData.addParameter("contentPublication", news.isPublished() ? "Yes" : "No");
     if (news.isPublished() && (operation.equals(CREATE_CONTENT_OPERATION_NAME) || operation.equals(UPDATE_CONTENT_OPERATION_NAME))) {
-      statisticData.addParameter("contentPublicationAudience", news.getAudience().equals("all") ? "All users" : "Only space members");
+      statisticData.addParameter("contentPublicationAudience", news.getAudience().equals(NewsUtils.ALL_NEWS_AUDIENCE) ? "All users" : "Only space members");
     }
     Space space = getSpaceService().getSpaceById(news.getSpaceId());
     if (space != null) {

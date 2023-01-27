@@ -29,7 +29,7 @@ public class NotificationConstants {
   public static enum NOTIFICATION_CONTEXT {
     POST_NEWS ("POST NEWS"),
     MENTION_IN_NEWS ("MENTION IN NEWS"),
-    PUBLISH_IN_NEWS("PUBLISH NEWS");
+    PUBLISH_NEWS("PUBLISH NEWS");
 
     private String context;
 

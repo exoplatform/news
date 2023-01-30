@@ -69,7 +69,7 @@ export default {
       return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
     },
     illustrationUrl() {
-      return this.news && this.news.illustrationURL ? this.news.illustrationURL.concat('&size=0x128').toString() : '/news/images/news.png';
+      return this.news && this.news.illustrationURL ? this.news.illustrationURL.concat('&size=315x128').toString() : '/news/images/news.png';
     },
     publicationState() {
       return this.news && this.news.publicationState;

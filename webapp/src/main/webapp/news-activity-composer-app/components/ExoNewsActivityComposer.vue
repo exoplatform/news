@@ -388,6 +388,7 @@ export default {
       switchView: false,
       spaceDisplayName: '',
       unAuthorizedAccess: false,
+      endUplodingFileTimeout: 50,
     };
   },
   computed: {
@@ -453,8 +454,9 @@ export default {
     'news.attachments': function() {
       if (this.initDone && this.news.attachments !== this.originalNews.attachments) {
         this.attachmentsChanged = true;
-        this.autoSave();
+        this.waitForEndUploding();
       }
+
     },
     'news.illustration': function() {
       if (this.initIllustrationDone) {
@@ -1107,6 +1109,16 @@ export default {
         attachFileButton.style.display = 'none';
         this.switchView = false;
       }
+    },
+    waitForEndUploding() {
+      window.setTimeout(() => {
+        if (this.uploading) {
+          this.waitForEndUploding();
+        }
+        else {
+          this.autoSave();
+        }
+      }, this.endUplodingFileTimeout);
     }
   }
 };

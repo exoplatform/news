@@ -550,6 +550,11 @@ export default {
         extraPlugins = `${extraPlugins},tagSuggester`;
       }
       CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
+      CKEDITOR.addCss('h1 { font-size: 34px;font-weight: 400;}');
+      CKEDITOR.addCss('h2 { font-size: 28px;font-weight: 400;}');
+      CKEDITOR.addCss('h3 { font-size: 21.84px;font-weight: 400;}');
+      CKEDITOR.addCss('p,li { font-size: 18.6667px;}');
+      CKEDITOR.addCss('blockquote p  { font-size: 17.5px;font-weight: 300;}');
       // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';

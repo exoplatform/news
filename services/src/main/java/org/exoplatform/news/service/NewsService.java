@@ -75,9 +75,10 @@ public interface NewsService {
    *
    * @param news to be published
    * @param publisher of the News
+   * @param broadcast if to broadcast send notification
    * @throws Exception when error
    */
-  void publishNews(News news, String publisher) throws Exception;
+  void publishNews(News news, String publisher, boolean broadcast) throws Exception;
   
   /**
    * Unpublish a News

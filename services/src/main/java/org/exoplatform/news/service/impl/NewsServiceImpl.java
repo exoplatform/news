@@ -166,16 +166,16 @@ public class NewsServiceImpl implements NewsService {
         if (news.getTargets() == null || news.getTargets().isEmpty()) {
           news.setTargets(oldTargets);
         }
-        publishNews(news, updater);
+        publishNews(news, updater, false);
       }
       // publish & unpublish cases without editing title
       else if (!publish && (oldTargets != null && !oldTargets.isEmpty())) {
         unpublishNews(news.getId(), updater);
-      } else if (publish && canPublish && !news.getPublicationState().equals("draft")) {
+      } else if (publish && (publish != news.isPublished()) && canPublish && !news.getPublicationState().equals("draft")) {
         if (news.getTargets() == null || news.getTargets().isEmpty()) {
           news.setTargets(oldTargets);
         }
-        publishNews(news, updater);
+        publishNews(news, updater, true);
       }
     } catch (Exception e) {
       throw new Exception("error while publish/unpublish news", e);
@@ -432,7 +432,7 @@ public class NewsServiceImpl implements NewsService {
     updateNews(news, poster, null, news.isPublished());
     sendNotification(poster, news, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
     if (news.isPublished()) {
-      publishNews(news, poster);
+      publishNews(news, poster, true);
     }
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS_ARTICLE, news.getId(), news);//Gamification
     NewsUtils.broadcastEvent(NewsUtils.POST_NEWS, news.getAuthor(), news);//Analytics
@@ -454,7 +454,7 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void publishNews(News publishedNews, String publisher) throws Exception {
+  public void publishNews(News publishedNews, String publisher, boolean broadcast) throws Exception {
     News news = getNewsById(publishedNews.getId(), false);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
     newsStorage.publishNews(news);
@@ -462,10 +462,13 @@ public class NewsServiceImpl implements NewsService {
       newsTargetingService.deleteNewsTargets(news, publisher);
       newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
     }
+
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
-      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
-      sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
+      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749
+      if(broadcast) {
+        sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
+      }
     } catch (Error | Exception e) {
       LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);
     }

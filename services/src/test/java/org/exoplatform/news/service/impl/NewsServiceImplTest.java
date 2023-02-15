@@ -170,22 +170,18 @@ public class NewsServiceImplTest {
         news.setPublished(true);
         news.setPublicationState("archived");
         news.setCanPublish(true);
-        newsService.updateNews(news, "root", null, true);
-        verify(newsStorage, times(0)).unpublishNews(news.getId());
-        verify(newsStorage, times(1)).publishNews(any(News.class));
-
         when(newsTargetingService.getTargetsByNewsId(news.getId())).thenReturn(targets);
         originalNews.setPublished(true);
         when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
         news.setTitle("title updated");
         newsService.updateNews(news, "root", null, true);
         verify(newsStorage, times(1)).unpublishNews(news.getId());
-        verify(newsStorage, times(2)).publishNews(any(News.class));
+        verify(newsStorage, times(1)).publishNews(any(News.class));
 
         originalNews.setTitle("title updated");
         when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
         newsService.updateNews(news, "root", null, false);
         verify(newsStorage, times(2)).unpublishNews(news.getId());
-        verify(newsStorage, times(2)).publishNews(any(News.class));
+        verify(newsStorage, times(1)).publishNews(any(News.class));
     }
 }

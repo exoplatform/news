@@ -158,29 +158,14 @@ public class NewsServiceImpl implements NewsService {
     org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
     boolean canPublish = NewsUtils.canPublishNews(news.getSpaceId(), updaterIdentity);
     Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
-    try {
-      // edit title case
-      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(originalNews.getTitle())
-          && !news.getPublicationState().equals("draft") && originalNews.isPublished()) {
-        unpublishNews(news.getId(), updater);
-        if (news.getTargets() == null || news.getTargets().isEmpty()) {
-          news.setTargets(oldTargets);
-        }
-        publish(news, updater);
-      }
-      // publish & unpublish cases without editing title
-      else if (!publish && (oldTargets != null && !oldTargets.isEmpty())) {
-        unpublishNews(news.getId(), updater);
-      } else if (publish && (publish != originalNews.isPublished()) && canPublish && !news.getPublicationState().equals("draft") && !originalNews.getPublicationState().equals("draft")) {
-        if (news.getTargets() == null || news.getTargets().isEmpty()) {
-          news.setTargets(oldTargets);
-        }
+    if (publish != news.isPublished() && news.isCanPublish()) {
+      news.setPublished(publish);
+      if (news.isPublished()) {
         publishNews(news, updater);
+      } else {
+        unpublishNews(news.getId(), updater);
       }
-    } catch (Exception e) {
-      throw new Exception("error while publish/unpublish news", e);
     }
-    news.setPublished(publish);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
     if (publish == news.isPublished() && news.isPublished() && canPublish) {
@@ -455,7 +440,13 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public void publishNews(News publishedNews, String publisher) throws Exception {
-    News news = publish(publishedNews, publisher);
+    News news = getNewsById(publishedNews.getId(), false);
+    boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
+    if (publishedNews.getTargets() != null) {
+      newsTargetingService.deleteNewsTargets(news, publisher);
+      newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
+    }
+    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
       news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749
       sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
@@ -464,24 +455,11 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  private News publish(News publishedNews ,String publisher) throws Exception {
-    News news = getNewsById(publishedNews.getId(), false);
-    boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
-    newsStorage.publishNews(news);
-    if (publishedNews.getTargets() != null) {
-      newsTargetingService.deleteNewsTargets(news, publisher);
-      newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
-    }
-    NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
-    return news;
-  }
-
   /**
    * {@inheritDoc}
    */
   @Override
   public void unpublishNews(String newsId, String publisher) throws Exception {
-    newsStorage.unpublishNews(newsId);
     News news = getNewsById(newsId, false);
     newsTargetingService.deleteNewsTargets(news, publisher);
   }

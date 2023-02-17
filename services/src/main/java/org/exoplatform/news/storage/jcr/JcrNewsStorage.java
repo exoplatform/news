@@ -77,9 +77,7 @@ import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
 public class JcrNewsStorage implements NewsStorage {
-  
-  public static final String       APPLICATION_DATA_PATH            = "/Application Data";
-  
+
   private static final String      HTML_AT_SYMBOL_PATTERN           = "@";
 
   private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN   = "&#64;";
@@ -105,8 +103,6 @@ public class JcrNewsStorage implements NewsStorage {
   public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
   
   public static final String       NEWS_NODES_FOLDER                = "News";
-  
-  public static final String       PUBLISHED_NEWS_NODES_FOLDER      = "Pinned";
 
   public  static final String      EXO_NEWS_LAST_MODIFIER           = "exo:newsLastModifier";
 
@@ -326,6 +322,24 @@ public class JcrNewsStorage implements NewsStorage {
     }
   }
   
+  /**
+   * Publish a news
+   *
+   * @param news The news to be published
+   * @throws Exception when error
+   */
+  public void publishNews(News news) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+
+    Node newsNode = session.getNodeByUUID(news.getId());
+    newsNode.setProperty("exo:pinned", true);
+    newsNode.save();
+  }
 
   @Override
   public News getNewsById(String newsId, boolean editMode) throws Exception {
@@ -609,8 +623,6 @@ public class JcrNewsStorage implements NewsStorage {
       newsNode.setProperty("exo:body", news.getBody());
       newsNode.setProperty("exo:dateModified", Calendar.getInstance());
       newsNode.setProperty(EXO_NEWS_LAST_MODIFIER, updater);
-      newsNode.setProperty("exo:pinned", news.isPublished());
-
       // illustration
       if (StringUtils.isNotEmpty(news.getUploadId())) {
         attachIllustration(newsNode, news.getUploadId());
@@ -774,33 +786,6 @@ public class JcrNewsStorage implements NewsStorage {
       resourceNode.setProperty("jcr:data", inputStream);
       newsNode.save();
     }
-  }
-  
-  /**
-   * Get the root folder for published news
-   *
-   * @return the published folder node
-   * @throws Exception when error
-   */
-  private Node getPublishedNewsFolder(Session session) throws Exception {
-    Node applicationDataNode = (Node) session.getItem(APPLICATION_DATA_PATH);
-    Node newsRootNode;
-    if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
-      newsRootNode = applicationDataNode.addNode(NEWS_NODES_FOLDER, "nt:unstructured");
-      applicationDataNode.save();
-    } 
-    else {
-      newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
-    }
-    Node publishedRootNode;
-    if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
-      publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
-      newsRootNode.save();
-    } 
-    else {
-      publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
-    }
-    return publishedRootNode;
   }
   
   private Node getSpaceNewsRootNode(String spaceId, Session session) throws RepositoryException {
@@ -978,39 +963,6 @@ public class JcrNewsStorage implements NewsStorage {
     }
   }
   
-  /**
-   * Get the root folder for published news
-   *
-   * @return the published folder node
-   * @throws Exception when error
-   */
-  private Node getPublishedNewsFolder() throws Exception {
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
-    Session session = sessionProvider.getSession(
-                                                 repositoryService.getCurrentRepository()
-                                                                  .getConfiguration()
-                                                                  .getDefaultWorkspaceName(),
-                                                 repositoryService.getCurrentRepository());
-    Node applicationDataNode = (Node) session.getItem(APPLICATION_DATA_PATH);
-    Node newsRootNode;
-    if (!applicationDataNode.hasNode(NEWS_NODES_FOLDER)) {
-      newsRootNode = applicationDataNode.addNode(NEWS_NODES_FOLDER, "nt:unstructured");
-      applicationDataNode.save();
-    } 
-    else {
-      newsRootNode = applicationDataNode.getNode(NEWS_NODES_FOLDER);
-    }
-    Node publishedRootNode;
-    if (!newsRootNode.hasNode(PUBLISHED_NEWS_NODES_FOLDER)) {
-      publishedRootNode = newsRootNode.addNode(PUBLISHED_NEWS_NODES_FOLDER, "nt:unstructured");
-      newsRootNode.save();
-    } 
-    else {
-      publishedRootNode = newsRootNode.getNode(PUBLISHED_NEWS_NODES_FOLDER);
-    }
-    return publishedRootNode;
-  }
-  
   public void markAsRead(News news, String userId) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -1069,6 +1021,33 @@ public class JcrNewsStorage implements NewsStorage {
     return isCurrentUserInNewsViewers;
   }
 
+  public void unpublishNews(String newsId) throws Exception {
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(
+                                                 repositoryService.getCurrentRepository()
+                                                                  .getConfiguration()
+                                                                  .getDefaultWorkspaceName(),
+                                                 repositoryService.getCurrentRepository());
+    News news = getNewsById(newsId, false);
+    if (news == null) {
+      throw new Exception("Unable to find a news with an id equal to: " + newsId);
+    }
+
+    // Update News node
+    Node newsNode = session.getNodeByUUID(newsId);
+    if (newsNode == null) {
+      throw new Exception("Unable to find a node with an UUID equal to: " + newsId);
+    }
+    newsNode.setProperty("exo:pinned", false);
+    if(newsNode.isNodeType("exo:privilegeable")) {
+      ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+    }
+    newsNode.getProperty(NEWS_AUDIENCE_PROP).remove();
+    newsNode.save();
+
+    newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
+  }
+
   public News unScheduleNews(News news) throws Exception {
     SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(
@@ -1122,7 +1101,7 @@ public class JcrNewsStorage implements NewsStorage {
     }
     boolean isPublished = newsNode.getProperty("exo:pinned").getBoolean();
     if (isPublished) {
-      newsNode.setProperty("exo:pinned", false);
+      unpublishNews(newsId);
     }
     newsNode.setProperty("exo:archived", true);
     newsNode.save();

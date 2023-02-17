@@ -442,6 +442,7 @@ public class NewsServiceImpl implements NewsService {
   public void publishNews(News publishedNews, String publisher) throws Exception {
     News news = getNewsById(publishedNews.getId(), false);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED) || news.isArchived());
+    newsStorage.publishNews(news);
     if (publishedNews.getTargets() != null) {
       newsTargetingService.deleteNewsTargets(news, publisher);
       newsTargetingService.saveNewsTarget(news, displayed, publishedNews.getTargets(), publisher);
@@ -460,6 +461,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public void unpublishNews(String newsId, String publisher) throws Exception {
+    newsStorage.unpublishNews(newsId);
     News news = getNewsById(newsId, false);
     newsTargetingService.deleteNewsTargets(news, publisher);
   }

@@ -1077,6 +1077,58 @@ public class JcrNewsStorageTest {
     verify(illustrationNode, times(1)).remove();
   }
 
+  @Test
+  public void shouldPublishNews() throws Exception {
+    // Given
+
+    DataDistributionType dataDistributionType = mock(DataDistributionType.class);
+    when(dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE)).thenReturn(dataDistributionType);
+    JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+
+    JcrNewsStorage jcrNewsStorageSpy = Mockito.spy(jcrNewsStorage);
+    ExtendedNode newsNode = mock(ExtendedNode.class);
+    Node publishedRootNode = mock(Node.class);
+    Node newsFolderNode = mock(Node.class);
+    Node applicationDataNode = mock(Node.class);
+    Node newsRootNode = mock(Node.class);
+
+    News news = new News();
+    news.setTitle("published title");
+    news.setAudience("all");
+    news.setSummary("published summary");
+    news.setBody("published body");
+    news.setUploadId(null);
+    String sDate1 = "22/08/2019";
+    Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+    news.setCreationDate(date1);
+    news.setPublished(true);
+    news.setId("id123");
+
+    when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
+    when(repositoryService.getCurrentRepository()).thenReturn(repository);
+    when(repository.getConfiguration()).thenReturn(repositoryEntry);
+    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    when(sessionProvider.getSession(any(), any())).thenReturn(session);
+    when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
+    when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
+    Mockito.doReturn(news).when(jcrNewsStorageSpy).getNewsById("id123", false);
+    when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);
+    when(applicationDataNode.hasNode(eq("News"))).thenReturn(true);
+    when(applicationDataNode.getNode(eq("News"))).thenReturn(newsRootNode);
+    when(newsRootNode.hasNode(eq("Pinned"))).thenReturn(true);
+    when(newsRootNode.getNode(eq("Pinned"))).thenReturn(publishedRootNode);
+//TODO to be moved with newsService tests
+//    Mockito.doNothing()
+//           .when(jcrNewsStorageSpy)
+//           .sendNotification(news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_IN_NEWS, session);
+
+    // When
+    jcrNewsStorageSpy.publishNews(news);
+
+    // Then
+    verify(newsNode, times(1)).save();
+    verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(true));
+  }
 
   @Test
   public void shouldCreateNewsDraftAndPublishIt() throws Exception {
@@ -1132,6 +1184,7 @@ public class JcrNewsStorageTest {
     when(poster.getId()).thenReturn("root");
     JcrNewsStorage jcrNewsStorageSpy = Mockito.spy(jcrNewsStorage);
 
+    Mockito.doNothing().when(jcrNewsStorageSpy).publishNews(createdNewsDraft);
     Mockito.doReturn(createdNewsDraft).when(jcrNewsStorageSpy).createNews(news);
     Mockito.doNothing().when(publicationServiceImpl).changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
 //TODO to be moved with newsService tests

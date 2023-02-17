@@ -549,7 +549,7 @@ export default {
       if (eXo.env.portal.activityTagsEnabled) {
         extraPlugins = `${extraPlugins},tagSuggester`;
       }
-      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; }');
+      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; line-height: 1.4 !important;}');
       CKEDITOR.addCss('h1 { font-size: 34px;font-weight: 400;}');
       CKEDITOR.addCss('h2 { font-size: 28px;font-weight: 400;}');
       CKEDITOR.addCss('h3 { font-size: 21.84px;font-weight: 400;}');

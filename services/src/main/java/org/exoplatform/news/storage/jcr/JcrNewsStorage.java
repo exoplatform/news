@@ -1120,6 +1120,10 @@ public class JcrNewsStorage implements NewsStorage {
     if (newsNode == null) {
       throw new ItemNotFoundException("Unable to find a node with an UUID equal to: " + newsId);
     }
+    boolean isPublished = newsNode.getProperty("exo:pinned").getBoolean();
+    if (isPublished) {
+      newsNode.setProperty("exo:pinned", false);
+    }
     newsNode.setProperty("exo:archived", true);
     newsNode.save();
   }

@@ -1110,7 +1110,6 @@ public class JcrNewsStorageTest {
     when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
     when(sessionProvider.getSession(any(), any())).thenReturn(session);
     when(session.getNodeByUUID(nullable(String.class))).thenReturn(newsNode);
-    when(dataDistributionType.getOrCreateDataNode(any(Node.class), nullable(String.class))).thenReturn(newsFolderNode);
     when(newsNode.canAddMixin(eq("exo:privilegeable"))).thenReturn(true);
     Mockito.doReturn(news).when(jcrNewsStorageSpy).getNewsById("id123", false);
     when(session.getItem(nullable(String.class))).thenReturn(applicationDataNode);

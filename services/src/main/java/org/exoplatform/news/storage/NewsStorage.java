@@ -11,9 +11,9 @@ import org.exoplatform.social.core.space.model.Space;
 public interface NewsStorage {
   
   News createNews(News news) throws Exception;
-  
+
   void publishNews(News news) throws Exception;
-  
+
   String getNewsIllustration(News news) throws Exception;
   
   News updateNews(News news, String updater) throws Exception;
@@ -29,9 +29,9 @@ public interface NewsStorage {
   void markAsRead(News news, String userId) throws Exception;
   
   boolean isCurrentUserInNewsViewers(String newsId, String userId) throws Exception;
-  
+
   void unpublishNews(String newsId) throws Exception;
-  
+
   void shareNews(News news, Space space, Identity userIdentity, String sharedActivityId) throws IllegalAccessException, ObjectNotFoundException;
   
   void deleteNews(String newsId, boolean isDraft) throws Exception;

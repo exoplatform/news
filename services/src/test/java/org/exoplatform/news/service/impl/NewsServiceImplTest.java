@@ -1,16 +1,6 @@
 package org.exoplatform.news.service.impl;
 
-import org.exoplatform.commons.api.notification.NotificationContext;
-import org.exoplatform.commons.api.notification.NotificationMessageUtils;
-import org.exoplatform.commons.api.notification.model.PluginKey;
-import org.exoplatform.commons.api.notification.plugin.NotificationPluginUtils;
-import org.exoplatform.commons.api.notification.service.template.TemplateContext;
-import org.exoplatform.commons.notification.impl.NotificationContextImpl;
-import org.exoplatform.commons.notification.template.TemplateUtils;
 import org.exoplatform.commons.search.index.IndexingService;
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.HTMLEntityEncoder;
-import org.exoplatform.commons.utils.PropertyManager;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsESSearchConnector;
 import org.exoplatform.news.service.NewsService;
@@ -25,9 +15,7 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
-import org.exoplatform.webui.utils.TimeConvertUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -110,8 +98,10 @@ public class NewsServiceImplTest {
 
     @Test
     public void testUpdateNews() throws Exception {
-        List<String> targets = new LinkedList<>();
-        targets.add("sliderNews");
+        List<String> oldTargets = new LinkedList<>();
+        oldTargets.add("sliderNews");
+        List<String> newTargets = new LinkedList<>();
+        newTargets.add("newsTarget");
 
         News originalNews = new News();
         originalNews.setTitle("title");
@@ -121,7 +111,7 @@ public class NewsServiceImplTest {
         originalNews.setActivities("3:39;");
         originalNews.setActivityId("10");
         originalNews.setPublished(false);
-        originalNews.setPublicationState("draft");
+        originalNews.setPublicationState("archived");
 
         News news = new News();
         news.setTitle("title");
@@ -133,6 +123,7 @@ public class NewsServiceImplTest {
         news.setPublished(false);
         news.setPublicationState("draft");
         news.setCanPublish(false);
+        news.setTargets(newTargets);
 
         org.exoplatform.services.security.Identity identity = new Identity("1");
         org.exoplatform.social.core.identity.model.Identity rootIdentity = new org.exoplatform.social.core.identity.model.Identity("1");
@@ -151,8 +142,8 @@ public class NewsServiceImplTest {
         when(newsTargetingService.getTargetsByNewsId(news.getId())).thenReturn(Collections.emptyList());
         when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
         when(newsStorage.updateNews(any(News.class), anyString())).thenReturn(originalNews);
-        doNothing().when(newsStorage).unpublishNews(news.getId());
-        doNothing().when(newsStorage).publishNews(any(News.class));
+        doNothing().when(newsTargetingService).deleteNewsTargets(news.getId());
+        doNothing().when(newsTargetingService).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
 
         PowerMockito.mockStatic(NewsUtils.class);
         when(NewsUtils.processMentions(anyString())).thenReturn(new HashSet<>());
@@ -164,28 +155,44 @@ public class NewsServiceImplTest {
         when(spaceService.getSpaceById(news.getSpaceId())).thenReturn(space);
 
         newsService.updateNews(news, "root", false, false);
-        verify(newsStorage, times(0)).unpublishNews(news.getId());
-        verify(newsStorage, times(0)).publishNews(any(News.class));
+        verify(newsStorage, times(1)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
 
-        news.setPublished(true);
+        when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
+        news.setTitle("title updated");
+        newsService.updateNews(news, "root", null, false);
+        verify(newsStorage, times(2)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
+
+        news.setSummary("summary updated");
+        newsService.updateNews(news, "root", null, false);
+        verify(newsStorage, times(3)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
+
+        news.setBody("body updated");
+        newsService.updateNews(news, "root", null, false);
+        verify(newsStorage, times(4)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(0)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
+
+        news.setPublished(false);
         news.setPublicationState("archived");
         news.setCanPublish(true);
         newsService.updateNews(news, "root", null, true);
-        verify(newsStorage, times(0)).unpublishNews(news.getId());
-        verify(newsStorage, times(1)).publishNews(any(News.class));
+        verify(newsStorage, times(5)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(2)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(2)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
 
-        when(newsTargetingService.getTargetsByNewsId(news.getId())).thenReturn(targets);
+        when(newsTargetingService.getTargetsByNewsId(news.getId())).thenReturn(oldTargets);
         originalNews.setPublished(true);
-        when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
-        news.setTitle("title updated");
-        newsService.updateNews(news, "root", null, true);
-        verify(newsStorage, times(1)).unpublishNews(news.getId());
-        verify(newsStorage, times(2)).publishNews(any(News.class));
-
-        originalNews.setTitle("title updated");
+        originalNews.setTargets(oldTargets);
         when(newsStorage.getNewsById(news.getId(), false)).thenReturn(originalNews);
         newsService.updateNews(news, "root", null, false);
-        verify(newsStorage, times(2)).unpublishNews(news.getId());
-        verify(newsStorage, times(2)).publishNews(any(News.class));
+        verify(newsStorage, times(6)).updateNews(any(News.class), anyString());
+        verify(newsTargetingService, times(3)).deleteNewsTargets(any(News.class), anyString());
+        verify(newsTargetingService, times(2)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
     }
 }

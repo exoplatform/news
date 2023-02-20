@@ -158,29 +158,14 @@ public class NewsServiceImpl implements NewsService {
     org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
     boolean canPublish = NewsUtils.canPublishNews(news.getSpaceId(), updaterIdentity);
     Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
-    try {
-      // edit title case
-      if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(originalNews.getTitle())
-          && !news.getPublicationState().equals("draft") && originalNews.isPublished()) {
-        unpublishNews(news.getId(), updater);
-        if (news.getTargets() == null || news.getTargets().isEmpty()) {
-          news.setTargets(oldTargets);
-        }
+    if (publish != news.isPublished() && news.isCanPublish()) {
+      news.setPublished(publish);
+      if (news.isPublished()) {
         publishNews(news, updater);
-      }
-      // publish & unpublish cases without editing title
-      else if (!publish && (oldTargets != null && !oldTargets.isEmpty())) {
+      } else {
         unpublishNews(news.getId(), updater);
-      } else if (publish && canPublish && !news.getPublicationState().equals("draft")) {
-        if (news.getTargets() == null || news.getTargets().isEmpty()) {
-          news.setTargets(oldTargets);
-        }
-        publishNews(news, updater);
       }
-    } catch (Exception e) {
-      throw new Exception("error while publish/unpublish news", e);
     }
-    news.setPublished(publish);
     boolean displayed = !(StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
         || news.isArchived());
     if (publish == news.isPublished() && news.isPublished() && canPublish) {
@@ -464,7 +449,7 @@ public class NewsServiceImpl implements NewsService {
     }
     NewsUtils.broadcastEvent(NewsUtils.PUBLISH_NEWS, news.getId(), news);
     try {
-      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749    
+      news.setAudience(publishedNews.getAudience());//TODO waiting to fix sending notification when the article is already published PR#749
       sendNotification(publisher, news, NotificationConstants.NOTIFICATION_CONTEXT.PUBLISH_NEWS);
     } catch (Error | Exception e) {
       LOG.warn("Error sending notification when publishing news with Id " + news.getId(), e);

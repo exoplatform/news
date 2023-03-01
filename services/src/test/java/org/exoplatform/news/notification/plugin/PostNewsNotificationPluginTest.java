@@ -2,7 +2,18 @@ package org.exoplatform.news.notification.plugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+
+import java.io.Serializable;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
@@ -23,22 +34,19 @@ import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.Serializable;
-
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
-    "com.sun.org.apache.*", "org.w3c.*" })
+@RunWith(MockitoJUnitRunner.class)
 public class PostNewsNotificationPluginTest {
+
+  private static MockedStatic<CommonsUtils>        COMMONS_UTILS;
+
+  private static MockedStatic<WCMCoreUtils>        WCM_CORE_UTILS;
+
+  private static MockedStatic<IdGenerator>         ID_GENERATOR;
+
+  private static MockedStatic<PluginKey>           PLUGIN_KEY;
+
+  private static MockedStatic<ExoContainerContext> EXO_CONTAINER_CONTEXT;
 
   @Mock
   private UserHandler         userhandler;
@@ -52,19 +60,32 @@ public class PostNewsNotificationPluginTest {
   @Mock
   private OrganizationService orgService;
 
-  @Rule
-  public ExpectedException    exceptionRule = ExpectedException.none();
+  @BeforeClass
+  public static void beforeRunBare() throws Exception { // NOSONAR
+    COMMONS_UTILS = mockStatic(CommonsUtils.class);
+    WCM_CORE_UTILS = mockStatic(WCMCoreUtils.class);
+    ID_GENERATOR = mockStatic(IdGenerator.class);
+    PLUGIN_KEY = mockStatic(PluginKey.class);
+    EXO_CONTAINER_CONTEXT = mockStatic(ExoContainerContext.class);
+  }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
+  @AfterClass
+  public static void afterRunBare() throws Exception { // NOSONAR
+    COMMONS_UTILS.close();
+    WCM_CORE_UTILS.close();
+    ID_GENERATOR.close();
+    PLUGIN_KEY.close();
+    EXO_CONTAINER_CONTEXT.close();
+  }
+
   @Test
   public void shouldMakeNotificationForPostNewsContext() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
 
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
-    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "root")
@@ -81,7 +102,6 @@ public class PostNewsNotificationPluginTest {
 
     User contentAuthorUser = mock(User.class);
     when(userhandler.findUserByName("root")).thenReturn(contentAuthorUser);
-    when(contentAuthorUser.getFullName()).thenReturn("root root");
     User currentUser = mock(User.class);
     when(userhandler.findUserByName("root")).thenReturn(currentUser);
     when(currentUser.getFullName()).thenReturn("root root");
@@ -94,10 +114,9 @@ public class PostNewsNotificationPluginTest {
     receivers[0] = user1;
     receivers[1] = user2;
 
-    PowerMockito.mockStatic(IdGenerator.class);
-    when(IdGenerator.generate()).thenReturn("123456");
+    ID_GENERATOR.when(() -> IdGenerator.generate()).thenReturn("123456");
     mockIdGeneratorService();
-    when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
@@ -122,16 +141,14 @@ public class PostNewsNotificationPluginTest {
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
   }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForPostNewsContextAndDoNotSendNotificationToCreator() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
 
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
-    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "root")
@@ -149,9 +166,6 @@ public class PostNewsNotificationPluginTest {
     User contentAuthorUser = mock(User.class);
     when(userhandler.findUserByName("root")).thenReturn(contentAuthorUser);
     when(contentAuthorUser.getFullName()).thenReturn("root root");
-    User currentUser = mock(User.class);
-    when(userhandler.findUserByName("root")).thenReturn(currentUser);
-    when(currentUser.getFullName()).thenReturn("root root");
     User user1 = mock(User.class);
     when(user1.getUserName()).thenReturn("root");
     User user2 = mock(User.class);
@@ -161,10 +175,9 @@ public class PostNewsNotificationPluginTest {
     receivers[0] = user1;
     receivers[1] = user2;
 
-    PowerMockito.mockStatic(IdGenerator.class);
-    when(IdGenerator.generate()).thenReturn("123456");
+    ID_GENERATOR.when(() -> IdGenerator.generate()).thenReturn("123456");
     mockIdGeneratorService();
-    when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
@@ -191,16 +204,14 @@ public class PostNewsNotificationPluginTest {
                  notificationInfo.getValueOwnerParameter("ACTIVITY_LINK"));
   }
 
-  @PrepareForTest({ IdGenerator.class, WCMCoreUtils.class, PluginKey.class, CommonsUtils.class, ExoContainerContext.class })
   @Test
   public void shouldMakeNotificationForPostNewsContextAndAuthorUserIsNull() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
     PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
 
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(NotificationService.class)).thenReturn(null);
-    when(CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
     NotificationContext ctx = NotificationContextImpl.cloneInstance()
                                                      .append(PostNewsNotificationPlugin.CONTENT_TITLE, "title")
                                                      .append(PostNewsNotificationPlugin.CONTENT_AUTHOR, "jean")
@@ -226,10 +237,9 @@ public class PostNewsNotificationPluginTest {
     receivers[0] = user1;
     receivers[1] = user2;
 
-    PowerMockito.mockStatic(IdGenerator.class);
-    when(IdGenerator.generate()).thenReturn("123456");
+    ID_GENERATOR.when(() -> IdGenerator.generate()).thenReturn("123456");
     mockIdGeneratorService();
-    when(CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
@@ -255,8 +265,7 @@ public class PostNewsNotificationPluginTest {
   }
 
   public static void mockIdGeneratorService() {
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    when(ExoContainerContext.getService(IDGeneratorService.class)).thenReturn(new IDGeneratorService() {
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IDGeneratorService.class)).thenReturn(new IDGeneratorService() {
       @Override
       public String generateStringID(Object o) {
         return "123456";

@@ -1,5 +1,30 @@
 package org.exoplatform.news.service.impl;
 
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsESSearchConnector;
@@ -16,30 +41,11 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.*;
-
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(NewsUtils.class)
-@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
-    "com.sun.org.apache.*", "org.w3c.*" })
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class NewsServiceImplTest {
+
+    private static final MockedStatic<NewsUtils> NEWS_UTILS = mockStatic(NewsUtils.class);
 
     @Mock
     private NewsStorage newsStorage;
@@ -70,6 +76,11 @@ public class NewsServiceImplTest {
 
     private NewsService newsService;
 
+    @AfterClass
+    public static void afterRunBare() throws Exception { // NOSONAR
+      NEWS_UTILS.close();
+    }
+
     @Before
     public void setUp() {
         this.newsService = new NewsServiceImpl(spaceService, activityManager, identityManager, uploadService,
@@ -82,18 +93,14 @@ public class NewsServiceImplTest {
         news.setId("1");
         news.setViewsCount((long) 2);
 
-        PowerMockito.mockStatic(NewsUtils.class);
         when(newsStorage.isCurrentUserInNewsViewers(anyString(), anyString())).thenReturn(true, false);
         doNothing().when(newsStorage).markAsRead(any(), anyString());
         newsService.markAsRead(news, "user");
-        PowerMockito.verifyStatic(NewsUtils.class, atLeastOnce());
-        NewsUtils.broadcastEvent(anyString(), any(), any());
+        NEWS_UTILS.verify(() -> NewsUtils.broadcastEvent(anyString(), any(), any()), atLeastOnce());
         verify(newsStorage, times(0)).markAsRead(news, "user");
         newsService.markAsRead(news, "user");
-        PowerMockito.verifyStatic(NewsUtils.class, atLeastOnce());
-        NewsUtils.broadcastEvent(anyString(), any(), any());
+        NEWS_UTILS.verify(() -> NewsUtils.broadcastEvent(anyString(), any(), any()), atLeastOnce());
         verify(newsStorage, times(1)).markAsRead(news, "user");
-
     }
 
     @Test
@@ -145,10 +152,9 @@ public class NewsServiceImplTest {
         doNothing().when(newsTargetingService).deleteNewsTargets(news.getId());
         doNothing().when(newsTargetingService).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
 
-        PowerMockito.mockStatic(NewsUtils.class);
-        when(NewsUtils.processMentions(anyString())).thenReturn(new HashSet<>());
-        when(NewsUtils.getUserIdentity(anyString())).thenReturn(identity);
-        when(NewsUtils.canPublishNews(anyString(), any(org.exoplatform.services.security.Identity.class))).thenReturn(true);
+        NEWS_UTILS.when(() -> NewsUtils.processMentions(anyString())).thenReturn(new HashSet<>());
+        NEWS_UTILS.when(() -> NewsUtils.getUserIdentity(anyString())).thenReturn(identity);
+        NEWS_UTILS.when(() -> NewsUtils.canPublishNews(anyString(), any(org.exoplatform.services.security.Identity.class))).thenReturn(true);
 
         when(spaceService.getSpaceById(news.getSpaceId())).thenReturn(null);
         assertThrows(IllegalArgumentException.class, () -> newsService.updateNews(news, "root", false, false));

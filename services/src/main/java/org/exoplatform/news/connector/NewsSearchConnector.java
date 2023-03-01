@@ -1,9 +1,23 @@
 package org.exoplatform.news.connector;
 
-import org.exoplatform.commons.api.search.SearchServiceConnector;
-import org.exoplatform.commons.api.search.data.SearchContext;
-import org.exoplatform.commons.api.search.data.SearchResult;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.ecms.legacy.search.SearchServiceConnector;
+import org.exoplatform.ecms.legacy.search.data.SearchContext;
+import org.exoplatform.ecms.legacy.search.data.SearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.queryBuilder.NewsQueryBuilder;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -12,15 +26,6 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.query.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class NewsSearchConnector extends SearchServiceConnector {
 

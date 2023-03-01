@@ -1,8 +1,8 @@
 package org.exoplatform.news.connector;
 
-import org.exoplatform.commons.api.search.data.SearchResult;
-
 import javax.jcr.Node;
+
+import org.exoplatform.ecms.legacy.search.data.SearchResult;
 
 public class NewsSearchResult extends SearchResult {
   private Node node;

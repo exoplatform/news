@@ -1,25 +1,44 @@
 package org.exoplatform.news.storage.jcr;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
-import javax.jcr.*;
-import javax.jcr.version.*;
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.Session;
+import javax.jcr.Workspace;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 
-import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.AdditionalMatchers;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -37,13 +56,17 @@ import org.exoplatform.services.jcr.core.ExtendedNode;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.jcr.ext.distribution.*;
+import org.exoplatform.services.jcr.ext.distribution.DataDistributionManager;
+import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
+import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
-import org.exoplatform.services.security.*;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.services.wcm.extensions.publication.WCMPublicationServiceImpl;
 import org.exoplatform.services.wcm.extensions.publication.impl.PublicationManagerImpl;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationPlugin;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
+import org.exoplatform.social.common.service.HTMLUploadImageProcessor;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
 import org.exoplatform.social.core.identity.model.Identity;
@@ -53,10 +76,12 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.upload.UploadService;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-@PrepareForTest(CommonsUtils.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class JcrNewsStorageTest {
+
+  private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
+
+  private static final MockedStatic<PortalContainer> PORTAL_CONTAINER = mockStatic(PortalContainer.class);
 
   @Mock
   RepositoryService          repositoryService;
@@ -130,6 +155,12 @@ public class JcrNewsStorageTest {
   @Rule
   public ExpectedException   exceptionRule = ExpectedException.none();
 
+  @AfterClass
+  public static void afterRunBare() throws Exception { // NOSONAR
+    COMMONS_UTILS.close();
+    PORTAL_CONTAINER.close();
+  }
+
   @Test
   public void shouldGetNodeWhenNewsExists() throws Exception {
     JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
@@ -160,7 +191,6 @@ public class JcrNewsStorageTest {
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
     when(spaceService.isSuperManager("user")).thenReturn(false);
-    when(spaceService.isMember(nullable(String.class), nullable(String.class))).thenReturn(false);
     when(space.getVisibility()).thenReturn("private");
     when(spaceService.isSuperManager(nullable(String.class))).thenReturn(false);
 
@@ -190,7 +220,6 @@ public class JcrNewsStorageTest {
     assertNull(news);
   }
 
-  @PrepareForTest({ PortalContainer.class, CommonsUtils.class })
   @Test
   public void shouldGetLastNewsVersionWhenNewsExistsAndHasVersions() throws Exception {
     // Given
@@ -264,10 +293,8 @@ public class JcrNewsStorageTest {
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);
     when(space.getGroupId()).thenReturn("/spaces/space1");
-    PowerMockito.mockStatic(CommonsUtils.class);
-    PowerMockito.mockStatic(PortalContainer.class);
-    when(CommonsUtils.getCurrentPortalOwner()).thenReturn("intranet");
-    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("intranet");
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
     MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "publisher");
     List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
@@ -992,15 +1019,13 @@ public class JcrNewsStorageTest {
     verify(newsImageNode, atLeastOnce()).setPermission("*:" + spaceGroup, JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
   }
 
-  @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
     JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);
@@ -1035,15 +1060,13 @@ public class JcrNewsStorageTest {
     verify(illustrationNode, times(0)).remove();
   }
 
-  @PrepareForTest({ CommonsUtils.class })
   @Test
   public void shouldUpdateNodeAndRemoveIllustrationWhenUpdatingNewsWithEmptyUploadId() throws Exception {
     JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(NewsESSearchConnector.class)).thenReturn(null);
     when(sessionProviderService.getSystemSessionProvider(any())).thenReturn(sessionProvider);
     when(sessionProviderService.getSessionProvider(any())).thenReturn(sessionProvider);
     when(repositoryService.getCurrentRepository()).thenReturn(repository);

@@ -1,10 +1,40 @@
 package org.exoplatform.news.connector;
 
-import org.exoplatform.commons.api.search.data.SearchContext;
-import org.exoplatform.commons.api.search.data.SearchResult;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.Workspace;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+
+import org.junit.AfterClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.container.xml.PropertiesParam;
 import org.exoplatform.container.xml.Property;
+import org.exoplatform.ecms.legacy.search.data.SearchContext;
+import org.exoplatform.ecms.legacy.search.data.SearchResult;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.config.RepositoryEntry;
@@ -13,21 +43,6 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.wcm.search.ResultNode;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.jcr.*;
-import javax.jcr.query.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsSearchConnectorTest {

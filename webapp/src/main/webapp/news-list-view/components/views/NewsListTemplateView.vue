@@ -15,14 +15,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="article-list-view" class="py-0">
+  <div id="article-list-view" class="py-0" ref="articleListView">
     <v-row>
       <v-col
         class="flex-grow-0"
-        cols="12"
-        xs="12"
-        :md="mdCols"
-        :xl="lgCols"
+        :cols="numberOfColumns"
         v-for="(item, index) of newsInfo"
         :key="item">
         <div
@@ -64,16 +61,12 @@ export default {
     showArticleDate: true,
     showArticleReactions: true,
     canPublishNews: false,
+    parentWidth: 0
   }),
   computed: {
-    isMobile() {
-      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
-    },
-    lgCols() {
-      return !this.isMobile && document.getElementById('article-list-view').offsetWidth < this.$vuetify.breakpoint?.thresholds.md && 12 || 3;
-    },
-    mdCols() {
-      return !this.isMobile && document.getElementById('article-list-view').offsetWidth < this.$vuetify.breakpoint?.thresholds.md && 12 || 6;
+    numberOfColumns(){
+      const thresholds = this.$vuetify.breakpoint?.thresholds;
+      return this.parentWidth < thresholds.xs ? 12 : this.parentWidth < thresholds.sm ? 6 : this.parentWidth < thresholds.lg ? 4 : 3;
     }
   },
   created() {
@@ -85,6 +78,13 @@ export default {
     this.getNewsList();
   },
   mounted() {
+    // get the initial width of the parent element
+    this.parentWidth = this.$refs.articleListView.offsetWidth;
+
+    // add a resize event listener to update the parent width
+    window.addEventListener('resize', () => {
+      this.parentWidth = this.$refs.articleListView.offsetWidth;
+    });
     this.$nextTick().then(() => this.$root.$emit('application-loaded'));
   },
   methods: {

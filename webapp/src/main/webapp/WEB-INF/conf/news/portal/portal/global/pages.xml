@@ -35,7 +35,9 @@
         <access-permissions>*:/platform/users</access-permissions>
         <factory-id>addonContainer</factory-id>
       </container>
-      <container id="news-container" template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl">
+      <container id="news-container"
+                 template="system:/groovy/portal/webui/container/UIAddOnContainer.gtmpl"
+                 cssClass="singlePageApplication">
         <name>news-container</name>
         <access-permissions>*:/platform/users</access-permissions>
         <factory-id>addonContainer</factory-id>

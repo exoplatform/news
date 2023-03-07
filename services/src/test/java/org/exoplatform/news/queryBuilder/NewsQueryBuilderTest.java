@@ -2,32 +2,37 @@ package org.exoplatform.news.queryBuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.exoplatform.commons.utils.CommonsUtils;
+import org.junit.AfterClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-@PrepareForTest(CommonsUtils.class)
+@RunWith(MockitoJUnitRunner.class)
 public class NewsQueryBuilderTest {
+
+  private static final MockedStatic<NewsUtils> NEWS_UTILS = mockStatic(NewsUtils.class);
+
   @Mock
   SpaceService               spaceService;
+
+  @AfterClass
+  public static void afterRunBare() throws Exception { // NOSONAR
+    NEWS_UTILS.close();
+  }
 
   @Test
   public void shouldCreateQueryWithPinnedStateAndSearchTextAndAuthorAndOneSpaceAndCurrentUserIsNoPublisher() throws Exception {
@@ -164,7 +169,6 @@ public class NewsQueryBuilderTest {
                  query.toString());
   }
 
-  @PrepareForTest(NewsUtils.class)
   @Test
   public void shouldCreateQueryWithStagedStateWhenCurrentUserIsAuthor() throws Exception {
     // Given
@@ -189,8 +193,7 @@ public class NewsQueryBuilderTest {
     spaces.add(space1);
     spaces.add(space2);
 
-    PowerMockito.mockStatic(NewsUtils.class);
-    when(NewsUtils.getAllowedScheduledNewsSpaces(currentIdentity)).thenReturn(spaces);
+    NEWS_UTILS.when(() -> NewsUtils.getAllowedScheduledNewsSpaces(currentIdentity)).thenReturn(spaces);
 
     // when
     StringBuilder query = queryBuilder.buildQuery(filter);

@@ -1,8 +1,22 @@
 package org.exoplatform.news.notification.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+import javax.jcr.Node;
+import javax.jcr.Session;
+
+import org.junit.AfterClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.PropertyManager;
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -11,27 +25,23 @@ import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.social.core.space.model.Space;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.jcr.Node;
-import javax.jcr.Session;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({ "javax.management.*", "jdk.internal.*", "javax.xml.*", "org.apache.xerces.*", "org.xml.*",
-    "com.sun.org.apache.*", "org.w3c.*" })
+@RunWith(MockitoJUnitRunner.class)
 public class NotificationUtilsTest {
 
-  @PrepareForTest({ExoContainerContext.class, PortalContainer.class, PropertyManager.class})
+  private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
+
+  private static final MockedStatic<PortalContainer> PORTAL_CONTAINER = mockStatic(PortalContainer.class);
+
+  private static final MockedStatic<PropertyManager> PROPERTY_MANAGER = mockStatic(PropertyManager.class);
+
+  @AfterClass
+  public static void afterRunBare() throws Exception { // NOSONAR
+    COMMONS_UTILS.close();
+    PORTAL_CONTAINER.close();
+    PROPERTY_MANAGER.close();
+  }
+
   @Test
   public void shouldGetTheSpaceUrlWhenTheUserIsNotMember() {
     // Given
@@ -40,11 +50,8 @@ public class NotificationUtilsTest {
     space1.setDisplayName("space1");
     space1.setPrettyName("space1");
     space1.setGroupId("space1");
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    PowerMockito.mockStatic(PortalContainer.class);
-    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    PROPERTY_MANAGER.when(() -> PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
     // When
     String activityUrl = NotificationUtils.getNotificationActivityLink(space1, "13", false);
@@ -52,7 +59,6 @@ public class NotificationUtilsTest {
     assertEquals("http://localhost:8080/portal/g/:spaces:space1/space1", activityUrl);
   }
 
-  @PrepareForTest({ExoContainerContext.class, PortalContainer.class, PropertyManager.class})
   @Test
   public void shouldGetTheSpaceUrlWhenTheUserIsNotMemberAndAfterUpdatingSpaceName() {
     // Given
@@ -62,11 +68,8 @@ public class NotificationUtilsTest {
     space.setPrettyName(space.getDisplayName());
     space.setGroupId("space1");
 
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    PowerMockito.mockStatic(PortalContainer.class);
-    when(PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
-    PowerMockito.mockStatic(PropertyManager.class);
-    when(PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    PROPERTY_MANAGER.when(() -> PropertyManager.getProperty("gatein.email.domain.url")).thenReturn("http://localhost:8080");
 
     // When
     String activityUrl = NotificationUtils.getNotificationActivityLink(space, "13", false);
@@ -81,28 +84,18 @@ public class NotificationUtilsTest {
     assertEquals("http://localhost:8080/portal/g/:spaces:space1/space_one", activityUrl);
   }
 
-  @PrepareForTest(CommonsUtils.class)
   @Test
   public void shouldGetTheDefaultIllustrationWhenTheNodeHasNotIllustration() throws Exception {
     // Given
     SessionProviderService sessionProviderService = mock(SessionProviderService.class);
-    PowerMockito.mockStatic(CommonsUtils.class);
-    when(CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
-    SessionProvider sessionProvider = mock(SessionProvider.class);
-    when(sessionProviderService.getSessionProvider(null)).thenReturn(sessionProvider);
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(SessionProviderService.class)).thenReturn(sessionProviderService);
     RepositoryService repositoryService = mock(RepositoryService.class);
-    when(CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
-    ManageableRepository repository = mock(ManageableRepository.class);
-    when(repositoryService.getCurrentRepository()).thenReturn(repository);
-    RepositoryEntry repositoryEntry = mock(RepositoryEntry.class);
-    when(repository.getConfiguration()).thenReturn(repositoryEntry);
-    when(repositoryEntry.getDefaultWorkspaceName()).thenReturn("collaboration");
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(RepositoryService.class)).thenReturn(repositoryService);
     Session session = mock(Session.class);
-    when(sessionProvider.getSession(any(), any())).thenReturn(session);
     Node node = mock(Node.class);
     when(session.getNodeByUUID("id123")).thenReturn(node);
     when(node.hasNode("illustration")).thenReturn(false);
-    when(CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
+    COMMONS_UTILS.when(() -> CommonsUtils.getCurrentDomain()).thenReturn("http://localhost:8080");
 
     News news = new News();
     news.setId("id123");

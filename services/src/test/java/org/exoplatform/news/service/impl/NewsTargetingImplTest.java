@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,13 +18,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.ExoContainer;
@@ -54,10 +52,12 @@ import org.exoplatform.social.metadata.model.MetadataKey;
 import org.exoplatform.social.metadata.model.MetadataType;
 
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({ "com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*" })
-@PrepareForTest({ ExoContainerContext.class, CommonsUtils.class })
+@RunWith(MockitoJUnitRunner.class)
 public class NewsTargetingImplTest {
+
+  private static final MockedStatic<ExoContainerContext> EXO_CONTAINER_CONTEXT = mockStatic(ExoContainerContext.class);
+
+  private static final MockedStatic<CommonsUtils>        COMMONS_UTILS         = mockStatic(CommonsUtils.class);
 
   @Mock
   MetadataService             metadataService;
@@ -82,6 +82,12 @@ public class NewsTargetingImplTest {
 
   @Mock
   private GroupHandler groupHandler;
+
+  @AfterClass
+  public static void afterRunBare() throws Exception { // NOSONAR
+    EXO_CONTAINER_CONTEXT.close();
+    COMMONS_UTILS.close();
+  }
 
   @Test
   public void testGetAllTargets() throws Exception {
@@ -323,16 +329,13 @@ public class NewsTargetingImplTest {
     MetadataKey metadataKey = new MetadataKey(NewsTargetingService.METADATA_TYPE.getName(), "sliderNews", 0);
     Identity userIdentity = new Identity("1");
     when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(userIdentity);
-    when(metadataService.createMetadataItem(newsTargetObject, metadataKey, 1)).thenReturn(metadataItem);
     IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
     Authenticator authenticator = mock(Authenticator.class);
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
-    when(ExoContainerContext.getCurrentContainer()).thenReturn(container);
-    when(container.getComponentInstanceOfType(SpaceService.class)).thenReturn(spaceService);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getCurrentContainer()).thenReturn(container);
     when(spaceService.getSpaceById("spaceId")).thenReturn(space);
     when(spaceService.isMember(space, identity.getUserId())).thenReturn(true);
-    when(ExoContainerContext.getService(Authenticator.class)).thenReturn(authenticator);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(Authenticator.class)).thenReturn(authenticator);
     when(authenticator.createIdentity("root")).thenReturn(identity);
     List<MembershipEntry> memberships = new LinkedList<>();
     MembershipEntry membershipEntry = new MembershipEntry("/platform/web-contributors", "publisher");
@@ -340,6 +343,8 @@ public class NewsTargetingImplTest {
     identity.setMemberships(memberships);
     Map<String, String> properties = new LinkedHashMap<>();
     properties.put("displayed", String.valueOf(true));
+
+    COMMONS_UTILS.when(() -> CommonsUtils.getService(SpaceService.class)).thenReturn(spaceService);
 
     // When
     newsTargetingService.saveNewsTarget(news, true, news.getTargets(), "root");
@@ -385,20 +390,16 @@ public class NewsTargetingImplTest {
   }
 
   @Test
-  @PrepareForTest({ ExoContainerContext.class })
   public void testDeleteTargetByName() throws IllegalAccessException {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
     String username = "user";
     Identity userIdentity = new Identity();
     userIdentity.setRemoteId(username);
-    when(identityManager.getOrCreateUserIdentity(username)).thenReturn(userIdentity);
 
     IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
     org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
-    when(identityRegistry.getIdentity(username)).thenReturn(identity);
     when(identity.isMemberOf("/platform/web-contributors", "manager")).thenReturn(true);
 
     List<Metadata> newsTargets = new LinkedList<>();
@@ -416,7 +417,6 @@ public class NewsTargetingImplTest {
     newsTargetingEntity.setName("test1");
     targets.add(newsTargetingEntity);
 
-    when(newsTargetingService.getAllTargets()).thenReturn(targets);
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     newsTargetingService.deleteTargetByName(targets.get(0).getName(), identity);
 
@@ -476,14 +476,10 @@ public class NewsTargetingImplTest {
     Identity userIdentity1 = new Identity();
     userIdentity1.setId(id1);
     userIdentity1.setRemoteId(username1);
-    when(identityManager.getIdentity(id1)).thenReturn(userIdentity1);
 
     IdentityRegistry identityRegistry1 = mock(IdentityRegistry.class);
-    PowerMockito.mockStatic(ExoContainerContext.class);
-    when(ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry1);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry1);
     org.exoplatform.services.security.Identity identity1 = mock(org.exoplatform.services.security.Identity.class);
-    when(identityRegistry1.getIdentity(username1)).thenReturn(identity1);
-    when(identity1.isMemberOf("/platform/web-contributors", "publisher")).thenReturn(true);
     try {
       newsTargetingService.createNewsTarget(newsTargetingEntity, identity1);
       fail();
@@ -541,7 +537,6 @@ public class NewsTargetingImplTest {
     assertEquals(sliderNews.getName(), updatedMetadata.getName());
 
     // use case when updating a target with the same name and same description
-    when(metadataService.updateMetadata(createdMetadata, 1)).thenReturn(sliderNews);
     when(metadataService.getMetadataByKey(any())).thenReturn(sliderNews);
     try {
       newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);
@@ -550,7 +545,6 @@ public class NewsTargetingImplTest {
       // Expected
     }
 
-    when(metadataService.updateMetadata(createdMetadata, 1)).thenReturn(sliderNews);
     when(metadataService.getMetadataByKey(any())).thenReturn(null);
     try {
       newsTargetingService.updateNewsTargets(originalTargetName, newsTargetingEntity, currentIdentity);

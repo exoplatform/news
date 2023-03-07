@@ -18,36 +18,4 @@
     </init-params>
   </component>
 
-  <component>
-    <key>org.exoplatform.services.database.HibernateService</key>
-    <jmx-name>database:type=HibernateService</jmx-name>
-    <type>org.exoplatform.services.organization.idm.CustomHibernateServiceImpl</type>
-    <init-params>
-      <properties-param>
-        <name>hibernate.properties</name>
-        <description>Default Hibernate Service</description>
-        <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-        <property name="hibernate.show_sql" value="false"/>
-        <property name="hibernate.current_session_context_class" value="thread"/>
-        <property name="hibernate.cache.use_second_level_cache" value="false"/>
-        <property name="hibernate.cache.use_query_cache" value="false"/>
-        <property name="hibernate.connection.datasource" value="java:/comp/env/exo-jpa_portal"/>
-        <property name="hibernate.c3p0.min_size" value="5"/>
-        <property name="hibernate.c3p0.max_size" value="20"/>
-        <property name="hibernate.c3p0.timeout" value="1800"/>
-        <property name="hibernate.c3p0.max_statements" value="50"/>
-        <property name="hibernate.enable_lazy_load_no_trans" value="true"/>
-      </properties-param>
-    </init-params>
-  </component>
-
-  <!-- Commons Services -->
-  <component>
-    <type>org.exoplatform.commons.persistence.impl.EntityManagerService</type>
-  </component>
-
-  <import>jar:/conf/exo.portal.component.identity-configuration.xml</import>
-
-  <remove-configuration>org.exoplatform.commons.search.index.IndexingOperationProcessor</remove-configuration>
-  <remove-configuration>org.exoplatform.commons.search.rest.IndexingManagementRestServiceV1</remove-configuration>
 </configuration>

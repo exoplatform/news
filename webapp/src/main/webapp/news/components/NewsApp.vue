@@ -32,18 +32,21 @@
             <option value="drafts">{{ $t('news.app.filter.drafts') }}</option>
             <option value="scheduled">{{ $t('news.app.filter.scheduled') }}</option>
           </select>
-          <v-btn
-            icon
-            class="d-flex flex-row justify-end my-auto flex-nowrap primary--text ms-2"
-            @click="$root.$emit('news-space-selector-drawer-open')">
-            <template v-if="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1')">
-              <i class="uiIcon uiIcon24x24 settingsIcon primary--text mb-1"></i>
+          <div class="d-flex align-center">
+            <v-btn
+              icon
+              class="d-flex flex-row my-auto flex-nowrap primary--text ms-2"
+              @click="$root.$emit('news-space-selector-drawer-open')">
+              <i
+                :class="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1') && 'primary--text' || 'text-color'"
+                class="fa fa-sliders-h uiIcon24x24"></i>
+            </v-btn>
+            <span
+              v-if="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1')"
+              class="primary--text">
               ({{ spacesFilter.length }})
-            </template>
-            <template v-else>
-              <i class="uiIcon uiIcon24x24 settingsIcon text-color"></i>
-            </template>
-          </v-btn>
+            </span>
+          </div>
         </div>
       </div>
     </v-toolbar>

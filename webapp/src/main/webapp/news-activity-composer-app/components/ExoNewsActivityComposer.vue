@@ -538,16 +538,13 @@ export default {
       CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
       CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile,googleDocPastePlugin';
+      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile,googleDocPastePlugin,tagSuggester';
       let removePlugins = 'image,confirmBeforeReload,maximize,resize,embedsemantic';
       const windowWidth = $(window).width();
       const windowHeight = $(window).height();
       if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
         // Disable suggester on smart-phone landscape
         extraPlugins = 'simpleLink';
-      }
-      if (eXo.env.portal.activityTagsEnabled) {
-        extraPlugins = `${extraPlugins},tagSuggester`;
       }
       CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; line-height: 1.4 !important;}');
       CKEDITOR.addCss('h1 { font-size: 34px;font-weight: 400;}');

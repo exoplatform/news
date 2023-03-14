@@ -46,6 +46,7 @@ public class ActivityNewsProcessor extends BaseActivityProcessorPlugin {
 
         activity.setMetadataObjectId(news.getId());
         activity.setMetadataObjectType(NewsUtils.NEWS_METADATA_OBJECT_TYPE);
+        news.setIllustration(null);
       } catch (Exception e) {
         LOG.warn("Error retrieving news with id {}",
                  activity.getTemplateParams().get("newsId"),

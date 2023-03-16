@@ -51,15 +51,25 @@ export default {
       return this.news?.spaceId;
     },
   },
+  watch: {
+    activityId() {
+      this.getActivityById();
+    } 
+  },
   created() {
-    this.$activityService.getActivityById(this.activityId)
-      .then(fullActivity => {
-        this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
-      });
-    this.templateParams.newsId = this.news && this.news.id;
-    this.templateParams.spaceId = this.news && this.news.spaceId;
+    if (this.activityId) {
+      this.getActivityById();
+    }
   },
   methods: {
+    getActivityById() {
+      this.$activityService.getActivityById(this.activityId)
+        .then(fullActivity => {
+          this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
+        });
+      this.templateParams.newsId = this.news && this.news.id;
+      this.templateParams.spaceId = this.news && this.news.spaceId;
+    },
     removed() {
       this.displayAlert(this.$t('Favorite.tooltip.SuccessfullyDeletedFavorite', {0: this.$t('news.label')}));
       this.$emit('removed');

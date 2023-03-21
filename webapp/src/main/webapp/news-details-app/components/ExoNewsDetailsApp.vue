@@ -9,6 +9,7 @@
       id="newsFullDetails"
       :news="news"
       :news-id="newsId"
+      :activity-id="activityId"
       :show-edit-button="showEditButton"
       :show-publish-button="showPublishButton"
       :show-delete-button="showDeleteButton" />
@@ -30,12 +31,14 @@ export default {
     showEditButton: false,
     showPublishButton: false,
     showDeleteButton: false,
+    activityId: '',
   }),
   created() {
     this.$newsServices.getNewsById(this.newsId, false)
       .then(news => {
         if (news !== null && news !== UNAUTHORIZED_CODE) {
           this.news = news;
+          this.activityId = news.activityId;
           this.showEditButton = this.news.canEdit;
           this.showPublishButton = this.news.canPublish;
           this.showDeleteButton = this.news.canDelete;

@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           class="spaceImage"
           :src="item.spaceAvatarUrl"
           :alt="$t('news.latest.alt.spaceImage')">
-        <span class="spaceName text-color text-body-1">{{ item.spaceDisplayName }}</span>
+        <span class="spaceName">{{ item.spaceDisplayName }}</span>
       </div>
       <span v-if="showArticleTitle" class="articleTitle text-color text-body-1">{{ item.title }}</span>
       <div class="articlePostTitle">

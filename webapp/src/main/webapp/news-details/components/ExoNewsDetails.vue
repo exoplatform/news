@@ -33,6 +33,7 @@
       :news-id="newsId"
       :space="currentSpace" />
     <exo-news-edit-publishing-drawer
+      v-if="news"
       :news="news"
       @refresh-news="getNewsById(newsId)" />
     <exo-news-notification-alerts />
@@ -124,6 +125,8 @@ export default {
           if (space && space.identity && space.identity.id) {
             this.currentSpace = space;
           }
+        }).catch(error => {
+          console.warn(`Could not get the space with id ${spaceId} : ${error}`);
         });
     },
     editLink() {

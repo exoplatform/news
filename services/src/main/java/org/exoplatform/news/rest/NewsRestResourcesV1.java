@@ -34,6 +34,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.social.metadata.favorite.model.Favorite;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -374,6 +375,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
+      // check favorite
+      Identity userIdentity = identityManager.getOrCreateUserIdentity(currentIdentity.getUserId());
+      if(userIdentity != null) {
+        news.setFavorite(favoriteService.isFavorite(new Favorite("news", news.getId(), "", Long.parseLong(userIdentity.getId()))));
+      }
+
       if (StringUtils.isNotEmpty(fields) && fields.equals("spaces")) {//TODO Move to service layer
         News filteredNews = new News();
         List<String> spacesList = new ArrayList<>();

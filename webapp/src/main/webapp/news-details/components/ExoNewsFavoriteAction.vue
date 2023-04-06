@@ -55,6 +55,8 @@ export default {
     this.$activityService.getActivityById(this.activityId)
       .then(fullActivity => {
         this.isFavorite = fullActivity && fullActivity.metadatas && fullActivity.metadatas.favorites && fullActivity.metadatas.favorites.length;
+      }).catch(()=>{
+        this.isFavorite = this.news.favorite;
       });
     this.templateParams.newsId = this.news && this.news.id;
     this.templateParams.spaceId = this.news && this.news.spaceId;

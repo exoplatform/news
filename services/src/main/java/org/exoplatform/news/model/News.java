@@ -14,109 +14,111 @@ import org.exoplatform.social.metadata.model.MetadataItem;
 @AllArgsConstructor
 public class News {
 
-  private String               id;
+  private String                          id;
 
-  private String               title;
+  private String                          title;
 
-  private String               summary;
+  private String                          summary;
 
   /* sanitizedBody with usernames */
-  private String               body;
+  private String                          body;
 
   /* originalBody with user mentions */
-  private String               originalBody;
+  private String                          originalBody;
 
-  private String               author;
+  private String                          author;
 
-  private String               authorDisplayName;
-  
-  private String               authorAvatarUrl;
+  private String                          authorDisplayName;
 
-  private String               updater;
+  private String                          authorAvatarUrl;
 
-  private String               updaterFullName;
+  private String                          updater;
 
-  private String               draftUpdater;
+  private String                          updaterFullName;
 
-  private String               draftUpdaterDisplayName;
+  private String                          draftUpdater;
 
-  private String               draftUpdaterUserName;
-  
-  private Date                 draftUpdateDate;
-  
-  private boolean              draftVisible;
+  private String                          draftUpdaterDisplayName;
 
-  private String               uploadId;
+  private String                          draftUpdaterUserName;
 
-  private byte[]               illustration;
+  private Date                            draftUpdateDate;
 
-  private Date                 illustrationUpdateDate;
+  private boolean                         draftVisible;
 
-  private String                 illustrationMimeType;
+  private String                          uploadId;
 
-  private String               illustrationURL;
+  private byte[]                          illustration;
 
-  private Date                 creationDate;
+  private Date                            illustrationUpdateDate;
 
-  private Date                 publicationDate;
-  
-  private String               publicationState;
+  private String                          illustrationMimeType;
 
-  private Date                 updateDate;
+  private String                          illustrationURL;
 
-  private Date                 publishDate;
+  private Date                            creationDate;
 
-  private boolean              published;
-  
-  private String               audience;
+  private Date                            publicationDate;
 
-  private boolean              archived;
+  private String                          publicationState;
 
-  private boolean              canArchive;
+  private Date                            updateDate;
 
-  private String               spaceId;
+  private Date                            publishDate;
 
-  private String               spaceDisplayName;
+  private boolean                         published;
 
-  private String               spaceUrl;
+  private String                          audience;
 
-  private boolean              isSpaceMember;
+  private boolean                         archived;
 
-  private String               path;
+  private boolean                         canArchive;
 
-  private Long                 viewsCount;
+  private String                          spaceId;
 
-  private int                 commentsCount;
+  private String                          spaceDisplayName;
 
-  private int                 likesCount;
+  private String                          spaceUrl;
 
-  private String               activities;
+  private boolean                         isSpaceMember;
 
-  private String               activityId;
+  private String                          path;
 
-  private List<NewsAttachment> attachments;
+  private Long                            viewsCount;
 
-  private String               spaceAvatarUrl;
+  private int                             commentsCount;
 
-  private boolean              canEdit;
+  private int                             likesCount;
 
-  private boolean              canDelete;
+  private String                          activities;
 
-  private boolean              canPublish;
+  private String                          activityId;
 
-  private List<String>         sharedInSpacesList;
+  private List<NewsAttachment>            attachments;
 
-  private String               url;
+  private String                          spaceAvatarUrl;
 
-  private boolean              hiddenSpace;
+  private boolean                         canEdit;
 
-  private String               schedulePostDate;
+  private boolean                         canDelete;
 
-  private String               timeZoneId;
+  private boolean                         canPublish;
 
-  private boolean              activityPosted;
+  private List<String>                    sharedInSpacesList;
+
+  private String                          url;
+
+  private boolean                         hiddenSpace;
+
+  private String                          schedulePostDate;
+
+  private String                          timeZoneId;
+
+  private boolean                         activityPosted;
 
   private Map<String, List<MetadataItem>> metadatas;
 
-  private List<String>              targets;
+  private List<String>                    targets;
+
+  private boolean                         favorite;
 }

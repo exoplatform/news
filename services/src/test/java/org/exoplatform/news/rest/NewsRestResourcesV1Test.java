@@ -19,6 +19,7 @@ import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
 
 import org.exoplatform.services.cms.thumbnail.ThumbnailService;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class NewsRestResourcesV1Test {
 
+  public static final String JOHN = "john";
   @Mock
   NewsService            newsService;
 
@@ -77,22 +79,32 @@ public class NewsRestResourcesV1Test {
                                                        container,
                                                        favoriteService,
                                                        thumbnailService);
+    org.exoplatform.social.core.identity.model.Identity userIdentity =
+                                                                     new org.exoplatform.social.core.identity.model.Identity("1",
+                                                                                                                             JOHN,
+                                                                                                                             OrganizationIdentityProvider.NAME,
+                                                                                                                             false,
+                                                                                                                             true,
+                                                                                                                             null,
+                                                                                                                             null,
+                                                                                                                             null);
+    when(identityManager.getOrCreateUserIdentity(JOHN)).thenReturn(userIdentity);
   }
 
   @Test
   public void shouldGetNewsWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
     news.setIllustration("illustration".getBytes());
     lenient().when(newsService.getNewsById(nullable(String.class), any(), nullable(Boolean.class))).thenReturn(news);
     lenient().when(spaceService.getSpaceById(nullable(String.class))).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -107,8 +119,8 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNewsByGivenTargetName() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<News> newsList = new LinkedList<>();
     News news = new News();
@@ -136,7 +148,7 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldReturnBadRequestWhenNoActivityId() throws Exception {
     // Given
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     // When
     Response response = newsRestResourcesV1.getNewsByActivityId(null);
@@ -147,7 +159,7 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldReturnNotFoundwhenNewsNotFound() throws Exception {
     // Given
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     String activityId = "activityId";
 
@@ -163,7 +175,7 @@ public class NewsRestResourcesV1Test {
     // Given
     String activityId = "activityId";
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     when(newsService.getNewsByActivityId(activityId, currentIdentity)).thenThrow(IllegalAccessException.class);
@@ -180,7 +192,7 @@ public class NewsRestResourcesV1Test {
     // Given
     String activityId = "activityId";
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     when(newsService.getNewsByActivityId(activityId, currentIdentity)).thenThrow(ObjectNotFoundException.class);
 
@@ -196,7 +208,7 @@ public class NewsRestResourcesV1Test {
     // Given;
     String activityId = "activityId";
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     when(newsService.getNewsByActivityId(activityId, currentIdentity)).thenThrow(RuntimeException.class);
 
@@ -212,7 +224,7 @@ public class NewsRestResourcesV1Test {
     // Given
     String activityId = "activityId";
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     News news = mock(News.class);
@@ -230,14 +242,14 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNewsWhenNewsExistsAndUserIsNotMemberOfTheSpaceButSuperManager() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(false);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -259,7 +271,7 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   // News news = new News();
   // news.setPublicationState(PublicationDefaultStates.PUBLISHED);
   // lenient().when(newsService.getNewsById(anyString(), any(),
@@ -267,8 +279,8 @@ public class NewsRestResourcesV1Test {
   // lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new
   // Space());
   // lenient().when(spaceService.isMember(any(Space.class),
-  // eq("john"))).thenReturn(false);
-  // lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+  // eq(JOHN))).thenReturn(false);
+  // lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
   //
   // // When
   // Response response = newsRestResourcesV1.getNewsById(request, "1", null,
@@ -283,13 +295,13 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNotFoundWhenNewsNotExists() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -302,8 +314,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNewsSpacesWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -319,9 +331,9 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById("1")).thenReturn(space1);
     lenient().when(spaceService.getSpaceById("2")).thenReturn(space2);
-    lenient().when(spaceService.isMember(space1, "john")).thenReturn(true);
-    lenient().when(spaceService.isMember(space2, "john")).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    lenient().when(spaceService.isMember(space1, JOHN)).thenReturn(true);
+    lenient().when(spaceService.isMember(space2, JOHN)).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", "spaces", false);
@@ -333,7 +345,7 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetOKWhenUpdatingNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News existingNews = new News();
     existingNews.setTitle("Title");
@@ -347,7 +359,7 @@ public class NewsRestResourcesV1Test {
     updatedNews.setSummary("Updated Summary");
     updatedNews.setBody("Updated Body");
     updatedNews.setPublicationState(PublicationDefaultStates.PUBLISHED);
-    lenient().when(newsService.updateNews(existingNews, "john", false, updatedNews.isPublished())).then(returnsFirstArg());
+    lenient().when(newsService.updateNews(existingNews, JOHN, false, updatedNews.isPublished())).then(returnsFirstArg());
 
     // When
     Response response = newsRestResourcesV1.updateNews("1", false, updatedNews);
@@ -398,7 +410,7 @@ public class NewsRestResourcesV1Test {
   @Test
   public void shouldGetNotFoundWhenUpdatingNewsAndNewsNotExists() throws Exception {
     // Given
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
 
@@ -413,7 +425,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenPinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unpinned");
@@ -431,7 +443,7 @@ public class NewsRestResourcesV1Test {
     News updatedNews = new News();
     updatedNews.setPublished(true);
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
@@ -452,7 +464,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenArchiveNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unarchived");
@@ -471,7 +483,7 @@ public class NewsRestResourcesV1Test {
     News updatedNews = new News();
     updatedNews.setArchived(true);
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
@@ -485,7 +497,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(1)).archiveNews("id123", "john");
+    verify(newsService, times(1)).archiveNews("id123", JOHN);
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
@@ -494,7 +506,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenUnarchiveNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unarchived");
@@ -508,13 +520,13 @@ public class NewsRestResourcesV1Test {
     oldnews.setArchived(true);
     oldnews.setId("id123");
     oldnews.setSpaceId("space");
-    oldnews.setAuthor("john");
+    oldnews.setAuthor(JOHN);
     oldnews.setCanEdit(true);
 
     News updatedNews = new News();
     updatedNews.setArchived(false);
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "redactor"));
@@ -528,7 +540,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(1)).unarchiveNews("id123", "john");
+    verify(newsService, times(1)).unarchiveNews("id123", JOHN);
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
@@ -537,7 +549,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetUnauthorizedWhenArchiveNewsAndNewsExistsAndUserIsNotAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unarchived");
@@ -557,7 +569,7 @@ public class NewsRestResourcesV1Test {
     News updatedNews = new News();
     updatedNews.setArchived(true);
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "redactor"));
@@ -570,7 +582,7 @@ public class NewsRestResourcesV1Test {
     Response response = newsRestResourcesV1.patchNews(request, "id123", updatedNews);
 
     // Then
-    verify(newsService, times(0)).archiveNews("id123", "john");
+    verify(newsService, times(0)).archiveNews("id123", JOHN);
     verify(newsService, times(0)).updateNews(oldnews, request.getRemoteUser(), null, oldnews.isPublished());
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
@@ -597,14 +609,14 @@ public class NewsRestResourcesV1Test {
     updatedNews.setSummary("pinned summary");
     updatedNews.setBody("pinned body");
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
     currentIdentity.setMemberships(memberships);
 
     lenient().when(newsService.getNewsById("id123", currentIdentity, false)).thenReturn(existingNews);
-    lenient().when(newsService.updateNews(existingNews, "john", false, updatedNews.isPublished())).then(returnsFirstArg());
+    lenient().when(newsService.updateNews(existingNews, JOHN, false, updatedNews.isPublished())).then(returnsFirstArg());
 
     // When
     Response response = newsRestResourcesV1.updateNews("id123", false, updatedNews);
@@ -622,7 +634,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenUpdatingAndUnpinNewsAndNewsExistsAndAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unpinned");
@@ -641,7 +653,7 @@ public class NewsRestResourcesV1Test {
     updatedNews.setPublished(false);
     oldnews.setTitle("pinned");
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
@@ -669,7 +681,7 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   //
   // News oldnews = new News();
   // oldnews.setTitle("unpinned");
@@ -688,7 +700,7 @@ public class NewsRestResourcesV1Test {
   // updatedNews.setPublished(true);
   // oldnews.setTitle("pinned");
   //
-  // Identity currentIdentity = new Identity("john");
+  // Identity currentIdentity = new Identity(JOHN);
   // ConversationState.setCurrent(new ConversationState(currentIdentity));
   //
   // lenient().when(newsService.getNewsById("id123", currentIdentity,
@@ -707,8 +719,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNotFoundWhenNewsIsNull() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News updatedNews = new News();
     updatedNews.setPublished(true);
@@ -734,7 +746,7 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   //
   // News oldnews = new News();
   // oldnews.setTitle("unpinned");
@@ -752,7 +764,7 @@ public class NewsRestResourcesV1Test {
   // News updatedNews = new News();
   // updatedNews.setPublished(true);
   //
-  // Identity currentIdentity = new Identity("john");
+  // Identity currentIdentity = new Identity(JOHN);
   // ConversationState.setCurrent(new ConversationState(currentIdentity));
   // Space space = mock(Space.class);
   //
@@ -773,7 +785,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenPatchNewsAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unpinned");
@@ -794,7 +806,7 @@ public class NewsRestResourcesV1Test {
     updatedNews.setSummary("summary updated");
     updatedNews.setBody("body updated");
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
@@ -815,7 +827,7 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenUnpinNewsAndNewsExistsAndUserIsAuthorized() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
     News oldnews = new News();
     oldnews.setTitle("unpinned");
@@ -833,7 +845,7 @@ public class NewsRestResourcesV1Test {
     News updatedNews = new News();
     updatedNews.setPublished(false);
 
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     List<MembershipEntry> memberships = new LinkedList<MembershipEntry>();
     memberships.add(new MembershipEntry("/platform/web-contributors", "publisher"));
@@ -854,8 +866,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetBadRequestWhenUpdatingNewsAndUpdatedNewsIsNull() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     // When
@@ -869,8 +881,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetBadRequestWhenPatchNewsAndUpdatedNewsIsNull() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     // When
@@ -887,9 +899,9 @@ public class NewsRestResourcesV1Test {
     news.setId("1");
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
     lenient().when(newsService.getNewsById("1", currentIdentity, false)).thenReturn(news);
 
     // When
@@ -903,8 +915,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenSavingDraftsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -915,8 +927,8 @@ public class NewsRestResourcesV1Test {
     space1.setId("1");
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.createNews(request, news);
@@ -937,8 +949,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOkWhenCreateNewsWithPublishedState() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -949,8 +961,8 @@ public class NewsRestResourcesV1Test {
     space1.setPrettyName("space1");
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.createNews(request, news);
@@ -963,8 +975,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOkWhenScheduleNews() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -976,8 +988,8 @@ public class NewsRestResourcesV1Test {
     space1.setPrettyName("space1");
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.scheduleNews(request, news);
@@ -999,9 +1011,9 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   // org.exoplatform.services.security.Identity currentIdentity = new
-  // org.exoplatform.services.security.Identity("john");
+  // org.exoplatform.services.security.Identity(JOHN);
   // News news = new News();
   // news.setId("1");
   // news.setSpaceId("1");
@@ -1011,8 +1023,8 @@ public class NewsRestResourcesV1Test {
   // lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new
   // Space());
   // lenient().when(spaceService.isMember(any(Space.class),
-  // eq("john"))).thenReturn(false);
-  // lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+  // eq(JOHN))).thenReturn(false);
+  // lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
   //
   // // When
   // Response response = newsRestResourcesV1.createNews(request, news);
@@ -1029,13 +1041,13 @@ public class NewsRestResourcesV1Test {
     news.setId("1");
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(false);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.createNews(request, new News());
@@ -1048,8 +1060,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNewsDraftWhenNewsDraftExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1077,7 +1089,7 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   // News news = new News();
   // news.setId("1");
   // news.setSpaceId("1");
@@ -1087,8 +1099,8 @@ public class NewsRestResourcesV1Test {
   // lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new
   // Space());
   // lenient().when(spaceService.isMember(any(Space.class),
-  // eq("john"))).thenReturn(false);
-  // lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+  // eq(JOHN))).thenReturn(false);
+  // lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
   //
   // // When
   // Response response = newsRestResourcesV1.getNewsById(request, "1", null,
@@ -1104,13 +1116,13 @@ public class NewsRestResourcesV1Test {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
 
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -1124,13 +1136,13 @@ public class NewsRestResourcesV1Test {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
 
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, null, null, false);
@@ -1143,8 +1155,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNewsDraftListWhenNewsDraftsExistsAndUserIsMemberOfTheSpaceAndSuperManager() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1161,11 +1173,11 @@ public class NewsRestResourcesV1Test {
     space1.setId("1");
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", "drafts", "", 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, "1", "drafts", "", 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1175,8 +1187,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNotAuthorizedWhenNewsDraftsExistsAndUserIsNotMemberOfTheSpaceNorSuperManager() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1189,11 +1201,11 @@ public class NewsRestResourcesV1Test {
     newsDrafts.add(news2);
     lenient().when(newsService.getNews(any(NewsFilter.class), any())).thenReturn(newsDrafts);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(false);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(false);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", "1", PublicationDefaultStates.DRAFT, null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, "1", PublicationDefaultStates.DRAFT, null, 0, 10, false);
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
   }
@@ -1203,7 +1215,7 @@ public class NewsRestResourcesV1Test {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn("");
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1229,12 +1241,12 @@ public class NewsRestResourcesV1Test {
   public void shouldDeleteNewsWhenNewsExists() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
-    news.setAuthor("john");
+    news.setAuthor(JOHN);
     news.setSpaceId("1");
     news.setCanDelete(true);
 
@@ -1243,8 +1255,8 @@ public class NewsRestResourcesV1Test {
     space1.setId("1");
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
@@ -1258,8 +1270,8 @@ public class NewsRestResourcesV1Test {
   public void shouldNotDeleteNewsWhenUserIsNotDraftAuthor() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1272,8 +1284,8 @@ public class NewsRestResourcesV1Test {
     space1.setId("1");
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
@@ -1296,8 +1308,8 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   // HttpServletRequest request = mock(HttpServletRequest.class);
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
-  // Identity currentIdentity = new Identity("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+  // Identity currentIdentity = new Identity(JOHN);
   // ConversationState.setCurrent(new ConversationState(currentIdentity));
   // News news = new News();
   // news.setId("1");
@@ -1309,8 +1321,8 @@ public class NewsRestResourcesV1Test {
   // lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new
   // Space());
   // lenient().when(spaceService.isMember(any(Space.class),
-  // eq("john"))).thenReturn(false);
-  // lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+  // eq(JOHN))).thenReturn(false);
+  // lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
   //
   // // When
   // Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
@@ -1325,14 +1337,14 @@ public class NewsRestResourcesV1Test {
   public void shouldGetNotFoundWhenDeletingNewsDraftThatNotExists() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
@@ -1347,14 +1359,14 @@ public class NewsRestResourcesV1Test {
     // Given
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.deleteNews(request, null, false, 0L);
@@ -1368,8 +1380,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllPublishedNewsWhenExist() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news1 = new News();
     News news2 = new News();
@@ -1383,7 +1395,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "", null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, null, "", null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1397,8 +1409,8 @@ public class NewsRestResourcesV1Test {
     // Given
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     NewsFilter newsFilter = new NewsFilter();
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
@@ -1406,7 +1418,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNews(newsFilter, currentIdentity)).thenReturn(null);
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, null, null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, null, null, null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1419,8 +1431,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetOKWhenViewNewsAndNewsExists() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1431,8 +1443,8 @@ public class NewsRestResourcesV1Test {
     Space space1 = new Space();
     space1.setPrettyName("space1");
     lenient().when(spaceService.getSpaceById("space1")).thenReturn(space1);
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
-    lenient().when(spaceService.isSuperManager(eq("john"))).thenReturn(false);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
+    lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(false);
 
     // When
     Response response = newsRestResourcesV1.getNewsById(request, "1", null, false);
@@ -1446,8 +1458,8 @@ public class NewsRestResourcesV1Test {
     // Given
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
@@ -1466,20 +1478,20 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllPinnedNewsWhenExist() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news1 = new News();
     news1.setPublished(true);
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setPublished(true);
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setPublished(true);
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
     allNews.add(news1);
@@ -1491,7 +1503,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsCount(any())).thenReturn(allNews.size());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, "pinned", null, 0, 10, true);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, null, "pinned", null, 0, 10, true);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1502,7 +1514,7 @@ public class NewsRestResourcesV1Test {
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(true, newsList.get(i).isPublished());
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
     }
     assertEquals(0, newsEntity.getOffset().intValue());
     assertEquals(10, newsEntity.getLimit().intValue());
@@ -1513,25 +1525,25 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String text = "search";
     String spacesIds = "4,1";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1543,7 +1555,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "", text, 0, 5, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spacesIds, "", text, 0, 5, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1553,7 +1565,7 @@ public class NewsRestResourcesV1Test {
     assertEquals(3, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
@@ -1566,25 +1578,25 @@ public class NewsRestResourcesV1Test {
   public void shouldGetAllNewsWhenSearchingWithTextInTheGivenSpace() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String text = "search";
     String spaceId = "4";
     News news1 = new News();
     news1.setSpaceId(spaceId);
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId(spaceId);
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId(spaceId);
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1595,7 +1607,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spaceId, "", text, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spaceId, "", text, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1605,7 +1617,7 @@ public class NewsRestResourcesV1Test {
     assertEquals(3, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals("4", newsList.get(i).getSpaceId());
     }
@@ -1615,8 +1627,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetPinnedNewsWhenSearchingWithTextInTheGivenSpaces() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String text = "search";
@@ -1624,19 +1636,19 @@ public class NewsRestResourcesV1Test {
     News news1 = new News();
     news1.setPublished(true);
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setPublished(true);
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setPublished(true);
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1648,7 +1660,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "pinned", text, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spacesIds, "pinned", text, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1659,7 +1671,7 @@ public class NewsRestResourcesV1Test {
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(true, newsList.get(i).isPublished());
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
@@ -1669,8 +1681,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetUnauthorizedWhenSearchingWithTextInNonMemberSpaces() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String text = "search";
@@ -1690,7 +1702,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, "pinned", text, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spacesIds, "pinned", text, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -1701,25 +1713,25 @@ public class NewsRestResourcesV1Test {
     // Given
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String filter = "myPosted";
     String text = "text";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1731,7 +1743,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, filter, null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, null, filter, null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1741,7 +1753,7 @@ public class NewsRestResourcesV1Test {
     assertEquals(3, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
     }
   }
 
@@ -1749,8 +1761,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetMyPostedNewsWhenFilteringWithTheGivenSpaces() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String filter = "myPosted";
@@ -1758,17 +1770,17 @@ public class NewsRestResourcesV1Test {
     String spacesIds = "4,1";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1780,7 +1792,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, filter, null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spacesIds, filter, null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1790,7 +1802,7 @@ public class NewsRestResourcesV1Test {
     assertEquals(3, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
   }
@@ -1799,8 +1811,8 @@ public class NewsRestResourcesV1Test {
   public void shouldGetMyPostedNewsWhenSearchingWithTheGivenSpaces() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     String filter = "myPosted";
@@ -1808,17 +1820,17 @@ public class NewsRestResourcesV1Test {
     String spacesIds = "4,1";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -1830,7 +1842,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", spacesIds, filter, text, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spacesIds, filter, text, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1840,7 +1852,7 @@ public class NewsRestResourcesV1Test {
     assertEquals(3, newsList.size());
     for (int i = 0; i < newsList.size(); i++) {
       assertEquals(PublicationDefaultStates.PUBLISHED, newsList.get(i).getPublicationState());
-      assertEquals("john", newsList.get(i).getAuthor());
+      assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals(true, spacesIds.contains(newsList.get(i).getSpaceId()));
     }
@@ -1850,13 +1862,13 @@ public class NewsRestResourcesV1Test {
   public void shouldGetStagedNewsWhenCurrentUserIsAuthor() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     lenient().when(request.getLocale()).thenReturn(new Locale("en"));
     News news = new News();
     news.setSpaceId("1");
-    news.setAuthor("john");
+    news.setAuthor(JOHN);
     news.setPublicationState(PublicationDefaultStates.STAGED);
     List<News> allNews = new ArrayList<>();
     allNews.add(news);
@@ -1866,7 +1878,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
 
     // When
-    Response response = newsRestResourcesV1.getNews(request, "john", null, null, null, 0, 10, false);
+    Response response = newsRestResourcesV1.getNews(request, JOHN, null, null, null, 0, 10, false);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -1875,7 +1887,7 @@ public class NewsRestResourcesV1Test {
     assertNotNull(newsList);
     assertEquals(1, newsList.size());
     assertEquals(PublicationDefaultStates.STAGED, newsList.get(0).getPublicationState());
-    assertEquals("john", newsList.get(0).getAuthor());
+    assertEquals(JOHN, newsList.get(0).getAuthor());
   }
 
   // TODO to be moved with newsService tests
@@ -1890,17 +1902,17 @@ public class NewsRestResourcesV1Test {
   // identityManager,
   // container);
   //
-  // Identity currentIdentity = new Identity("john");
+  // Identity currentIdentity = new Identity(JOHN);
   // ConversationState.setCurrent(new ConversationState(currentIdentity));
   // News news = new News();
   // lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new
   // Space());
   // lenient().when(spaceService.isRedactor(any(Space.class),
-  // eq("john"))).thenReturn(true);
+  // eq(JOHN))).thenReturn(true);
   // lenient().when(spaceService.isMember(any(Space.class),
-  // eq("john"))).thenReturn(true);
+  // eq(JOHN))).thenReturn(true);
   // lenient().when(spaceService.isManager(any(Space.class),
-  // eq("john"))).thenReturn(true);
+  // eq(JOHN))).thenReturn(true);
   //
   // // When
   // Response response = newsRestResourcesV1.canScheduleNews("1");
@@ -1948,15 +1960,15 @@ public class NewsRestResourcesV1Test {
   public void shouldDeleteNews() throws Exception {
     // Given
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
     news.setCanDelete(true);
     lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    lenient().when(spaceService.isMember(any(Space.class), eq("john"))).thenReturn(true);
+    lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
 
     // When
     Response response = newsRestResourcesV1.deleteNews(request, news.getId(), false, 0);
@@ -1989,11 +2001,11 @@ public class NewsRestResourcesV1Test {
   public void getNewsIllustrationTest() throws Exception {
     // Given
     Request rsRequest = mock(Request.class);
-    Identity currentIdentity = new Identity("john");
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setSpaceId("1");
-    news.setAuthor("john");
+    news.setAuthor(JOHN);
     news.setPublished(true);
     news.setIllustrationUpdateDate(new Date());
     news.setIllustration("illustration".getBytes());
@@ -2001,7 +2013,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.getNewsById("1", currentIdentity, false)).thenReturn(news);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
 
     // When
@@ -2030,7 +2042,7 @@ public class NewsRestResourcesV1Test {
   // Space space = new Space();
   // space.setId("1");
   //
-  // lenient().when(request.getRemoteUser()).thenReturn("john");
+  // lenient().when(request.getRemoteUser()).thenReturn(JOHN);
   // lenient().when(spaceService.getSpaceById("1")).thenReturn(space);
   //
   // // When
@@ -2039,7 +2051,7 @@ public class NewsRestResourcesV1Test {
   // assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(),
   // response.getStatus());
   //
-  // lenient().when(spaceService.isMember(space, "john")).thenReturn(true);
+  // lenient().when(spaceService.isMember(space, JOHN)).thenReturn(true);
   // // When
   // response = newsRestResourcesV1.canCreateNews(request, "1");
   // // Then
@@ -2057,17 +2069,17 @@ public class NewsRestResourcesV1Test {
     String text = "text";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -2093,17 +2105,17 @@ public class NewsRestResourcesV1Test {
     String text = "text";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -2113,7 +2125,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    setCurrentUser("john");
+    setCurrentUser(JOHN);
 
     // When
     Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", -1,null, 10, false);
@@ -2130,17 +2142,17 @@ public class NewsRestResourcesV1Test {
     String text = "text";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -2150,7 +2162,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    setCurrentUser("john");
+    setCurrentUser(JOHN);
 
     // When
     Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, "query", "", 0,null, -1, false);
@@ -2168,17 +2180,17 @@ public class NewsRestResourcesV1Test {
     String spacesIds = "4,1";
     News news1 = new News();
     news1.setSpaceId("4");
-    news1.setAuthor("john");
+    news1.setAuthor(JOHN);
     news1.setTitle(text);
     news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news2 = new News();
     news2.setSpaceId("1");
-    news2.setAuthor("john");
+    news2.setAuthor(JOHN);
     news2.setTitle(text);
     news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
     News news3 = new News();
     news3.setSpaceId("4");
-    news3.setAuthor("john");
+    news3.setAuthor(JOHN);
     news3.setTitle(text);
     news3.setPublicationState(PublicationDefaultStates.PUBLISHED);
     List<News> allNews = new ArrayList<>();
@@ -2188,7 +2200,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
-    setCurrentUser("john");
+    setCurrentUser(JOHN);
 
     // When
     Response response = newsRestResourcesV1.search(uriInfo, httpServletRequest, text, "", 0,null, 10, false);
@@ -2207,15 +2219,15 @@ public class NewsRestResourcesV1Test {
   @Test
   public void testMarkAsRead() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    lenient().when(request.getRemoteUser()).thenReturn("john");
-    Identity currentIdentity = new Identity("john");
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
     ConversationState.setCurrent(new ConversationState(currentIdentity));
     News news = new News();
     news.setId("1");
     when(newsService.getNewsById("1",currentIdentity, false)).thenReturn(news);
-    doNothing().when(newsService).markAsRead(news, "john");
+    doNothing().when(newsService).markAsRead(news, JOHN);
     Response response = newsRestResourcesV1.markNewsAsRead(request, "1");
-    verify(newsService, times(1)).markAsRead(news,"john");
+    verify(newsService, times(1)).markAsRead(news,JOHN);
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
   }
 }

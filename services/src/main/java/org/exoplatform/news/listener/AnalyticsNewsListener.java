@@ -90,6 +90,7 @@ public class AnalyticsNewsListener extends Listener<String, News> {
     statisticData.setOperation(operation);
     statisticData.setUserId(userId);
     statisticData.addParameter("contentId", news.getId());
+    statisticData.addParameter("contentTitle", news.getTitle());
     statisticData.addParameter("contentAuthor", news.getAuthor());
     statisticData.addParameter("contentLastModifier", news.getUpdater());
     statisticData.addParameter("contentType", "News");

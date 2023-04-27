@@ -58,6 +58,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             mdi-comment
           </v-icon>
           <div class="comments-count me-2">{{ item.commentsCount }}</div>
+          <v-icon class="reactions-icon-style me-1" size="12">
+            mdi-eye
+          </v-icon>
+          <div class="viewCount">{{ item.viewsCount }}</div>           
         </div>
       </div>
     </div>

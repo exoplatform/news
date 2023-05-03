@@ -1,6 +1,7 @@
 package org.exoplatform.news.connector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,6 +67,10 @@ public class NewsSearchConnector extends SearchServiceConnector {
             repositoryService.getCurrentRepository());
 
     if (filter.getSearchText() != null) {
+      // search text composed by one keyword maybe it is the tag text
+      if (filter.getSearchText().split(" ").length <= 1){
+        filter.setTagNames(new ArrayList<>(Arrays.asList(filter.getSearchText().trim())));
+      }
       filter.setSearchText(this.addFuzzySyntaxAndOR(filter.getSearchText().trim().toLowerCase()));
     }
     List<SearchResult> res = new ArrayList<>();

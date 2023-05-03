@@ -40,9 +40,9 @@
   </modules>
 
   <properties>
-    <org.exoplatform.social.version>6.5.x-exo-SNAPSHOT</org.exoplatform.social.version>
-    <addon.exo.ecms.version>6.5.x-SNAPSHOT</addon.exo.ecms.version>
-    <addon.exo.analytics.version>1.4.x-exo-SNAPSHOT</addon.exo.analytics.version>
+    <org.exoplatform.social.version>6.5.0-exo-20230503</org.exoplatform.social.version>
+    <addon.exo.ecms.version>6.5.0-20230503</addon.exo.ecms.version>
+    <addon.exo.analytics.version>1.4.0-exo-20230503</addon.exo.analytics.version>
     <pitest.version>1.4.10</pitest.version>
     
     <sonar.organization>exoplatform</sonar.organization>

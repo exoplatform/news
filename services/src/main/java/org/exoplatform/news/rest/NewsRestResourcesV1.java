@@ -34,7 +34,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.social.metadata.favorite.model.Favorite;
+import org.exoplatform.social.metadata.tag.TagService;
+import org.exoplatform.social.metadata.tag.model.TagFilter;
+import org.exoplatform.social.metadata.tag.model.TagName;
+import org.exoplatform.social.rest.api.RestUtils;
 import org.picocontainer.Startable;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -476,6 +481,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       //Set text to search news with
       if (StringUtils.isNotEmpty(text)) {
         String lang = request.getLocale().getLanguage();
+        TagService tagService = CommonsUtils.getService(TagService.class);
+        long userIdentityId = RestUtils.getCurrentUserIdentityId();
+        List<TagName> tagNames = tagService.findTags(new TagFilter(text, 0), userIdentityId);
+        if (tagNames != null && !tagNames.isEmpty()) newsFilter.setTagNames(tagNames.stream().map(e -> e.getName()).toList());
         news = newsService.searchNews(newsFilter, lang);
       } else {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();

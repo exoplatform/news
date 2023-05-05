@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -43,6 +44,7 @@ public class NewsQueryBuilderTest {
     filter.setSearchText("text");
     filter.setOrder("jcr:score");
     filter.setAuthor("john");
+    filter.setTagNames(Arrays.asList(new String[]{"text","tex"}));
     List<String> spaces = new ArrayList<>();
     spaces.add("1");
     filter.setSpaces(spaces);
@@ -59,7 +61,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') OR ( exo:body LIKE '%#text%' OR exo:body LIKE '%#tex%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 
@@ -72,6 +74,7 @@ public class NewsQueryBuilderTest {
     filter.setSearchText("text");
     filter.setOrder("jcr:score");
     filter.setAuthor("john");
+    filter.setTagNames(Arrays.asList(new String[]{"text"}));
     List<String> spaces = new ArrayList<>();
     spaces.add("1");
     spaces.add("2");
@@ -90,7 +93,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') OR ( exo:body LIKE '%#text%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 

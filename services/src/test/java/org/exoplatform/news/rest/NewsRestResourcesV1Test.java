@@ -21,6 +21,9 @@ import org.exoplatform.news.storage.NewsAttachmentsStorage;
 import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
+import org.exoplatform.social.metadata.tag.TagService;
+import org.exoplatform.social.metadata.tag.model.TagFilter;
+import org.exoplatform.social.metadata.tag.model.TagName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +69,9 @@ public class NewsRestResourcesV1Test {
 
   @Mock
   ThumbnailService       thumbnailService;
+
+  @Mock
+  TagService tagService;
 
   private NewsRestResourcesV1 newsRestResourcesV1;
   
@@ -1550,6 +1556,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
+    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1603,6 +1611,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
+    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1620,6 +1630,51 @@ public class NewsRestResourcesV1Test {
       assertEquals(JOHN, newsList.get(i).getAuthor());
       assertEquals(text, newsList.get(i).getTitle());
       assertEquals("4", newsList.get(i).getSpaceId());
+    }
+  }
+
+  @Test
+  public void shouldGetAllNewsWhenSearchingWithTagTextInTheGivenSpace() throws Exception {
+    // Given
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    lenient().when(request.getRemoteUser()).thenReturn(JOHN);
+    Identity currentIdentity = new Identity(JOHN);
+    ConversationState.setCurrent(new ConversationState(currentIdentity));
+    lenient().when(request.getLocale()).thenReturn(new Locale("en"));
+    String tagText = "tagText";
+    String newsBody = "body including tag text #tagText";
+    String spaceId = "4";
+    News news1 = new News();
+    news1.setSpaceId(spaceId);
+    news1.setAuthor(JOHN);
+    news1.setTitle("newsTitle");
+    news1.setBody(newsBody);
+    news1.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    News news2 = new News();
+    news2.setSpaceId(spaceId);
+    news2.setAuthor(JOHN);
+    news2.setTitle("newsTitle");
+    news2.setBody(newsBody);
+    news2.setPublicationState(PublicationDefaultStates.PUBLISHED);
+    List<News> allNews = new ArrayList<>();
+    allNews.add(news1);
+    allNews.add(news2);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
+    when(tagService.findTags(new TagFilter(tagText, 0), 1L)).thenReturn(Arrays.asList(new TagName("tagText")));
+    lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
+    lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
+    lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
+    // When
+    Response response = newsRestResourcesV1.getNews(request, JOHN, spaceId, "", tagText, 0, 10, false);
+
+    // Then
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    NewsEntity newsEntity = (NewsEntity) response.getEntity();
+    List<News> newsList = newsEntity.getNews();
+    assertNotNull(newsList);
+    assertEquals(2, newsList.size());
+    for (News newsItem : newsList) {
+      assertTrue(newsItem.getBody().contains(tagText));
     }
   }
 
@@ -1655,6 +1710,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
+    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1837,6 +1894,8 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
+    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());

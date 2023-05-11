@@ -8,14 +8,12 @@ import static org.mockito.Mockito.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.enterprise.inject.New;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
@@ -26,8 +24,6 @@ import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.tag.TagService;
 import org.exoplatform.social.metadata.tag.model.TagFilter;
 import org.exoplatform.social.metadata.tag.model.TagName;
-import org.exoplatform.social.rest.api.RestUtils;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,18 +40,12 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NewsRestResourcesV1Test {
 
   public static final String JOHN = "john";
-
-  private static final MockedStatic<CommonsUtils> COMMONS_UTILS = mockStatic(CommonsUtils.class);
-
-  private static final MockedStatic<RestUtils> REST_UTILS = mockStatic(RestUtils.class);
-
   @Mock
   NewsService            newsService;
 
@@ -106,14 +96,6 @@ public class NewsRestResourcesV1Test {
                                                                                                                              null);
     when(identityManager.getOrCreateUserIdentity(JOHN)).thenReturn(userIdentity);
   }
-
-
-  @AfterClass
-  public static void afterRunBare() throws Exception { // NOSONAR
-    COMMONS_UTILS.close();
-    REST_UTILS.close();
-  }
-
 
   @Test
   public void shouldGetNewsWhenNewsExistsAndUserIsMemberOfTheSpace() throws Exception {
@@ -1574,8 +1556,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
-    REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
     when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
@@ -1630,8 +1611,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
-    REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
     when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
@@ -1679,8 +1659,7 @@ public class NewsRestResourcesV1Test {
     List<News> allNews = new ArrayList<>();
     allNews.add(news1);
     allNews.add(news2);
-    COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
-    REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
     when(tagService.findTags(new TagFilter(tagText, 0), 1L)).thenReturn(Arrays.asList(new TagName("tagText")));
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
@@ -1731,8 +1710,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
-    REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
     when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
@@ -1916,8 +1894,7 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
-    REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
+    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
     when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);

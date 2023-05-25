@@ -1,5 +1,6 @@
 package org.exoplatform.news.storage.jcr;
 
+import static org.exoplatform.news.storage.jcr.JcrNewsStorage.EXO_PRIVILEGEABLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -1151,6 +1152,16 @@ public class JcrNewsStorageTest {
     // Then
     verify(newsNode, times(1)).save();
     verify(newsNode, times(1)).setProperty(eq("exo:pinned"), eq(true));
+
+    //
+    ExtendedNode newsImageNode = mock(ExtendedNode.class);
+    news.setBody("news body with image src=\"/portal/rest/images/repository/collaboration/123\"");
+    when(jcrNewsStorageSpy.getNodeById("123", sessionProvider)).thenReturn(newsImageNode);
+    when(newsImageNode.canAddMixin(EXO_PRIVILEGEABLE)).thenReturn(true);
+    // When
+    jcrNewsStorageSpy.publishNews(news);
+    verify(newsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(newsImageNode, times(1)).save();
   }
 
   @Test

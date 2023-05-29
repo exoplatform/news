@@ -339,6 +339,7 @@ public class JcrNewsStorage implements NewsStorage {
     Node newsNode = session.getNodeByUUID(news.getId());
     newsNode.setProperty("exo:pinned", true);
     newsNode.save();
+    updateNewsImagesPermissions(news, sessionProvider, null);
   }
 
   @Override
@@ -1218,8 +1219,15 @@ public class JcrNewsStorage implements NewsStorage {
         if (image.canAddMixin(EXO_PRIVILEGEABLE)) {
           image.addMixin(EXO_PRIVILEGEABLE);
         }
-        image.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
-        image.save();
+        // share with space
+        if (space != null) {
+          image.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
+          image.save();
+        } else {
+          // make news images public
+          image.setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
+          image.save();
+        }
       }
     }
   }

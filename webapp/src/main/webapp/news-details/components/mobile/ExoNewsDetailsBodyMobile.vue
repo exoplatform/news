@@ -43,8 +43,7 @@
       <div
         v-for="attachedFile in attachments"
         :key="attachedFile.id"
-        class="newsAttachment text-truncate"
-        @click="openPreview(attachedFile)">
+        class="newsAttachment text-truncate">
         <exo-attachment-item :file="attachedFile" />
       </div>
     </div>
@@ -121,23 +120,6 @@ export default {
         }
       }
       return docElement.innerHTML;
-    },
-    openPreview(attachedFile) {
-      const self = this;
-      window.require(['SHARED/documentPreview'], function(documentPreview) {
-        documentPreview.init({
-          doc: {
-            id: attachedFile.id,
-            repository: 'repository',
-            workspace: 'collaboration',
-            title: attachedFile.name,
-            downloadUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/file`,
-            openUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/open`
-          },
-          showComments: false
-        });
-        self.hideDocPreviewComments();
-      });
     },
   }
 };

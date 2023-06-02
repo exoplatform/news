@@ -126,8 +126,7 @@
             <div
               v-for="attachedFile in attachments"
               :key="attachedFile.id"
-              class="newsAttachment"
-              @click="openPreview(attachedFile)">
+              class="newsAttachment">
               <exo-attachment-item :file="attachedFile" />
             </div>
           </div>
@@ -220,41 +219,6 @@ export default {
     },
   },
   methods: {
-    openPreview(attachedFile) {
-      const self = this;
-      window.require(['SHARED/documentPreview'], function(documentPreview) {
-        documentPreview.init({
-          doc: {
-            id: attachedFile.id,
-            repository: 'repository',
-            workspace: 'collaboration',
-            title: attachedFile.name,
-            downloadUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/file`,
-            openUrl: `/portal/rest/v1/news/attachments/${attachedFile.id}/open`
-          },
-          showComments: false
-        });
-        self.hideDocPreviewComments();
-      });
-    },
-    /**
-     * Hack to hide the document preview comments panel because the document preview component
-     * does not allow to hide it through its API
-     * @returns {void} when the comments panel appeared and has been hidden
-     */
-    hideDocPreviewComments() {
-      const intervalCheck = 100;
-
-      const commentsPanel = document.querySelector('.uiDocumentPreview .commentArea');
-      const collapsedCommentsButton = document.querySelector('.uiDocumentPreview .resizeButton');
-      if (commentsPanel != null && collapsedCommentsButton != null) {
-        commentsPanel.style.display = 'none';
-        collapsedCommentsButton.style.display = 'none';
-        document.querySelector('.uiDocumentPreview').classList += ' collapsed';
-      } else {
-        setTimeout(this.hideDocPreviewComments, intervalCheck);
-      }
-    },
     targetBlank: function (content) {
       const internal = location.host + eXo.env.portal.context;
       const domParser = new DOMParser();

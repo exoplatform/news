@@ -781,7 +781,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           String[] dimension = size.split("x");
           byte[] thumbnail = thumbnailService.createCustomThumbnail(news.getIllustration(),
                                                                     Integer.parseInt(dimension[0]),
-                                                                    Integer.parseInt(dimension[1]));
+                                                                    Integer.parseInt(dimension[1]),
+                                                                    news.getIllustrationMimeType());
           news.setIllustration(thumbnail);
         }
         builder = Response.ok(news.getIllustration(), news.getIllustrationMimeType());

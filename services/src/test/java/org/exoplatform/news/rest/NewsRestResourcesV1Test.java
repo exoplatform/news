@@ -2068,22 +2068,36 @@ public class NewsRestResourcesV1Test {
     news.setPublished(true);
     news.setIllustrationUpdateDate(new Date());
     news.setIllustration("illustration".getBytes());
+    news.setIllustrationMimeType("image");
+    News news1 = new News();
+    news1.setSpaceId("2");
+    news1.setAuthor(JOHN);
+    news1.setPublished(true);
+    news1.setIllustrationUpdateDate(new Date());
+    news1.setIllustration("illustration".getBytes());
+    news1.setIllustrationMimeType("image/gif");
 
     lenient().when(newsService.getNewsById("1", currentIdentity, false)).thenReturn(news);
+    lenient().when(newsService.getNewsById("2", currentIdentity, false)).thenReturn(news1);
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     lenient().when(request.getRemoteUser()).thenReturn(JOHN);
 
 
     // When
-    when(thumbnailService.createCustomThumbnail(any(), anyInt(), anyInt())).thenReturn("illustration".getBytes());
+    when(thumbnailService.createCustomThumbnail(any(), anyInt(), anyInt(),anyString())).thenReturn("illustration".getBytes());
     Response response = newsRestResourcesV1.getNewsIllustration(rsRequest, request, "1", 2316465L, "300x300");
-
+    Response response1 = newsRestResourcesV1.getNewsIllustration(rsRequest, request, "2", 2316465L, "300x300");
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     byte[] illustration = (byte[]) response.getEntity();
     assertNotNull(illustration);
     assertEquals("illustration", new String(illustration));
+    assertEquals(Response.Status.OK.getStatusCode(), response1.getStatus());
+    byte[] illustration1 = (byte[]) response1.getEntity();
+    assertNotNull(illustration1);
+    assertEquals("illustration", new String(illustration1));
+
   }
 
   // TODO to be moved with newsService tests

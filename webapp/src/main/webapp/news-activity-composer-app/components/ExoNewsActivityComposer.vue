@@ -591,7 +591,7 @@ export default {
         ckEditorExtensions.forEach(ckEditorExtension => newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem));
       }
       $('textarea#newsContent').ckeditor({
-        customConfig: '/commons-extension/ckeditorCustom/config.js',
+        customConfig: `${eXo.env.portal.context}/${eXo.env.portal.rest}/richeditor/configuration?type=news&v=${eXo.env.client.assetsVersion}`,
         extraPlugins: extraPlugins,
         removePlugins: removePlugins,
         allowedContent: true,

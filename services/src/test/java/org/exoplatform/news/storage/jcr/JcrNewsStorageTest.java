@@ -160,6 +160,7 @@ public class JcrNewsStorageTest {
   public static void afterRunBare() throws Exception { // NOSONAR
     COMMONS_UTILS.close();
     PORTAL_CONTAINER.close();
+    REST_UTILS.close();
   }
 
   @Test

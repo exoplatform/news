@@ -85,7 +85,6 @@ public class JcrNewsStorageTest {
 
   private static final MockedStatic<PortalContainer> PORTAL_CONTAINER = mockStatic(PortalContainer.class);
 
-  private static final MockedStatic<RestUtils> REST_UTILS = mockStatic(RestUtils.class);
 
   @Mock
   RepositoryService          repositoryService;
@@ -163,7 +162,6 @@ public class JcrNewsStorageTest {
   public static void afterRunBare() throws Exception { // NOSONAR
     COMMONS_UTILS.close();
     PORTAL_CONTAINER.close();
-    REST_UTILS.close();
   }
 
   @Test
@@ -1170,8 +1168,12 @@ public class JcrNewsStorageTest {
     //
     ExtendedNode existingUploadedNewsImageNode = mock(ExtendedNode.class);
     String nodePath = "Groups/spaces/test/testimage";
-    String baseRestUrl = "https://exoplatform.com/portal/rest";
-    REST_UTILS.when(() -> RestUtils.getBaseRestUrl()).thenReturn(baseRestUrl);
+    String currentDomainName = "https://exoplatform.com";
+    String currentPortalContainerName = "portal";
+    String restContextName = "rest";
+    COMMONS_UTILS.when(() -> CommonsUtils.getRestContextName()).thenReturn(restContextName);
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn(currentPortalContainerName);
+    COMMONS_UTILS.when(() -> CommonsUtils.getCurrentDomain()).thenReturn(currentDomainName);
     news.setBody("news body with image src=\"https://exoplatform.com/portal/rest/jcr/repository/collaboration/Groups/spaces/test/testimage\"");
     when(session.getItem(nullable(String.class))).thenReturn(existingUploadedNewsImageNode);
     when(jcrNewsStorageSpy.getNodeByPath(nodePath, sessionProvider)).thenReturn(existingUploadedNewsImageNode);

@@ -1248,7 +1248,7 @@ public class JcrNewsStorage implements NewsStorage {
     if (matcher.find()) {
       updateNewsImagesPermissions(news, sessionProvider,space, IMAGE_SRC_REGEX);
     } else {
-      String existingUploadImagesSrcRegex = "src=\"" + RestUtils.getBaseRestUrl() + "/jcr/?(.+)?\"";
+      String existingUploadImagesSrcRegex = "src=\"" + CommonsUtils.getCurrentDomain() + "/" + PortalContainer.getCurrentPortalContainerName() + "/" + CommonsUtils.getRestContextName() + "/jcr/?(.+)?\"";
       updateNewsImagesPermissions(news, sessionProvider,space, existingUploadImagesSrcRegex);
     }
   }

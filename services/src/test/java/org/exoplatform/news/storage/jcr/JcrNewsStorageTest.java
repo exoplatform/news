@@ -61,7 +61,7 @@ import org.exoplatform.upload.UploadService;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-@PrepareForTest(CommonsUtils.class)
+@PrepareForTest({CommonsUtils.class, PortalContainer.class})
 public class JcrNewsStorageTest {
 
   @Mock
@@ -1144,6 +1144,26 @@ public class JcrNewsStorageTest {
     jcrNewsStorageSpy.publishNews(news);
     verify(newsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
     verify(newsImageNode, times(1)).save();
+
+    //
+    ExtendedNode existingUploadedNewsImageNode = mock(ExtendedNode.class);
+    String nodePath = "Groups/spaces/test/testimage";
+    String currentDomainName = "https://exoplatform.com";
+    String currentPortalContainerName = "portal";
+    String restContextName = "rest";
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(PortalContainer.class);
+    when(CommonsUtils.getRestContextName()).thenReturn(restContextName);
+    when(PortalContainer.getCurrentPortalContainerName()).thenReturn(currentPortalContainerName);
+    when(CommonsUtils.getCurrentDomain()).thenReturn(currentDomainName);
+    news.setBody("news body with image src=\"https://exoplatform.com/portal/rest/jcr/repository/collaboration/Groups/spaces/test/testimage\"");
+    when(session.getItem(nullable(String.class))).thenReturn(existingUploadedNewsImageNode);
+    when(jcrNewsStorageSpy.getNodeByPath(nodePath, sessionProvider)).thenReturn(existingUploadedNewsImageNode);
+    when(existingUploadedNewsImageNode.canAddMixin(EXO_PRIVILEGEABLE)).thenReturn(true);
+    // When
+    jcrNewsStorageSpy.publishNews(news);
+    verify(existingUploadedNewsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(existingUploadedNewsImageNode, times(1)).save();
   }
 
   @Test

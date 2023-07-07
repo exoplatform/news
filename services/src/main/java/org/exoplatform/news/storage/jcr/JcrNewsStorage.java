@@ -3,6 +3,8 @@ package org.exoplatform.news.storage.jcr;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.OffsetTime;
 import java.time.ZoneId;
@@ -12,12 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.Value;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
@@ -73,74 +70,75 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.rest.api.RestUtils;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
 public class JcrNewsStorage implements NewsStorage {
 
-  private static final String      HTML_AT_SYMBOL_PATTERN           = "@";
+  private static final String    HTML_AT_SYMBOL_PATTERN           = "@";
 
-  private static final String      HTML_AT_SYMBOL_ESCAPED_PATTERN   = "&#64;";
-  
-  private static final String      LAST_PUBLISHER                   = "publication:lastUser";
-  
-  private static final Log         LOG                             = ExoLogger.getLogger(JcrNewsStorage.class);
-  
+  private static final String    HTML_AT_SYMBOL_ESCAPED_PATTERN   = "&#64;";
+
+  private static final String    LAST_PUBLISHER                   = "publication:lastUser";
+
+  private static final Log       LOG                              = ExoLogger.getLogger(JcrNewsStorage.class);
+
   private static final Pattern   MENTION_PATTERN                  = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
 
-  private static final Pattern   IMAGE_SRC_PATTERN                = Pattern.compile("src=\"/portal/rest/images/?(.+)?\"");
-  
-  public static final String       MIX_NEWS_MODIFIERS               = "mix:newsModifiers";
+  private static final String    IMAGE_SRC_REGEX                  = "src=\"/portal/rest/images/?(.+)?\"";
 
-  public static final String       MIX_NEWS_MODIFIERS_PROP          = "exo:newsModifiersIds";
+  public static final String     MIX_NEWS_MODIFIERS               = "mix:newsModifiers";
 
-  public static final String       NEWS_ACTIVITY_POSTING_MIXIN_TYPE = "mix:newsActivityPosting";
+  public static final String     MIX_NEWS_MODIFIERS_PROP          = "exo:newsModifiersIds";
 
-  public static final String       NEWS_ACTIVITY_POSTED_MIXIN_PROP  = "exo:newsActivityPosted";
-  
-  public static final String       NEWS_DRAFT_VISIBILE_MIXIN_PROP   = "exo:draftVisible";
-  
-  public static final String       NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
-  
-  public static final String       NEWS_NODES_FOLDER                = "News";
+  public static final String     NEWS_ACTIVITY_POSTING_MIXIN_TYPE = "mix:newsActivityPosting";
 
-  public  static final String      EXO_NEWS_LAST_MODIFIER           = "exo:newsLastModifier";
+  public static final String     NEWS_ACTIVITY_POSTED_MIXIN_PROP  = "exo:newsActivityPosted";
 
-  public  static final String      NEWS_MODIFICATION_MIXIN          = "mix:newsModification";
+  public static final String     NEWS_DRAFT_VISIBILE_MIXIN_PROP   = "exo:draftVisible";
 
-  public static final String       EXO_PRIVILEGEABLE                = "exo:privilegeable";
+  public static final String     NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
 
-  public static final String       NEWS_AUDIENCE_PROP  = "exo:audience";
+  public static final String     NEWS_NODES_FOLDER                = "News";
 
-  public static final String[]     SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
-  
-  private ActivityManager          activityManager;
-  
-  private DataDistributionType     dataDistributionType;
-  
-  private IdentityManager          identityManager;
+  public static final String     EXO_NEWS_LAST_MODIFIER           = "exo:newsLastModifier";
 
-  private LinkManager              linkManager;
+  public static final String     NEWS_MODIFICATION_MIXIN          = "mix:newsModification";
 
-  private NewsAttachmentsStorage   newsAttachmentsService;
-  
-  private NodeHierarchyCreator     nodeHierarchyCreator;
-  
-  private PublicationManager       publicationManager;
-  
-  private PublicationService       publicationService;
-  
-  private RepositoryService        repositoryService;
-  
-  private SessionProviderService   sessionProviderService;
+  public static final String     EXO_PRIVILEGEABLE                = "exo:privilegeable";
 
-  private SpaceService             spaceService;
+  public static final String     NEWS_AUDIENCE_PROP               = "exo:audience";
 
-  private UploadService            uploadService;
-  
-  private WCMPublicationService    wCMPublicationService;
-  
-  private NewsSearchConnector      newsSearchConnector;
+  public static final String[]   SHARE_NEWS_PERMISSIONS           = new String[] { PermissionType.READ };
+
+  private ActivityManager        activityManager;
+
+  private DataDistributionType   dataDistributionType;
+
+  private IdentityManager        identityManager;
+
+  private LinkManager            linkManager;
+
+  private NewsAttachmentsStorage newsAttachmentsService;
+
+  private NodeHierarchyCreator   nodeHierarchyCreator;
+
+  private PublicationManager     publicationManager;
+
+  private PublicationService     publicationService;
+
+  private RepositoryService      repositoryService;
+
+  private SessionProviderService sessionProviderService;
+
+  private SpaceService           spaceService;
+
+  private UploadService          uploadService;
+
+  private WCMPublicationService  wCMPublicationService;
+
+  private NewsSearchConnector    newsSearchConnector;
 
   public JcrNewsStorage(RepositoryService repositoryService,
                          SessionProviderService sessionProviderService,
@@ -1209,12 +1207,18 @@ public class JcrNewsStorage implements NewsStorage {
                                       repositoryService.getCurrentRepository());
   }
 
-  private void updateNewsImagesPermissions(News news, SessionProvider sessionProvider, Space space) throws RepositoryException {
-    Matcher matcher = IMAGE_SRC_PATTERN.matcher(news.getBody());
+  private void updateNewsImagesPermissions(News news, SessionProvider sessionProvider, Space space, String imageSrcRegex) throws RepositoryException {
+    Matcher matcher = Pattern.compile(imageSrcRegex).matcher(news.getBody());
     while (matcher.find()) {
       String match = matcher.group(1);
-      String imageUUID = match.substring(match.lastIndexOf("/") + 1);
-      ExtendedNode image = (ExtendedNode) getNodeById(imageUUID, sessionProvider);
+      ExtendedNode image = null;
+      if (imageSrcRegex.equals(IMAGE_SRC_REGEX)) {
+        String imageUUID = match.substring(match.lastIndexOf("/") + 1);
+        image = (ExtendedNode) getNodeById(imageUUID, sessionProvider);
+      } else {
+        String imagePath = match.substring(match.indexOf("/Groups"));
+        image = (ExtendedNode) getNodeByPath(imagePath,sessionProvider);
+      }
       if (image != null) {
         if (image.canAddMixin(EXO_PRIVILEGEABLE)) {
           image.addMixin(EXO_PRIVILEGEABLE);
@@ -1229,6 +1233,24 @@ public class JcrNewsStorage implements NewsStorage {
           image.save();
         }
       }
+    }
+  }
+  private void updateNewsImagesPermissions(News news, SessionProvider sessionProvider, Space space) throws RepositoryException {
+    Matcher matcher = Pattern.compile(IMAGE_SRC_REGEX).matcher(news.getBody());
+    if (matcher.find()) {
+      updateNewsImagesPermissions(news, sessionProvider,space, IMAGE_SRC_REGEX);
+    } else {
+      String existingUploadImagesSrcRegex = "src=\"" + CommonsUtils.getCurrentDomain() + "/" + PortalContainer.getCurrentPortalContainerName() + "/" + CommonsUtils.getRestContextName() + "/jcr/?(.+)?\"";
+      updateNewsImagesPermissions(news, sessionProvider,space, existingUploadImagesSrcRegex);
+    }
+  }
+
+  public Node getNodeByPath(String path, SessionProvider sessionProvider) {
+    try {
+      Session session = getSession(sessionProvider);
+      return (Node) session.getItem(URLDecoder.decode(path, StandardCharsets.UTF_8));
+    } catch (RepositoryException exception) {
+      return null;
     }
   }
 }

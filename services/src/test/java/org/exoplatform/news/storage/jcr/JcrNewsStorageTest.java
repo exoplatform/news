@@ -30,6 +30,7 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
 
+import org.exoplatform.social.rest.api.RestUtils;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,6 +84,7 @@ public class JcrNewsStorageTest {
   private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
 
   private static final MockedStatic<PortalContainer> PORTAL_CONTAINER = mockStatic(PortalContainer.class);
+
 
   @Mock
   RepositoryService          repositoryService;
@@ -1162,6 +1164,24 @@ public class JcrNewsStorageTest {
     jcrNewsStorageSpy.publishNews(news);
     verify(newsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
     verify(newsImageNode, times(1)).save();
+
+    //
+    ExtendedNode existingUploadedNewsImageNode = mock(ExtendedNode.class);
+    String nodePath = "Groups/spaces/test/testimage";
+    String currentDomainName = "https://exoplatform.com";
+    String currentPortalContainerName = "portal";
+    String restContextName = "rest";
+    COMMONS_UTILS.when(() -> CommonsUtils.getRestContextName()).thenReturn(restContextName);
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn(currentPortalContainerName);
+    COMMONS_UTILS.when(() -> CommonsUtils.getCurrentDomain()).thenReturn(currentDomainName);
+    news.setBody("news body with image src=\"https://exoplatform.com/portal/rest/jcr/repository/collaboration/Groups/spaces/test/testimage\"");
+    when(session.getItem(nullable(String.class))).thenReturn(existingUploadedNewsImageNode);
+    when(jcrNewsStorageSpy.getNodeByPath(nodePath, sessionProvider)).thenReturn(existingUploadedNewsImageNode);
+    when(existingUploadedNewsImageNode.canAddMixin(EXO_PRIVILEGEABLE)).thenReturn(true);
+    // When
+    jcrNewsStorageSpy.publishNews(news);
+    verify(existingUploadedNewsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(existingUploadedNewsImageNode, times(1)).save();
   }
 
   @Test

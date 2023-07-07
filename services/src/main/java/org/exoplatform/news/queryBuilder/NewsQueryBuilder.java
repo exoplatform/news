@@ -55,7 +55,7 @@ public class NewsQueryBuilder {
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
           String escapedQuoteSearchText = filter.getSearchText().replace("'", "''").replace("\"", "\"\"");
           sqlQuery.append("CONTAINS(.,'").append(escapedQuoteSearchText).append("')");
-          if (!filter.getTagNames().isEmpty()){
+          if (filter.getTagNames() != null && !filter.getTagNames().isEmpty()){
             sqlQuery.append(" OR (");
             for (String tagName : filter.getTagNames()) {
               sqlQuery.append(" exo:body LIKE '%#").append(tagName).append("%'");

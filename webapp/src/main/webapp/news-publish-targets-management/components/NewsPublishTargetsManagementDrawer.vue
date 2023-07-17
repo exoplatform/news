@@ -108,6 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               :group-member="userGroup"
               :group-type="groupType"
               :all-groups-for-admin="allGroupsForAdmin"
+              :search-options="{filterType: 'all'}"
               include-spaces
               include-groups
               required />

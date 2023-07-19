@@ -229,4 +229,24 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.social.core.manager.ActivityManager</target-component>
+    <component-plugin>
+      <name>NewsActivityTypePlugin</name>
+      <set-method>addActivityTypePlugin</set-method>
+      <type>org.exoplatform.social.core.ActivityTypePlugin</type>
+      <init-params>
+        <value-param>
+          <name>type</name>
+          <value>news</value>
+        </value-param>
+        <value-param>
+          <name>enableNotification</name>
+          <value>false</value>
+        </value-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
 </configuration>

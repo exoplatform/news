@@ -94,4 +94,40 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
+  <external-component-plugins>
+    <target-component>org.exoplatform.portal.page.PageTemplateService</target-component>
+    <component-plugin>
+      <name>newsPageConfigs</name>
+      <set-method>addPageTemplate</set-method>
+      <type>org.exoplatform.portal.page.PageTemplatePlugin</type>
+      <init-params>
+        <object-param>
+          <name>category</name>
+          <object type="org.exoplatform.webui.core.model.SelectItemCategory">
+            <field name="name">
+              <string>newsPageConfigs</string>
+            </field>
+            <field name="options">
+              <collection type="java.util.ArrayList" item-type="org.exoplatform.webui.core.model.SelectItemOption">
+                <value>
+                  <object type="org.exoplatform.webui.core.model.SelectItemOption">
+                    <field name="label">
+                      <string>newsPage.newsLayout</string>
+                    </field>
+                    <field name="value">
+                      <string>news</string>
+                    </field>
+                    <field name="icon">
+                      <string>NewsLayout</string>
+                    </field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
 </configuration>

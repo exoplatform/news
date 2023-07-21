@@ -1,0 +1,30 @@
+
+#topNewsPage {
+  margin-bottom: 10px;
+}
+
+#newsBodyPageChildren {
+  display: flex;
+  .newsBodyPageLeftColumn {
+    width: 75%;
+    margin: 0 15px;
+  }
+  .newsBodyPageRightColumn {
+    width: 25%;
+    margin: 0 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  #newsBodyPageChildren {
+    display: block;
+    .newsBodyPageLeftColumn {
+      width: auto;
+      margin: 0 15px;
+    }
+    .newsBodyPageRightColumn {
+      width: auto;
+      margin: 0 15px;
+    }
+  }
+}

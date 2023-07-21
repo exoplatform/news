@@ -22,57 +22,56 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_objects_1_8 http://www.exoplatform.org/xml/ns/gatein_objects_1_8"
       xmlns="http://www.exoplatform.org/xml/ns/gatein_objects_1_8">
-    <name></name>
-    <container
-            id="newsPage"
-            template="system:/groovy/portal/webui/container/UIContainer.gtmpl"
-            cssClass="border-box-sizing">
-        <access-permissions>Everyone</access-permissions>
-        <container id="topNewsPage" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-            <access-permissions>*:/platform/users</access-permissions>
-        </container>
-        <container id="newsBodyPage" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-            <access-permissions>Everyone</access-permissions>
-            <container cssClass="newsBodyPageLeftColumn"
-                       template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-                <access-permissions>*:/platform/users</access-permissions>
-                <portlet-application>
-                    <portlet>
-                        <application-ref>news</application-ref>
-                        <portlet-ref>NewsListView</portlet-ref>
-                    </portlet>
-                    <access-permissions>Everyone</access-permissions>
-                    <show-info-bar>false</show-info-bar>
-                </portlet-application>
-                <portlet-application>
-                    <portlet>
-                        <application-ref>news</application-ref>
-                        <portlet-ref>NewsListView</portlet-ref>
-                    </portlet>
-                    <access-permissions>Everyone</access-permissions>
-                    <show-info-bar>false</show-info-bar>
-                </portlet-application>
-            </container>
-            <container cssClass="newsBodyPageRightColumn"
-                       template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-                <access-permissions>*:/platform/users</access-permissions>
-                <portlet-application>
-                    <portlet>
-                        <application-ref>news</application-ref>
-                        <portlet-ref>NewsListView</portlet-ref>
-                    </portlet>
-                    <access-permissions>Everyone</access-permissions>
-                    <show-info-bar>false</show-info-bar>
-                </portlet-application>
-                <portlet-application>
-                    <portlet>
-                        <application-ref>news</application-ref>
-                        <portlet-ref>NewsListView</portlet-ref>
-                    </portlet>
-                    <access-permissions>Everyone</access-permissions>
-                    <show-info-bar>false</show-info-bar>
-                </portlet-application>
-            </container>
-        </container>
+  <name></name>
+  <container id="newsPage"
+             template="system:/groovy/portal/webui/container/UIContainer.gtmpl"
+             cssClass="border-box-sizing">
+    <access-permissions>Everyone</access-permissions>
+    <container id="topNewsPage" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+      <access-permissions>*:/platform/users</access-permissions>
     </container>
+    <container id="newsBodyPage" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+      <access-permissions>Everyone</access-permissions>
+      <container cssClass="newsBodyPageLeftColumn"
+                 template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+        <access-permissions>*:/platform/users</access-permissions>
+        <portlet-application>
+          <portlet>
+            <application-ref>news</application-ref>
+            <portlet-ref>NewsListView</portlet-ref>
+          </portlet>
+          <access-permissions>Everyone</access-permissions>
+          <show-info-bar>false</show-info-bar>
+        </portlet-application>
+        <portlet-application>
+          <portlet>
+            <application-ref>news</application-ref>
+            <portlet-ref>NewsListView</portlet-ref>
+          </portlet>
+          <access-permissions>Everyone</access-permissions>
+          <show-info-bar>false</show-info-bar>
+        </portlet-application>
+      </container>
+      <container cssClass="newsBodyPageRightColumn"
+                 template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+        <access-permissions>*:/platform/users</access-permissions>
+        <portlet-application>
+          <portlet>
+            <application-ref>news</application-ref>
+            <portlet-ref>NewsListView</portlet-ref>
+          </portlet>
+          <access-permissions>Everyone</access-permissions>
+          <show-info-bar>false</show-info-bar>
+        </portlet-application>
+        <portlet-application>
+          <portlet>
+            <application-ref>news</application-ref>
+            <portlet-ref>NewsListView</portlet-ref>
+          </portlet>
+          <access-permissions>Everyone</access-permissions>
+          <show-info-bar>false</show-info-bar>
+        </portlet-application>
+      </container>
+    </container>
+  </container>
 </page>

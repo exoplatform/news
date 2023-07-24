@@ -136,15 +136,20 @@ export default {
         this.disabled = true;
       } else {
         this.disabled = false;
+      }     
+      if (this.publish && this.news.targets && this.selectedTargets !== this.news.targets) {
+        this.selectedTargets = this.news.targets;
+        this.disabled = false;
+        if (this.news.published) {
+          this.disabled = true;
+        }
       }
     },
     selectedTargets(newVal, oldVal) {
       if (this.publish && newVal.length === 0) {
         this.disabled = true;
-      } else if (newVal !== oldVal) {
+      } else if (this.publish && this.selectedTargets !== this.news.targets && newVal !== oldVal) {
         this.disabled = false;
-      } else {
-        this.disabled = true;
       }
     },
   },
@@ -211,9 +216,7 @@ export default {
       this.editingNews = true;
       this.news.published = this.publish;
       this.news.activityPosted = !this.isActivityPosted;
-      if (this.selectedTargets.length > 0) {
-        this.news.targets = this.selectedTargets;
-      }
+      this.news.targets = this.selectedTargets;
       if (this.publish) {
         this.news.audience = this.selectedAudience === this.$t('news.composer.stepper.audienceSection.allUsers') ? 'all' : 'space';
       }

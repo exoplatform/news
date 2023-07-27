@@ -7,11 +7,13 @@
   display: flex;
   .newsBodyPageLeftColumn {
     width: 75%;
-    margin: 0 15px;
+    margin-left: 15px ~'; /** orientation=rt */ ';
+    margin-right: 15px ~'; /** orientation=lt */ ';
   }
   .newsBodyPageRightColumn {
     width: 25%;
-    margin: 0 15px;
+    margin-left: 15px ~'; /** orientation=lt */ ';
+    margin-right: 15px ~'; /** orientation=rt */ ';
   }
 }
 
@@ -20,11 +22,11 @@
     display: block;
     .newsBodyPageLeftColumn {
       width: auto;
-      margin: 0 15px;
+      margin: 0 ;
     }
     .newsBodyPageRightColumn {
       width: auto;
-      margin: 0 15px;
+      margin: 0 ;
     }
   }
 }

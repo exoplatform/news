@@ -31,9 +31,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-flex class="d-flex news-empty-template noNews">
         <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent">
           <i class="uiNoNewsIcon"></i>
-          <span class="title mt-5">
+          <span v-if="!canPublishNews" class="title mt-5">
             {{ $t('news.latest.noNews') }}
           </span>
+          <span v-else class="title my-1 font-weight-bold">
+            {{ $t('news.latest.noSettings') }}
+          </span>
+          <v-btn
+            v-if="canPublishNews"
+            class="btn btn-primary"
+            outlined
+            @click="openDrawer">
+            {{ $t('news.latest.openSettings') }}
+          </v-btn>
         </div>
       </v-flex>
     </v-main>

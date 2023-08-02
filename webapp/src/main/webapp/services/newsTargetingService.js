@@ -74,11 +74,9 @@ export function createTarget(target) {
     body: JSON.stringify(target),
   }).then((resp) => {
     if (resp && resp.ok) {
-      return resp.status;
-    } else if ( resp.status === 409) {
-      return resp.status;
-    } else {
-      throw new Error('Error when creating news target');
+      return resp.json();
+    } else  {
+      throw new Error(resp.status);
     }
   });
 }

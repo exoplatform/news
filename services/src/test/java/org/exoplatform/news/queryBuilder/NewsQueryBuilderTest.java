@@ -61,7 +61,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') OR ( exo:body LIKE '%#text%' OR exo:body LIKE '%#tex%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%')) OR ( exo:body LIKE '%#text%' OR exo:body LIKE '%#tex%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 
@@ -74,7 +74,6 @@ public class NewsQueryBuilderTest {
     filter.setSearchText("text");
     filter.setOrder("jcr:score");
     filter.setAuthor("john");
-    filter.setTagNames(Arrays.asList(new String[]{"text"}));
     List<String> spaces = new ArrayList<>();
     spaces.add("1");
     spaces.add("2");
@@ -93,7 +92,7 @@ public class NewsQueryBuilderTest {
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND CONTAINS(.,'text') OR ( exo:body LIKE '%#text%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%'))AND exo:pinned = 'true' AND ( exo:spaceId = '1' OR exo:spaceId = '2' OR exo:spaceId = '3') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 
@@ -205,5 +204,75 @@ public class NewsQueryBuilderTest {
     assertNotNull(query);
     assertEquals("SELECT * FROM exo:news WHERE publication:currentState = 'staged' AND (exo:author = 'john' OR exo:spaceId = '1' OR exo:spaceId = '2' ) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY null DESC",
                  query.toString());
+  }
+  @Test
+  public void shouldCreateQueryWithNoFilter() throws Exception {
+    // Given
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+    NewsFilter filter = new NewsFilter();
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    filter = null;
+    // when
+    StringBuilder query = queryBuilder.buildQuery(filter);
+
+    // then
+    assertNotNull(query);
+    assertEquals("SELECT * FROM exo:news WHERE ", query.toString());
+  }
+  @Test
+  public void shouldAddFuzzySyntaxWhitQuotedWord() throws Exception {
+    // Given
+    String text = "\"quoted\"";
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+
+    // When
+    String result = queryBuilder.addFuzzySyntaxAndOR(text);
+
+    // Then
+    assertNotNull(result);
+    assertEquals(result, "\"quoted\"~0.6");
+  }
+
+  @Test
+  public void shouldAddFuzzySyntaxWhenTextContainsMultiWords() throws Exception {
+    // Given
+    String text = "search text";
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+
+    // When
+    String result = queryBuilder.addFuzzySyntaxAndOR(text);
+
+    // Then
+    assertNotNull(result);
+    assertEquals(result, "search~0.6 OR text~0.6");
+  }
+
+  @Test
+  public void shouldAddFuzzySyntaxWhenTextContainsQuotedMultiWords() throws Exception {
+    // Given
+    String text = "\"search text\"";
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+
+    // When
+    String result = queryBuilder.addFuzzySyntaxAndOR(text);
+
+    // Then
+    assertNotNull(result);
+    assertEquals(result, "\"search text\"~0.6");
+  }
+  @Test
+  public void shouldAddFuzzySyntaxWhenTextContainsMultiWordsAndQuotedOne() throws Exception {
+    // Given
+    String text = "this is a \"search text\"";
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+
+    // When
+    String result = queryBuilder.addFuzzySyntaxAndOR(text);
+
+    // Then
+    assertNotNull(result);
+    assertEquals(result, "this~0.6 OR is~0.6 OR a~0.6 OR \"search text\"~0.6");
   }
 }

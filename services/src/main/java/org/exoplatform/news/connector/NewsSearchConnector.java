@@ -30,7 +30,6 @@ public class NewsSearchConnector extends SearchServiceConnector {
 
   private static final Log LOG = ExoLogger.getLogger(NewsSearchConnector.class.getName());
 
-  private static final String FUZZY_SEARCH_SYNTAX = "~0.6";
 
   public NewsSearchConnector(InitParams initParams,SessionProviderService sessionProviderService,RepositoryService repositoryService) throws Exception {
     super(initParams);
@@ -60,9 +59,6 @@ public class NewsSearchConnector extends SearchServiceConnector {
     Session session = sessionProvider.getSession(repositoryService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName(),
             repositoryService.getCurrentRepository());
 
-    if (filter.getSearchText() != null) {
-      filter.setSearchText(this.addFuzzySyntaxAndOR(filter.getSearchText().trim().toLowerCase()));
-    }
     List<SearchResult> res = new ArrayList<>();
     NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
     try {
@@ -92,36 +88,5 @@ public class NewsSearchConnector extends SearchServiceConnector {
       LOG.error("Error while searching News", e);
     }
     return res;
-  }
-
-  protected String addFuzzySyntaxAndOR(String text) {
-    StringBuilder fuzzyText = new StringBuilder();
-    boolean quote = false;
-    for (int i =0; i < text.length(); i++) {
-      if (text.charAt(i) == ' ' && text.charAt(i-1) != '"' && !quote) {
-        fuzzyText = fuzzyText.append(FUZZY_SEARCH_SYNTAX);
-        if(i != text.length()-1) {
-          fuzzyText = fuzzyText.append(" OR ");
-        }
-      } else if (text.charAt(i) == '"' && !quote){
-        fuzzyText = fuzzyText.append("\"");
-        quote = true;
-      } else if (text.charAt(i) == '"' && quote){
-        if (i != text.length()-1) {
-          quote = false;
-          fuzzyText = fuzzyText.append("\"").append(FUZZY_SEARCH_SYNTAX);
-          if(i != text.length()-1) {
-            fuzzyText = fuzzyText.append(" OR ");
-          }
-        } else {
-          quote = false;
-          fuzzyText = fuzzyText.append("\"");
-        }
-      }
-      else{
-        fuzzyText  = fuzzyText.append(text.charAt(i));
-      }
-    }
-    return fuzzyText.append(FUZZY_SEARCH_SYNTAX).toString();
   }
 }

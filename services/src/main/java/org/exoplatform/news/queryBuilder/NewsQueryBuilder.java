@@ -24,6 +24,9 @@ public class NewsQueryBuilder {
 
   private final static String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
 
+  private static final String FUZZY_SEARCH_SYNTAX = "~0.6";
+
+
   /**
    * builds query for news actions
    * 
@@ -53,8 +56,10 @@ public class NewsQueryBuilder {
           }
         }
         if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
+          String fuzzyText = this.addFuzzySyntaxAndOR(filter.getSearchText().trim().toLowerCase());
+          String escapedQuoteFuzzyText = fuzzyText.replace("'", "''").replace("\"", "\"\"");
           String escapedQuoteSearchText = filter.getSearchText().replace("'", "''").replace("\"", "\"\"");
-          sqlQuery.append("CONTAINS(.,'").append(escapedQuoteSearchText).append("')");
+          sqlQuery.append("(CONTAINS(.,'").append(escapedQuoteFuzzyText).append("') OR (exo:body LIKE '%").append(escapedQuoteSearchText).append("%'))");
           if (filter.getTagNames() != null && !filter.getTagNames().isEmpty()){
             sqlQuery.append(" OR (");
             for (String tagName : filter.getTagNames()) {
@@ -125,5 +130,36 @@ public class NewsQueryBuilder {
       LOG.error("Error while creating query", e);
     }
     return sqlQuery;
+  }
+
+  protected String addFuzzySyntaxAndOR(String text) {
+    StringBuilder fuzzyText = new StringBuilder();
+    boolean quote = false;
+    for (int i =0; i < text.length(); i++) {
+      if (text.charAt(i) == ' ' && text.charAt(i-1) != '"' && !quote) {
+        fuzzyText = fuzzyText.append(FUZZY_SEARCH_SYNTAX);
+        if(i != text.length()-1) {
+          fuzzyText = fuzzyText.append(" OR ");
+        }
+      } else if (text.charAt(i) == '"' && !quote){
+        fuzzyText = fuzzyText.append("\"");
+        quote = true;
+      } else if (text.charAt(i) == '"' && quote){
+        if (i != text.length()-1) {
+          quote = false;
+          fuzzyText = fuzzyText.append("\"").append(FUZZY_SEARCH_SYNTAX);
+          if(i != text.length()-1) {
+            fuzzyText = fuzzyText.append(" OR ");
+          }
+        } else {
+          quote = false;
+          fuzzyText = fuzzyText.append("\"");
+        }
+      }
+      else{
+        fuzzyText  = fuzzyText.append(text.charAt(i));
+      }
+    }
+    return fuzzyText.append(FUZZY_SEARCH_SYNTAX).toString();
   }
 }

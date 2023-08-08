@@ -20,10 +20,10 @@
       class="text-truncate"
       rel="nofollow"
       target="_blank">
-    {{ contentTitle }}
+      {{ contentTitle }}
     </a>
     <p>
-    ({{ attrValue }})
+      ({{ attrValue }})
     </p>
   </div>
 </template>

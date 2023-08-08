@@ -483,8 +483,12 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         String lang = request.getLocale().getLanguage();
         TagService tagService = CommonsUtils.getService(TagService.class);
         long userIdentityId = RestUtils.getCurrentUserIdentityId();
-        List<TagName> tagNames = tagService.findTags(new TagFilter(text, 0), userIdentityId);
-        if (tagNames != null && !tagNames.isEmpty()) newsFilter.setTagNames(tagNames.stream().map(e -> e.getName()).toList());
+        if (text.indexOf("#") == 0) {
+          String tagName = text.replace("#","");
+          List<TagName> tagNames = tagService.findTags(new TagFilter(tagName, 0), userIdentityId);
+          if (tagNames != null && !tagNames.isEmpty()) newsFilter.setTagNames(tagNames.stream().map(e -> e.getName()).toList());
+        }
+
         news = newsService.searchNews(newsFilter, lang);
       } else {
         org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
@@ -1008,7 +1012,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       }
     }
     // Set text to search news with
-    if (StringUtils.isNotEmpty(text)) {
+    if (StringUtils.isNotEmpty(text) && text.indexOf("#") != 0) {
       newsFilter.setSearchText(text);
     }
 

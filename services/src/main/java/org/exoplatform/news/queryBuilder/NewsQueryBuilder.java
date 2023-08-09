@@ -60,16 +60,17 @@ public class NewsQueryBuilder {
           String escapedQuoteFuzzyText = fuzzyText.replace("'", "''").replace("\"", "\"\"");
           String escapedQuoteSearchText = filter.getSearchText().replace("'", "''").replace("\"", "\"\"");
           sqlQuery.append("(CONTAINS(.,'").append(escapedQuoteFuzzyText).append("') OR (exo:body LIKE '%").append(escapedQuoteSearchText).append("%'))");
-          if (filter.getTagNames() != null && !filter.getTagNames().isEmpty()){
-            sqlQuery.append(" OR (");
+          sqlQuery.append("AND ");
+        } else {
+          if (filter.getTagNames() != null && !filter.getTagNames().isEmpty()) {
             for (String tagName : filter.getTagNames()) {
               sqlQuery.append(" exo:body LIKE '%#").append(tagName).append("%'");
-              if (filter.getTagNames().indexOf(tagName) != filter.getTagNames().size() -1) {
+              if (filter.getTagNames().indexOf(tagName) != filter.getTagNames().size() - 1) {
                 sqlQuery.append(" OR");
               }
             }
-            sqlQuery.append(" ) AND ");
-          } else sqlQuery.append("AND ");
+            sqlQuery.append(" AND ");
+          }
         }
         if (filter.isPublishedNews()) {
           sqlQuery.append("exo:pinned = 'true' AND ");

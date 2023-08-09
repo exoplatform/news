@@ -1576,7 +1576,6 @@ public class NewsRestResourcesV1Test {
     allNews.add(news3);
     COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
     REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1632,7 +1631,6 @@ public class NewsRestResourcesV1Test {
     allNews.add(news3);
     COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
     REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1681,7 +1679,6 @@ public class NewsRestResourcesV1Test {
     allNews.add(news2);
     COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
     REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
-    when(tagService.findTags(new TagFilter(tagText, 0), 1L)).thenReturn(Arrays.asList(new TagName("tagText")));
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1733,7 +1730,6 @@ public class NewsRestResourcesV1Test {
     allNews.add(news3);
     COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
     REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1918,7 +1914,6 @@ public class NewsRestResourcesV1Test {
     allNews.add(news3);
     COMMONS_UTILS.when(()-> CommonsUtils.getService(TagService.class)).thenReturn(tagService);
     REST_UTILS.when(()-> RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());

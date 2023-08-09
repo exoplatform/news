@@ -55,6 +55,9 @@ export function markNewsAsRead(newsId){
 export function getNews(filter, spaces, searchText, offset, limit, returnSize) {
   let url = `${newsConstants.NEWS_API}?author=${newsConstants.userName}&publicationState=published&filter=${filter}`;
   if (searchText) {
+    if (searchText.indexOf('#') === 0) {
+      searchText = searchText.replace('#', '%23');
+    } 
     url += `&text=${searchText}`;
   }
   if (spaces) {

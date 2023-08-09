@@ -395,8 +395,13 @@ export default {
     editMode: function() {
       return this.activityId && this.activityId !== '';
     },
+    hasMediaContent() {
+      const parsedDocument = new DOMParser().parseFromString(this.news.body, 'text/html');
+      const mediaElements = parsedDocument.querySelectorAll('img, video, iframe');
+      return mediaElements.length > 0;
+    },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
+      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim() && !this.hasMediaContent;
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment
@@ -404,7 +409,7 @@ export default {
         return true;
       }
       // disable update button if a mandatory field is empty
-      if (!this.news.title || !this.news.title.trim() || !this.news.body || !this.news.body.replace(/&nbsp;/g, '').trim()) {
+      if (!this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim() && !this.hasMediaContent) {
         return true;
       }
       // disable update button nothing has changed
@@ -412,6 +417,7 @@ export default {
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.getString(this.news.body) === this.getString(this.originalNews.body)
+                 && !this.areMediaContentsChanged(this.originalNews.body, this.news.body)
                  && this.news.published === this.originalNews.published
                  && this.news.publicationState !== 'draft') {
         return true;
@@ -1121,6 +1127,20 @@ export default {
           this.autoSave();
         }
       }, this.endUplodingFileTimeout);
+    },
+    areMediaContentsChanged(originalNewsBody, newsBody) {
+      const newsBodyParsedDocument = new DOMParser().parseFromString(newsBody, 'text/html');
+      const originalNewsBodyParsedDocument = new DOMParser().parseFromString(originalNewsBody, 'text/html');
+      const newsMediaElements = newsBodyParsedDocument.querySelectorAll('img, video, iframe');
+      const originalNewsmediaElements = originalNewsBodyParsedDocument.querySelectorAll('img, video, iframe');
+      const newsMediaSources = Array.from(newsMediaElements).map(element => element.src);
+      const originalNewsMediaSources = Array.from(originalNewsmediaElements).map(element => element.src);
+      // check if the media element is removed or new element is inserted
+      if (newsMediaSources.length !== originalNewsMediaSources.length) {
+        return true;
+      }
+      // check if the element is reinserted by the same url or from the existing upload !
+      return !originalNewsMediaSources.every((element, index) => element === newsMediaSources[index]);
     }
   }
 };

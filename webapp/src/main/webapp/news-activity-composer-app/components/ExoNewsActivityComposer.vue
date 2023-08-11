@@ -395,29 +395,37 @@ export default {
     editMode: function() {
       return this.activityId && this.activityId !== '';
     },
-    hasMediaContent() {
-      const parsedDocument = new DOMParser().parseFromString(this.news.body, 'text/html');
-      const mediaElements = parsedDocument.querySelectorAll('img, video, iframe');
-      return mediaElements.length > 0;
+    isEmptyNewsBody() {
+      return this.news.body === '' ||Array.from($(this.news.body).contents()).every(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '');
+    },
+    isSameNewsBody() {
+      // check if news body composed only by text and then compare only the text content
+      const containOnlyText = Array.from($(this.news.body).contents()).every(node => node.nodeType === Node.TEXT_NODE) && Array.from($(this.originalNews.body).contents()).every(node => node.nodeType === Node.TEXT_NODE);
+      if (containOnlyText) {
+        return this.getString(this.news.body) === this.getString(this.originalNews.body);
+      }
+      // get nodes and remove all empty text nodes then compare.
+      // isEqualNode : Two nodes are equal when they have the same type and the same content.
+      const cleanedOriginalNewsBody = Array.from($(this.originalNews.body).contents()).filter(item => !(item.nodeType === Node.TEXT_NODE && item.textContent.trim() === ''));
+      const cleanedNewsBody = Array.from($(this.news.body).contents()).filter(item => !(item.nodeType === Node.TEXT_NODE && item.textContent.trim() === ''));
+      return  cleanedOriginalNewsBody.length === cleanedNewsBody.length && cleanedNewsBody.every((node, index) => node.isEqualNode(cleanedOriginalNewsBody[index]));
     },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim() && !this.hasMediaContent;
+      return this.uploading || !this.news.title || !this.news.title.trim() || this.isEmptyNewsBody;
     },
     updateDisabled: function () {
       // disable update button while uploading an attachment
       if (this.uploading) {
         return true;
       }
-      // disable update button if a mandatory field is empty
-      if (!this.news.title || !this.news.title.trim() || !this.news.body || !new DOMParser().parseFromString(this.news.body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim() && !this.hasMediaContent) {
+      if (!this.news.title || !this.news.title.trim() || this.isEmptyNewsBody ) {
         return true;
       }
       // disable update button nothing has changed
       if (!this.illustrationChanged && !this.attachmentsChanged
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
-                 && this.getString(this.news.body) === this.getString(this.originalNews.body)
-                 && !this.areMediaContentsChanged(this.originalNews.body, this.news.body)
+                 && this.isSameNewsBody
                  && this.news.published === this.originalNews.published
                  && this.news.publicationState !== 'draft') {
         return true;
@@ -1128,20 +1136,6 @@ export default {
         }
       }, this.endUplodingFileTimeout);
     },
-    areMediaContentsChanged(originalNewsBody, newsBody) {
-      const newsBodyParsedDocument = new DOMParser().parseFromString(newsBody, 'text/html');
-      const originalNewsBodyParsedDocument = new DOMParser().parseFromString(originalNewsBody, 'text/html');
-      const newsMediaElements = newsBodyParsedDocument.querySelectorAll('img, video, iframe');
-      const originalNewsmediaElements = originalNewsBodyParsedDocument.querySelectorAll('img, video, iframe');
-      const newsMediaSources = Array.from(newsMediaElements).map(element => element.src);
-      const originalNewsMediaSources = Array.from(originalNewsmediaElements).map(element => element.src);
-      // check if the media element is removed or new element is inserted
-      if (newsMediaSources.length !== originalNewsMediaSources.length) {
-        return true;
-      }
-      // check if the element is reinserted by the same url or from the existing upload !
-      return !originalNewsMediaSources.every((element, index) => element === newsMediaSources[index]);
-    }
   }
 };
 </script>

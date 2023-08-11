@@ -183,8 +183,8 @@ export default {
   created() {
     const filterQueryParam = this.getQueryParam('filter');
     const searchQueryParam = this.getQueryParam('search');
-    this.removeQueryParam('spaces');
-    if (filterQueryParam || searchQueryParam) {
+    const spacesFilterParam = this.getQueryParam('spaces')?.split('_');    
+    if (filterQueryParam || searchQueryParam || spacesFilterParam) {
       if (filterQueryParam) {
         // set filter value, which will trigger news fetching
         this.newsFilter = filterQueryParam;
@@ -193,6 +193,11 @@ export default {
         // set search value
         this.searchText = searchQueryParam;
       }
+      if (spacesFilterParam) {
+        // set search value
+        this.spacesFilter = spacesFilterParam;
+      }
+      
     } else if (filterQueryParam === null) {
       this.newsFilter = 'all';
     } else {

@@ -36,10 +36,13 @@ export default {
   },
   created() {
     this.$root.$on('news-space-selector-drawer-open', this.open);
+    this.selectedOwnerIds = this.value;
   },
   methods: {
     applyFilters() {
-      this.value = this.selectedOwnerIds;
+      if (this.value !== this.selectedOwnerIds){
+        this.value = this.selectedOwnerIds;
+      }
       this.$emit('input', this.value);
     },
     close() {

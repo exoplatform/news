@@ -13,8 +13,9 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-import * as analyticsExtension from './analytics-extensions/main.js';
-
-export function init() {
-  analyticsExtension.init();
+export function initExtensions() {
+  extensionRegistry.registerComponent('favorite-news', 'favorite-drawer-item', {
+    id: 'news',
+    vueComponent: Vue.options.components['news-favorite-item'],
+  });
 }

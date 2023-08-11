@@ -15,7 +15,7 @@ let config = merge(webpackCommonConfig, {
   output: {
     path: path.resolve(`${exoServerPath}/webapps/${app}/`)
   },
-  devtool: 'eval-source-map'
+  devtool: 'inline-source-map'
 });
 
 module.exports = config;

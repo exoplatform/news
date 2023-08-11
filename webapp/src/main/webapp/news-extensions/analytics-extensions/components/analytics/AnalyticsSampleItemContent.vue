@@ -42,10 +42,10 @@ export default {
   }),
   computed: {
     contentTitle() {
-      return this.content && this.content.title;
+      return this.content?.title;
     },
     contentUrl() {
-      return this.content && this.content.url;
+      return this.content?.url;
     },
   },
   created() {

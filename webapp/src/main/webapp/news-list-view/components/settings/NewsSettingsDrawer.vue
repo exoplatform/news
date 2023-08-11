@@ -102,6 +102,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </template>
             </v-select>
           </div>
+          <div class="d-flex flex-row clickable text-decoration-underline">
+            <a @click="createNewTarget"> {{ $t('news.list.settings.drawer.createNewTarget') }} </a>
+          </div>
           <div v-if="newsTargets.length === 0" class="d-flex flex-row grey--text">
             <i class="fas fa-exclamation-triangle mt-3"></i>
             <span class="mx-2"> {{ $t('news.composer.stepper.selectedTarget.noTargetAllowed') }}</span>
@@ -262,6 +265,16 @@ export default {
       this.showDrawer = true;
       this.init();
       setTimeout(() => this.open(), 100);
+    });
+    this.$root.$on('new-news-target-created', (target) => {
+      const newTarget = {
+        name: target.name,
+        label: target?.properties?.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
+        toolTipInfo: target?.properties?.label,
+        description: target?.properties?.description
+      };
+      this.newsTargets.push(newTarget);
+      this.newsTarget = newTarget.name;
     });
     this.$newsServices.canPublishNews().then(canPublishNews => {
       this.saveSettingsURL = canPublishNews ? this.$root.saveSettingsURL : null;
@@ -450,6 +463,9 @@ export default {
     switchSettingsDrawer() {
       this.showAdvancedSettings = !this.showAdvancedSettings;
       this.reset();
+    },
+    createNewTarget() {
+      this.$root.$emit('open-news-publish-targets-management-drawer');
     }
   },
 };

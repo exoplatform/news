@@ -225,6 +225,7 @@ export default {
       }
       this.saveMode = 'edit';
     });
+    this.$root.$on('open-news-publish-targets-management-drawer', () => { this.open(); });
   },
   methods: {
     removePermission(permission) {
@@ -287,12 +288,14 @@ export default {
       };
       this.sameTargetError = false;
       this.$newsTargetingService.createTarget(target)
-        .then((resp) => {
-          if (resp && resp === 200) {
-            this.$emit('news-target-saved');
-            this.reset();
-            this.closeDrawer();
-          } else if (resp && resp === 409) {
+        .then((createdTarget) => {
+          this.$emit('news-target-saved');
+          this.$root.$emit('new-news-target-created', createdTarget);
+          this.reset();
+          this.closeDrawer();
+        })
+        .catch((resp) => {
+          if (resp.message && resp.message === 409) {
             this.sameTargetError = true;
             this.disabled = true;
             this.saving = false;

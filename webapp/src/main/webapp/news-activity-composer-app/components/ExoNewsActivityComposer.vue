@@ -396,19 +396,31 @@ export default {
       return this.activityId && this.activityId !== '';
     },
     isEmptyNewsBody() {
-      return this.news.body === '' ||Array.from($(this.news.body).contents()).every(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '');
+      return this.news.body === '' || Array.from(new DOMParser().parseFromString(this.news.body, 'text/html').body.childNodes).every(node => (node.nodeName === 'P' && !node.textContent.trim() && node.children.length === 0) || (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()));
     },
     isSameNewsBody() {
       // check if news body composed only by text and then compare only the text content
-      const containOnlyText = Array.from($(this.news.body).contents()).every(node => node.nodeType === Node.TEXT_NODE) && Array.from($(this.originalNews.body).contents()).every(node => node.nodeType === Node.TEXT_NODE);
+      const containOnlyText = Array.from(new DOMParser().parseFromString(this.news.body, 'text/html').body.childNodes).every(node => (node.nodeName === 'P' && node.textContent.trim()) || node.nodeType === Node.TEXT_NODE)
+          && Array.from(new DOMParser().parseFromString(this.originalNews.body, 'text/html').body.childNodes).every(node => (node.nodeName === 'P' && node.textContent.trim()) || node.nodeType === Node.TEXT_NODE);
       if (containOnlyText) {
         return this.getString(this.news.body) === this.getString(this.originalNews.body);
       }
-      // get nodes and remove all empty text nodes then compare.
+      // get nodes and remove all empty paragraph elements then compare.
+      const originalNewsBody = Array.from(new DOMParser().parseFromString(this.originalNews.body, 'text/html').body.childNodes).filter(node => !(node.nodeName === 'P' && !node.textContent.trim() && !node.children.length > 0));
+      let index = originalNewsBody.length - 1;
+      //remove all empty text nodes at the end.
+      while (index >= 0 && originalNewsBody[index].nodeType === Node.TEXT_NODE && !originalNewsBody[index].textContent.trim() ) {
+        originalNewsBody.pop();
+        index--;
+      }
+      const currentNewsBody = Array.from(new DOMParser().parseFromString(this.news.body, 'text/html').body.childNodes).filter(node => !(node.nodeName === 'P' && !node.textContent.trim() && !node.children.length > 0));
+      index = currentNewsBody.length - 1;
+      while (index >= 0 && currentNewsBody[index].nodeType === Node.TEXT_NODE && !currentNewsBody[index].textContent.trim() ) {
+        currentNewsBody.pop();
+        index--;
+      }
       // isEqualNode : Two nodes are equal when they have the same type and the same content.
-      const cleanedOriginalNewsBody = Array.from($(this.originalNews.body).contents()).filter(item => !(item.nodeType === Node.TEXT_NODE && item.textContent.trim() === ''));
-      const cleanedNewsBody = Array.from($(this.news.body).contents()).filter(item => !(item.nodeType === Node.TEXT_NODE && item.textContent.trim() === ''));
-      return  cleanedOriginalNewsBody.length === cleanedNewsBody.length && cleanedNewsBody.every((node, index) => node.isEqualNode(cleanedOriginalNewsBody[index]));
+      return  originalNewsBody.length === currentNewsBody.length && originalNewsBody.every((node, index) => node.isEqualNode(currentNewsBody[index]));
     },
     postDisabled: function () {
       return this.uploading || !this.news.title || !this.news.title.trim() || this.isEmptyNewsBody;
@@ -418,7 +430,7 @@ export default {
       if (this.uploading) {
         return true;
       }
-      if (!this.news.title || !this.news.title.trim() || this.isEmptyNewsBody ) {
+      if (!this.news.title.trim() || this.isEmptyNewsBody ) {
         return true;
       }
       // disable update button nothing has changed

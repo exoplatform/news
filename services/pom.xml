@@ -36,7 +36,7 @@
     <rest.api.doc.version>1.0</rest.api.doc.version>
     <rest.api.doc.description>News addon used Rest endpoints</rest.api.doc.description>
 
-    <exo.test.coverage.ratio>0.41</exo.test.coverage.ratio>
+    <exo.test.coverage.ratio>0.43</exo.test.coverage.ratio>
   </properties>
 
   <dependencies>

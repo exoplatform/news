@@ -2,33 +2,41 @@ package org.exoplatform.news.queryBuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.exoplatform.commons.utils.CommonsUtils;
+
+import org.exoplatform.social.core.identity.model.Identity;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.MembershipEntry;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
-@PrepareForTest(CommonsUtils.class)
+@PrepareForTest({CommonsUtils.class, NewsUtils.class})
 public class NewsQueryBuilderTest {
   @Mock
   SpaceService               spaceService;
+
 
   @Test
   public void shouldCreateQueryWithPinnedStateAndSearchTextAndAuthorAndOneSpaceAndCurrentUserIsNoPublisher() throws Exception {
@@ -43,6 +51,16 @@ public class NewsQueryBuilderTest {
     List<String> spaces = new ArrayList<>();
     spaces.add("1");
     filter.setSpaces(spaces);
+    filter.setDraftNews(true);
+    Space space1 = new Space();
+    space1.setId("1");
+    List<Space> allowedDraftNewsSpaces = new ArrayList<>();
+    allowedDraftNewsSpaces.add(space1);
+    PowerMockito.mockStatic(NewsUtils.class);
+    PowerMockito.mockStatic(CommonsUtils.class);
+    when( NewsUtils.getAllowedDraftNewsSpaces(any())).thenReturn(allowedDraftNewsSpaces);
+    Identity identity = new Identity(OrganizationIdentityProvider.NAME, "jean");
+    identity.setRemoteId("jean");
     org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
     MembershipEntry membershipentry = new MembershipEntry("/platform/web-contributors", "redactor");
     List<MembershipEntry> memberships = new ArrayList<MembershipEntry>();
@@ -50,13 +68,16 @@ public class NewsQueryBuilderTest {
     currentIdentity.setMemberships(memberships);
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
+    IdentityManager identityMock = mock(IdentityManager.class);
+    when(CommonsUtils.getService(IdentityManager.class)).thenReturn(identityMock);
+    when(identityMock.getOrCreateIdentity(anyString(), anyString())).thenReturn(identity);
 
     // when
     StringBuilder query = queryBuilder.buildQuery(filter);
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%')) OR ( exo:body LIKE '%#text%' OR exo:body LIKE '%#tex%' ) AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%'))AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND publication:currentState = 'draft' AND (('null' IN exo:newsModifiersIds AND exo:activities <> '') OR ( exo:author = 'john' AND exo:activities = '')OR (exo:spaceId = '1') AND exo:draftVisible = 'true') AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 
@@ -218,6 +239,27 @@ public class NewsQueryBuilderTest {
     assertNotNull(query);
     assertEquals("SELECT * FROM exo:news WHERE ", query.toString());
   }
+
+  @Test
+  public void testBuildQueryWithTagNames() throws Exception {
+    // Given
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+    org.exoplatform.services.security.Identity currentIdentity = new org.exoplatform.services.security.Identity("john");
+    ConversationState state = new ConversationState(currentIdentity);
+    ConversationState.setCurrent(state);
+    NewsFilter filter = new NewsFilter();
+    filter.setAuthor("john");
+    filter.setTagNames(Arrays.asList(new String[]{"text"}));
+
+    // when
+    StringBuilder query = queryBuilder.buildQuery(filter);
+
+    // then
+    assertNotNull(query);
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND  exo:body LIKE '%#text%' AND exo:author = 'john' AND (publication:currentState = 'published' OR (publication:currentState = 'draft' AND exo:activities <> '' )) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY null DESC",
+            query.toString());
+  }
+
   @Test
   public void shouldAddFuzzySyntaxWhitQuotedWord() throws Exception {
     // Given
@@ -229,7 +271,7 @@ public class NewsQueryBuilderTest {
 
     // Then
     assertNotNull(result);
-    assertEquals(result, "\"quoted\"~0.6");
+    assertEquals("\"quoted\"~0.6", result);
   }
 
   @Test
@@ -243,7 +285,7 @@ public class NewsQueryBuilderTest {
 
     // Then
     assertNotNull(result);
-    assertEquals(result, "search~0.6 OR text~0.6");
+    assertEquals("search~0.6 OR text~0.6", result);
   }
 
   @Test
@@ -257,7 +299,7 @@ public class NewsQueryBuilderTest {
 
     // Then
     assertNotNull(result);
-    assertEquals(result, "\"search text\"~0.6");
+    assertEquals("\"search text\"~0.6", result);
   }
   @Test
   public void shouldAddFuzzySyntaxWhenTextContainsMultiWordsAndQuotedOne() throws Exception {
@@ -270,6 +312,19 @@ public class NewsQueryBuilderTest {
 
     // Then
     assertNotNull(result);
-    assertEquals(result, "this~0.6 OR is~0.6 OR a~0.6 OR \"search text\"~0.6");
+    assertEquals("this~0.6 OR is~0.6 OR a~0.6 OR \"search text\"~0.6", result);
+  }
+
+  @Test
+  public void testAddFuzzySyntaxAndORQuoteInsideQuote() {
+    // Given
+    NewsQueryBuilder queryBuilder = new NewsQueryBuilder();
+    String text = "This \"quoted\" text.";
+
+    // when
+    String result = queryBuilder.addFuzzySyntaxAndOR(text);
+
+    // then
+    assertEquals("This~0.6 OR \"quoted\"~0.6 OR  text.~0.6", result);
   }
 }

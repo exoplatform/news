@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.news.model.NewsAttachment;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.storage.NewsAttachmentsStorage;
@@ -22,8 +23,7 @@ import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.metadata.favorite.FavoriteService;
 import org.exoplatform.social.metadata.tag.TagService;
-import org.exoplatform.social.metadata.tag.model.TagFilter;
-import org.exoplatform.social.metadata.tag.model.TagName;
+import org.exoplatform.social.rest.api.RestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,13 +36,17 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.services.rest.impl.RuntimeDelegateImpl;
 import org.exoplatform.services.security.*;
 import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
-import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.*", "org.w3c.*", "javax.naming.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
+@PrepareForTest({CommonsUtils.class, RestUtils.class})
 public class NewsRestResourcesV1Test {
 
   public static final String JOHN = "john";
@@ -59,9 +63,6 @@ public class NewsRestResourcesV1Test {
   IdentityManager        identityManager;
 
   @Mock
-  ActivityManager        activityManager;
-
-  @Mock
   PortalContainer        container;
 
   @Mock
@@ -74,7 +75,7 @@ public class NewsRestResourcesV1Test {
   TagService tagService;
 
   private NewsRestResourcesV1 newsRestResourcesV1;
-  
+
   @Before
   public void setup() {
     RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
@@ -1556,8 +1557,10 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(RestUtils.class);
+    when(CommonsUtils.getService(TagService.class)).thenReturn(tagService);
+    when(RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1611,8 +1614,10 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(RestUtils.class);
+    when(CommonsUtils.getService(TagService.class)).thenReturn(tagService);
+    when(RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1659,8 +1664,10 @@ public class NewsRestResourcesV1Test {
     List<News> allNews = new ArrayList<>();
     allNews.add(news1);
     allNews.add(news2);
-    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
-    when(tagService.findTags(new TagFilter(tagText, 0), 1L)).thenReturn(Arrays.asList(new TagName("tagText")));
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(RestUtils.class);
+    when(CommonsUtils.getService(TagService.class)).thenReturn(tagService);
+    when(RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1710,8 +1717,10 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(RestUtils.class);
+    when(CommonsUtils.getService(TagService.class)).thenReturn(tagService);
+    when(RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
@@ -1894,8 +1903,10 @@ public class NewsRestResourcesV1Test {
     allNews.add(news1);
     allNews.add(news2);
     allNews.add(news3);
-    when(container.getComponentInstanceOfType(TagService.class)).thenReturn(tagService);
-    when(tagService.findTags(new TagFilter(text, 0), 1L)).thenReturn(new ArrayList<>());
+    PowerMockito.mockStatic(CommonsUtils.class);
+    PowerMockito.mockStatic(RestUtils.class);
+    when(CommonsUtils.getService(TagService.class)).thenReturn(tagService);
+    when(RestUtils.getCurrentUserIdentityId()).thenReturn(1L);
     lenient().when(newsService.searchNews(any(), any())).thenReturn(allNews);
     lenient().when(spaceService.isMember(any(Space.class), any())).thenReturn(true);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());

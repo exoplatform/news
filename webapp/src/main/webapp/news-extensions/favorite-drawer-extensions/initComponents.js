@@ -13,8 +13,12 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-import * as analyticsExtension from './analytics-extensions/main.js';
+import NewsFavoriteItem from './components/favorites/NewsFavoriteItem.vue';
 
-export function init() {
-  analyticsExtension.init();
+const components = {
+  'news-favorite-item': NewsFavoriteItem,
+};
+
+for (const key in components) {
+  Vue.component(key, components[key]);
 }

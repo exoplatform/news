@@ -49,12 +49,12 @@
     <css-path>/skin/css/newsComposer.css</css-path>
   </portlet-skin>
 
-  <portlet-skin>
-    <application-name>news</application-name>
-    <portlet-name>NewsExtensions</portlet-name>
+  <portal-skin>
     <skin-name>Enterprise</skin-name>
+    <skin-module>NewsComposerActivityStreamExtensions</skin-module>
     <css-path>/skin/css/newsExtensions.css</css-path>
-  </portlet-skin>
+    <css-priority>11</css-priority>
+  </portal-skin>
 
   <portlet-skin>
     <application-name>news</application-name>
@@ -157,6 +157,7 @@
     </module>
   </portlet>
 
+  <!--FIXME: We should use the load-group for all declared news extensions-->
   <portlet>
     <name>NewsExtensions</name>
     <module>
@@ -485,4 +486,90 @@
     </depends>
   </module>
 
+  <module>
+    <name>NewsActivityStreamExtensions</name>
+    <load-group>ActivityStreamGRP</load-group>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsActivityExtensions.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>NewsComposerActivityStreamExtensions</name>
+    <load-group>ActivityStreamGRP</load-group>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsComposerActionExtensions.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>NewsFavoriteDrawerExtensions</name>
+    <load-group>FavoriteDrawerGRP</load-group>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsFavoriteDrawerExtensions.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+    <depends>
+      <module>newsSnackbarComponent</module>
+    </depends>
+  </module>
 </gatein-resources>

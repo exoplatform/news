@@ -580,6 +580,13 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
+      Identity userIdentity = identityManager.getOrCreateUserIdentity(currentIdentity.getUserId());
+      if (userIdentity != null) {
+        news.setFavorite(favoriteService.isFavorite(new Favorite("news",
+                                                                 news.getId(),
+                                                                 "",
+                                                                 Long.parseLong(userIdentity.getId()))));
+      }
       return Response.ok(news).build();
     } catch (IllegalAccessException e) {
       LOG.warn("User {} attempt to access unauthorized news with id {}", currentIdentity.getUserId(), activityId);

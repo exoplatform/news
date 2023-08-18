@@ -13,8 +13,14 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-import * as analyticsExtension from './analytics-extensions/main.js';
+import AnalyticsTableCellContentValue from './components/analytics/AnalyticsTableCellContentValue.vue';
+import AnalyticsSampleItemContent from './components/analytics/AnalyticsSampleItemContent.vue';
 
-export function init() {
-  analyticsExtension.init();
+const components = {
+  'analytics-table-cell-content-value': AnalyticsTableCellContentValue,
+  'analytics-sample-item-content': AnalyticsSampleItemContent,
+};
+
+for (const key in components) {
+  Vue.component(key, components[key]);
 }

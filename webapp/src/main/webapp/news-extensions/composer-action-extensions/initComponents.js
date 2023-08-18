@@ -13,8 +13,14 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-import * as analyticsExtension from './analytics-extensions/main.js';
+import ActivitySwitchToNews from './components/activity/ActivitySwitchToNews.vue';
+import ActivityWriteNews from './components/activity/ActivityWriteNews.vue';
 
-export function init() {
-  analyticsExtension.init();
+const components = {
+  'activity-switch-to-news': ActivitySwitchToNews,
+  'activity-write-news': ActivityWriteNews,
+};
+
+for (const key in components) {
+  Vue.component(key, components[key]);
 }

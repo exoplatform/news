@@ -19,6 +19,9 @@ let config = {
     scheduleNewsDrawer: './src/main/webapp/schedule-news-drawer/main.js',
     newsListView: './src/main/webapp/news-list-view/main.js',
     newsPublishTargetsManagement: './src/main/webapp/news-publish-targets-management/main.js',
+    newsActivityExtensions: './src/main/webapp/news-extensions/activity-extensions/main.js',
+    newsComposerActionExtensions: './src/main/webapp/news-extensions/composer-action-extensions/main.js',
+    newsFavoriteDrawerExtensions: './src/main/webapp/news-extensions/favorite-drawer-extensions/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',
@@ -29,6 +32,7 @@ let config = {
       files: [
         './src/main/webapp/**/*.js',
         './src/main/webapp/**/*.vue',
+        './src/main/webapp/**/**/*.js',
       ],
     }),
     new VueLoaderPlugin()

@@ -28,13 +28,6 @@
     <css-priority>11</css-priority>
   </portal-skin>
 
-  <portal-skin>
-    <skin-name>Enterprise</skin-name>
-    <skin-module>newsPageTemplate</skin-module>
-    <css-path>/skin/css/newsPageTemplate.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
-
   <portlet-skin>
     <application-name>news</application-name>
     <portlet-name>News</portlet-name>

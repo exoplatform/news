@@ -27,22 +27,17 @@
     <access-permissions>Everyone</access-permissions>
     <container id="newsPageSimpleRowContainer" template='system:/groovy/portal/webui/container/UISimpleRowContainer.gtmpl'>
       <access-permissions>Everyone</access-permissions>
-      <container id="newsPage"
-        template="system:/groovy/portal/webui/container/UIContainer.gtmpl"
-        cssClass="border-box-sizing">
+      <portlet-application>
+        <portlet>
+          <application-ref>layout-management</application-ref>
+          <portlet-ref>ImagesPortlet</portlet-ref>
+        </portlet>
         <access-permissions>Everyone</access-permissions>
-        <portlet-application>
-          <portlet>
-            <application-ref>social-portlet</application-ref>
-            <portlet-ref>ImagesPortlet</portlet-ref>
-          </portlet>
-          <access-permissions>Everyone</access-permissions>
-          <show-info-bar>false</show-info-bar>
-        </portlet-application>
-        <container id="newsBodyPage" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
-          <access-permissions>Everyone</access-permissions>
-          <container cssClass="newsBodyPageLeftColumn"
-                     template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+        <show-info-bar>false</show-info-bar>
+      </portlet-application>
+      <container template="system:/groovy/portal/webui/container/UIResponsiveColumnGroupContainer.gtmpl">
+        <access-permissions>Everyone</access-permissions>
+        <container template="system:/groovy/portal/webui/container/UISimpleColumnContainer.gtmpl">
             <access-permissions>*:/platform/users</access-permissions>
             <portlet-application>
               <portlet>
@@ -61,8 +56,7 @@
               <show-info-bar>false</show-info-bar>
             </portlet-application>
           </container>
-          <container cssClass="newsBodyPageRightColumn"
-                     template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+        <container template="system:/groovy/portal/webui/container/UISimpleColumnContainer.gtmpl" width="400px">
             <access-permissions>*:/platform/users</access-permissions>
             <portlet-application>
               <portlet>
@@ -81,9 +75,7 @@
               <show-info-bar>false</show-info-bar>
             </portlet-application>
           </container>
-        </container>
       </container>
     </container>
   </container>
-
 </page>

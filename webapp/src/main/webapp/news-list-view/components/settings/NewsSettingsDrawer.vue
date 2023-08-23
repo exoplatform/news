@@ -102,7 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </template>
             </v-select>
           </div>
-          <div class="d-flex flex-row clickable text-decoration-underline">
+          <div v-if="canManageNewsPublishTargets" class="d-flex flex-row clickable text-decoration-underline">
             <a @click="createNewTarget"> {{ $t('news.list.settings.drawer.createNewTarget') }} </a>
           </div>
           <div v-if="newsTargets.length === 0" class="d-flex flex-row grey--text">
@@ -197,7 +197,8 @@ export default {
     showArticleReactions: false,
     showTooltip: false,
     seeAllUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=pinned`,
-    saveSettingsURL: ''
+    saveSettingsURL: '',
+    canManageNewsPublishTargets: eXo.env.portal.canManageNewsPublishTargets
   }),
   computed: {
     backgroundColor(){

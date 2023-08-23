@@ -68,9 +68,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     PortalHttpServletResponseWrapper responseWrapper = ( PortalHttpServletResponseWrapper ) rcontext.getResponse();
     String newsListUrl = "/portal/rest/v1/news/byTarget/" + newsTarget + "?offset=0&limit=" + limit + "&returnSize=true";
     responseWrapper.addHeader("Link", "<" + newsListUrl + ">; rel=prefetch; as=fetch; crossorigin=use-credentials", false);
+    boolean canManageNewsPublishTargets = NewsUtils.canManageNewsPublishTargets(currentIdentity);
   %>
   <div class="news-list-view-app" id="<%= appId %>">
     <script type="text/javascript">
+      eXo.env.portal.canManageNewsPublishTargets = <%=canManageNewsPublishTargets%>;
       require(['PORTLET/news/NewsListView'], app => app.init({
         appId: '<%=appId%>',
         saveSettingsURL: <%= "'" + saveSettingsURL + "'" %>,

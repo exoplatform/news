@@ -31,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       </v-card-text>
     </v-card>
     <news-settings-drawer v-if="canPublishNews" />
-    <news-publish-targets-management-drawer v-if="canPublishNews" />
+    <news-publish-targets-management-drawer v-if="canManageNewsPublishTargets" />
   </v-app>
 </template>
 
@@ -104,6 +104,7 @@ export default {
     hasMore: false,
     offset: 0,
     canPublishNews: false,
+    canManageNewsPublishTargets: eXo.env.portal.canManageNewsPublishTargets
   }),
   computed: {
     displayHeader() {

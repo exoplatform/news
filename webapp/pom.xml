@@ -107,7 +107,6 @@
                 <include>newsDetails.less</include>
                 <include>newsExtensions.less</include>
                 <include>newsPublishTargetsManagement.less</include>
-                <include>newsPageTemplate.less</include>
               </includes>
             </configuration>
             <goals>

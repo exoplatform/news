@@ -76,6 +76,32 @@
                     </field>
                   </object>
                 </value>
+                <value>
+                  <object type="org.exoplatform.application.registry.Application">
+                    <field name="displayName">
+                      <string>Images Portlet</string>
+                    </field>
+                    <field name="contentId">
+                      <string>layout-management/ImagesPortlet</string>
+                    </field>
+                    <field name="type">
+                      <string>portlet</string>
+                    </field>
+                    <field name="categoryName">
+                      <string>content</string>
+                    </field>
+                    <field name="applicationName">
+                      <string>ImagesPortlet</string>
+                    </field>
+                    <field name="accessPermissions">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string>*:/platform/users</string>
+                        </value>
+                      </collection>
+                    </field>
+                  </object>
+                </value>
               </collection>
             </field>
           </object>

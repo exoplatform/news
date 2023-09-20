@@ -91,7 +91,7 @@ export default {
     this.getNewsList();
   },
   mounted() {
-    this.isSmallWidth =  this.$refs && this.$refs['top-news-mosaic'] && this.$refs['top-news-mosaic']?.clientWidth *100 / window.screen.width  < 33;
+    this.isSmallWidth =  this.$refs && this.$refs['top-news-mosaic'] && this.$refs['top-news-mosaic']?.clientWidth < this.isSmallBreakpoint;
   },
   computed: {
     isMobile() {

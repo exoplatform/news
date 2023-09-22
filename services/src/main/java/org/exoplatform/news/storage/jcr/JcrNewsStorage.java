@@ -57,6 +57,7 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.wcm.core.NodeLocation;
+import org.exoplatform.services.wcm.core.NodetypeConstant;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.authoring.AuthoringPublicationConstant;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig.Lifecycle;
@@ -199,7 +200,7 @@ public class JcrNewsStorage implements NewsStorage {
     }
     String newsNodeName = !news.getTitle().equals("") ? news.getTitle() : "Untitled";
     Node newsFolderNode = dataDistributionType.getOrCreateDataNode(spaceNewsRootNode, getNodeRelativePath(creationCalendar));
-    Node newsDraftNode = newsFolderNode.addNode(Utils.cleanName(newsNodeName).trim(), "exo:news");
+    Node newsDraftNode = newsFolderNode.addNode(Utils.cleanName(newsNodeName, NodetypeConstant.EXO_NEWS).trim(), NodetypeConstant.EXO_NEWS);
     newsDraftNode.addMixin("exo:datetime");
     newsDraftNode.setProperty("exo:title", news.getTitle());
     newsDraftNode.setProperty("exo:summary", news.getSummary());
@@ -601,7 +602,7 @@ public class JcrNewsStorage implements NewsStorage {
       String srcPath = newsNode.getPath();
       String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY
                                                                     : newsNode.getParent().getPath())
-          + "/" + Utils.cleanName(news.getTitle()).trim();
+          + "/" + Utils.cleanName(news.getTitle(), NodetypeConstant.EXO_NEWS).trim();
       session.getWorkspace().move(srcPath, destPath);
     }
   }

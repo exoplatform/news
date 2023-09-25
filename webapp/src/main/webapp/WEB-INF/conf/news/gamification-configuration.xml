@@ -28,63 +28,51 @@
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>io.meeds.gamification.service.RuleRegistry</target-component>
+    <target-component>io.meeds.gamification.service.EventRegistry</target-component>
     <component-plugin>
-      <name>rule.PostArticle</name>
+      <name>PostArticle</name>
       <set-method>addPlugin</set-method>
-      <type>io.meeds.gamification.plugin.RuleConfigPlugin</type>
+      <type>io.meeds.gamification.plugin.EventConfigPlugin</type>
       <init-params>
-        <value-param>
-          <name>rule-title</name>
-          <value>PostArticle</value>
-        </value-param>
-        <value-param>
-          <name>rule-description</name>
-          <value>Post an article</value>
-        </value-param>
-        <value-param>
-          <name>rule-score</name>
-          <value>15</value>
-        </value-param>
-        <value-param>
-          <name>rule-zone</name>
-          <value>Knowledge</value>
-        </value-param>
-        <value-param>
-          <name>rule-enable</name>
-          <value>true</value>
-        </value-param>
+        <object-param>
+          <name>event</name>
+          <object type="io.meeds.gamification.model.EventDTO">
+            <field name="title">
+              <string>PostArticle</string>
+            </field>
+            <field name="type">
+              <string>exoplatform</string>
+            </field>
+            <field name="trigger">
+              <string>PostArticle</string>
+            </field>
+          </object>
+        </object-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>
-    <target-component>io.meeds.gamification.service.RuleRegistry</target-component>
+    <target-component>io.meeds.gamification.service.EventRegistry</target-component>
     <component-plugin>
-      <name>rule.PublishArticle</name>
+      <name>PublishArticle</name>
       <set-method>addPlugin</set-method>
-      <type>io.meeds.gamification.plugin.RuleConfigPlugin</type>
+      <type>io.meeds.gamification.plugin.EventConfigPlugin</type>
       <init-params>
-        <value-param>
-          <name>rule-title</name>
-          <value>PublishArticle</value>
-        </value-param>
-        <value-param>
-          <name>rule-description</name>
-          <value>Publish an article</value>
-        </value-param>
-        <value-param>
-          <name>rule-score</name>
-          <value>10</value>
-        </value-param>
-        <value-param>
-          <name>rule-zone</name>
-          <value>Knowledge</value>
-        </value-param>
-        <value-param>
-          <name>rule-enable</name>
-          <value>true</value>
-        </value-param>
+        <object-param>
+          <name>event</name>
+          <object type="io.meeds.gamification.model.EventDTO">
+            <field name="title">
+              <string>PublishArticle</string>
+            </field>
+            <field name="type">
+              <string>exoplatform</string>
+            </field>
+            <field name="trigger">
+              <string>PublishArticle</string>
+            </field>
+          </object>
+        </object-param>
       </init-params>
     </component-plugin>
   </external-component-plugins>

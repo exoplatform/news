@@ -666,12 +666,10 @@ export default {
             self.news.body = evt.editor.getData();
             self.autoSave();
           },
-          drop: function (evt) {
-            window.setTimeout(() => {
-              self.news.body = evt.editor.getData();
-              self.autoSave();
-            }, 1000);
-          }
+          afterInsertHtml: function (evt) {
+            self.news.body = evt.editor.getData();
+            self.autoSave();
+          },
         }
       });
     },

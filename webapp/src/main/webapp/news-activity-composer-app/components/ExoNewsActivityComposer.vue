@@ -625,7 +625,7 @@ export default {
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,
         spaceGroupId: self.spaceGroupId,
-        imagesDownloadFolder: 'news/images',
+        imagesDownloadFolder: 'DRIVE_ROOT_NODE/news/images',
         toolbarLocation: 'top',
         extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
         removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',

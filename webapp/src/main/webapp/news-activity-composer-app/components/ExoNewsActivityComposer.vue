@@ -595,7 +595,7 @@ export default {
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,
         spaceGroupId: self.spaceGroupId,
-        imagesDownloadFolder: 'DRIVE_ROOT_NODE/News/images',
+        imagesDownloadFolder: 'DRIVE_ROOT_NODE/news/images',
         toolbarLocation: 'top',
         extraAllowedContent: 'table[summary];img[style,class,src,referrerpolicy,alt,width,height];span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*];',
         removeButtons: '',

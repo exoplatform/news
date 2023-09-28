@@ -389,6 +389,7 @@ export default {
       spaceDisplayName: '',
       unAuthorizedAccess: false,
       endUplodingFileTimeout: 50,
+      newsBody: null
     };
   },
   computed: {
@@ -667,7 +668,10 @@ export default {
             self.autoSave();
           },
           afterInsertHtml: function (evt) {
-            self.news.body = evt.editor.getData();
+            self.newsBody = evt.editor.getData();
+          },
+          fileUploadResponse: function() {
+            self.news.body = self.newsBody;
             self.autoSave();
           },
         }

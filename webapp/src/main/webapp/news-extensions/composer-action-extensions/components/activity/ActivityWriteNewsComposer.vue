@@ -1,18 +1,24 @@
 <template>
-  <div
-    class="actionItem"
-    @click="switchToNews"
-    :title="disableComposerButtonTooltip">
-    <div class="actionItemIcon">
-      <div class="newsComposerIcon"></div>
+  <v-card
+    id="writeNewsComposerButton"
+    class="mx-4 px-6 py-3"
+    outlined
+    flat
+    hover
+    :title="displayTitle">
+    <div
+      class="d-flex flex-row align-center"
+      @click="switchToNews">
+      <v-icon
+        color="grey darken-1"
+        size="42">
+        fa-newspaper
+      </v-icon>
+      <v-span class="caption font-weight-bold ms-5">
+        {{ $t('news.composer.write') }}
+      </v-span>
     </div>
-    <div class="actionItemDescription">
-      <div class="actionLabel">{{ $t('news.composer.write') }}</div>
-      <div class="actionDescription">
-        <p>{{ $t('news.composer.write.description') }}</p>
-      </div>
-    </div>
-  </div>
+  </v-card>
 </template>
 <script>
 export default {
@@ -46,17 +52,17 @@ export default {
     disableComposerButton() {
       return this.activityType && this.activityType.length !== 0;
     },
-    disableComposerButtonTooltip() {
-      return this.disableComposerButton ? this.$t('news.composer.write.disable') : '';
+    displayTitle() {
+      return this.disableComposerButton ? this.$t('news.composer.write.disable') : this.$t('news.composer.write.description');
     }
   },
   watch: {
     disableComposerButton(value) {
       if (value) {
-        document.getElementsByClassName('actionItem')[1].setAttribute('style', 'opacity: 0.5');
+        document.getElementById('writeNewsComposerButton').setAttribute('style', 'opacity: 0.5');
       }
       else {
-        document.getElementsByClassName('actionItem')[1].removeAttribute('style');
+        document.getElementById('writeNewsComposerButton').removeAttribute('style');
       }
     }
   },

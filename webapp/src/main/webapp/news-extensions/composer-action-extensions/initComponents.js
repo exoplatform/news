@@ -14,11 +14,13 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 import ActivitySwitchToNews from './components/activity/ActivitySwitchToNews.vue';
-import ActivityWriteNews from './components/activity/ActivityWriteNews.vue';
+import ActivityWriteNewsComposer from './components/activity/ActivityWriteNewsComposer.vue';
+import ActivityWriteNewsToolbarAction from './components/activity/ActivityWriteNewsToolbarAction.vue';
 
 const components = {
   'activity-switch-to-news': ActivitySwitchToNews,
-  'activity-write-news': ActivityWriteNews,
+  'activity-write-news-composer': ActivityWriteNewsComposer,
+  'activity-write-news-toolbar-action': ActivityWriteNewsToolbarAction,
 };
 
 for (const key in components) {

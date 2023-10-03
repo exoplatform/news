@@ -32,7 +32,12 @@ export function initExtensions() {
             });
             extensionRegistry.registerComponent('ActivityComposerFooterAction', 'activity-composer-footer-action', {
               id: 'writeNewsButton',
-              vueComponent: Vue.options.components['activity-write-news'],
+              vueComponent: Vue.options.components['activity-write-news-composer'],
+              rank: 30,
+            });
+            extensionRegistry.registerComponent('ActivityToolbarAction', 'activity-toolbar-action', {
+              id: 'writeNewsToolbarButton',
+              vueComponent: Vue.options.components['activity-write-news-toolbar-action'],
               rank: 30,
             });
           });

@@ -27,7 +27,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       @click="switchToNews">
       <v-icon
         color="grey darken-1"
-        size="42">
+        size="39"
+        style="min-height:50px">
         fa-newspaper
       </v-icon>
       <v-span class="caption font-weight-bold ms-5">

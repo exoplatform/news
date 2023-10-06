@@ -33,6 +33,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         @post-article="postNews" />
       <div class="newsComposerToolbar">
         <div id="composerToolbarInformation" class="d-flex flex-row py-2">
+          <v-btn 
+            v-if="isMobile"
+            icon
+            fab
+            class="my-auto"
+            @click="close()">
+            <v-icon> mdi-arrow-left </v-icon>
+          </v-btn>
           <v-avatar
             height="40"
             min-height="40"
@@ -40,7 +48,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             min-width="40"
             max-width="40"
             size="40"
-            class="mx-3 my-auto">
+            :class="isMobile ? 'me-3' : 'mx-3'"
+            class="my-auto">
             <v-img src="/news/images/news.png" />
           </v-avatar>
           <div class="d-flex flex-grow-1 flex-column my-auto align-left">
@@ -1016,6 +1025,9 @@ export default {
         }
       }).then(() => this.$emit('draftUpdated'))
         .then(() => this.draftSavingStatus = this.$t('news.composer.draft.savedDraftStatus'));
+    },
+    close() {
+      window.close();
     },
     goBack() {
       if ( history.length > 1) {

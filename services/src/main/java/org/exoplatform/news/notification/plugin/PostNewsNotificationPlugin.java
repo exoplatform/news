@@ -103,6 +103,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
 
     return NotificationInfo.instance()
                            .setFrom(currentUserName)
+                           .setSpaceId(Long.parseLong(contentSpaceId))
                            .with(NotificationConstants.CONTENT_TITLE, contentTitle)
                            .to(receivers)
                            .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)

@@ -565,4 +565,24 @@
       <module>newsSnackbarComponent</module>
     </depends>
   </module>
+
+  <module>
+    <name>newsNotificationExtension</name>
+    <load-group>notificationGRP</load-group>
+    <script>
+      <path>/js/newsNotificationsExtension.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+  </module>
 </gatein-resources>

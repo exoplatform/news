@@ -67,6 +67,7 @@ public class PublishNewsNotificationPlugin extends BaseNotificationPlugin {
     String audience = ctx.value(PostNewsNotificationPlugin.AUDIENCE);
     NotificationInfo notificationInfo = NotificationInfo.instance()
                                                         .setFrom(currentUserName)
+                                                        .setSpaceId(Long.parseLong(contentSpaceId))
                                                         .with(NotificationConstants.CONTENT_TITLE, contentTitle)
                                                         .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
                                                         .with(NotificationConstants.CURRENT_USER, currentUserFullName)

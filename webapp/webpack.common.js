@@ -22,6 +22,7 @@ let config = {
     newsActivityExtensions: './src/main/webapp/news-extensions/activity-extensions/main.js',
     newsComposerActionExtensions: './src/main/webapp/news-extensions/composer-action-extensions/main.js',
     newsFavoriteDrawerExtensions: './src/main/webapp/news-extensions/favorite-drawer-extensions/main.js',
+    newsNotificationsExtension: './src/main/webapp/news-notifications/main.js',
   },
   output: {
     filename: 'js/[name].bundle.js',

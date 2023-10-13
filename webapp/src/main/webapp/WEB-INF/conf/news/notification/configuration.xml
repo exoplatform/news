@@ -159,6 +159,9 @@
             <field name="groupId">
               <string>news</string>
             </field>
+            <field name="mutable">
+              <boolean>false</boolean>
+            </field>
             <field name="bundlePath">
               <string>locale.portlet.news.News</string>
             </field>

@@ -82,7 +82,7 @@ public class PushTemplateProvider extends TemplateProvider {
       templateContext.put("ACTIVITY_LINK", encoder.encode(activityUrl.toString()));
       templateContext.put("CONTEXT", encoder.encode(context));
       templateContext.put("READ",
-                          Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey())) ? "read"
+                          Boolean.TRUE.equals(Boolean.valueOf(notification.getValueOwnerParameter(NotificationMessageUtils.READ_PORPERTY.getKey()))) ? "read"
                                                                                                                                 : "unread");
       templateContext.put("NOTIFICATION_ID", notification.getId());
       Calendar lastModified = Calendar.getInstance();
@@ -106,5 +106,5 @@ public class PushTemplateProvider extends TemplateProvider {
       return false;
     }
 
-  };
+  }
 }

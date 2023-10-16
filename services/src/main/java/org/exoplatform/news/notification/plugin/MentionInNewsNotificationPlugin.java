@@ -51,6 +51,7 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
     } catch (Exception e) {
       LOG.error("An error occured when trying to retreive a user with username " + currentUserName + " " + e.getMessage(), e);
     }
+    String contentSpaceId = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE_ID);
     String contentAuthor = ctx.value(PostNewsNotificationPlugin.CONTENT_AUTHOR);
     String contentSpaceName = ctx.value(PostNewsNotificationPlugin.CONTENT_SPACE);
     List<String> mentionedIds = new ArrayList<>(ctx.value(MENTIONED_IDS));
@@ -62,6 +63,7 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
 
     return NotificationInfo.instance()
             .setFrom(currentUserName)
+            .setSpaceId(Long.parseLong(contentSpaceId))
             .to(mentionedIds)
             .key(getKey())
             .with(NotificationConstants.CONTENT_TITLE, newsTitle)

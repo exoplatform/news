@@ -120,6 +120,9 @@
             <field name="bundlePath">
               <string>locale.portlet.news.News</string>
             </field>
+            <field name="mutable">
+              <boolean>false</boolean>
+            </field>
           </object>
         </object-param>
       </init-params>
@@ -156,6 +159,9 @@
             <field name="groupId">
               <string>news</string>
             </field>
+            <field name="mutable">
+              <boolean>false</boolean>
+            </field>
             <field name="bundlePath">
               <string>locale.portlet.news.News</string>
             </field>
@@ -184,17 +190,6 @@
 
   <external-component-plugins>
     <target-component>org.exoplatform.commons.api.notification.channel.ChannelManager</target-component>
-    <component-plugin>
-      <name>web.channel.content</name>
-      <set-method>registerTemplateProvider</set-method>
-      <type>org.exoplatform.news.notification.provider.WebTemplateProvider</type>
-      <init-params>
-        <value-param>
-          <name>channel-id</name>
-          <value>WEB_CHANNEL</value>
-        </value-param>
-      </init-params>
-    </component-plugin>
     <component-plugin>
       <name>web.channel.content</name>
       <set-method>registerTemplateProvider</set-method>

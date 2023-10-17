@@ -15,7 +15,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="article-list-view" class="py-0" ref="articleListView">
+  <div
+    id="article-list-view"
+    class="py-0"
+    ref="articleListView">
     <v-row>
       <v-col
         class="flex-grow-0"

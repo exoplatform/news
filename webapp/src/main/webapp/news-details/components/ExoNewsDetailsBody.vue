@@ -61,6 +61,11 @@
                       :format="dateFormat"
                       class="newsInformationValue newsPostedDate news-details-information caption ms-1" />
                   </template>
+                  <extension-registry-component
+                    v-if="translateExtension"
+                    :component="translateExtension"
+                    :params="params"
+                    element="div" />
                   <span v-else-if="postedDate" class="newsInformationValue newsPostedDate news-details-information">- {{ postedDate }}</span>
                 </div>
                 <div class="newsUpdater caption">
@@ -108,7 +113,7 @@
             v-if="newsSummary"
             id="newsSummary"
             class="summary">
-            <span v-html="newsSummary"></span>
+            <span v-sanitized-html="newsSummary"></span>
           </div>
 
           <div
@@ -156,8 +161,29 @@ export default {
       hour: '2-digit',
       minute: '2-digit',
     },
+    translateExtension: null,
+    newsTitleContent: null,
+    newsSummaryContent: null,
+    newsBodyContent: null
   }),
+  created() {
+    this.setNewsTitle(this.news?.title);
+    this.setNewsSummary(this.news?.summary);
+    this.setNewsContent(this.news?.body);
+    this.refreshTranslationExtensions();
+    document.addEventListener('automatic-translation-extensions-updated', () => {
+      this.refreshTranslationExtensions();
+    });
+    this.$root.$on('update-news-title', this.setNewsTitle);
+    this.$root.$on('update-news-summary', this.setNewsSummary);
+    this.$root.$on('update-news-body', this.setNewsContent);
+  },
   computed: {
+    params() {
+      return {
+        news: this.news,
+      };
+    },
     archivedNews() {
       return this.news && this.news.archived;
     },
@@ -165,7 +191,7 @@ export default {
       return this.news && this.news.illustrationURL;
     },
     newsTitle() {
-      return this.news && this.news.title;
+      return this.news && this.newsTitleContent;
     },
     showUpdateInfo() {
       return this.news && this.news.updateDate && this.news.updater !=='__system' && this.news.updateDate !== 'null' && this.news.publicationDate && this.news.publicationDate !== 'null' && this.news.updateDate.time > this.news.publicationDate.time;
@@ -177,7 +203,7 @@ export default {
       return this.news && this.news.hiddenSpace;
     },
     newsBody() {
-      return this.news && this.targetBlank(this.news.body);
+      return this.news && this.targetBlank(this.newsBodyContent);
     },
     updaterFullName() {
       return this.news && this.news.updaterFullName;
@@ -195,7 +221,7 @@ export default {
       return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
     },
     newsSummary() {
-      return this.news && this.targetBlank(this.news.summary);
+      return this.news && this.targetBlank(this.newsSummaryContent);
     },
     spaceId() {
       return this.news && this.news.spaceId;
@@ -220,6 +246,18 @@ export default {
     },
   },
   methods: {
+    setNewsTitle(title) {
+      this.newsTitleContent = title;
+    },
+    setNewsSummary(content) {
+      this.newsSummaryContent = content;
+    },
+    setNewsContent(translation) {
+      this.newsBodyContent = translation;
+    },
+    refreshTranslationExtensions() {
+      this.translateExtension = extensionRegistry.loadExtensions('news', 'translation-menu-extension')[0];
+    },
     openPreview(attachedFile) {
       const self = this;
       window.require(['SHARED/documentPreview'], function(documentPreview) {

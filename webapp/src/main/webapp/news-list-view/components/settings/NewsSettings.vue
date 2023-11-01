@@ -25,14 +25,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="d-flex flex-column me-2">
       <v-icon
         class="button-open-settings"
-        v-if="canPublishNews"
+        v-if="canPublishNews && showSettingsIcon"
         size="24"
         icon
         @click="openDrawer">
         mdi-cog
       </v-icon>
     </div>
-    <div v-if="showSeeAll" class="d-flex flex-column my-auto me-2">
+    <div v-if="showSeeAll && !hideSeeAllButton" class="d-flex flex-column my-auto me-2">
       <v-btn
         depressed
         small
@@ -45,6 +45,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </template>
 <script>
 export default {
+  props: {
+    isHovering: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    hideOpenSettingButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    hideSeeAllButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
   data: () => ({
     newsHeader: '',
     seeAllUrl: 'news?filter=pinned',
@@ -55,6 +72,9 @@ export default {
   computed: {
     showSettingsContainer(){
       return this.showHeader || this.showSeeAll || this.canPublishNews ;
+    },
+    showSettingsIcon() {
+      return this.isHovering && !this.hideOpenSettingButton;
     }
   },
   created() {

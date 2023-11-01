@@ -15,38 +15,40 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="top-news-mosaic" ref="top-news-mosaic">
-    <news-settings 
-      v-if="!isSmallBreakpoint" 
-      :class="isMobile ? '' : 'settingNewsContainer'"
-      class="mt-3 mr-1" />
-    <div :class="`mosaic-container ${smallHeightClass}`">
-      <div 
-        v-for="(item, index) of news"
-        :key="index"
-        :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
-        :id="`articleItem-${index}`">
-        <a
-          class="articleLink d-block"
-          target="_self"
-          :href="item.url">
-          <img :src="showArticleImage && item.illustrationURL !== null ? illustrationURL(item,index) : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
-          <div class="titleArea">
-            <div v-if="showArticleDate" class="articleDate">
-              <date-format
-                :value="new Date(item.publishDate.time)"
-                :format="dateFormat" />
+  <v-hover v-slot="{ hover }">
+    <div id="top-news-mosaic" ref="top-news-mosaic">
+      <news-settings :is-hovering="hover"
+                     v-if="!isSmallBreakpoint"
+                     :class="isMobile ? '' : 'settingNewsContainer'"
+                     class="mt-3 mr-1" />
+      <div :class="`mosaic-container ${smallHeightClass}`">
+        <div
+            v-for="(item, index) of news"
+            :key="index"
+            :class="isSmallWidth ? 'articleSmallWidth' : 'article'"
+            :id="`articleItem-${index}`">
+          <a
+              class="articleLink d-block"
+              target="_self"
+              :href="item.url">
+            <img :src="showArticleImage && item.illustrationURL !== null ? illustrationURL(item,index) : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
+            <div class="titleArea">
+              <div v-if="showArticleDate" class="articleDate">
+                <date-format
+                    :value="new Date(item.publishDate.time)"
+                    :format="dateFormat" />
+              </div>
+              <div
+                  v-if="showArticleTitle"
+                  :class="styleArticleTitle()">
+                {{ item.title }}
+              </div>
             </div>
-            <div
-              v-if="showArticleTitle" 
-              :class="styleArticleTitle()">
-              {{ item.title }}
-            </div>
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
+  </v-hover>
 </template>
 
 <script>

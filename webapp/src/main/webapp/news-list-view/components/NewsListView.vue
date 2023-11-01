@@ -15,24 +15,26 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <v-app class="news-list-view-app position-relative">
-    <v-card 
-      height="100%"
-      flat
-      :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
-      class="list-view-card rounded-0">
-      <v-card-text class="pa-0">
-        <news-settings v-if="displayHeader" />
-        <extension-registry-component
-          v-if="selectedViewExtension"
-          element-class="news-list-view"
-          :component="selectedViewComponent"
-          :params="viewComponentParams" />
-      </v-card-text>
-    </v-card>
-    <news-settings-drawer v-if="canPublishNews" />
-    <news-publish-targets-management-drawer v-if="canManageNewsPublishTargets" />
-  </v-app>
+  <v-hover v-slot="{ hover }">
+    <v-app class="news-list-view-app position-relative">
+      <v-card
+          height="100%"
+          flat
+          :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
+          class="list-view-card rounded-0">
+        <v-card-text class="pa-0">
+          <news-settings v-if="displayHeader" :is-hovering="hover" />
+          <extension-registry-component
+              v-if="selectedViewExtension"
+              element-class="news-list-view"
+              :component="selectedViewComponent"
+              :params="viewComponentParams" />
+        </v-card-text>
+      </v-card>
+      <news-settings-drawer v-if="canPublishNews" />
+      <news-publish-targets-management-drawer v-if="canManageNewsPublishTargets" />
+    </v-app>
+  </v-hover>
 </template>
 
 <script>

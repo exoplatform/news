@@ -15,21 +15,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="noNewsSlideContent">
-    <v-btn
-      v-if="canPublishNews"
-      icon
-      @click="openDrawer"
-      class="mt-2 me-4 float-right">
-      <v-icon>mdi-cog</v-icon>
-    </v-btn>
-    <div class="noNewsImage">
-      <div class="bookImage"></div>
+  <v-hover v-slot="{ hover }">
+    <div class="noNewsSlideContent">
+      <v-btn
+          v-if="canPublishNews && hover"
+          icon
+          @click="openDrawer"
+          class="mt-2 me-4 float-right">
+        <v-icon>mdi-cog</v-icon>
+      </v-btn>
+      <div class="noNewsImage">
+        <div class="bookImage"></div>
+      </div>
+      <div class="NewsSliderText">
+        <div class="noNewsMsg">{{ $t('news.slider.yourArticleTitleGoesHere') }}</div>
+      </div>
     </div>
-    <div class="NewsSliderText">
-      <div class="noNewsMsg">{{ $t('news.slider.yourArticleTitleGoesHere') }}</div>
-    </div>
-  </div>
+  </v-hover>
 </template>
 <script>
 export default {

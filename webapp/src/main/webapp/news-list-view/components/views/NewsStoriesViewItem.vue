@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <div class="card">
-    <news-settings />
+    <news-settings :hide-open-setting-button="true" />
     <a
       class="articleLink"
       target="_self"

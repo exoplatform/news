@@ -15,59 +15,61 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div id="critical-alerts-slider" v-show="!emptyTemplate">
-    <div class="alerts-header">
-      <div class="alerts-icon">
-        <v-icon>warning</v-icon>
+  <v-hover v-slot="{ hover }">
+    <div id="critical-alerts-slider" v-show="!emptyTemplate">
+      <div class="alerts-header">
+        <div class="alerts-icon">
+          <v-icon>warning</v-icon>
+        </div>
+        <span class="d-none d-md-block" v-if="showHeader">{{ newsHeader }}</span>
       </div>
-      <span class="d-none d-md-block" v-if="showHeader">{{ newsHeader }}</span>
-    </div>
 
-    <div class="alerts-viewer ps-5 flex-grow-1">
-      <v-carousel
-        v-model="slider"
-        hide-delimiters
-        cycle
-        :show-arrows="false"
-        interval="10000"
-        height="20">
-        <v-carousel-item
-          v-for="(item,i) in news"
-          :key="i">
-          <a :href="item.url" class="article-link flex-grow-1">
-            <div class="alerts-article">
+      <div class="alerts-viewer ps-5 flex-grow-1">
+        <v-carousel
+            v-model="slider"
+            hide-delimiters
+            cycle
+            :show-arrows="false"
+            interval="10000"
+            height="20">
+          <v-carousel-item
+              v-for="(item,i) in news"
+              :key="i">
+            <a :href="item.url" class="article-link flex-grow-1">
+              <div class="alerts-article">
               <span v-if="showArticleDate" class="alerts-article-date">
                 <date-format
-                  :value="new Date(item.publishDate.time)"
-                  :format="dateFormat" />
+                    :value="new Date(item.publishDate.time)"
+                    :format="dateFormat" />
               </span>
-              <span v-if="showArticleDate && showArticleTitle" class="alerts-article-seperator">|</span>
-              <span v-if="showArticleTitle" class="alerts-article-title">{{ item.title }}</span>
-            </div>
-          </a>
-        </v-carousel-item>
-      </v-carousel>
-    </div>  
+                <span v-if="showArticleDate && showArticleTitle" class="alerts-article-seperator">|</span>
+                <span v-if="showArticleTitle" class="alerts-article-title">{{ item.title }}</span>
+              </div>
+            </a>
+          </v-carousel-item>
+        </v-carousel>
+      </div>
 
-    <div class="slider-buttons d-flex pe-2">
-      <v-btn
-        @click="slider--"
-        icon>
-        <v-icon>chevron_left</v-icon>
-      </v-btn>
-      <v-btn
-        @click="slider++"
-        icon>
-        <v-icon>chevron_right</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="canPublishNews"
-        icon
-        @click="openDrawer">
-        <v-icon>mdi-cog</v-icon>
-      </v-btn>
+      <div class="slider-buttons d-flex pe-2">
+        <v-btn
+            @click="slider--"
+            icon>
+          <v-icon>chevron_left</v-icon>
+        </v-btn>
+        <v-btn
+            @click="slider++"
+            icon>
+          <v-icon>chevron_right</v-icon>
+        </v-btn>
+        <v-btn
+            v-if="canPublishNews && hover"
+            icon
+            @click="openDrawer">
+          <v-icon>mdi-cog</v-icon>
+        </v-btn>
+      </div>
     </div>
-  </div>
+  </v-hover>
 </template>
 
 <script>

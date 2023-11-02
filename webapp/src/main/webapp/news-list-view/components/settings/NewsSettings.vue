@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
       <span
         v-if="showHeader"
-        class="headerLatestNews body-1 text-uppercase text-sub-title text-truncate text-center"
+        class="news-text-header text-capitalize-first-letter text-truncate"
         :title="newsHeader">{{ newsHeader }}</span>
     </div>
-    <div class="d-flex flex-column me-2">
+    <div class="d-flex flex-column me-2 mt-1">
       <v-icon
         class="button-open-settings"
         v-if="canPublishNews && showSettingsIcon"

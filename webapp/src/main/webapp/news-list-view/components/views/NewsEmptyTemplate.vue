@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-main class="white">
         <v-flex class="news-empty-header d-flex mx-3 my-2">
           <v-spacer />
-          <div class="d-flex flex-row newsSettingButton justify-end">
+          <div :class="[hover ? 'd-flex flex-row newsSettingButton justify-end' : 'd-flex flex-row newsSettingButton justify-end mb-10']">
             <v-btn
                 v-if="canPublishNews && hover"
                 icon
@@ -30,13 +30,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
         </v-flex>
         <v-flex class="d-flex news-empty-template noNews">
-          <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent">
-            <i class="uiNoNewsIcon"></i>
-            <span v-if="!canPublishNews" class="title mt-5">
+          <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent mb-10">
+            <span v-if="!canPublishNews" class="title">
             {{ $t('news.latest.noNews') }}
-          </span>
-            <span v-else class="title my-1 font-weight-bold">
-            {{ $t('news.latest.noSettings') }}
           </span>
             <v-btn
                 v-if="canPublishNews"

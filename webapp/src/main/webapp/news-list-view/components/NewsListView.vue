@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           height="100%"
           flat
           :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
-          class="list-view-card rounded-0">
+          class="list-view-card rounded mb-5 pa-4">
         <v-card-text class="pa-0">
           <news-settings v-if="displayHeader" :is-hovering="hover" />
           <extension-registry-component

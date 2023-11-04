@@ -22,7 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         class="news-text-header text-capitalize-first-letter text-truncate"
         :title="newsHeader">{{ newsHeader }}</span>
     </div>
-    <div class="d-flex flex-column me-2 mt-1">
+    <div :class="[showHeader && newsHeader ? 'd-flex flex-column me-2 mt-1' : 'd-flex flex-column me-2']">
       <v-icon
         class="button-open-settings"
         v-if="canPublishNews && showSettingsIcon"

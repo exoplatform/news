@@ -49,7 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                   v-if="showArticleTitle"
                   :href="item.url"
                   class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate"
-                  :class="extraClass">
+                  :class="extraClass.concat(canPublishNews && !hover ? 'mt-12' : '')">
               <span class="text-h4 font-weight-medium white--text text-truncate-2">
                 {{ item.title }}
               </span>

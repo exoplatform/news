@@ -18,9 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <v-hover v-slot="{ hover }">
     <v-app class="newsEmptyTemplate border-box-sizing" flat>
       <v-main class="white">
-        <v-flex class="news-empty-header d-flex mx-3 my-2">
+        <v-sheet height="32" class="news-empty-header d-flex mx-3 my-2">
           <v-spacer />
-          <div :class="[hover ? 'd-flex flex-row newsSettingButton justify-end' : 'd-flex flex-row newsSettingButton justify-end mb-10']">
+          <div class="d-flex flex-row newsSettingButton justify-end">
             <v-btn
                 v-if="canPublishNews && hover"
                 icon
@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               <v-icon>mdi-cog</v-icon>
             </v-btn>
           </div>
-        </v-flex>
+        </v-sheet>
         <v-flex class="d-flex news-empty-template noNews">
           <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent mb-10">
             <span v-if="!canPublishNews" class="title">

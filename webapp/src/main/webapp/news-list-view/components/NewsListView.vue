@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-hover v-slot="{ hover }">
-    <v-app class="news-list-view-app position-relative">
+    <v-app v-if="!hideEmptyNewsTemplateForNonPublisher" class="news-list-view-app position-relative">
       <v-card
           height="100%"
           flat
@@ -163,6 +163,9 @@ export default {
         loading: this.loading,
       };
     },
+    hideEmptyNewsTemplateForNonPublisher() {
+      return this.selectedViewExtension.id === 'NewsEmptyTemplate' && !this.canPublishNews;
+    }
   },
   watch: {
     viewExtensions() {

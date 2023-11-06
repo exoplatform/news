@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="d-flex latestNewsTitleContainer flex-column flex-grow-1 my-1">
       <span
         v-if="showHeader"
-        class="news-text-header text-capitalize-first-letter text-truncate"
+        class="news-text-header text-truncate"
         :title="newsHeader">{{ newsHeader }}</span>
     </div>
     <div class="d-flex flex-column me-2 mt-1">

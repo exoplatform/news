@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-hover v-slot="{ hover }">
-    <v-app class="newsEmptyTemplate border-box-sizing" flat>
+    <v-app v-show="canPublishNews" class="newsEmptyTemplate border-box-sizing" flat>
       <v-main class="white">
         <v-sheet height="32" class="news-empty-header d-flex mx-3 my-2">
           <v-spacer />
           <div class="d-flex flex-row newsSettingButton justify-end">
             <v-btn
-                v-if="canPublishNews && hover"
+                v-if="hover"
                 icon
                 @click="openDrawer">
               <v-icon>mdi-cog</v-icon>
@@ -31,11 +31,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-sheet>
         <v-flex class="d-flex news-empty-template noNews">
           <div class="ma-auto py-5 d-flex flex-column align-center noNewsContent mb-10">
-            <span v-if="!canPublishNews" class="title">
+            <span v-if="isNewsSettingDefined" class="title">
             {{ $t('news.latest.noNews') }}
           </span>
             <v-btn
-                v-if="canPublishNews"
+                v-else
                 class="btn btn-primary"
                 outlined
                 @click="openDrawer">
@@ -54,6 +54,11 @@ export default {
     return {
       canPublishNews: false,
     };
+  },
+  computed: {
+    isNewsSettingDefined() {
+      return this.$root.viewTemplate && this.$root.newsTarget;
+    }
   },
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {

@@ -362,7 +362,6 @@ export default {
       newsFormTitlePlaceholder: `${this.$t('news.composer.placeholderTitleInput')}*`,
       newsFormSummaryPlaceholder: this.$t('news.composer.placeholderSummaryInput'),
       newsFormContentPlaceholder: `${this.$t('news.composer.placeholderContentInput')}*`,
-      newsFormContentHeight: '250',
       newsFormSummaryHeight: '80',
       initDone: false,
       initIllustrationDone: false,
@@ -398,7 +397,8 @@ export default {
       spaceDisplayName: '',
       unAuthorizedAccess: false,
       endUplodingFileTimeout: 50,
-      newsBody: null
+      newsBody: null,
+      desktopToolbar: null
     };
   },
   computed: {
@@ -570,91 +570,46 @@ export default {
       if (CKEDITOR.instances['newsContent'] && CKEDITOR.instances['newsContent'].destroy) {
         CKEDITOR.instances['newsContent'].destroy(true);
       }
-      CKEDITOR.plugins.addExternal('video','/news/js/ckeditor/plugins/video/','plugin.js');
-      CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
-      CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
       CKEDITOR.dtd.$removeEmpty['i'] = false;
-      let extraPlugins = 'sharedspace,simpleLink,suggester,font,justify,widget,video,switchView,attachFile,googleDocPastePlugin,tagSuggester';
-      let removePlugins = 'image,confirmBeforeReload,maximize,resize,embedsemantic';
-      const windowWidth = $(window).width();
-      const windowHeight = $(window).height();
-      if (windowWidth > windowHeight && windowWidth < this.SMARTPHONE_LANDSCAPE_WIDTH) {
-        // Disable suggester on smart-phone landscape
-        extraPlugins = 'simpleLink';
-      }
-      CKEDITOR.addCss('.cke_editable { font-size: 14pt; font-family: Helvetica, regular, sans-serif; line-height: 1.4 !important;}');
-      CKEDITOR.addCss('h1 { font-size: 34px;font-weight: 400;}');
-      CKEDITOR.addCss('h2 { font-size: 28px;font-weight: 400;}');
-      CKEDITOR.addCss('h3 { font-size: 21.84px;font-weight: 400;}');
-      CKEDITOR.addCss('p,li { font-size: 18.6667px;}');
-      CKEDITOR.addCss('blockquote p  { font-size: 17.5px;font-weight: 300;}');
-      // this line is mandatory when a custom skin is defined
 
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
       const mobile = this.isMobile;
-      const newsToolbar = [];
-      if (this.isMobile) {
-        newsToolbar.push(
-          { name: 'switchView', items: ['switchView'] },
-          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'links', items: ['Video'] },
-          { name: 'attachFile', items: ['attachFile'] },
-        );
-      } else {
-        newsToolbar.push(
-          { name: 'format', items: ['Format'] },
-          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-          { name: 'fontsize', items: ['FontSize'] },
-          { name: 'colors', items: [ 'TextColor' ] },
-          { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-          { name: 'links', items: [ 'simpleLink', 'Video'] },
-        );
-      }
 
-      const ckEditorExtensions = extensionRegistry.loadExtensions('WYSIWYGPlugins', 'image');
-      if (ckEditorExtensions && ckEditorExtensions.length) {
-        const ckEditorExtraPlugins = ckEditorExtensions.map(ckEditorExtension => ckEditorExtension.extraPlugin).join(',');
-        const ckEditorRemovePlugins = ckEditorExtensions.map(ckEditorExtension => ckEditorExtension.removePlugin).join(',');
-        if (ckEditorExtraPlugins) {
-          extraPlugins = `${extraPlugins},${ckEditorExtraPlugins}`;
-        }
-        if (ckEditorRemovePlugins) {
-          removePlugins = `${extraPlugins},${ckEditorRemovePlugins}`;
-        }
-        ckEditorExtensions.forEach(ckEditorExtension => newsToolbar.find(toolbarItem => toolbarItem.name === 'links').items.push(ckEditorExtension.extraToolbarItem));
-      }
       $('textarea#newsContent').ckeditor({
         customConfig: `${eXo.env.portal.context}/${eXo.env.portal.rest}/richeditor/configuration?type=news&v=${eXo.env.client.assetsVersion}`,
-        extraPlugins: extraPlugins,
-        removePlugins: removePlugins,
         allowedContent: true,
         typeOfRelation: 'mention_activity_stream',
         spaceURL: self.spaceURL,
         spaceGroupId: self.spaceGroupId,
         imagesDownloadFolder: 'DRIVE_ROOT_NODE/News/images',
         toolbarLocation: 'top',
-        extraAllowedContent: 'img[style,class,src,referrerpolicy,alt,width,height]; span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*]',
-        removeButtons: 'Subscript,Superscript,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,Strike,Outdent,Indent,BGColor,About',
-        toolbar: newsToolbar,
-        format_tags: 'p;h1;h2;h3',
-        autoGrow_minHeight: self.newsFormContentHeight,
-        height: self.newsFormContentHeight,
+        extraAllowedContent: 'table[summary];img[style,class,src,referrerpolicy,alt,width,height];span(*)[*]{*}; span[data-atwho-at-query,data-atwho-at-value,contenteditable]; a[*];i[*];',
+        removeButtons: '',
         bodyClass: 'newsContent',
         dialog_noConfirmCancel: true,
+        indentBlock: {
+          offset: 40,
+          unit: 'px'
+        },
+        copyFormatting_allowedContexts: true,
+        colorButton_enableMore: true,
+        enterMode: CKEDITOR.ENTER_P,
+        shiftEnterMode: CKEDITOR.ENTER_BR,
         sharedSpaces: {
           top: 'newsTop'
         },
         on: {
           instanceReady: function(evt) {
+            CKEDITOR.instances['newsContent'].removeMenuItem('selectImageItem');
             if (mobile) {
-              const numerotationGroupButton = document.getElementById('cke_16');
-              const attachMediaButton = document.getElementById('cke_20');
-              const attachFileButton = document.getElementById('cke_23');
-              numerotationGroupButton.style.borderRight = 'none';
-              attachMediaButton.style.display = 'none';
+              const paragraph = document.getElementById('cke_22');
+              const linkSection = document.getElementById('cke_27');
+              const blockSection = document.getElementById('cke_30');
+              const attachFileButton = document.getElementById('cke_38');
+              paragraph.style.borderRight = 'none';
+              linkSection.style.display = 'none';
+              blockSection.style.display = 'none';
               attachFileButton.style.display = 'none';
               const spanBadge = document.createElement('span');
               spanBadge.setAttribute('class','badge');
@@ -1129,27 +1084,29 @@ export default {
       const elementNewTop = document.getElementById('newsTop');
       elementNewTop.classList.remove('greyComposerEffect');
       elementNewTop.classList.add('darkComposerEffect');
-      const switchViewButton = document.getElementById('cke_9');
-      const fontStyleGroupButton = document.getElementById('cke_11');
-      const numerotationGroupButton = document.getElementById('cke_16');
-      const attachMediaButton = document.getElementById('cke_20');
-      const attachFileButton = document.getElementById('cke_23');
-      numerotationGroupButton.style.borderRight = 'none';
-      attachMediaButton.style.display = 'none';
-      if (!this.switchView) {
-        switchViewButton.style.borderRight = 'none';
-        fontStyleGroupButton.style.display = 'none';
-        numerotationGroupButton.style.display = 'none';
-        attachMediaButton.style.display = 'initial';
-        attachMediaButton.style.borderRight = 'none';
-        attachFileButton.style.display = 'initial';
-        this.switchView = true;
-      } else {
-        switchViewButton.style.display = 'initial';
-        fontStyleGroupButton.style.display = 'initial';
-        numerotationGroupButton.style.display = 'initial';
+      const basicStyles = document.getElementById('cke_14');
+      const paragraph = document.getElementById('cke_22');
+      const switchViewButton = document.getElementById('cke_12');
+      const linkSection = document.getElementById('cke_27');
+      const blockSection = document.getElementById('cke_30');
+      const attachFileButton = document.getElementById('cke_38');
+      if (this.switchView) {
+        basicStyles.style.display = 'inline';
+        paragraph.style.display = 'inline';
+        switchViewButton.style.borderRight = '1px solid #b6b6b6';
+        linkSection.style.display = 'none';
+        blockSection.style.display = 'none';
         attachFileButton.style.display = 'none';
         this.switchView = false;
+      } else {
+        basicStyles.style.display = 'none';
+        paragraph.style.display = 'none';
+        switchViewButton.style.borderRight = 'none';
+        switchViewButton.style.display = 'initial';
+        linkSection.style.display = 'initial';
+        blockSection.style.display = 'initial';
+        attachFileButton.style.display = 'initial';
+        this.switchView = true;
       }
     },
     waitForEndUploding() {

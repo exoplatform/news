@@ -120,7 +120,9 @@
             id="newsBody"
             :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody clearfix">
-            <span v-sanitized-html="newsBody" class="rich-editor-content"></span>
+            <span
+              class="reset-style-box rich-editor-content extended-rich-content"
+              v-sanitized-html="newsBody" />
           </div>
 
           <div v-show="attachments && attachments.length" class="newsAttachmentsTitle">

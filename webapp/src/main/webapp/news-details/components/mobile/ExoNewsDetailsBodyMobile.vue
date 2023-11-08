@@ -34,7 +34,9 @@
     </div>
     <v-divider class="mx-4" />
     <div class="d-flex flex-row pa-4 newsBody">
-      <span v-html="newsBody"></span>
+      <span
+        class="reset-style-box rich-editor-content extended-rich-content"
+        v-sanitized-html="newsBody" />
     </div>
     <div v-show="attachments && attachments.length" class="d-flex flex-row pa-4 newsAttachmentsTitle subtitle-2">
       {{ $t('news.details.attachments.title') }} ({{ attachments ? attachments.length : 0 }})

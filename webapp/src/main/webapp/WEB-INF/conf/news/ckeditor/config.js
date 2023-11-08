@@ -16,7 +16,7 @@ CKEDITOR.editorConfig = function (config) {
 
   const toolbar = [
     {name: 'accessibility', items: ['A11ychecker']},
-    {name: 'format', items: ['format']},
+    {name: 'format', items: ['Format']},
     {name: 'fontSize', items: ['FontSize']},
     {
       name: 'basicstyles',

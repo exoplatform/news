@@ -16,11 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-hover v-slot="{ hover }">
-    <v-app v-if="!hideEmptyNewsTemplateForNonPublisher" class="news-list-view-app position-relative">
+    <v-app v-show="!hideEmptyNewsTemplateForNonPublisher" class="news-list-view-app position-relative">
       <v-card
           height="100%"
           flat
-          :class="viewTemplate === 'NewsStories' ? 'background-transparent' : ''"
+          :class="newsStoriesClass"
           class="list-view-card rounded mb-5 pa-4">
         <v-card-text class="pa-0">
           <news-settings v-if="displayHeader" :is-hovering="hover" />
@@ -110,7 +110,8 @@ export default {
   }),
   computed: {
     displayHeader() {
-      return this.viewTemplate && 
+      return this.viewTemplate &&
+            this.selectedViewExtension?.id !== 'NewsEmptyTemplate' &&
             this.viewTemplate !== 'NewsSlider' && 
             this.viewTemplate !== 'NewsAlert' && 
             this.viewTemplate !== 'NewsStories' && 
@@ -118,16 +119,13 @@ export default {
     },
     selectedViewExtension() {
       if (this.viewTemplate) {
-        if (this.viewTemplate === 'NewsSlider' && this.newsList.length === 0) {
+        if (this.newsList.length === 0) {
           const sortedViewExtensions = Object.values(this.viewExtensions).sort();
-          return sortedViewExtensions[3];
-        } else if (( this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsList' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' || this.viewTemplate === 'NewsCards' ) && this.newsList.length === 0) {
-          const sortedViewExtensions = Object.values(this.viewExtensions).sort();
-          return sortedViewExtensions[4];
+          return sortedViewExtensions[0];
         } else {
           return this.viewExtensions[this.viewTemplate];
         }
-      } else if (Object.keys(this.viewExtensions).length && this.newsList.length > 0) {
+      } else if (Object.keys(this.viewExtensions).length && (this.newsList.length > 0 || this.newsTarget)) {
         const sortedViewExtensions = Object.values(this.viewExtensions).sort();
         return sortedViewExtensions[0];
       }
@@ -164,7 +162,10 @@ export default {
       };
     },
     hideEmptyNewsTemplateForNonPublisher() {
-      return this.selectedViewExtension.id === 'NewsEmptyTemplate' && !this.canPublishNews;
+      return this.selectedViewExtension?.id === 'NewsEmptyTemplate' && !this.canPublishNews;
+    },
+    newsStoriesClass() {
+      return (this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate') ? 'background-transparent' : '';
     }
   },
   watch: {

@@ -25,7 +25,7 @@
     <skin-name>Enterprise</skin-name>
     <skin-module>newsDetails</skin-module>
     <css-path>/skin/css/newsDetails.css</css-path>
-    <css-priority>11</css-priority>
+    <css-priority>30</css-priority>
   </portal-skin>
 
   <portlet-skin>

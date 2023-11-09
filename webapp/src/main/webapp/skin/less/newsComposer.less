@@ -197,10 +197,16 @@
     z-index: 5;
     background-color: #eeeeee;
 
+    .newsTitle {
+      border-bottom: solid 1px @greyColorDefault !important;
+    }
+
+    .newsSummary {
+      border-bottom: solid 1px @greyColorDefault !important;
+    }
     .newsFormInput {
       display: flex;
       flex-direction: column;
-      margin: 20px 14%;
       background-color: white;
       color: grey;
 
@@ -305,11 +311,10 @@
           border-radius: 0px;
           border-color: transparent;
           margin: 0;
-          padding: 20px;
+          padding: 30px;
           font-size: 24px;
           text-align: center;
           box-shadow:none;
-          border-bottom:solid 1px @greyColorDefault !important;
         }
 
         textarea {
@@ -320,7 +325,6 @@
           font-size: 18px;
           border: none !important;
           resize: none;
-          border-bottom:solid 1px @greyColorDefault !important;
           border-radius: 0;
           box-shadow:none;
 

@@ -205,7 +205,7 @@ export default {
       return this.news && this.news.hiddenSpace;
     },
     newsBody() {
-      return this.news && this.targetBlank(this.newsBodyContent);
+      return this.news && this.newsBodyContent;
     },
     updaterFullName() {
       return this.news && this.news.updaterFullName;
@@ -223,7 +223,7 @@ export default {
       return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
     },
     newsSummary() {
-      return this.news && this.targetBlank(this.newsSummaryContent);
+      return this.news && this.newsSummaryContent;
     },
     spaceId() {
       return this.news && this.news.spaceId;
@@ -294,24 +294,7 @@ export default {
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
       }
-    },
-    targetBlank: function (content) {
-      const internal = location.host + eXo.env.portal.context;
-      const domParser = new DOMParser();
-      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
-      const links = docElement.getElementsByTagName('a');
-      for (const link of links) {
-        let href = link.href.replace(/(^\w+:|^)\/\//, '');
-        if (href.endsWith('/')) {
-          href = href.slice(0, -1);
-        }
-        if (href !== location.host && !href.startsWith(internal)) {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-        }
-      }
-      return docElement.innerHTML;
-    },
+    }
   }
 };
 </script>

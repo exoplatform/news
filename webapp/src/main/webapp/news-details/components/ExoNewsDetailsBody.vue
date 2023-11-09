@@ -26,7 +26,7 @@
               </div>
             </div>
           </div>
-          <div class="newsInformationBackground">
+          <div class="newsInformationBackground center">
             <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content  d-inline-flex align-center">
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
                 <exo-user-avatar 
@@ -112,14 +112,14 @@
           <div
             v-if="newsSummary"
             id="newsSummary"
-            class="summary">
+            class="summary center ms-13 me-13">
             <span v-sanitized-html="newsSummary"></span>
           </div>
 
           <div
             id="newsBody"
             :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
-            class="fullDetailsBody clearfix">
+            class="fullDetailsBody ms-13 me-13 clearfix">
             <span
               class="reset-style-box rich-editor-content extended-rich-content"
               v-sanitized-html="newsBody" />

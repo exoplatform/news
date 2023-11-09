@@ -218,50 +218,52 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         id="newsForm"
         class="newsForm"
         onsubmit="event.preventDefault(); return false;">
-        <div class="newsFormInput">
-          <div id="newsFormAttachment" class="newsFormAttachment">
-            <div class="control-group attachments">
-              <div class="controls">
-                <exo-news-file-drop v-model="news.illustration" @change="autoSave" />
+        <div class="newsFormInput singlePageApplication transparent">
+          <div class="white">
+            <div id="newsFormAttachment" class="newsFormAttachment">
+              <div class="control-group attachments">
+                <div class="controls">
+                  <exo-news-file-drop v-model="news.illustration" @change="autoSave" />
+                </div>
               </div>
             </div>
+            <div class="formInputGroup newsTitle">
+              <input
+                id="newsTitle"
+                v-model="news.title"
+                :maxlength="titleMaxLength"
+                :placeholder="newsFormTitlePlaceholder"
+                type="text">
+            </div>
+            <div class="formInputGroup newsSummary">
+              <textarea
+                id="newsSummary"
+                v-model="news.summary"
+                :maxlength="summaryMaxLength"
+                :placeholder="newsFormSummaryPlaceholder"
+                class="newsFormInput">
+              </textarea>
+            </div>
+            <div class="formInputGroup">
+              <textarea
+                id="newsContent"
+                v-model="news.content"
+                :placeholder="newsFormContentPlaceholder"
+                class="newsFormInput"
+                name="newsContent">
+              </textarea>
+            </div>
+            <v-alert
+              v-if="news.draftUpdaterUserName !== currentUser && news.publicationState === 'draft' && activityId"
+              dismissible
+              border="left"
+              elevation="2"
+              colored-border
+              class="warningAlert">
+              <i class="fas fa-exclamation-circle exclamationIcon"></i>
+              <span class="warningText">{{ draftWarningText }}</span>
+            </v-alert>
           </div>
-          <div class="formInputGroup newsTitle">
-            <input
-              id="newsTitle"
-              v-model="news.title"
-              :maxlength="titleMaxLength"
-              :placeholder="newsFormTitlePlaceholder"
-              type="text">
-          </div>
-          <div class="formInputGroup">
-            <textarea
-              id="newsSummary"
-              v-model="news.summary"
-              :maxlength="summaryMaxLength"
-              :placeholder="newsFormSummaryPlaceholder"
-              class="newsFormInput">
-            </textarea>
-          </div>
-          <div class="formInputGroup">
-            <textarea
-              id="newsContent"
-              v-model="news.content"
-              :placeholder="newsFormContentPlaceholder"
-              class="newsFormInput"
-              name="newsContent">
-            </textarea>
-          </div>
-          <v-alert
-            v-if="news.draftUpdaterUserName !== currentUser && news.publicationState === 'draft' && activityId"
-            dismissible
-            border="left"
-            elevation="2"
-            colored-border
-            class="warningAlert">
-            <i class="fas fa-exclamation-circle exclamationIcon"></i>
-            <span class="warningText">{{ draftWarningText }}</span>
-          </v-alert>
         </div>
       </form>
       <v-btn

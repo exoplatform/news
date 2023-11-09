@@ -1,8 +1,6 @@
 package org.exoplatform.news.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -18,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.social.rest.api.RestUtils;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +58,8 @@ public class NewsTargetingImplTest {
 
   private static final MockedStatic<CommonsUtils>        COMMONS_UTILS         = mockStatic(CommonsUtils.class);
 
+  private static final MockedStatic<RestUtils>        REST_UTILS         = mockStatic(RestUtils.class);
+
   @Mock
   MetadataService             metadataService;
 
@@ -87,12 +88,18 @@ public class NewsTargetingImplTest {
   public static void afterRunBare() throws Exception { // NOSONAR
     EXO_CONTAINER_CONTEXT.close();
     COMMONS_UTILS.close();
+    REST_UTILS.close();
   }
 
   @Test
   public void testGetAllTargets() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
+    org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    REST_UTILS.when(() -> RestUtils.getCurrentUser()).thenReturn("root");
+    when(identityRegistry.getIdentity("root")).thenReturn(identity);
     MetadataType metadataType = new MetadataType(4, "newsTarget");
     List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();
@@ -147,7 +154,11 @@ public class NewsTargetingImplTest {
   public void testGetAllowedTargets() throws Exception {
     // Given
     NewsTargetingServiceImpl newsTargetingService = new NewsTargetingServiceImpl(metadataService, identityManager, spaceService, organizationService);
+    IdentityRegistry identityRegistry = mock(IdentityRegistry.class);
+    EXO_CONTAINER_CONTEXT.when(() -> ExoContainerContext.getService(IdentityRegistry.class)).thenReturn(identityRegistry);
     org.exoplatform.services.security.Identity identity = mock(org.exoplatform.services.security.Identity.class);
+    REST_UTILS.when(() -> RestUtils.getCurrentUser()).thenReturn("user");
+    when(identityRegistry.getIdentity("user")).thenReturn(identity);
     MetadataType metadataType = new MetadataType(4, "newsTarget");
     List<Metadata> newsTargets = new LinkedList<>();
     Metadata sliderNews = new Metadata();
@@ -206,6 +217,7 @@ public class NewsTargetingImplTest {
     assertNotNull(allowedTargets);
     assertEquals(1, allowedTargets.size());
     assertEquals("latestNews", allowedTargets.get(0).getName());
+    assertTrue(allowedTargets.get(0).isRestrictedAudience());
 
     // Given
     Metadata testNews = new Metadata();
@@ -245,6 +257,7 @@ public class NewsTargetingImplTest {
     assertEquals(2, allowedTargets.size());
     assertEquals("latestNews", allowedTargets.get(0).getName());
     assertEquals("testNews", allowedTargets.get(1).getName());
+    assertTrue(allowedTargets.get(0).isRestrictedAudience());
 
     // Given
     when(spaceService.getSpaceById("1")).thenReturn(null);

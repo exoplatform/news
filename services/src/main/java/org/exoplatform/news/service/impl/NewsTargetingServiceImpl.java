@@ -43,6 +43,7 @@ import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.Metadata;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataKey;
+import org.exoplatform.social.rest.api.RestUtils;
 
 /**
  * Service managing News Targeting
@@ -245,6 +246,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
       newsTargetingEntity.setProperties(metadata.getProperties());
     }
     if (newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS) != null) {
+      org.exoplatform.services.security.Identity currentIdentity = NewsUtils.getUserIdentity(RestUtils.getCurrentUser());
+      boolean isSpacePublisher = false;
+      boolean isGroupPublisher = false;
       String permissions = newsTargetingEntity.getProperties().get(NewsUtils.TARGET_PERMISSIONS);
       List<String> permissionsList = List.of(permissions.split(","));
       List<NewsTargetingPermissionsEntity> permissionsEntities = new ArrayList<>();
@@ -259,6 +263,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
               permissionEntity.setProviderId("space");
               permissionEntity.setRemoteId(space.getPrettyName());
               permissionEntity.setAvatar(space.getAvatarUrl());
+              if (!isSpacePublisher) {
+                isSpacePublisher = spaceService.isPublisher(space, currentIdentity.getUserId());
+              }
             }
           }
         } else {
@@ -269,6 +276,9 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
               permissionEntity.setName(group.getLabel());
               permissionEntity.setProviderId("group");
               permissionEntity.setRemoteId(group.getGroupName());
+              if (!isGroupPublisher) {
+                isGroupPublisher = currentIdentity.isMemberOf(group.getId(), PUBLISHER_MEMBERSHIP_NAME);
+              }
             }
           } catch (Exception e) {
             LOG.error("Could not find group from permission" + permission);
@@ -279,6 +289,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
         }
       }
       newsTargetingEntity.setPermissions(permissionsEntities);
+      newsTargetingEntity.setRestrictedAudience(isSpacePublisher && !isGroupPublisher);
     }
     return newsTargetingEntity;
   }

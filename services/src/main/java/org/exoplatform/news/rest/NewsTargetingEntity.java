@@ -31,4 +31,6 @@ public class NewsTargetingEntity {
   private Map<String, String> properties;
 
   private List<NewsTargetingPermissionsEntity> permissions;
+
+  private boolean restrictedAudience;
 }

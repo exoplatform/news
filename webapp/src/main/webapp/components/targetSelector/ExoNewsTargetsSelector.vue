@@ -83,18 +83,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div 
         @click.stop
         class="mr-3">
-        <v-select
-          id="chooseAudience"
-          ref="chooseAudience"
-          class="text-subtitle-2 py-0"
-          v-model="selectedAudience"
-          :items="audiences"
-          dense
-          outlined 
-          @change="addAudience()" />
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-sheet
+                height="40"
+                :class="[disableAudienceChoiceSelect ? 'select-audience-block grey lighten-3' : 'select-audience-block']" v-on="on">
+              <v-select
+                v-on="on"
+                id="chooseAudience"
+                ref="chooseAudience"
+                class="text-subtitle-2 py-0"
+                v-model="selectedAudience"
+                :items="audiences"
+                dense
+                outlined
+                :disabled="disableAudienceChoiceSelect"
+                @change="addAudience()" />
+            </v-sheet>
+          </template>
+          <span>{{ selectAudienceTooltipText }}</span>
+        </v-tooltip>
+
+
       </div>
-      <div class="d-flex flex-row grey--text ms-2">
-        <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+      <div class="d-flex flex-row grey--text ms-2 mt-2">
+        <i class="fas fa-exclamation-triangle mx-2 pt-1"></i>
         {{ selectedAudienceDescription }}
       </div>
     </div>
@@ -124,7 +137,8 @@ export default {
   },
   data: () =>({
     selectedAudience: null,
-    selectedTargets: []
+    selectedTargets: [],
+    disableAudienceChoice: false
   }),
   computed: {
     selectedAudienceDescription() {
@@ -152,6 +166,12 @@ export default {
     },
     selectTargetLabel() {
       return this.selectAllTargets ? this.$t('news.composer.stepper.chooseTarget.deselectAllTargets') : this.$t('news.composer.stepper.chooseTarget.selectAllTargets');
+    },
+    disableAudienceChoiceSelect() {
+      return this.disableAudienceChoice;
+    },
+    selectAudienceTooltipText() {
+      return this.disableAudienceChoiceSelect ? this.$t('news.composer.stepper.audienceSection.Restricted.audience.tooltip') : this.selectedAudienceDescription;
     }
   },
   created() {
@@ -165,6 +185,20 @@ export default {
       }
     });
     this.selectedTargets = this.news.targets;
+  },
+  watch: {
+    selectedTargets() {
+      const selectedTargetForCurrentUser = this.selectedTargets.filter(item => this.targets.some(e => {
+        return e.name === item;
+      }));
+      if (!selectedTargetForCurrentUser.length > 0) {
+        this.disableAudienceChoice = false;
+        this.selectedAudience = this.audiences[0];
+        this.addAudience();
+      } else {
+        this.selectAudience(selectedTargetForCurrentUser);
+      }
+    },
   },
   methods: {
     removeTarget(item) {
@@ -191,6 +225,17 @@ export default {
     },
     addAudience(){
       this.$emit('selected-audience', this.selectedAudience);
+    },
+    selectAudience(selectedTargetForCurrentUser) {
+      const targets = this.targets.filter(item => selectedTargetForCurrentUser.includes(item.name));
+      const restrictedAudience = targets.some(target => target.restrictedAudience);
+      this.selectedAudience = restrictedAudience ? this.audiences[1] : this.audiences[0];
+      if (restrictedAudience) {
+        this.disableAudienceChoice = true;
+      } else {
+        this.disableAudienceChoice = false;
+      }
+      this.addAudience();
     }
   }
 };

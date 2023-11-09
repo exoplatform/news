@@ -94,10 +94,10 @@ export default {
       return this.news && this.news.publicationState;
     },
     newsSummary() {
-      return this.news && this.targetBlank(this.news.summary);
+      return this.news?.summary;
     },
     newsBody() {
-      return this.news && this.targetBlank(this.news.body);
+      return this.news?.body;
     },
     newsAuthor() {
       return this.news && this.news.author;
@@ -107,23 +107,6 @@ export default {
     },
   },
   methods: {
-    targetBlank: function (content) {
-      const internal = location.host + eXo.env.portal.context;
-      const domParser = new DOMParser();
-      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
-      const links = docElement.getElementsByTagName('a');
-      for (const link of links) {
-        let href = link.href.replace(/(^\w+:|^)\/\//, '');
-        if (href.endsWith('/')) {
-          href = href.slice(0, -1);
-        }
-        if (href !== location.host && !href.startsWith(internal)) {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-        }
-      }
-      return docElement.innerHTML;
-    },
     openPreview(attachedFile) {
       const self = this;
       window.require(['SHARED/documentPreview'], function(documentPreview) {

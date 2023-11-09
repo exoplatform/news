@@ -1,6 +1,11 @@
 @import "./variables.less";
 @import "../../ckeditor/skins/common/extendedRichContent.less";
 
+
+.singlePageApplicationTDContainer {
+  padding: 0;
+}
+
 .VuetifyApp {
   #newsDetailApp {
     padding: 10px 8%;
@@ -149,7 +154,6 @@
 .newsDetails-description {
   word-break: break-word;
   background-color: #FFFFFF;
-  text-align: center;
   .newsEditComponent {
     float: right ~'; /** orientation=lt */ ';
     float: left ~'; /** orientation=rt */ ';
@@ -198,7 +202,6 @@
 
     .summary {
       padding: 40px 0;
-      max-width: 80%;
       margin: auto;
       font-style: italic;
       font-size: 16pt;
@@ -206,13 +209,10 @@
     }
     .fullDetailsBody {
       border-top: 1px #ced2d5 solid;
-      text-align: justify;
       padding-top: 20px;
       padding-bottom: 30px;
-      letter-spacing: .1px;
       line-height: 1.4;
       font-size: 14pt;
-      max-width: 80%;
       margin: auto;
       word-break: break-word;
     }

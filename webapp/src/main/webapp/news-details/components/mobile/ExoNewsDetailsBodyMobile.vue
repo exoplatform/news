@@ -29,11 +29,11 @@
     <div class="d-flex flex-row caption text-light-color">
       <exo-news-details-time :news="news" />
     </div>
-    <div class="d-flex flex-row caption font-italic grey--text text-darken-1 pa-4">
-      <span v-html="newsSummary"></span>
+    <div class="d-flex flex-row ms-2 me-2 caption font-italic grey--text text-darken-1 pa-4">
+      <span v-sanitized-html="newsSummary"></span>
     </div>
     <v-divider class="mx-4" />
-    <div class="d-flex flex-row pa-4 newsBody">
+    <div class="d-flex flex-row pa-4 ms-2 me-2 newsBody">
       <span
         class="reset-style-box rich-editor-content extended-rich-content"
         v-sanitized-html="newsBody" />

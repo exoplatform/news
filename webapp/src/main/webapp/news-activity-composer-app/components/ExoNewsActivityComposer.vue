@@ -574,6 +574,15 @@ export default {
       }
       CKEDITOR.dtd.$removeEmpty['i'] = false;
 
+      CKEDITOR.on('dialogDefinition', function (e) {
+        if (e.data.name === 'link') {
+          const informationTab = e.data.definition.getContents('target');
+          const targetField = informationTab.get('linkTargetType');
+          targetField['default'] = '_self';
+          targetField.items = targetField.items.filter(t => ['_self', '_blank'].includes(t[1]));
+        }
+      });
+
       CKEDITOR.basePath = '/commons-extension/ckeditor/';
       const self = this;
       const mobile = this.isMobile;

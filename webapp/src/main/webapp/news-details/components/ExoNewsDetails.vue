@@ -114,6 +114,16 @@ export default {
     this.markNewsAsRead(this.newsId);
   },
   methods: {
+    formatContent(content) {
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      docElement.querySelectorAll('pre > code').forEach((e) => codeHighlighter.highlightBlock(e));
+      docElement.querySelectorAll('oembed').forEach((oembed) => {
+        oembed.innerHTML = oembed.dataset.iframe;
+        delete oembed.dataset.iframe;
+      });
+      return docElement?.children[1].innerHTML;
+    },
     markNewsAsRead(newsId) {
       if (newsId) {
         this.$newsServices.markNewsAsRead(newsId);

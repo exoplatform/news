@@ -338,6 +338,9 @@
       <module>newsTargetSelectorComponent</module>
     </depends>
     <depends>
+      <module>codeHighlighter</module>
+    </depends>
+    <depends>
       <module>commons-editor</module>
       <as>editor</as>
     </depends>

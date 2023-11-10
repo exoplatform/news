@@ -3,7 +3,8 @@
     "eslint-config-meedsio"
   ],
   "globals": {
-    "CKEDITOR": true
+    "CKEDITOR": true,
+    "codeHighlighter": true
   },
   "rules": {
     "vue/no-mutating-props": "warn"

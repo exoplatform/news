@@ -400,7 +400,8 @@ export default {
       unAuthorizedAccess: false,
       endUplodingFileTimeout: 50,
       newsBody: null,
-      desktopToolbar: null
+      desktopToolbar: null,
+      oembedMinWidth: 300,
     };
   },
   computed: {
@@ -710,7 +711,7 @@ export default {
             this.news.activityPosted = fetchedNode.activityPosted;
             this.news.audience = fetchedNode.audience;
             this.initCKEditor();
-            this.initCKEditorData(fetchedNode.body);
+            this.initCKEditorData(this.getContentToEdit(fetchedNode.body));
 
             if (fetchedNode.illustrationURL) {
               this.$newsServices.importFileFromUrl(fetchedNode.illustrationURL)
@@ -1015,9 +1016,67 @@ export default {
     setUploadingCount: function(uploadingCount) {
       this.uploading = uploadingCount > 0;
     },
-    getBody: function() {
+    getContentToEdit(content) {
+      const domParser = new DOMParser();
+      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
+      this.restoreOembed(docElement);
+      this.restoreUnHighlightedCode(docElement);
+      return docElement?.children[1].innerHTML;
+    },
+    restoreUnHighlightedCode(documentElement) {
+      documentElement.querySelectorAll('code.hljs').forEach(code => {
+        code.innerHTML = code.innerText;
+        code.classList.remove('hljs');
+      });
+    },
+    restoreOembed(documentElement) {
+      documentElement.querySelectorAll('div.embed-wrapper').forEach(wrapper => {
+        const oembed = document.createElement('oembed');
+        oembed.innerHTML = wrapper.dataset.url;
+        wrapper.replaceWith(oembed);
+      });
+    },
+    preserveEmbedded(body, documentElement) {
+      const iframes = body.querySelectorAll('[data-widget="embedSemantic"] div iframe');
+      if (iframes.length) {
+        documentElement.querySelectorAll('oembed').forEach((oembed, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.dataset.url = decodeURIComponent(oembed.innerHTML);
+          wrapper.innerHTML = iframes[index]?.parentNode?.innerHTML;
+          const width = iframes[index]?.parentNode?.offsetWidth;
+          const height = iframes[index]?.parentNode?.offsetHeight;
+          const aspectRatio = width / height;
+          const minHeight = parseInt(this.oembedMinWidth) / aspectRatio;
+          const style = `
+            min-height: ${minHeight}px;
+            min-width: ${this.oembedMinWidth}px;
+            width: 100%;
+            margin-bottom: 10px;
+            aspect-ratio: ${aspectRatio};
+          `;
+          wrapper.setAttribute('style', style);
+          wrapper.setAttribute('class', 'embed-wrapper d-flex position-relative ml-auto mr-auto');
+          oembed.replaceWith(wrapper);
+        });
+      }
+    },
+    preserveHighlightedCode(body, documentElement) {
+      const codes = body.querySelectorAll('pre[data-widget="codeSnippet"] code');
+      if (codes.length) {
+        documentElement.querySelectorAll('code').forEach((code, index) => {
+          code.innerHTML = codes[index]?.innerHTML;
+          code.setAttribute('class', codes[index]?.getAttribute('class'));
+        });
+      }
+    },
+    getBody: function () {
+      const domParser = new DOMParser();
       const newData = CKEDITOR.instances['newsContent'].getData();
-      return newData ? newData : null;
+      const body = CKEDITOR.instances['newsContent'].document.getBody().$;
+      const documentElement = domParser.parseFromString(newData, 'text/html').documentElement;
+      this.preserveEmbedded(body, documentElement);
+      this.preserveHighlightedCode(body, documentElement);
+      return documentElement?.children[1].innerHTML;
     },
     formatDate(time) {
       return this.$dateUtil.formatDateObjectToDisplay(new Date(time),this.fullDateFormat, eXo.env.portal.language);

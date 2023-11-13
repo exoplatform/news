@@ -35,6 +35,26 @@ CKEDITOR.editorConfig = function (config) {
     },
   ];
 
+  const mobileToolbar = [
+    {name: 'switchView', items: ['switchView']},
+    {
+      name: 'basicstyles',
+      groups: ['basicstyles', 'cleanup'],
+      items: ['Bold', 'Italic', 'TextColor', 'RemoveFormat', 'CopyFormatting']
+    },
+    {
+      name: 'paragraph',
+      groups: ['list', 'indent'],
+      items: ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
+    },
+    {name: 'links', items: ['Link', 'Anchor']},
+    {
+      name: 'blocks',
+      items: ['Blockquote', 'tagSuggester', 'emoji', 'selectImage', 'Table', 'EmbedSemantic', 'InsertOptions']
+    },
+    {name: 'attachFile', items: ['attachFile']},
+  ];
+
   let extraPlugins = 'a11ychecker,balloonpanel,indent,switchView,attachFile,googleDocPastePlugin,copyformatting,indentblock,indentlist,sharedspace,' +
         'autolink,colordialog,tagSuggester,emoji,link,font,justify,widget,contextmenu,table,codesnippet,tabletools,tableresize,embedsemantic';
 
@@ -54,18 +74,13 @@ CKEDITOR.editorConfig = function (config) {
     }
   });
 
-  if (window.innerWidth < 960) {
-    toolbar.unshift({name: 'switchView', items: ['switchView']});
-    toolbar.splice(toolbar.findIndex(item => item.name === 'format'), 1);
-    toolbar.splice(toolbar.findIndex(item => item.name === 'accessibility'), 1);
-    toolbar.splice(toolbar.findIndex(item => item.name === 'fontSize'), 1);
-    toolbar[toolbar.findIndex(item => item.name === 'paragraph')].items = ['NumberedList', 'BulletedList', 'Outdent', 'Indent'];
-    toolbar.push({name: 'attachFile', items: ['attachFile']});
-  }
-
   config.extraPlugins = extraPlugins;
   config.removePlugins = removePlugins;
-  config.toolbar = toolbar;
+  if (window.innerWidth < 960) {
+    config.toolbar = mobileToolbar;
+  } else {
+    config.toolbar = toolbar;
+  }
   config.toolbarGroups = [
     { name: 'accessibility'},
     { name: 'format'},

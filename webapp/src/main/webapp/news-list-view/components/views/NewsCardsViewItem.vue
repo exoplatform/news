@@ -32,7 +32,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <div class="upper-row">
         <a
           class="space-link"
-          id="space-link"
+          :id="`space-link-${item.activityId}`"
           target="_self"
           v-if="!isHiddenSpace && showArticleSpace"
           :href="item.spaceUrl">

@@ -615,10 +615,10 @@ export default {
           instanceReady: function(evt) {
             CKEDITOR.instances['newsContent'].removeMenuItem('selectImageItem');
             if (mobile) {
-              const paragraph = document.getElementById('cke_22');
-              const linkSection = document.getElementById('cke_27');
-              const blockSection = document.getElementById('cke_30');
-              const attachFileButton = document.getElementById('cke_38');
+              const paragraph = document.getElementById('cke_20');
+              const linkSection = document.getElementById('cke_25');
+              const blockSection = document.getElementById('cke_28');
+              const attachFileButton = document.getElementById('cke_35');
               paragraph.style.borderRight = 'none';
               linkSection.style.display = 'none';
               blockSection.style.display = 'none';
@@ -1155,11 +1155,11 @@ export default {
       elementNewTop.classList.remove('greyComposerEffect');
       elementNewTop.classList.add('darkComposerEffect');
       const basicStyles = document.getElementById('cke_14');
-      const paragraph = document.getElementById('cke_22');
+      const paragraph = document.getElementById('cke_20');
       const switchViewButton = document.getElementById('cke_12');
-      const linkSection = document.getElementById('cke_27');
-      const blockSection = document.getElementById('cke_30');
-      const attachFileButton = document.getElementById('cke_38');
+      const linkSection = document.getElementById('cke_25');
+      const blockSection = document.getElementById('cke_28');
+      const attachFileButton = document.getElementById('cke_35');
       if (this.switchView) {
         basicStyles.style.display = 'inline';
         paragraph.style.display = 'inline';

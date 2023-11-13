@@ -93,7 +93,10 @@ export default {
     this.getNewsList();
   },
   mounted() {
-    this.isSmallWidth =  this.$refs && this.$refs['top-news-mosaic'] && this.$refs['top-news-mosaic']?.clientWidth < this.isSmallBreakpoint;
+    this.isSmallWidth =  this.$refs?.['top-news-mosaic']?.clientWidth < 600;
+    window.addEventListener('resize', () => {
+      this.isSmallWidth = this.$refs?.['top-news-mosaic']?.clientWidth < 600;
+    });
   },
   computed: {
     isMobile() {

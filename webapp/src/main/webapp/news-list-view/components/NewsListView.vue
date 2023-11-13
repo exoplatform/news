@@ -20,8 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-card
           height="100%"
           flat
-          :class="newsStoriesClass"
-          class="list-view-card rounded mb-5 pa-4">
+          :class="newsListViewClass">
         <v-card-text class="pa-0">
           <news-settings v-if="displayHeader" :is-hovering="hover" />
           <extension-registry-component
@@ -164,9 +163,22 @@ export default {
     hideEmptyNewsTemplateForNonPublisher() {
       return this.selectedViewExtension?.id === 'NewsEmptyTemplate' && !this.canPublishNews;
     },
-    newsStoriesClass() {
-      return (this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate') ? 'background-transparent' : '';
-    }
+    newsListViewClass() {
+      let newsListViewClass = 'list-view-card';
+      const displayPadding = this.viewTemplate && this.viewTemplate !== 'NewsStories' && this.viewTemplate !== 'NewsSlider' && this.viewTemplate !== 'NewsAlert' && this.viewTemplate !== 'NewsMosaic';
+      const backgroundTransparent = this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate';
+      const displayMargin = this.viewTemplate !== 'NewsStories';
+      if (displayPadding) {
+        newsListViewClass = `${newsListViewClass} pa-4`;
+      }
+      if (displayMargin) {
+        newsListViewClass = `${newsListViewClass} mb-5`;
+      }
+      if (backgroundTransparent) {
+        newsListViewClass = `${newsListViewClass} background-transparent`;
+      }
+      return newsListViewClass;
+    },
   },
   watch: {
     viewExtensions() {

@@ -98,7 +98,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </span>
           </div>
           <div class="d-flex flex-row">
-            <span class="text-subtitle-6 grey--text font-weight-regular pt-2">
+            <span class="text-subtitle-6 font-weight-regular pt-2">
               {{ $t('news.publishTargets.managementDrawer.permissions.restrict.audience.choice.description') }}
             </span>
           </div>

@@ -165,7 +165,7 @@ export default {
     },
     newsListViewClass() {
       let newsListViewClass = 'list-view-card';
-      const displayPadding = this.viewTemplate && this.viewTemplate !== 'NewsStories' && this.viewTemplate !== 'NewsSlider' && this.viewTemplate !== 'NewsAlert' && this.viewTemplate !== 'NewsMosaic';
+      const displayPadding = this.viewTemplate && !['NewsStories', 'NewsSlider', 'NewsAlert', 'NewsMosaic'].includes(this.viewTemplate);
       const backgroundTransparent = this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate';
       const displayMargin = this.viewTemplate !== 'NewsStories';
       if (displayPadding) {

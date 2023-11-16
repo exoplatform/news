@@ -85,7 +85,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         class="mr-3">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <div :class="[disableAudienceChoiceSelect ? 'select-audience-block grey lighten-1' : 'select-audience-block']" v-on="on">
+            <v-sheet
+                height="40"
+                :class="[disableAudienceChoiceSelect ? 'select-audience-block grey lighten-3' : 'select-audience-block']" v-on="on">
               <v-select
                 v-on="on"
                 id="chooseAudience"
@@ -97,7 +99,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 outlined
                 :disabled="disableAudienceChoiceSelect"
                 @change="addAudience()" />
-            </div>
+            </v-sheet>
           </template>
           <span>{{ selectAudienceTooltipText }}</span>
         </v-tooltip>
@@ -105,7 +107,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
       </div>
       <div class="d-flex flex-row grey--text ms-2">
-        <i class="fas fa-exclamation-triangle mx-2 mt-1"></i>
+        <i class="fas fa-exclamation-triangle mx-2 mt-2"></i>
         {{ selectedAudienceDescription }}
       </div>
     </div>
@@ -185,12 +187,16 @@ export default {
     this.selectedTargets = this.news.targets;
   },
   watch: {
-    selectedTargets(){
-      if (!this.selectedTargets.length > 0) {
+    selectedTargets() {
+      const selectedTargetForCurrentUser = this.selectedTargets.filter(item => this.targets.some(e => {
+        return e.name === item;
+      }));
+      if (!selectedTargetForCurrentUser.length > 0) {
         this.disableAudienceChoice = false;
         this.selectedAudience = this.audiences[0];
+        this.addAudience();
       } else {
-        this.selectAudience();
+        this.selectAudience(selectedTargetForCurrentUser);
       }
     },
   },
@@ -220,44 +226,24 @@ export default {
     addAudience(){
       this.$emit('selected-audience', this.selectedAudience);
     },
-    selectAudience() {
-      if (this.selectedTargets.length){
-        const selectedTargetName = this.selectedTargets[this.selectedTargets.length - 1];
-        const target = this.targets.find((e) => e.name === selectedTargetName);
-        const isSpace = target?.permissions.some(e => e.providerId === 'space');
-        const isGroup = target?.permissions.some(e => e.providerId === 'group');
-        if (this.selectedTargets.length === 1 ) {
-          // Do not disable the selected box for the saved space's target when it is associated with the all audience
-          if (isSpace && !isGroup || isSpace && isGroup) {
-            if (this.news.targets && this.news.targets[0] === selectedTargetName && this.selectedAudience === this.audiences[0] && this.news.audience === 'all'){
-              return;
-            }
-            this.selectedAudience = this.audiences[1];
-            this.addAudience();
-            this.disableAudienceChoice = isSpace && !isGroup ? true : this.disableAudienceChoice;
-          } else if (isGroup && !isSpace) {
-            this.selectedAudience = this.audiences[0];
-            this.addAudience();
-            this.disableAudienceChoice = false;
-          }
+    selectAudience(selectedTargetForCurrentUser) {
+      if (selectedTargetForCurrentUser.length === 1) {
+        const target = this.targets.find((e) => e.name === selectedTargetForCurrentUser[0]);
+        if (target?.restrictAudience && !target.groupAndSpacePublisher) {
+          this.selectedAudience = this.audiences[1];
+          this.disableAudienceChoice = true;
+          this.addAudience();
         } else {
-          const selectedTargetList = this.targets.filter(e => this.selectedTargets.includes(e.name));
-          let isTargetListIncludeSpace = false;
-          isTargetListIncludeSpace = selectedTargetList.some((e)=> {
-            if (e.permissions.some(e => e.providerId === 'space')) {
-              this.selectedAudience = this.audiences[1];
-              this.addAudience();
-              this.disableAudienceChoice = false;
-              return true;
-            }
-            return false;
-          });
-          if (!isTargetListIncludeSpace) {
-            this.selectedAudience = this.audiences[0];
-            this.addAudience();
-            this.disableAudienceChoice = false;
-          }
+          this.selectedAudience = this.audiences[0];
+          this.disableAudienceChoice = false;
+          this.addAudience();
         }
+      } else {
+        const targets = this.targets.filter(item => selectedTargetForCurrentUser.includes(item.name));
+        const restrictAudience = targets.some(target => target.restrictAudience);
+        this.selectedAudience = restrictAudience ? this.audiences[1] : this.audiences[0];
+        this.disableAudienceChoice = false;
+        this.addAudience();
       }
     }
   }

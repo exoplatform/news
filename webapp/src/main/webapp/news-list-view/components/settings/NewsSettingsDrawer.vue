@@ -57,16 +57,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <template slot="content">
       <form ref="form1" class="pa-2 ms-2">
         <div v-if="!showAdvancedSettings" class="d-flex flex-column flex-grow-1">
-          <div class="d-flex flex-row mt-6">
-            <label for="name" class="listViewLabel text-subtitle-1 me-1 my-auto">
+          <div d-flex flex-row>
+            <label for="name" class="listViewLabel text-subtitle-1 me-1 my-auto mt-4">
               {{ $t('news.list.settings.header') }}:
             </label>
+          </div>
+          <div class="d-flex flex-row mt-2">
             <v-text-field
               v-model="newsHeader"
               type="string"
               name="newsHeader"
               :placeholder="$t('news.list.settings.placeHolderName')"
-              :error-messages="checkAlphanumeric"
               maxlength="100"
               class="input-block-level ignore-vuetify-classes pa-0"
               counter
@@ -216,11 +217,8 @@ export default {
     displayedViewTemplates() {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
-    checkAlphanumeric() {
-      return this.newsHeader && !this.newsHeader.trim().match(/^[a-zA-Z0-9\u00C0-\u00FF ]*$/) && this.newsHeader.length > 0 ? this.$t('news.list.settings.name.errorMessage') : '';
-    },
     disabled() {
-      return this.checkAlphanumeric !== '' || (this.newsHeader && this.newsHeader.length === 0) || (this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0);
+      return (this.newsHeader && this.newsHeader.length === 0) || (this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {

@@ -167,12 +167,8 @@ export default {
       let newsListViewClass = 'list-view-card';
       const displayPadding = this.viewTemplate && !['NewsStories', 'NewsSlider', 'NewsAlert', 'NewsMosaic'].includes(this.viewTemplate);
       const backgroundTransparent = this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate';
-      const displayMargin = this.viewTemplate !== 'NewsStories';
       if (displayPadding) {
         newsListViewClass = `${newsListViewClass} pa-4`;
-      }
-      if (displayMargin) {
-        newsListViewClass = `${newsListViewClass} mb-5`;
       }
       if (backgroundTransparent) {
         newsListViewClass = `${newsListViewClass} background-transparent`;

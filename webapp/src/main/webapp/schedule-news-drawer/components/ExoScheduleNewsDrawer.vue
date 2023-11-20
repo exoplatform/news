@@ -493,7 +493,8 @@ export default {
             label: target.properties && target.properties.label && target.properties.label.length > 35 ? target.properties.label.substring(0, 35).concat('...'): target.properties.label,
             tooltipInfo: target.properties && target.properties.label,
             description: target.properties && target.properties.description,
-            permissions: target.permissions
+            restrictAudience: target.restrictAudience,
+            groupAndSpacePublisher: target.groupAndSpacePublisher
           }));
         });
     },

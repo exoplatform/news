@@ -23,58 +23,58 @@
       xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_objects_1_8 http://www.exoplatform.org/xml/ns/gatein_objects_1_8"
       xmlns="http://www.exoplatform.org/xml/ns/gatein_objects_1_8">
   <name></name>
-  <container id="newsPageSimpleTableContainer" template='system:/groovy/portal/webui/container/UISimpleTableContainer.gtmpl'>
+  <container id="newsPageSimpleTableContainer" template='system:/groovy/portal/webui/container/UISimpleTableContainer.gtmpl' cssClass="VuetifyApp">
     <access-permissions>Everyone</access-permissions>
-    <container id="newsPageSimpleRowContainer" template='system:/groovy/portal/webui/container/UISimpleRowContainer.gtmpl'>
+    <container id="newsPageSimpleRowContainer" template='system:/groovy/portal/webui/container/UISimpleRowContainer.gtmpl' cssClass="v-application v-application--is-ltr v-application--wrap">
       <access-permissions>Everyone</access-permissions>
       <portlet-application>
         <portlet>
-          <application-ref>layout-management</application-ref>
-          <portlet-ref>ImagesPortlet</portlet-ref>
+          <application-ref>social-portlet</application-ref>
+          <portlet-ref>Image</portlet-ref>
         </portlet>
         <access-permissions>Everyone</access-permissions>
         <show-info-bar>false</show-info-bar>
       </portlet-application>
-      <container template="system:/groovy/portal/webui/container/UIResponsiveColumnGroupContainer.gtmpl">
+      <container template="system:/groovy/portal/webui/container/UIResponsiveColumnGroupContainer.gtmpl" cssClass="mt-5">
         <access-permissions>Everyone</access-permissions>
         <container template="system:/groovy/portal/webui/container/UISimpleColumnContainer.gtmpl">
-            <access-permissions>*:/platform/users</access-permissions>
-            <portlet-application>
-              <portlet>
-                <application-ref>news</application-ref>
-                <portlet-ref>NewsListView</portlet-ref>
-              </portlet>
-              <access-permissions>Everyone</access-permissions>
-              <show-info-bar>false</show-info-bar>
-            </portlet-application>
-            <portlet-application>
-              <portlet>
-                <application-ref>news</application-ref>
-                <portlet-ref>NewsListView</portlet-ref>
-              </portlet>
-              <access-permissions>Everyone</access-permissions>
-              <show-info-bar>false</show-info-bar>
-            </portlet-application>
-          </container>
+          <access-permissions>Everyone</access-permissions>
+          <portlet-application>
+            <portlet>
+              <application-ref>news</application-ref>
+              <portlet-ref>NewsListView</portlet-ref>
+            </portlet>
+            <access-permissions>Everyone</access-permissions>
+            <show-info-bar>false</show-info-bar>
+          </portlet-application>
+          <portlet-application>
+            <portlet>
+              <application-ref>news</application-ref>
+              <portlet-ref>NewsListView</portlet-ref>
+            </portlet>
+            <access-permissions>Everyone</access-permissions>
+            <show-info-bar>false</show-info-bar>
+          </portlet-application>
+        </container>
         <container template="system:/groovy/portal/webui/container/UISimpleColumnContainer.gtmpl" width="400px">
-            <access-permissions>*:/platform/users</access-permissions>
-            <portlet-application>
-              <portlet>
-                <application-ref>news</application-ref>
-                <portlet-ref>NewsListView</portlet-ref>
-              </portlet>
-              <access-permissions>Everyone</access-permissions>
-              <show-info-bar>false</show-info-bar>
-            </portlet-application>
-            <portlet-application>
-              <portlet>
-                <application-ref>news</application-ref>
-                <portlet-ref>NewsListView</portlet-ref>
-              </portlet>
-              <access-permissions>Everyone</access-permissions>
-              <show-info-bar>false</show-info-bar>
-            </portlet-application>
-          </container>
+          <access-permissions>Everyone</access-permissions>
+          <portlet-application>
+            <portlet>
+              <application-ref>news</application-ref>
+              <portlet-ref>NewsListView</portlet-ref>
+            </portlet>
+            <access-permissions>Everyone</access-permissions>
+            <show-info-bar>false</show-info-bar>
+          </portlet-application>
+          <portlet-application>
+            <portlet>
+              <application-ref>news</application-ref>
+              <portlet-ref>NewsListView</portlet-ref>
+            </portlet>
+            <access-permissions>Everyone</access-permissions>
+            <show-info-bar>false</show-info-bar>
+          </portlet-application>
+        </container>
       </container>
     </container>
   </container>

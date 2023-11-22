@@ -289,8 +289,7 @@ public class NewsTargetingServiceImpl implements NewsTargetingService {
         }
       }
       newsTargetingEntity.setPermissions(permissionsEntities);
-      newsTargetingEntity.setGroupAndSpacePublisher(isSpacePublisher && isGroupPublisher);
-      newsTargetingEntity.setRestrictAudience(isSpacePublisher);
+      newsTargetingEntity.setRestrictedAudience(isSpacePublisher && !isGroupPublisher);
     }
     return newsTargetingEntity;
   }

@@ -32,7 +32,5 @@ public class NewsTargetingEntity {
 
   private List<NewsTargetingPermissionsEntity> permissions;
 
-  private boolean restrictAudience;
-
-  private boolean groupAndSpacePublisher;
+  private boolean restrictedAudience;
 }

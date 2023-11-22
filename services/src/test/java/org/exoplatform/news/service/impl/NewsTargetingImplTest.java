@@ -217,8 +217,7 @@ public class NewsTargetingImplTest {
     assertNotNull(allowedTargets);
     assertEquals(1, allowedTargets.size());
     assertEquals("latestNews", allowedTargets.get(0).getName());
-    assertTrue(allowedTargets.get(0).isRestrictAudience());
-    assertFalse(allowedTargets.get(0).isGroupAndSpacePublisher());
+    assertTrue(allowedTargets.get(0).isRestrictedAudience());
 
     // Given
     Metadata testNews = new Metadata();
@@ -258,8 +257,7 @@ public class NewsTargetingImplTest {
     assertEquals(2, allowedTargets.size());
     assertEquals("latestNews", allowedTargets.get(0).getName());
     assertEquals("testNews", allowedTargets.get(1).getName());
-    assertTrue(allowedTargets.get(0).isRestrictAudience());
-    assertFalse(allowedTargets.get(1).isRestrictAudience());
+    assertTrue(allowedTargets.get(0).isRestrictedAudience());
 
     // Given
     when(spaceService.getSpaceById("1")).thenReturn(null);

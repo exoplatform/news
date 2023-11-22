@@ -165,10 +165,14 @@ export default {
     },
     newsListViewClass() {
       let newsListViewClass = 'list-view-card';
-      const displayPadding = this.viewTemplate && !['NewsStories', 'NewsSlider', 'NewsAlert', 'NewsMosaic'].includes(this.viewTemplate);
+      const displayPadding = this.viewTemplate && !['NewsStories', 'NewsSlider', 'NewsAlert', 'NewsMosaic'].includes(this.viewTemplate) || this.selectedViewExtension?.id === 'NewsEmptyTemplate';
       const backgroundTransparent = this.viewTemplate === 'NewsStories' && this.selectedViewExtension?.id !== 'NewsEmptyTemplate';
+      const borderRadius = this.viewTemplate && !['NewsStories', 'NewsMosaic'].includes(this.viewTemplate) || this.selectedViewExtension?.id === 'NewsEmptyTemplate';
       if (displayPadding) {
         newsListViewClass = `${newsListViewClass} pa-4`;
+      }
+      if (borderRadius) {
+        newsListViewClass = `${newsListViewClass} card-border-radius`;
       }
       if (backgroundTransparent) {
         newsListViewClass = `${newsListViewClass} background-transparent`;

@@ -227,24 +227,15 @@ export default {
       this.$emit('selected-audience', this.selectedAudience);
     },
     selectAudience(selectedTargetForCurrentUser) {
-      if (selectedTargetForCurrentUser.length === 1) {
-        const target = this.targets.find((e) => e.name === selectedTargetForCurrentUser[0]);
-        if (target?.restrictAudience && !target.groupAndSpacePublisher) {
-          this.selectedAudience = this.audiences[1];
-          this.disableAudienceChoice = true;
-          this.addAudience();
-        } else {
-          this.selectedAudience = this.audiences[0];
-          this.disableAudienceChoice = false;
-          this.addAudience();
-        }
+      const targets = this.targets.filter(item => selectedTargetForCurrentUser.includes(item.name));
+      const restrictedAudience = targets.some(target => target.restrictedAudience);
+      this.selectedAudience = restrictedAudience ? this.audiences[1] : this.audiences[0];
+      if (restrictedAudience && !this.disableAudienceChoice) {
+        this.disableAudienceChoice = true;
       } else {
-        const targets = this.targets.filter(item => selectedTargetForCurrentUser.includes(item.name));
-        const restrictAudience = targets.some(target => target.restrictAudience);
-        this.selectedAudience = restrictAudience ? this.audiences[1] : this.audiences[0];
         this.disableAudienceChoice = false;
-        this.addAudience();
       }
+      this.addAudience();
     }
   }
 };

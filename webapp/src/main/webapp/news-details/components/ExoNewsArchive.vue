@@ -12,7 +12,7 @@
       </transition>
     </div>
     <a
-      :data-original-title="archiveLabel"
+      :title="newsArchiveLabel"
       class="btn newsArchiveButton"
       rel="tooltip"
       data-placement="bottom"
@@ -52,12 +52,15 @@ export default {
       messageArchive: '',
       successArchive: true,
       archiveLabel: '',
+      newsArchiveLabel: '',
     };
   },
   created() {
     if (!this.newsArchived) {
+      this.newsArchiveLabel = this.$t('news.details.archive.action');
       this.archiveLabel = this.$t('news.archive.action');
     } else {
+      this.newsArchiveLabel = this.$t('news.details.unarchive.action');
       this.archiveLabel = this.$t('news.unarchive.action');
     }
   },
@@ -105,11 +108,13 @@ export default {
         if (context.newsArchived === false) {
           context.messageArchive = context.$t('news.archive.success');
           context.archiveLabel = context.$t('news.unarchive.action');
+          context.newsArchiveLabel = context.$t('news.details.unarchive.action');
           // eslint-disable-next-line vue/no-mutating-props
           context.newsArchived = true;
         } else {
           context.messageArchive = context.$t('news.unarchive.success');
           context.archiveLabel = context.$t('news.archive.action');
+          context.newsArchiveLabel = context.$t('news.details.archive.action');
           // eslint-disable-next-line vue/no-mutating-props
           context.newsArchived = false;
         }

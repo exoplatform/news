@@ -48,6 +48,12 @@
       <artifactId>news-services</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-extension-webapp</artifactId>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -57,7 +63,7 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>less-copy-resources</id>
+            <id>a-copy-resources</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>copy-resources</goal>
@@ -72,20 +78,37 @@
               <overwrite>true</overwrite>
             </configuration>
           </execution>
+          <execution>
+            <id>b-copy-resources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/src/main/webapp/ckeditor</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/webapp/ckeditor</directory>
+                </resource>
+              </resources>
+              <overwrite>true</overwrite>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>platform-ui-src</id>
+            <id>dependencies-less-src</id>
             <phase>initialize</phase>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>commons-exo.portal.web.eXoSkin</includeArtifactIds>
+              <includeArtifactIds>commons-exo.portal.web.eXoSkin,commons-extension-webapp</includeArtifactIds>
               <outputDirectory>${project.build.directory}/src/main/webapp</outputDirectory>
+              <excludes>**/custom-variables.less</excludes>
             </configuration>
           </execution>
         </executions>
@@ -107,6 +130,20 @@
                 <include>newsDetails.less</include>
                 <include>newsExtensions.less</include>
                 <include>newsPublishTargetsManagement.less</include>
+              </includes>
+            </configuration>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>editor</id>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/src/main/webapp/ckeditorCustom/</sourceDirectory>
+              <outputDirectory>${project.build.directory}/${project.build.finalName}/ckeditorCustom</outputDirectory>
+              <compress>true</compress>
+              <includes>
+                <include>*.less</include>
               </includes>
             </configuration>
             <goals>

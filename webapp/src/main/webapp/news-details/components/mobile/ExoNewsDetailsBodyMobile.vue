@@ -29,12 +29,14 @@
     <div class="d-flex flex-row caption text-light-color">
       <exo-news-details-time :news="news" />
     </div>
-    <div class="d-flex flex-row caption font-italic grey--text text-darken-1 pa-4">
-      <span v-html="newsSummary"></span>
+    <div class="d-flex flex-row ms-2 me-2 caption font-italic grey--text text-darken-1 pa-4">
+      <span v-sanitized-html="newsSummary"></span>
     </div>
     <v-divider class="mx-4" />
-    <div class="d-flex flex-row pa-4 newsBody">
-      <span v-html="newsBody"></span>
+    <div class="d-flex flex-column pa-4 ms-2 me-2 newsBody">
+      <div
+        class="reset-style-box rich-editor-content extended-rich-content"
+        v-html="newsBody" />
     </div>
     <div v-show="attachments && attachments.length" class="d-flex flex-row pa-4 newsAttachmentsTitle subtitle-2">
       {{ $t('news.details.attachments.title') }} ({{ attachments ? attachments.length : 0 }})
@@ -92,10 +94,10 @@ export default {
       return this.news && this.news.publicationState;
     },
     newsSummary() {
-      return this.news && this.targetBlank(this.news.summary);
+      return this.news?.summary;
     },
     newsBody() {
-      return this.news && this.targetBlank(this.news.body);
+      return this.news?.body;
     },
     newsAuthor() {
       return this.news && this.news.author;
@@ -105,23 +107,6 @@ export default {
     },
   },
   methods: {
-    targetBlank: function (content) {
-      const internal = location.host + eXo.env.portal.context;
-      const domParser = new DOMParser();
-      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
-      const links = docElement.getElementsByTagName('a');
-      for (const link of links) {
-        let href = link.href.replace(/(^\w+:|^)\/\//, '');
-        if (href.endsWith('/')) {
-          href = href.slice(0, -1);
-        }
-        if (href !== location.host && !href.startsWith(internal)) {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-        }
-      }
-      return docElement.innerHTML;
-    },
     openPreview(attachedFile) {
       const self = this;
       window.require(['SHARED/documentPreview'], function(documentPreview) {

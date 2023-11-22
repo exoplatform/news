@@ -28,9 +28,10 @@
       .latestNewsTitleContainer {
         position: relative;
 
-        .headerLatestNews {
-          position: absolute;
-          max-width: 100%;
+        .news-text-header {
+          font-size: 18px!important;
+          color: var(--allPagesGreyColorLighten1,#707070)!important;
+          font-weight: normal!important
         }
       }
     }
@@ -40,17 +41,6 @@
         color: @blackColorDefault;
       }
 
-      .uiNoNewsIcon {
-        color: #6d7d9821;
-        font-size: 60px;
-        font-style: normal;
-        font-weight: normal;
-
-        &:before {
-          font-family: 'PLF-FONT-ICONS';
-          content: "\e62a" !important;
-        }
-      }
     }
 
     #newsSettingsDrawer {
@@ -248,20 +238,6 @@
         .noNewsContent {
           text-align: center;
           margin: auto;
-
-          .uiNoNewsIcon {
-            color: @colorNoContentIcon;
-            font-size: 60px;
-            font-style: normal;
-            font-weight: normal;
-            opacity: 0.1;
-
-            &:before {
-              font-family: 'PLF-FONT-ICONS';
-              content: "\e62a" !important;
-            }
-          }
-
           .noNewsTitle {
             color: @darkGrey;
             font-weight: normal;
@@ -285,7 +261,6 @@
   flex: 1 1 auto;
   max-width: 100%;
   height: 100%;
-  margin-bottom: 20px;
   #news-latest-view {
     overflow: hidden;
     background: #fff;
@@ -1819,6 +1794,8 @@ p.caption-title:after {
   line-height: 18px;
   .theme--light.v-card {
     background: transparent !important;
+    padding-top: 0 !important;
+    padding-bottom: 0!important;
   }
   .author-photo {
     margin: 0 0 0 7px !important;

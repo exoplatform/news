@@ -89,6 +89,7 @@ export default {
         hour: '2-digit',
         minute: '2-digit',
       },
+      iframelyOriginRegex: /^https?:\/\/if-cdn.com/
     };
   },
   computed: {
@@ -109,6 +110,14 @@ export default {
       }
       this.$root.$emit('application-loaded');
     }
+    window.addEventListener('message', (event) => {
+      if (this.iframelyOriginRegex.exec(event.origin)) {
+        const data = JSON.parse(event.data);
+        if (data.method === 'open-href') {
+          window.open(data.href, '_blank');
+        }
+      }
+    });
   },
   mounted() {
     this.markNewsAsRead(this.newsId);

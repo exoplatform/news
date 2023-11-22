@@ -26,7 +26,7 @@
               </div>
             </div>
           </div>
-          <div class="newsInformationBackground">
+          <div class="newsInformationBackground center">
             <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content  d-inline-flex align-center">
               <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
                 <exo-user-avatar 
@@ -112,15 +112,17 @@
           <div
             v-if="newsSummary"
             id="newsSummary"
-            class="summary">
+            class="summary center ms-13 me-13">
             <span v-sanitized-html="newsSummary"></span>
           </div>
 
           <div
             id="newsBody"
             :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
-            class="fullDetailsBody clearfix">
-            <span v-sanitized-html="newsBody" class="rich-editor-content"></span>
+            class="fullDetailsBody ms-13 me-13 clearfix">
+            <div
+              class="reset-style-box rich-editor-content extended-rich-content"
+              v-html="newsBody" />
           </div>
 
           <div v-show="attachments && attachments.length" class="newsAttachmentsTitle">
@@ -203,7 +205,7 @@ export default {
       return this.news && this.news.hiddenSpace;
     },
     newsBody() {
-      return this.news && this.targetBlank(this.newsBodyContent);
+      return this.news && this.newsBodyContent;
     },
     updaterFullName() {
       return this.news && this.news.updaterFullName;
@@ -221,7 +223,7 @@ export default {
       return this.news && this.news.updateDate && this.news.updateDate.time && new Date(this.news.updateDate.time);
     },
     newsSummary() {
-      return this.news && this.targetBlank(this.newsSummaryContent);
+      return this.news && this.newsSummaryContent;
     },
     spaceId() {
       return this.news && this.news.spaceId;
@@ -292,24 +294,7 @@ export default {
       } else {
         setTimeout(this.hideDocPreviewComments, intervalCheck);
       }
-    },
-    targetBlank: function (content) {
-      const internal = location.host + eXo.env.portal.context;
-      const domParser = new DOMParser();
-      const docElement = domParser.parseFromString(content, 'text/html').documentElement;
-      const links = docElement.getElementsByTagName('a');
-      for (const link of links) {
-        let href = link.href.replace(/(^\w+:|^)\/\//, '');
-        if (href.endsWith('/')) {
-          href = href.slice(0, -1);
-        }
-        if (href !== location.host && !href.startsWith(internal)) {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-        }
-      }
-      return docElement.innerHTML;
-    },
+    }
   }
 };
 </script>

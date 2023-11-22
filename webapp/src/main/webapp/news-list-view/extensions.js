@@ -33,43 +33,31 @@ extensionRegistry.registerComponent('NewsList', 'views', {
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
-  id: 'NewsSliderEmptyTemplate',
-  vueComponent: Vue.options.components['news-empty-slider-view'],
-  rank: 40,
-});
-
-extensionRegistry.registerComponent('NewsList', 'views', {
-  id: 'NewsLatestEmptyTemplate',
-  vueComponent: Vue.options.components['news-empty-latest-view'],
-  rank: 50,
-});
-
-extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsAlert',
   vueComponent: Vue.options.components['news-alert-view'],
-  rank: 60,
+  rank: 40,
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsList',
   vueComponent: Vue.options.components['news-list-template-view'],
-  rank: 70,
+  rank: 50,
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsMosaic',
   vueComponent: Vue.options.components['news-mosaic-view'],
-  rank: 80,
+  rank: 60,
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsStories',
   vueComponent: Vue.options.components['news-stories-view'],
-  rank: 90,
+  rank: 70,
 });
 
 extensionRegistry.registerComponent('NewsList', 'views', {
   id: 'NewsCards',
   vueComponent: Vue.options.components['news-cards-view'],
-  rank: 100,
+  rank: 80,
 });

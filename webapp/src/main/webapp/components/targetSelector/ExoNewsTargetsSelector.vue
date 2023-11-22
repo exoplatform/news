@@ -230,7 +230,7 @@ export default {
       const targets = this.targets.filter(item => selectedTargetForCurrentUser.includes(item.name));
       const restrictedAudience = targets.some(target => target.restrictedAudience);
       this.selectedAudience = restrictedAudience ? this.audiences[1] : this.audiences[0];
-      if (restrictedAudience && !this.disableAudienceChoice) {
+      if (restrictedAudience) {
         this.disableAudienceChoice = true;
       } else {
         this.disableAudienceChoice = false;

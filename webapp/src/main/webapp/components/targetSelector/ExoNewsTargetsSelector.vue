@@ -106,8 +106,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
       </div>
-      <div class="d-flex flex-row grey--text ms-2">
-        <i class="fas fa-exclamation-triangle mx-2 mt-2"></i>
+      <div class="d-flex flex-row grey--text ms-2 mt-2">
+        <i class="fas fa-exclamation-triangle mx-2 pt-1"></i>
         {{ selectedAudienceDescription }}
       </div>
     </div>

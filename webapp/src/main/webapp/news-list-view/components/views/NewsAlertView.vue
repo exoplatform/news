@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-hover v-slot="{ hover }">
-    <div id="critical-alerts-slider" v-show="!emptyTemplate">
+    <div class="card-border-radius" id="critical-alerts-slider" v-show="!emptyTemplate">
       <div class="alerts-header">
         <div class="alerts-icon">
           <v-icon>warning</v-icon>

@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           interval="10000"
           height="220"
           hide-delimiter-background
-          class="sliderNewsItems fill-height">
+          class="sliderNewsItems fill-height card-border-radius">
         <v-carousel-item
             v-for="(item,i) in news"
             :key="i"

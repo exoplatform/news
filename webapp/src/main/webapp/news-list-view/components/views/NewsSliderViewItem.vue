@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-img
           class="author-image"
           :src="authorAvatarUrl"
-          alt="Author image" />
+          :alt="$t('news.avatar.author.alt',{0:authorDisplayName})" />
       </v-avatar>
       <span class="text-capitalize text--white my-auto ml-2">{{ authorDisplayName }}</span>
     </div>
@@ -36,9 +36,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-img
           class="spaceImage"
           :src="spaceAvatarUrl"
-          alt="Space icon" />
+          :alt="$t('news.space.icon.alt',{ 0:spaceDisplayName })" />
       </v-avatar>
-      <a :href="spaceUrl" class="my-auto">
+      <a 
+        :href="spaceUrl" 
+        class="my-auto"
+        :arial-label="$t('news.space.icon.title',{ 0:spaceDisplayName })">
         <span class="my-auto spaceName ml-2">{{ spaceDisplayName }}</span>
       </a>
     </div>

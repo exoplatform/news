@@ -38,10 +38,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="flex flex-column carouselNewsInfo">
               <div class="flex flex-row">
                 <v-btn
-                    v-if="canPublishNews && hover"
-                    icon
-                    @click="openDrawer"
-                    class="float-right settingNewsButton">
+                  v-if="canPublishNews && hover"
+                  :aria-label="$t('news.latest.openSettings')"
+                  icon
+                  @click="openDrawer"
+                  class="float-right settingNewsButton">
                   <v-icon>mdi-cog</v-icon>
                 </v-btn>
               </div>

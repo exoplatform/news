@@ -171,9 +171,6 @@
         <module>newsDetails</module>
       </depends>
       <depends>
-        <module>newsSnackbarComponent</module>
-      </depends>
-      <depends>
         <module>extensionRegistry</module>
       </depends>
       <depends>
@@ -273,9 +270,6 @@
       <depends>
         <module>commonVueComponents</module>
       </depends>
-      <depends>
-        <module>newsSnackbarComponent</module>
-      </depends>
     </module>
   </portlet>
 
@@ -304,9 +298,6 @@
       <depends>
         <module>commonVueComponents</module>
       </depends>
-      <depends>
-        <module>newsSnackbarComponent</module>
-      </depends>
   </module>
 
   <module>
@@ -330,9 +321,6 @@
     </depends>
     <depends>
       <module>commonVueComponents</module>
-    </depends>
-    <depends>
-      <module>newsSnackbarComponent</module>
     </depends>
     <depends>
       <module>newsTargetSelectorComponent</module>
@@ -394,17 +382,6 @@
   </module>
 
   <module>
-    <name>newsSnackbarComponent</name>
-    <script>
-      <minify>false</minify>
-      <path>/js/newsSnackbarComponent.bundle.js</path>
-    </script>
-    <depends>
-      <module>vue</module>
-    </depends>
-  </module>
-
-  <module>
     <name>newsTargetSelectorComponent</name>
     <script>
       <minify>false</minify>
@@ -454,9 +431,6 @@
     </script>
     <depends>
       <module>commonVueComponents</module>
-    </depends>
-    <depends>
-      <module>newsSnackbarComponent</module>
     </depends>
     <depends>
       <module>newsTargetSelectorComponent</module>
@@ -560,9 +534,6 @@
     </depends>
     <depends>
       <module>commonVueComponents</module>
-    </depends>
-    <depends>
-      <module>newsSnackbarComponent</module>
     </depends>
   </module>
 

@@ -288,7 +288,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
-      <exo-news-notification-alerts name="event-form" />
       <exo-news-draft-visibility-mobile
         ref="selectVisibilityDialog"
         :items="items" />
@@ -1142,7 +1141,16 @@ export default {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     updateDraftVisibility(){
-      this.$root.$emit('update-draft-visibility', this.news.draftVisible);
+      if (this.news.draftVisible) {
+        const message = this.$t('news.composer.alert.share.draft.success');
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'info',
+          alertMessage: message}}));
+      } else {
+        const message = this.$t('news.composer.alert.unshare.draft.success');
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'info',
+          alertMessage: message}}));      }
     },
     updateVisibility(visibility){
       if (visibility !== this.news.draftVisible) {

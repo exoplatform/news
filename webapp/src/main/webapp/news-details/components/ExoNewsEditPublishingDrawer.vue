@@ -225,11 +225,7 @@ export default {
       }
       return this.$newsServices.updateNews(this.news, false).then(() => {
         this.editingNews = false;
-        const message = this.$t('news.composer.alert.success.UpdateTargets');
-        this.$root.$emit('news-notification-alert', {
-          message,
-          type: 'success',
-        });
+        this.$root.$emit('alert-message', this.$t('news.composer.alert.success.UpdateTargets'), 'success');
         this.$emit('refresh-news', this.news.newsId);
         window.setTimeout(() => {
           this.drawer = false;
@@ -237,11 +233,7 @@ export default {
       })
         .catch(() => {
           this.editingNews = false;
-          const message = this.$t('news.composer.alert.error.UpdateTargets');
-          this.$root.$emit('news-notification-alert', {
-            message,
-            type: 'error',
-          });
+          this.$root.$emit('alert-message', this.$t('news.composer.alert.error.UpdateTargets'), 'error');
         });
     },
     removeTargets() {

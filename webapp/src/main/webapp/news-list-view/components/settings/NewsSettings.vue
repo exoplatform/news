@@ -24,8 +24,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div :class="[showHeader && newsHeader ? 'd-flex flex-column me-2 mt-1' : 'd-flex flex-column me-2']">
       <v-icon
-        class="button-open-settings"
         v-if="canPublishNews && showSettingsIcon"
+        class="button-open-settings"
+        :aria-label="$t('news.latest.openSettings')"
         size="24"
         icon
         @click="openDrawer">

@@ -52,19 +52,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
       <div class="slider-buttons d-flex pe-2">
         <v-btn
-            @click="slider--"
-            icon>
+          :aria-label="$t('news.alertView.leftArrowButtonTitle')"
+          @click="slider--"
+          icon>
           <v-icon>chevron_left</v-icon>
         </v-btn>
         <v-btn
-            @click="slider++"
-            icon>
+          :aria-label="$t('news.alertView.rightArrowButtonTitle')"
+          @click="slider++"
+          icon>
           <v-icon>chevron_right</v-icon>
         </v-btn>
         <v-btn
-            v-if="canPublishNews && hover"
-            icon
-            @click="openDrawer">
+          v-if="canPublishNews && hover"
+          :aria-label="$t('news.latest.openSettings')"
+          icon
+          @click="openDrawer">
           <v-icon>mdi-cog</v-icon>
         </v-btn>
       </div>

@@ -36,7 +36,6 @@
       v-if="news"
       :news="news"
       @refresh-news="getNewsById(newsId)" />
-    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -151,6 +150,14 @@ export default {
       this.$newsServices.deleteNews(this.newsId, false, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
+          const clickMessage = this.$t('news.details.undoDelete');
+          const message = this.$t('news.details.deleteSuccess');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message ,
+            alertLinkText: clickMessage ,
+            alertLinkCallback: () => this.undoDeleteNews(),
+          }}));
         });
       setTimeout(() => {
         const deletedNews = localStorage.getItem('deletedNews');
@@ -218,6 +225,13 @@ export default {
         .finally(() => {
           document.title = this.$t('news.window.title', {0: this.news.title});
           this.$root.$emit('application-loaded');
+        });
+    },
+    undoDeleteNews() {
+      return this.$newsServices.undoDeleteNews(this.newsId)
+        .then(() => {
+          const message = this.$t('news.details.deleteCanceled');
+          this.$root.$emit('alert-message', message, 'success');
         });
     }
   }

@@ -10,7 +10,7 @@
     </div>
     <div class="newsDetails-description">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
-        <div v-if="illustrationURL" class="illustration">
+        <div v-if="illustrationURL" class="illustration center">
           <img
             :src="illustrationURL.concat('&size=0x400').toString()"
             class="newsDetailsImage illustrationPicture"

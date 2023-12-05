@@ -42,6 +42,8 @@ export default {
           this.showDeleteButton = this.news.canDelete;
           if (!this.news.spaceMember) {
             this.$root.$emit('restricted-space', this.news.spaceDisplayName, this.news.hiddenSpace);
+            const message = this.news.hiddenSpace ? this.$t('news.activity.notAuthorizedUserForSpaceHidden'): this.$t('news.activity.notAuthorizedUser').replace('{0}',  this.news.spaceDisplayName);
+            this.$root.$emit('alert-message', message, 'warning');
           }
         } else {
           this.notFound = true;

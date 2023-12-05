@@ -83,7 +83,6 @@
     <div v-if="showLoadMoreButton" class="newsListPagination">
       <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
     </div>
-    <exo-news-notification-alerts />
     <news-activity-sharing-spaces-drawer />
     <activity-share-drawer />
   </v-app>
@@ -203,7 +202,15 @@ export default {
     } else {
       this.fetchNews();
     }
-    this.$root.$on('activity-shared', () => {
+    this.$root.$on('activity-shared', (activityId, spaces, selectedApps) => {
+      if (selectedApps === 'newsApp' && activityId && spaces && spaces.length > 0) {
+        const spacesList = spaces.map(space => space.displayName);
+        const message = `${this.$t('news.share.message')} ${spacesList.join(', ')}`;
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'success',
+          alertMessage: message ,
+        }}));
+      }
       this.fetchNews(false);
     });
   },
@@ -299,7 +306,14 @@ export default {
       const redirectionTime = 8100;
       this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
         .then(() => {
-          this.$root.$emit('confirm-news-deletion', news, this.isDraftsFilter);
+          const clickMessage = this.$t('news.details.undoDelete');
+          const message = this.isDraftsFilter ? this.$t('news.details.deleteDraftSuccess') : this.$t('news.details.deleteSuccess');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message ,
+            alertLinkText: clickMessage ,
+            alertLinkCallback: () => this.undoDeleteNews(news.newsId, this.isDraftsFilter),
+          }}));
         });
       setTimeout(() => {
         const deletedNews = localStorage.getItem('deletedNews');
@@ -326,6 +340,17 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
+    undoDeleteNews(newsId, isDraftsFilter) {
+      return this.$newsServices.undoDeleteNews(newsId)
+        .then(() => {
+          this.$root.$emit('close-alert-message');
+          const message = isDraftsFilter ? this.$t('news.details.deleteDraftCanceled') : this.$t('news.details.deleteCanceled');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message
+          }}));
+        });
+    }
   },
 };
 </script>

@@ -64,11 +64,7 @@ export default {
       this.displayAlert(this.$t('Favorite.tooltip.ErrorDeletingFavorite', {0: this.$t('news.label')}), 'error');
     },
     displayAlert(message, type) {
-      this.$root.$emit('news-notification-alert', {
-        activityId: this.id,
-        message,
-        type: type || 'success',
-      });
+      this.$root.$emit('alert-message', message, type || 'success');
     },
   }
 };

@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-btn
         depressed
         small
-        class="button-see-all-news caption text-uppercase grey--text my-auto me-2"
+        class="button-see-all-news caption text-uppercase text-light-color my-auto me-2"
         @click="seeAllNews">
         {{ $t('news.published.seeAll') }}
       </v-btn>

@@ -51,6 +51,9 @@ public class NewsSpaceWebNotificationPlugin extends SpaceWebNotificationPlugin {
         }
         ExoSocialActivity activity = activityManager.getActivity(activityId);
         MetadataObject metadataObject;
+        if (activity.isHidden()) {
+            return null;
+        }
         if (activity.isComment()) {
             ExoSocialActivity parentActivity = activityManager.getActivity(activity.getParentId());
             metadataObject = parentActivity.getMetadataObject();

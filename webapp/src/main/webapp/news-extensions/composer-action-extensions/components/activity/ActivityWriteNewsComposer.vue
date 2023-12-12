@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <v-card
     id="writeNewsComposerButton"
-    class="mx-4 px-6 py-3"
+    class="mx-4 px-6 py-3 card-border-radius"
     outlined
     flat
     hover

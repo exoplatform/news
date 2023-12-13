@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="newsTargetsAdminSettings">
-    <v-main class="white  card-border-radius pa-5">
+    <v-main class="white card-border-radius pa-5">
       <div class="white">
         <div class="d-flex flex-row">
           <h4 class="pb-5 font-weight-bold">

@@ -11,6 +11,7 @@
     <template #activator="{ on, attrs }">
       <v-btn
         v-bind="attrs"
+        :title="$t('news.details.menu.open')"
         class="newsDetailsActionMenu pull-right"
         icon
         v-on="on">

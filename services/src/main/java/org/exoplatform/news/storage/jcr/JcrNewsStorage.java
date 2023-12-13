@@ -397,7 +397,7 @@ public class JcrNewsStorage implements NewsStorage {
     news.setUpdater(getLastUpdater(originalNode));
     news.setUpdateDate(getLastUpdatedDate(originalNode));
     news.setDraftUpdater(getStringProperty(originalNode, EXO_NEWS_LAST_MODIFIER));
-    news.setDraftUpdateDate(getDateProperty(node, "exo:dateModified"));
+    news.setDraftUpdateDate(getDateProperty(node, "exo:lastModifiedDate"));
     news.setPath(getPath(node));
     news.setAudience(audience);
     if (node.hasProperty(StageAndVersionPublicationConstant.CURRENT_STATE)) {
@@ -629,8 +629,12 @@ public class JcrNewsStorage implements NewsStorage {
       newsNode.setProperty("exo:name", news.getTitle());
       newsNode.setProperty("exo:summary", news.getSummary());
       newsNode.setProperty("exo:body", news.getBody());
-      newsNode.setProperty("exo:dateModified", Calendar.getInstance());
       newsNode.setProperty(EXO_NEWS_LAST_MODIFIER, updater);
+      if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
+        newsNode.setProperty("exo:lastModifiedDate", Calendar.getInstance());
+      } else {
+        newsNode.setProperty("exo:dateModified", Calendar.getInstance());
+      }
       // illustration
       if (StringUtils.isNotEmpty(news.getUploadId())) {
         attachIllustration(newsNode, news.getUploadId());

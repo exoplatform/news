@@ -456,6 +456,7 @@ export default {
             this.schedulePostDate = news.schedulePostDate;
             this.selectedTargets = news.targets;
             this.audience = news.audience ? news.audience : 'all';
+            this.$root.$emit('news-space-url',news.spaceUrl);
           }
         });
     },

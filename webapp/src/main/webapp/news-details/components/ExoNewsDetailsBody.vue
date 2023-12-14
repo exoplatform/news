@@ -211,7 +211,7 @@ export default {
       return this.news && this.news.updaterFullName;
     },
     updaterProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${this.news.updater}`;
     },
     newsUpdater() {
       return this.news && this.news.updater;

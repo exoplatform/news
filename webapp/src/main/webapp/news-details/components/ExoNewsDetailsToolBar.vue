@@ -75,7 +75,7 @@ export default {
   },
   computed: {
     historyClearedBackUrl() {
-      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
     },
     archivedNews() {
       return this.news && this.news.archived;

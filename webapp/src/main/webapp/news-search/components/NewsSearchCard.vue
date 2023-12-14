@@ -79,7 +79,7 @@ export default {
       return this.poster && this.poster.fullname;
     },
     posterProfile() {
-      return this.poster && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.poster.username}`;
+      return this.poster && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${this.poster.username}`;
     },
     excerpts() {
       return this.result && this.result.excerpts;

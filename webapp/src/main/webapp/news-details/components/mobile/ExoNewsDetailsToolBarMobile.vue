@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     backURL() {
-      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+      return this.news && this.news.spaceMember ? this.news.spaceUrl : `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
     },
     illustrationUrl() {
       return this.news && this.news.illustrationURL ? this.news.illustrationURL.concat('&size=315x128').toString() : '/news/images/news.png';

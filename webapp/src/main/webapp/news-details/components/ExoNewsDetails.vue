@@ -138,7 +138,7 @@ export default {
         });
     },
     editLink() {
-      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_target');
     },
     deleteConfirmDialog() {
@@ -193,9 +193,9 @@ export default {
             }
           }
           if (createdNewsActivity) {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${createdNewsActivity}`;
           } else {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
           }
         });
       } else {
@@ -204,7 +204,7 @@ export default {
           this.news.id = createdNews.id;
           this.$emit('draftCreated');
           if (createdNews) {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=drafts`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news?filter=drafts`;
           }
         });
       }

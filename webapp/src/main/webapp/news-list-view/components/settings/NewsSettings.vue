@@ -98,7 +98,7 @@ export default {
       this.$root.$emit('news-settings-drawer-open');
     },
     seeAllNews() {
-      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;
+      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}${this.seeAllUrl}`;
     }
   },
 };

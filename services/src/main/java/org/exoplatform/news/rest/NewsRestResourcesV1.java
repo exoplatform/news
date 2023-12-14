@@ -1017,13 +1017,16 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           break;
         }
       }
+      if ("DRAFTS".equals(filterType.toString())) {
+        newsFilter.setOrder("exo:lastModifiedDate");
+      } else {
+        newsFilter.setOrder("exo:dateModified");
+      }
     }
     // Set text to search news with
     if (StringUtils.isNotEmpty(text) && text.indexOf("#") != 0) {
       newsFilter.setSearchText(text);
     }
-
-    newsFilter.setOrder("exo:dateModified");
     newsFilter.setLimit(limit);
     newsFilter.setOffset(offset);
 

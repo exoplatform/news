@@ -401,6 +401,7 @@ export default {
       newsBody: null,
       desktopToolbar: null,
       oembedMinWidth: 300,
+      spaceUrl: null,
     };
   },
   computed: {
@@ -566,6 +567,7 @@ export default {
       this.openApp();
     });
     this.$root.$on('update-visibility', this.updateVisibility);
+    this.$root.$on('news-space-url', (spaceUrl)=>this.spaceUrl = spaceUrl);
   },
   methods: {
     initCKEditor: function() {
@@ -830,6 +832,7 @@ export default {
       if (news.publicationState ==='staged') {
         this.$newsServices.scheduleNews(news).then((scheduleNews) => {
           if (scheduleNews) {
+            history.replaceState(null,'',scheduleNews.spaceUrl);
             window.location.href = scheduleNews.url;
           }
         });
@@ -843,6 +846,7 @@ export default {
             }
           }
           if (createdNewsActivity) {
+            history.replaceState(null,'',this.spaceUrl);
             window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
           } else {
             window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
@@ -956,6 +960,7 @@ export default {
     },
     updateNews: function (post) {
       this.confirmAndUpdateNews(post).then(() => {
+        history.replaceState(null,'',this.spaceUrl);
         window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
       }).catch (function() {
         window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
@@ -986,6 +991,7 @@ export default {
       }
 
       return this.$newsServices.updateNews(updatedNews, post).then((createdNews) => {
+        this.spaceUrl = createdNews.spaceUrl;
         if (this.news.body !== createdNews.body) {
           this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, createdNews.body);
         }

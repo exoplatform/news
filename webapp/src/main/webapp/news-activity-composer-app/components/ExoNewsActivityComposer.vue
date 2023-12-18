@@ -847,9 +847,9 @@ export default {
           }
           if (createdNewsActivity) {
             history.replaceState(null,'',this.spaceUrl);
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${createdNewsActivity}`;
           } else {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
           }
         });
       }
@@ -961,9 +961,9 @@ export default {
     updateNews: function (post) {
       this.confirmAndUpdateNews(post).then(() => {
         history.replaceState(null,'',this.spaceUrl);
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${this.activityId}`;
       }).catch (function() {
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${this.activityId}`;
       });
     },
     confirmAndUpdateNews: function(post) {

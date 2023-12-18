@@ -71,7 +71,7 @@ export default {
       return this.news && this.news.updater !=='__system' && this.news.updater !== this.news.author;
     },
     updaterProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${this.news.updater}`;
     },
     postModeLabel() {
       return this.publicationState === 'staged' && this.updatedDate ? this.$t('news.details.scheduled') :this.$t('news.activity.lastUpdated');

@@ -66,7 +66,7 @@ export default {
             spaceId: spaceId,
             spaceAvatar: space.avatarUrl,
             spaceDisplayName: space.displayName,
-            activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activity.split(':')[1]}`
+            activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${activity.split(':')[1]}`
           });
           this.sharedActivities.sort((a, b) => a.spaceDisplayName.toLowerCase().localeCompare(b.spaceDisplayName.toLowerCase()));
         });
@@ -98,7 +98,7 @@ export default {
                   spaceId: spaceId,
                   spaceAvatar: sharedInSpace.avatarUrl,
                   spaceDisplayName: sharedInSpace.displayName,
-                  activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${activity.split(':')[1]}`
+                  activityUrl: `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${activity.split(':')[1]}`
                 });
                 this.sharedActivities.sort((a, b) => a.spaceDisplayName.toLowerCase().localeCompare(b.spaceDisplayName.toLowerCase()));
               }

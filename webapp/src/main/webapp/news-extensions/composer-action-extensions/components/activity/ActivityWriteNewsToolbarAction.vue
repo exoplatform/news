@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     switchToNews() {
-      let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
+      let url = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor`;
       if (eXo.env.portal.spaceId) {
         url += `?spaceId=${eXo.env.portal.spaceId}`;
       }

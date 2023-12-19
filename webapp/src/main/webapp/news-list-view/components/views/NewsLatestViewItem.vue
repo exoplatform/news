@@ -18,7 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <a
     class="articleLink"
     target="_self"
-    :href="item.url">
+    :href="item.url"
+    :arial-label="$t('news.space.icon.title',{ 0:item.spaceDisplayName })">
     <div class="articleImage" v-if="showImage">
       <img 
         :src="articleImg"
@@ -29,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <img
           class="spaceImage"
           :src="item.spaceAvatarUrl"
-          :alt="$t('news.latest.alt.spaceImage')">
+          :alt="$t('news.space.icon.alt',{ 0:item.spaceDisplayName })">
         <span class="spaceName">{{ item.spaceDisplayName }}</span>
       </div>
       <span v-if="showArticleTitle" class="articleTitle text-color text-body-1">{{ item.title }}</span>

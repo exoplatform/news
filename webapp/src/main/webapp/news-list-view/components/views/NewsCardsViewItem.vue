@@ -31,16 +31,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="text-area">
       <div class="upper-row">
         <a
-          class="space-link"
-          :id="`space-link-${item.activityId}`"
-          target="_self"
           v-if="!isHiddenSpace && showArticleSpace"
-          :href="item.spaceUrl">
+          :id="`space-link-${item.activityId}`"
+          :href="item.spaceUrl"
+          class="space-link"
+          target="_self"
+          :arial-label="$t('news.space.icon.title',{ 0:item.spaceDisplayName })">
           <div class="article-space">
             <img
               class="space-icon"
               :src="item.spaceAvatarUrl"
-              alt="Space icon">
+              :alt="$t('news.space.icon.alt',{ 0:item.spaceDisplayName })">
             <div class="space-name">{{ item.spaceDisplayName }}</div>
           </div>
         </a>

@@ -7,12 +7,17 @@ import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 
+import org.exoplatform.news.model.News;
+import org.exoplatform.news.service.NewsService;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import org.exoplatform.commons.api.notification.NotificationContext;
@@ -52,7 +57,12 @@ public class PostNewsNotificationPluginTest {
   private UserHandler         userhandler;
 
   @Mock
-  private SpaceService        spaceService;
+  private SpaceService spaceService;
+  @Mock
+  private NewsService     newsService;
+  @Mock
+  private ActivityManager activityManager;
+
 
   @Mock
   private InitParams          initParams;
@@ -82,7 +92,7 @@ public class PostNewsNotificationPluginTest {
   public void shouldMakeNotificationForPostNewsContext() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService, newsService, activityManager);
 
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
@@ -98,6 +108,8 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID,
+                                                             "456789")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     User contentAuthorUser = mock(User.class);
@@ -126,6 +138,14 @@ public class PostNewsNotificationPluginTest {
     when(members.getSize()).thenReturn(2);
     when(members.load(0, 2)).thenReturn(receivers);
 
+    News news = mock(News.class);
+    when(news.getActivityId()).thenReturn("12345");
+    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+    when(activity.isHidden()).thenReturn(false);
+    when(activityManager.getActivity("12345")).thenReturn(activity);
+
     // When
     NotificationInfo notificationInfo = newsPlugin.makeNotification(ctx);
 
@@ -145,7 +165,7 @@ public class PostNewsNotificationPluginTest {
   public void shouldMakeNotificationForPostNewsContextAndDoNotSendNotificationToCreator() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService, newsService, activityManager);
 
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
@@ -161,6 +181,8 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID,
+                                                             "456789")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     User contentAuthorUser = mock(User.class);
@@ -187,6 +209,14 @@ public class PostNewsNotificationPluginTest {
     when(members.getSize()).thenReturn(2);
     when(members.load(0, 2)).thenReturn(receivers);
 
+    News news = mock(News.class);
+    when(news.getActivityId()).thenReturn("12345");
+    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+    when(activity.isHidden()).thenReturn(false);
+    when(activityManager.getActivity("12345")).thenReturn(activity);
+
     // When
     NotificationInfo notificationInfo = newsPlugin.makeNotification(ctx);
 
@@ -208,7 +238,7 @@ public class PostNewsNotificationPluginTest {
   public void shouldMakeNotificationForPostNewsContextAndAuthorUserIsNull() throws Exception {
     // Given
     when(orgService.getUserHandler()).thenReturn(userhandler);
-    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService);
+    PostNewsNotificationPlugin newsPlugin = new PostNewsNotificationPlugin(initParams, spaceService, orgService, newsService, activityManager);
 
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationService.class)).thenReturn(null);
     COMMONS_UTILS.when(() -> CommonsUtils.getService(NotificationCompletionService.class)).thenReturn(null);
@@ -224,6 +254,8 @@ public class PostNewsNotificationPluginTest {
                                                              "http://localhost:8080/portal/rest/v1/social/users/default-image/avatar")
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK,
                                                              "http://localhost:8080/portal/intranet/activity?id=38")
+                                                     .append(PostNewsNotificationPlugin.NEWS_ID,
+                                                             "456789")
                                                      .append(PostNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.POST_NEWS);
 
     when(userhandler.findUserByName("jean")).thenReturn(null);
@@ -249,6 +281,14 @@ public class PostNewsNotificationPluginTest {
     when(members.getSize()).thenReturn(2);
     when(members.load(0, 2)).thenReturn(receivers);
 
+
+    News news = mock(News.class);
+    when(news.getActivityId()).thenReturn("12345");
+    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+
+    ExoSocialActivity activity = mock(ExoSocialActivity.class);
+    when(activity.isHidden()).thenReturn(false);
+    when(activityManager.getActivity("12345")).thenReturn(activity);
     // When
     NotificationInfo notificationInfo = newsPlugin.makeNotification(ctx);
 

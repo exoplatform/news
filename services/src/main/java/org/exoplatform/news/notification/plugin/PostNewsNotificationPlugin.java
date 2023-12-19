@@ -1,25 +1,32 @@
 package org.exoplatform.news.notification.plugin;
 
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.exoplatform.commons.api.notification.NotificationContext;
 import org.exoplatform.commons.api.notification.model.ArgumentLiteral;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.commons.api.notification.plugin.BaseNotificationPlugin;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.container.xml.InitParams;
+import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
+import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
 import org.exoplatform.services.organization.User;
 import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.model.MetadataObject;
 
 public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log                    LOG              = ExoLogger.getLogger(PostNewsNotificationPlugin.class);
@@ -49,12 +56,16 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   public static final ArgumentLiteral<String> CURRENT_USER     = new ArgumentLiteral<>(String.class, "CURRENT_USER");
 
   private SpaceService                        spaceService;
+  private NewsService                         newsService;
+  private ActivityManager                     activityManager;
 
   private UserHandler                         userhandler;
 
-  public PostNewsNotificationPlugin(InitParams initParams, SpaceService spaceService, OrganizationService organizationService) {
+  public PostNewsNotificationPlugin(InitParams initParams, SpaceService spaceService, OrganizationService organizationService, NewsService newsService, ActivityManager activityManager) {
     super(initParams);
     this.spaceService = spaceService;
+    this.newsService = newsService;
+    this.activityManager = activityManager;
     this.userhandler = organizationService.getUserHandler();
   }
 
@@ -94,29 +105,55 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     String activityLink = ctx.value(ACTIVITY_LINK);
     String newsId = ctx.value(NEWS_ID);
 
-    List<String> receivers = new ArrayList<String>();
-    try {
-      receivers = getReceivers(contentSpaceId, currentUserName);
-    } catch (Exception e) {
-      LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
+    if (mustSendNotification(newsId)) {
+      List<String> receivers = new ArrayList<String>();
+      try {
+        receivers = getReceivers(contentSpaceId, currentUserName);
+      } catch (Exception e) {
+        LOG.error("An error occured when trying to have the list of receivers " + e.getMessage(), e);
+      }
+
+      return NotificationInfo.instance()
+                             .setFrom(currentUserName)
+                             .setSpaceId(Long.parseLong(contentSpaceId))
+                             .with(NotificationConstants.CONTENT_TITLE, contentTitle)
+                             .to(receivers)
+                             .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
+                             .with(NotificationConstants.CURRENT_USER, currentUserFullName)
+                             .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
+                             .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
+                             .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
+                             .with(NotificationConstants.ACTIVITY_LINK, activityLink)
+                             .with(NotificationConstants.CONTEXT, context.getContext())
+                             .with(NotificationConstants.NEWS_ID, newsId)
+                             .key(getKey())
+                             .end();
     }
 
-    return NotificationInfo.instance()
-                           .setFrom(currentUserName)
-                           .setSpaceId(Long.parseLong(contentSpaceId))
-                           .with(NotificationConstants.CONTENT_TITLE, contentTitle)
-                           .to(receivers)
-                           .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)
-                           .with(NotificationConstants.CURRENT_USER, currentUserFullName)
-                           .with(NotificationConstants.CONTENT_SPACE, contentSpaceName)
-                           .with(NotificationConstants.ILLUSTRATION_URL, illustrationUrl)
-                           .with(NotificationConstants.AUTHOR_AVATAR_URL, authorAvatarUrl)
-                           .with(NotificationConstants.ACTIVITY_LINK, activityLink)
-                           .with(NotificationConstants.CONTEXT, context.getContext())
-                           .with(NotificationConstants.NEWS_ID, newsId)
-                           .key(getKey())
-                           .end();
+    return null;
+  }
 
+  private boolean mustSendNotification(String newsId) {
+    News news = null;
+    try {
+      news = newsService.getNewsById(newsId, false);
+    } catch (Exception e) {
+      LOG.warn("Error retrieving news by id {}", newsId, e);
+      return false;
+    }
+    if (news == null) {
+      LOG.debug("News by id {} wasn't found. The space web notification will not be sent.", newsId);
+      return false;
+    }
+    String activityId = news.getActivityId();
+    if (StringUtils.isBlank(activityId)) {
+      return false;
+    }
+    ExoSocialActivity activity = activityManager.getActivity(activityId);
+    if (activity.isHidden()) {
+      return false;
+    }
+    return true;
   }
 
   private List<String> getReceivers(String contentSpaceId,

@@ -121,8 +121,8 @@
             :class="[!summary ? 'fullDetailsBodyNoSummary' : '']"
             class="fullDetailsBody ms-13 me-13 clearfix">
             <div
-              class="reset-style-box rich-editor-content extended-rich-content"
-              v-html="newsBody" />
+              class="rich-editor-content extended-rich-content"
+              v-html="newsBody"></div>
           </div>
 
           <div v-show="attachments && attachments.length" class="newsAttachmentsTitle">

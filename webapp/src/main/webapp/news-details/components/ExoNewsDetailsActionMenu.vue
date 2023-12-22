@@ -12,6 +12,7 @@
         <v-btn
           v-bind="attrs"
           class="newsDetailsActionMenu pull-right"
+          :aria-label="$t('news.details.menu.open')"
           icon
           v-on="on">
           <v-icon>mdi-dots-vertical</v-icon>

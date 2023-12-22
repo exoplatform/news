@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           v-if="showArticleAuthor"
           class="author-photo"
           :src="item.authorAvatarUrl"
-          alt="Author image">
+          :alt="$t('news.avatar.author.alt',{0:item.authorDisplayName})">
         <div v-if="showArticleDate" class="author-date">
           <date-format
             :value="displayDate"

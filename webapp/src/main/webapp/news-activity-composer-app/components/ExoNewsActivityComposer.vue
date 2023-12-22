@@ -288,7 +288,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
-      <exo-news-notification-alerts name="event-form" />
       <exo-news-draft-visibility-mobile
         ref="selectVisibilityDialog"
         :items="items" />
@@ -402,6 +401,7 @@ export default {
       newsBody: null,
       desktopToolbar: null,
       oembedMinWidth: 300,
+      spaceUrl: null,
     };
   },
   computed: {
@@ -567,6 +567,7 @@ export default {
       this.openApp();
     });
     this.$root.$on('update-visibility', this.updateVisibility);
+    this.$root.$on('news-space-url', (spaceUrl)=>this.spaceUrl = spaceUrl);
   },
   methods: {
     initCKEditor: function() {
@@ -831,6 +832,7 @@ export default {
       if (news.publicationState ==='staged') {
         this.$newsServices.scheduleNews(news).then((scheduleNews) => {
           if (scheduleNews) {
+            history.replaceState(null,'',scheduleNews.spaceUrl);
             window.location.href = scheduleNews.url;
           }
         });
@@ -844,9 +846,10 @@ export default {
             }
           }
           if (createdNewsActivity) {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+            history.replaceState(null,'',this.spaceUrl);
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${createdNewsActivity}`;
           } else {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
           }
         });
       }
@@ -957,9 +960,10 @@ export default {
     },
     updateNews: function (post) {
       this.confirmAndUpdateNews(post).then(() => {
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        history.replaceState(null,'',this.spaceUrl);
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${this.activityId}`;
       }).catch (function() {
-        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${this.activityId}`;
+        window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${this.activityId}`;
       });
     },
     confirmAndUpdateNews: function(post) {
@@ -987,6 +991,7 @@ export default {
       }
 
       return this.$newsServices.updateNews(updatedNews, post).then((createdNews) => {
+        this.spaceUrl = createdNews.spaceUrl;
         if (this.news.body !== createdNews.body) {
           this.imagesURLs = this.extractImagesURLsDiffs(this.news.body, createdNews.body);
         }
@@ -1142,7 +1147,16 @@ export default {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
     },
     updateDraftVisibility(){
-      this.$root.$emit('update-draft-visibility', this.news.draftVisible);
+      if (this.news.draftVisible) {
+        const message = this.$t('news.composer.alert.share.draft.success');
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'info',
+          alertMessage: message}}));
+      } else {
+        const message = this.$t('news.composer.alert.unshare.draft.success');
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'info',
+          alertMessage: message}}));      }
     },
     updateVisibility(visibility){
       if (visibility !== this.news.draftVisible) {

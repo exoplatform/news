@@ -55,7 +55,7 @@ const newsActivityTypeExtensionOptions = {
     }
     return '';
   },
-  getSourceLink: (activity) => `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${!activity.parentActivity ? activity.id : activity.parentActivity.id}`,
+  getSourceLink: (activity) => `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${!activity.parentActivity ? activity.id : activity.parentActivity.id}`,
   getSummary: (activity) => {
     const news = activity?.news;
     if (news?.summary) {

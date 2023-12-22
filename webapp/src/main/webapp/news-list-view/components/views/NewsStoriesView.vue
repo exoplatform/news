@@ -89,7 +89,7 @@ export default {
   },
   computed: {
     seeAllArticles() {
-      return this.seeAllUrl && `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;
+      return this.seeAllUrl && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}${this.seeAllUrl}`;
     },
   },
   methods: {

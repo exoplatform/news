@@ -4,9 +4,7 @@ import static org.exoplatform.news.storage.jcr.JcrNewsStorage.EXO_PRIVILEGEABLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -1025,6 +1023,9 @@ public class JcrNewsStorageTest {
   @Test
   public void shouldUpdateNodeAndKeepIllustrationWhenUpdatingNewsWithNullUploadId() throws Exception {
     JcrNewsStorage jcrNewsStorage = buildJcrNewsStorage();
+    Identity userIdentity = new Identity("organization", "user");
+    userIdentity.setId("user");
+    userIdentity.setRemoteId("user");
     Node newsNode = mock(Node.class);
     Node illustrationNode = mock(Node.class);
     Property property = mock(Property.class);
@@ -1042,13 +1043,14 @@ public class JcrNewsStorageTest {
     when(property.getDate()).thenReturn(Calendar.getInstance());
     when(imageProcessor.processImages(nullable(String.class), any(), nullable(String.class))).thenAnswer(i -> i.getArguments()[0]);
     when(newsNode.getName()).thenReturn("Updated title");
-
+    when(identityManager.getOrCreateIdentity(anyString(), nullable(String.class))).thenReturn(userIdentity);
     News news = new News();
     news.setTitle("Updated title");
     news.setSummary("Updated summary");
     news.setBody("Updated body");
     news.setUploadId(null);
     news.setViewsCount((long) 10);
+    news.setPublicationState(PublicationDefaultStates.DRAFT);
 
     // When
     jcrNewsStorage.updateNews(news, "user");
@@ -1057,7 +1059,7 @@ public class JcrNewsStorageTest {
     verify(newsNode, times(1)).setProperty(eq("exo:title"), eq("Updated title"));
     verify(newsNode, times(1)).setProperty(eq("exo:summary"), eq("Updated summary"));
     verify(newsNode, times(1)).setProperty(eq("exo:body"), eq("Updated body"));
-    verify(newsNode, times(1)).setProperty(eq("exo:dateModified"), any(Calendar.class));
+    verify(newsNode, times(1)).setProperty(eq("exo:lastModifiedDate"), any(Calendar.class));
     verify(newsNode, times(1)).setProperty("exo:newsLastModifier", "user");
 
     verify(illustrationNode, times(0)).remove();
@@ -1090,7 +1092,6 @@ public class JcrNewsStorageTest {
     news.setBody("Updated body");
     news.setUploadId("");
     news.setViewsCount((long) 10);
-
     // When
     jcrNewsStorage.updateNews(news, "user");
 

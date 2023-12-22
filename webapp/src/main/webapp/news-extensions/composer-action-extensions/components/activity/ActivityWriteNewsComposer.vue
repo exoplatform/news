@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <template>
   <v-card
     id="writeNewsComposerButton"
-    class="mx-4 px-6 py-3"
+    class="mx-4 px-6 py-3 card-border-radius"
     outlined
     flat
     hover
@@ -86,7 +86,7 @@ export default {
   methods: {
     switchToNews() {
       if (!this.disableComposerButton) {
-        let url = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor`;
+        let url = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor`;
         if (eXo.env.portal.spaceId) {
           url += `?spaceId=${eXo.env.portal.spaceId}`;
         }

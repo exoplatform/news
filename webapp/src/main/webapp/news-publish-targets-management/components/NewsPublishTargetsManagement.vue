@@ -16,10 +16,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
   <v-app class="newsTargetsAdminSettings">
-    <v-main class="white rounded-lg ma-5 px-7 pb-2">
+    <v-main class="white card-border-radius pa-5">
       <div class="white">
         <div class="d-flex flex-row">
-          <h4 class="py-5 font-weight-bold">
+          <h4 class="pb-5 font-weight-bold">
             {{ $t('newsTargets.settings.title') }}
           </h4>
         </div>
@@ -118,7 +118,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <news-publish-targets-management-drawer
         ref="newsPublishTargetsManagementDrawer"
         @news-target-saved="init" />
-      <exo-news-notification-alerts />
     </v-main>
   </v-app>
 </template>
@@ -180,6 +179,14 @@ export default {
       this.$newsTargetingService.deleteTargetByName(targetName, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-newsTarget-deletion', targetName);
+          const clickMessage = this.$t('news.details.undoDelete');
+          const message = this.$t('news.newsTarget.deleteSuccess');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message ,
+            alertLinkText: clickMessage ,
+            alertLinkCallback: () => this.undoDeleteNewsTarget(targetName),
+          }}));
         });
       setTimeout(() => {
         const deletedNewsTarget = localStorage.getItem('deletedNewsTarget');
@@ -204,7 +211,17 @@ export default {
     },
     openAddTargetDrawer() {
       this.$refs.newsPublishTargetsManagementDrawer.open();
-    }
+    },
+    undoDeleteNewsTarget(targetName) {
+      return this.$newsTargetingService.undoDeleteTarget(targetName)
+        .then(() => {
+          const message =  this.$t('news.newsTarget.deleteCanceled');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message
+          }}));
+        });
+    },
   }
 };
 </script>

@@ -24,8 +24,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
     <div :class="[showHeader && newsHeader ? 'd-flex flex-column me-2 mt-1' : 'd-flex flex-column me-2']">
       <v-icon
-        class="button-open-settings"
         v-if="canPublishNews && showSettingsIcon"
+        class="button-open-settings"
+        :aria-label="$t('news.latest.openSettings')"
         size="24"
         icon
         @click="openDrawer">
@@ -36,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-btn
         depressed
         small
-        class="button-see-all-news caption text-uppercase grey--text my-auto me-2"
+        class="button-see-all-news caption text-uppercase text-light-color my-auto me-2"
         @click="seeAllNews">
         {{ $t('news.published.seeAll') }}
       </v-btn>
@@ -97,7 +98,7 @@ export default {
       this.$root.$emit('news-settings-drawer-open');
     },
     seeAllNews() {
-      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}${this.seeAllUrl}`;
+      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}${this.seeAllUrl}`;
     }
   },
 };

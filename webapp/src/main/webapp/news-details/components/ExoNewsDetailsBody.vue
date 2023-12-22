@@ -10,7 +10,7 @@
     </div>
     <div class="newsDetails-description">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
-        <div v-if="illustrationURL" class="illustration">
+        <div v-if="illustrationURL" class="illustration center">
           <img
             :src="illustrationURL.concat('&size=0x400').toString()"
             class="newsDetailsImage illustrationPicture"
@@ -211,7 +211,7 @@ export default {
       return this.news && this.news.updaterFullName;
     },
     updaterProfileURL() {
-      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${this.news.updater}`;
+      return this.news && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${this.news.updater}`;
     },
     newsUpdater() {
       return this.news && this.news.updater;

@@ -36,7 +36,6 @@
       v-if="news"
       :news="news"
       @refresh-news="getNewsById(newsId)" />
-    <exo-news-notification-alerts />
   </div>
 </template>
 <script>
@@ -139,7 +138,7 @@ export default {
         });
     },
     editLink() {
-      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
+      const editUrl = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor?spaceId=${this.spaceId}&newsId=${this.newsId}&activityId=${this.activityId}`;
       window.open(editUrl, '_target');
     },
     deleteConfirmDialog() {
@@ -151,6 +150,14 @@ export default {
       this.$newsServices.deleteNews(this.newsId, false, deleteDelay)
         .then(() => {
           this.$root.$emit('confirm-news-deletion', this.news);
+          const clickMessage = this.$t('news.details.undoDelete');
+          const message = this.$t('news.details.deleteSuccess');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message ,
+            alertLinkText: clickMessage ,
+            alertLinkCallback: () => this.undoDeleteNews(),
+          }}));
         });
       setTimeout(() => {
         const deletedNews = localStorage.getItem('deletedNews');
@@ -186,9 +193,9 @@ export default {
             }
           }
           if (createdNewsActivity) {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/activity?id=${createdNewsActivity}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/activity?id=${createdNewsActivity}`;
           } else {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}`;
           }
         });
       } else {
@@ -197,7 +204,7 @@ export default {
           this.news.id = createdNews.id;
           this.$emit('draftCreated');
           if (createdNews) {
-            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news?filter=drafts`;
+            window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news?filter=drafts`;
           }
         });
       }
@@ -218,6 +225,13 @@ export default {
         .finally(() => {
           document.title = this.$t('news.window.title', {0: this.news.title});
           this.$root.$emit('application-loaded');
+        });
+    },
+    undoDeleteNews() {
+      return this.$newsServices.undoDeleteNews(this.newsId)
+        .then(() => {
+          const message = this.$t('news.details.deleteCanceled');
+          this.$root.$emit('alert-message', message, 'success');
         });
     }
   }

@@ -1,91 +1,92 @@
 <template>
   <v-app class="newsApp" role="main">
-    <v-toolbar
-      color="white"
-      flat
-      dense>
-      <div class="flex d-flex flex-row">
-        <v-spacer />
-        <div
-          class="d-flex flex-row justify-end my-auto flex-nowrap">
-          <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'">
-            <div class="inputNewsSearchWrapper">
-              <v-scale-transition>
-                <v-text-field
-                  v-model="searchText"
-                  :placeholder="$t('news.app.searchPlaceholder')"
-                  prepend-inner-icon="fa-filter"
-                  class="pa-0 my-auto" />
-              </v-scale-transition>
+    <div class="white card-border-radius pa-5">
+      <v-toolbar
+        color="white"
+        flat
+        dense>
+        <div class="flex d-flex flex-row">
+          <v-spacer />
+          <div
+            class="d-flex flex-row justify-end my-auto flex-nowrap">
+            <div :class="searchInputDisplayed ? '' : 'newsAppHideSearchInput'">
+              <div class="inputNewsSearchWrapper">
+                <v-scale-transition>
+                  <v-text-field
+                    v-model="searchText"
+                    :placeholder="$t('news.app.searchPlaceholder')"
+                    prepend-inner-icon="fa-filter"
+                    class="pa-0 my-auto" />
+                </v-scale-transition>
+              </div>
+            </div>
+          </div>
+          <div
+            class="d-flex flex-row justify-end my-auto flex-nowrap">
+            <select
+              v-model="newsFilter"
+              class="width-auto my-auto ms-4 subtitle-1 ignore-vuetify-classes">
+              <option value="all">{{ $t('news.app.filter.all') }}</option>
+              <option value="pinned">{{ $t('news.app.filter.pinned') }}</option>
+              <option value="myPosted">{{ $t('news.app.filter.myPosted') }}</option>
+              <option value="archived">{{ $t('news.app.filter.archived') }}</option>
+              <option value="drafts">{{ $t('news.app.filter.drafts') }}</option>
+              <option value="scheduled">{{ $t('news.app.filter.scheduled') }}</option>
+            </select>
+            <div class="d-flex align-center">
+              <v-btn
+                icon
+                class="d-flex flex-row my-auto flex-nowrap primary--text ms-2"
+                @click="$root.$emit('news-space-selector-drawer-open')">
+                <i
+                  :class="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1') && 'primary--text' || 'text-color'"
+                  class="fa fa-sliders-h uiIcon24x24"></i>
+              </v-btn>
+              <span
+                v-if="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1')"
+                class="primary--text">
+                ({{ spacesFilter.length }})
+              </span>
             </div>
           </div>
         </div>
-        <div
-          class="d-flex flex-row justify-end my-auto flex-nowrap">
-          <select
-            v-model="newsFilter"
-            class="width-auto my-auto ms-4 subtitle-1 ignore-vuetify-classes">
-            <option value="all">{{ $t('news.app.filter.all') }}</option>
-            <option value="pinned">{{ $t('news.app.filter.pinned') }}</option>
-            <option value="myPosted">{{ $t('news.app.filter.myPosted') }}</option>
-            <option value="archived">{{ $t('news.app.filter.archived') }}</option>
-            <option value="drafts">{{ $t('news.app.filter.drafts') }}</option>
-            <option value="scheduled">{{ $t('news.app.filter.scheduled') }}</option>
-          </select>
-          <div class="d-flex align-center">
-            <v-btn
-              icon
-              class="d-flex flex-row my-auto flex-nowrap primary--text ms-2"
-              @click="$root.$emit('news-space-selector-drawer-open')">
-              <i
-                :class="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1') && 'primary--text' || 'text-color'"
-                class="fa fa-sliders-h uiIcon24x24"></i>
-            </v-btn>
-            <span
-              v-if="spacesFilter && spacesFilter.length && !spacesFilter.includes('-1')"
-              class="primary--text">
-              ({{ spacesFilter.length }})
-            </span>
-          </div>
-        </div>
+      </v-toolbar>
+      <div class="newsAppFilterOptions">
+        <news-filter-space-drawer
+          v-model="spacesFilter" />
       </div>
-    </v-toolbar>
-    <div class="newsAppFilterOptions">
-      <news-filter-space-drawer
-        v-model="spacesFilter" />
+      <v-app
+        class="VuetifyApp">
+        <v-progress-circular
+          v-if="loadingNews && newsList.length === 0"
+          :size="40"
+          :width="4"
+          indeterminate
+          class="loadingRing" />
+      </v-app>
+      <div
+        v-if="newsList.length"
+        id="newsListItems"
+        class="newsListItems">
+        <news-app-item
+          v-for="news in newsList"
+          :key="news.newsId"
+          :news="news"
+          :news-filter="newsFilter"
+          @update-news-list="updateNewsList"
+          @delete-news="deleteNews"
+          class="newsItem" />
+      </div>
+      <div v-if="newsList.length === 0 && !loadingNews" class="articleNotFound">
+        <span class="iconNotFound"></span>
+        <h3>{{ notFoundMessage }}</h3>
+      </div>
+      <div v-if="showLoadMoreButton" class="newsListPagination">
+        <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
+      </div>
+      <news-activity-sharing-spaces-drawer />
+      <activity-share-drawer />
     </div>
-    <v-app
-      class="VuetifyApp">
-      <v-progress-circular
-        v-if="loadingNews && newsList.length === 0"
-        :size="40"
-        :width="4"
-        indeterminate
-        class="loadingRing" />
-    </v-app>
-    <div
-      v-if="newsList.length"
-      id="newsListItems"
-      class="newsListItems">
-      <news-app-item
-        v-for="news in newsList"
-        :key="news.newsId"
-        :news="news"
-        :news-filter="newsFilter"
-        @update-news-list="updateNewsList"
-        @delete-news="deleteNews"
-        class="newsItem" />
-    </div>
-    <div v-if="newsList.length === 0 && !loadingNews" class="articleNotFound">
-      <span class="iconNotFound"></span>
-      <h3>{{ notFoundMessage }}</h3>
-    </div>
-    <div v-if="showLoadMoreButton" class="newsListPagination">
-      <div class="btn btn-block" @click="loadMore">{{ $t('news.app.loadMore') }}</div>
-    </div>
-    <exo-news-notification-alerts />
-    <news-activity-sharing-spaces-drawer />
-    <activity-share-drawer />
   </v-app>
 </template>
 
@@ -203,7 +204,15 @@ export default {
     } else {
       this.fetchNews();
     }
-    this.$root.$on('activity-shared', () => {
+    this.$root.$on('activity-shared', (activityId, spaces, selectedApps) => {
+      if (selectedApps === 'newsApp' && activityId && spaces && spaces.length > 0) {
+        const spacesList = spaces.map(space => space.displayName);
+        const message = `${this.$t('news.share.message')} ${spacesList.join(', ')}`;
+        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+          alertType: 'success',
+          alertMessage: message ,
+        }}));
+      }
       this.fetchNews(false);
     });
   },
@@ -237,9 +246,9 @@ export default {
           updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
+          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
           authorFullName: item.authorDisplayName,
-          authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.portalName}/profile/${item.author}`,
+          authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
           activityId: activityId,
           canEdit: item.canEdit,
@@ -299,7 +308,14 @@ export default {
       const redirectionTime = 8100;
       this.$newsServices.deleteNews(news.newsId, this.newsFilter === 'drafts', deleteDelay)
         .then(() => {
-          this.$root.$emit('confirm-news-deletion', news, this.isDraftsFilter);
+          const clickMessage = this.$t('news.details.undoDelete');
+          const message = this.isDraftsFilter ? this.$t('news.details.deleteDraftSuccess') : this.$t('news.details.deleteSuccess');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message ,
+            alertLinkText: clickMessage ,
+            alertLinkCallback: () => this.undoDeleteNews(news.newsId, this.isDraftsFilter),
+          }}));
         });
       setTimeout(() => {
         const deletedNews = localStorage.getItem('deletedNews');
@@ -326,6 +342,17 @@ export default {
       url.searchParams.delete(paramName);
       return url.href;
     },
+    undoDeleteNews(newsId, isDraftsFilter) {
+      return this.$newsServices.undoDeleteNews(newsId)
+        .then(() => {
+          this.$root.$emit('close-alert-message');
+          const message = isDraftsFilter ? this.$t('news.details.deleteDraftCanceled') : this.$t('news.details.deleteCanceled');
+          document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+            alertType: 'success',
+            alertMessage: message
+          }}));
+        });
+    }
   },
 };
 </script>

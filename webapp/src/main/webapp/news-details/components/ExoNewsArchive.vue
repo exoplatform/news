@@ -12,7 +12,7 @@
       </transition>
     </div>
     <a
-      :title="newsArchiveLabel"
+      :arial-label="newsArchiveLabel"
       class="btn newsArchiveButton"
       rel="tooltip"
       data-placement="bottom"

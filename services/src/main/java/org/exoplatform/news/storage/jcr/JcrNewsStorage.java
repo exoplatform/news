@@ -890,13 +890,17 @@ public class JcrNewsStorage implements NewsStorage {
    * @throws RepositoryException when error
    */
   private Date getPublicationDate(Node node) throws RepositoryException {
-    VersionNode versionNode = new VersionNode(node, node.getSession());
-    List<VersionNode> versions = versionNode.getChildren();
-    if (!versions.isEmpty()) {
-      versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
-      return versions.get(0).getCreatedTime().getTime();
+    if (node.hasProperty("publication:liveDate")) {
+      Calendar nodeLiveDate = node.getProperty("publication:liveDate").getDate();
+      return nodeLiveDate.getTime();
+    } else {
+      VersionNode versionNode = new VersionNode(node, node.getSession());
+      List<VersionNode> versions = versionNode.getChildren();
+      if (!versions.isEmpty()) {
+        versions.sort(Comparator.comparingInt(v -> Integer.parseInt(v.getName())));
+        return versions.get(0).getCreatedTime().getTime();
+      }
     }
-
     return null;
   }
   

@@ -1018,9 +1018,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }
       }
       if ("DRAFTS".equals(filterType.toString())) {
-        newsFilter.setOrder("exo:lastModifiedDate");
-      } else {
         newsFilter.setOrder("exo:dateModified");
+      } else {
+        newsFilter.setOrder("publication:liveDate");
       }
     }
     // Set text to search news with

@@ -289,7 +289,7 @@ public class JcrNewsStorageTest {
             .thenReturn(version1).thenReturn(version2);
     when(versionHistory.getAllVersions()).thenReturn(versionIterator);
     when(versionHistory.getRootVersion()).thenReturn(mock(Version.class));
-    when(property.getDate()).thenReturn(Calendar.getInstance());
+    when(property.getDate()).thenReturn(calendar1);
     when(property.getLong()).thenReturn((long) 10);
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(nullable(String.class))).thenReturn(space);

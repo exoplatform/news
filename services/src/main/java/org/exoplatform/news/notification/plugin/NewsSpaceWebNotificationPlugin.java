@@ -1,6 +1,6 @@
 package org.exoplatform.news.notification.plugin;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.api.notification.model.NotificationInfo;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.news.model.News;

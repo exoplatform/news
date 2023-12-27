@@ -608,7 +608,7 @@ public class JcrNewsStorage implements NewsStorage {
   private void updateNewsName(Session session, Node newsNode, News news) throws RepositoryException {
     if (StringUtils.isNotBlank(news.getTitle()) && !news.getTitle().equals(newsNode.getName())) {
       String srcPath = newsNode.getPath();
-      String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang.StringUtils.EMPTY
+      String destPath = (newsNode.getParent().getPath().equals("/") ? org.apache.commons.lang3.StringUtils.EMPTY
                                                                     : newsNode.getParent().getPath())
           + "/" + Utils.cleanName(news.getTitle(), NodetypeConstant.EXO_NEWS).trim();
       session.getWorkspace().move(srcPath, destPath);

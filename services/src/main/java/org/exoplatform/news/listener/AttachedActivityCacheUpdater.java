@@ -16,7 +16,7 @@
  */
 package org.exoplatform.news.listener;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.news.model.News;
 import org.exoplatform.services.listener.Event;
 import org.exoplatform.services.listener.Listener;

@@ -205,6 +205,9 @@ export default {
     this.retrieveNewsList().finally(() => this.$root.$applicationLoaded());
     document.addEventListener(`component-${this.extensionApp}-${this.extensionType}-updated`, this.refreshViewExtensions);
     this.refreshViewExtensions();
+
+    document.addEventListener('drawerOpened', () => this.$el.closest('#stickyBlockDesktop').style.position = 'static');
+    document.addEventListener('drawerClosed', () => this.$el.closest('#stickyBlockDesktop').style.position = 'sticky');
   },
   methods: {
     retrieveNewsList() {

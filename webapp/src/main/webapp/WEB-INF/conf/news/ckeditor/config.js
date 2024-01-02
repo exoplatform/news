@@ -56,7 +56,7 @@ CKEDITOR.editorConfig = function (config) {
   ];
 
   let extraPlugins = 'a11ychecker,balloonpanel,indent,switchView,attachFile,googleDocPastePlugin,copyformatting,indentblock,indentlist,sharedspace,' +
-        'autolink,colordialog,tagSuggester,emoji,link,font,justify,widget,contextmenu,table,codesnippet,tabletools,tableresize,embedsemantic';
+        'autolink,colordialog,tagSuggester,emoji,link,font,justify,widget,contextmenu,table,codesnippet,tabletools,tableresize,embedsemantic,suggester';
 
   let removePlugins = 'image,confirmBeforeReload,maximize,resize,autoembed';
 

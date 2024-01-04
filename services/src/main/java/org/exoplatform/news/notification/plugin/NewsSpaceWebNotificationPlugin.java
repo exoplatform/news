@@ -64,6 +64,7 @@ public class NewsSpaceWebNotificationPlugin extends SpaceWebNotificationPlugin {
                 metadataObject.getId(),
                 0,
                 metadataObject.getSpaceId());
+        spaceWebNotificationItem.setActivityId(activityId);
         if (activity.isComment()) {
             spaceWebNotificationItem.addApplicationSubItem(activity.getId());
         }

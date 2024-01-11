@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.search.domain.Document;
 import org.exoplatform.commons.search.index.impl.ElasticIndexingServiceConnector;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -122,7 +122,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     }
     // Ensure to index text only without html tags
     if (StringUtils.isNotBlank(body)) {
-      body = StringEscapeUtils.unescapeHtml(body);
+      body = StringEscapeUtils.unescapeHtml4(body);
       try {
         body = HTMLSanitizer.sanitize(body);
       } catch (Exception e) {
@@ -133,7 +133,7 @@ public class NewsIndexingServiceConnector extends ElasticIndexingServiceConnecto
     }
 
     if (StringUtils.isNotBlank(summary)) {
-      summary = StringEscapeUtils.unescapeHtml(summary);
+      summary = StringEscapeUtils.unescapeHtml4(summary);
       try {
         summary = HTMLSanitizer.sanitize(summary);
       } catch (Exception e) {

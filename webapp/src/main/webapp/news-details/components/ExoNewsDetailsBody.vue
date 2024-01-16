@@ -8,7 +8,7 @@
         <h3>{{ $t('news.archive.text') }}</h3>
       </div>
     </div>
-    <div class="newsDetails-description">
+    <div class="newsDetails-description card-border-radius">
       <div :class="[illustrationURL ? 'newsDetails-header' : '']" class="newsDetails-header">
         <div v-if="illustrationURL" class="illustration center">
           <img

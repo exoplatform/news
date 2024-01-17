@@ -76,10 +76,9 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
-import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.rest.api.RestUtils;
+import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
@@ -389,7 +388,7 @@ public class JcrNewsStorage implements NewsStorage {
     String audience = getStringProperty(node, NEWS_AUDIENCE_PROP);
     String sanitizedBody = HTMLSanitizer.sanitize(body);
     sanitizedBody = sanitizedBody.replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN);
-    news.setBody(substituteUsernames(portalOwner, sanitizedBody));
+    news.setBody(MentionUtils.substituteUsernames(portalOwner, sanitizedBody));
     news.setOriginalBody(sanitizedBody);
     news.setAuthor(getStringProperty(node, "exo:author"));
     news.setCreationDate(getDateProperty(node, "exo:dateCreated"));
@@ -843,43 +842,6 @@ public class JcrNewsStorage implements NewsStorage {
     }
 
     return null;
-  }
-  
-  public String substituteUsernames(String portalOwner, String message) {
-    if (message == null || message.trim().isEmpty()) {
-      return message;
-    }
-    //
-    Matcher matcher = MENTION_PATTERN.matcher(message);
-
-    // Replace all occurrences of pattern in input
-    StringBuffer buf = new StringBuffer();
-    while (matcher.find()) {
-      // Get the match result
-      String username = matcher.group().substring(1);
-      if (username == null || username.isEmpty()) {
-        continue;
-      }
-      Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
-      if (identity == null || identity.isDeleted() || !identity.isEnable()) {
-        continue;
-      }
-      try {
-        username = LinkProvider.getProfileLink(username, portalOwner);
-      } catch (Exception e) {
-        LOG.warn("Error while retrieving link for profile of user {}", username, e);
-        continue;
-      }
-      // Insert replacement
-      if (username != null) {
-        matcher.appendReplacement(buf, username);
-      }
-    }
-    if (buf.length() > 0) {
-      matcher.appendTail(buf);
-      return buf.toString();
-    }
-    return message;
   }
   
   /**

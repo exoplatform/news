@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.exoplatform.social.notification.Utils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -152,7 +153,7 @@ public class NewsServiceImplTest {
         doNothing().when(newsTargetingService).deleteNewsTargets(news.getId());
         doNothing().when(newsTargetingService).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
 
-        NEWS_UTILS.when(() -> NewsUtils.processMentions(anyString())).thenReturn(new HashSet<>());
+        NEWS_UTILS.when(() -> NewsUtils.processMentions(anyString(),any())).thenReturn(new HashSet<>());
         NEWS_UTILS.when(() -> NewsUtils.getUserIdentity(anyString())).thenReturn(identity);
         NEWS_UTILS.when(() -> NewsUtils.canPublishNews(anyString(), any(org.exoplatform.services.security.Identity.class))).thenReturn(true);
 

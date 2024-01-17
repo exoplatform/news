@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,6 +36,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
+import org.exoplatform.portal.application.localization.LocalizationFilter;
+import org.exoplatform.social.core.utils.MentionUtils;
 import org.exoplatform.social.metadata.favorite.model.Favorite;
 import org.exoplatform.social.metadata.tag.TagService;
 import org.exoplatform.social.metadata.tag.model.TagFilter;
@@ -379,6 +382,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
+      Locale userLocale = LocalizationFilter.getCurrentLocale();
+      news.setBody(MentionUtils.substituteRoleWithLocale(news.getBody(), userLocale));
       news.setIllustration(null);
       // check favorite
       Identity userIdentity = identityManager.getOrCreateUserIdentity(currentIdentity.getUserId());
@@ -500,6 +505,10 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
           newsItem.setIllustration(null);
         }
       }
+      if (news != null) {
+        Locale userLocale = LocalizationFilter.getCurrentLocale();
+        news.forEach(news1 -> news1.setBody(MentionUtils.substituteRoleWithLocale(news1.getBody(), userLocale)));
+      }
       newsEntity.setNews(news);
       newsEntity.setOffset(offset);
       newsEntity.setLimit(limit);
@@ -545,6 +554,8 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       NewsEntity newsEntity = new NewsEntity();
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       List<News> news = newsService.getNewsByTargetName(newsFilter, targetName, currentIdentity);
+      Locale userLocale = LocalizationFilter.getCurrentLocale();
+      news.forEach(news1 -> news1.setBody(MentionUtils.substituteRoleWithLocale(news1.getBody(),userLocale)));
       newsEntity.setNews(news);
       newsEntity.setOffset(offset);
       newsEntity.setLimit(limit);
@@ -580,6 +591,9 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
       news.setIllustration(null);
+      Locale userLocale = LocalizationFilter.getCurrentLocale();
+      news.setBody(MentionUtils.substituteRoleWithLocale(news.getBody(),userLocale));
+
       Identity userIdentity = identityManager.getOrCreateUserIdentity(currentIdentity.getUserId());
       if (userIdentity != null) {
         news.setFavorite(favoriteService.isFavorite(new Favorite("news",

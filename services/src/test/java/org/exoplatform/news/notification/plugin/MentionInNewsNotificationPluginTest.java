@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.exoplatform.social.notification.Utils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,6 +44,9 @@ public class MentionInNewsNotificationPluginTest {
   private static MockedStatic<CommonsUtils>        COMMONS_UTILS;
 
   private static MockedStatic<WCMCoreUtils>        WCM_CORE_UTILS;
+
+  private static final MockedStatic<Utils> SOCIAL_UTILS = mockStatic(Utils.class);
+
 
   private static MockedStatic<IdGenerator>         ID_GENERATOR;
 

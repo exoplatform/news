@@ -9,6 +9,7 @@ import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.social.notification.Utils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -61,10 +62,13 @@ public class MentionInNewsNotificationPlugin extends BaseNotificationPlugin {
     String activityLink = ctx.value(PostNewsNotificationPlugin.ACTIVITY_LINK);
     String newsId = ctx.value(PostNewsNotificationPlugin.NEWS_ID);
 
+    Set<String> receivers = new HashSet<>();
+    String[] mentionnedIdArray = new String[mentionedIds.size()];
+    Utils.sendToMentioners(receivers, mentionedIds.toArray(mentionnedIdArray), currentUserName, contentSpaceId);
     return NotificationInfo.instance()
             .setFrom(currentUserName)
             .setSpaceId(Long.parseLong(contentSpaceId))
-            .to(mentionedIds)
+            .to(new ArrayList<>(receivers))
             .key(getKey())
             .with(NotificationConstants.CONTENT_TITLE, newsTitle)
             .with(NotificationConstants.CONTENT_AUTHOR, contentAuthor)

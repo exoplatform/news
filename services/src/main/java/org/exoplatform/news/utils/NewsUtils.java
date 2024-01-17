@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,9 +22,12 @@ import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.IdentityRegistry;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.identity.provider.SpaceIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.core.storage.api.IdentityStorage;
+import org.exoplatform.social.core.utils.MentionUtils;
 
 public class NewsUtils {
 
@@ -82,33 +87,42 @@ public class NewsUtils {
   /**
    * Processes Mentioners who has been mentioned via the news body.
    *
-   * @param body
+   * @param content : the content in which update mention
+   * @param space : the space of the news (for group mentioning)
    * @return set of mentioned users
    */
-  public static Set<String> processMentions(String body) {
-    Set<String> mentions = new HashSet<>();
-    mentions.addAll(parseMention(body));
+  public static Set<String> processMentions(String content,Space space) {
+      Set<String> mentions = new HashSet<>();
+      mentions.addAll(MentionUtils.getMentionedUsernames(content));
 
-    return mentions;
-  }
-
-  private static Set<String> parseMention(String str) {
-    if (str == null || str.length() == 0) {
-      return Collections.emptySet();
-    }
-
-    Set<String> mentions = new HashSet<>();
-    Matcher matcher = MentionInNewsNotificationPlugin.MENTION_PATTERN.matcher(str);
-    while (matcher.find()) {
-      String remoteId = matcher.group().substring(1);
-      Identity identity = loadUser(remoteId);
-      // if not the right mention then ignore
-      if (identity != null && !mentions.contains(identity.getRemoteId())) {
-        mentions.add(identity.getRemoteId());
+      if (space != null) {
+        IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
+        String spaceIdentityId = identityStorage.findIdentityId(SpaceIdentityProvider.NAME, space.getPrettyName());
+        Set<String> mentionedRoles = MentionUtils.getMentionedRoles(content, spaceIdentityId);
+        mentionedRoles.forEach(role -> {
+          if (StringUtils.equals("member", role) && space.getMembers() != null) {
+            mentions.addAll(Arrays.asList(space.getMembers()));
+          } else if (StringUtils.equals("manager", role) && space.getManagers() != null) {
+            mentions.addAll(Arrays.asList(space.getManagers()));
+          } else if (StringUtils.equals("redactor", role) && space.getRedactors() != null) {
+            mentions.addAll(Arrays.asList(space.getRedactors()));
+          } else if (StringUtils.equals("publisher", role) && space.getPublishers() != null) {
+            mentions.addAll(Arrays.asList(space.getPublishers()));
+          }
+        });
       }
-    }
-    return mentions;
+
+      return mentions.stream()
+                     .map(remoteId -> {
+                       IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
+
+                       Identity identity = identityStorage.findIdentity(OrganizationIdentityProvider.NAME, remoteId);
+                       return identity == null ? null : identity.getId();
+                     })
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toSet());
   }
+
 
   /**
    * Load the user identity

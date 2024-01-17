@@ -157,7 +157,7 @@ public class NewsServiceImpl implements NewsService {
     List<String> oldTargets = newsTargetingService.getTargetsByNewsId(news.getId());
     org.exoplatform.services.security.Identity updaterIdentity = NewsUtils.getUserIdentity(updater);
     boolean canPublish = NewsUtils.canPublishNews(news.getSpaceId(), updaterIdentity);
-    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody());
+    Set<String> previousMentions = NewsUtils.processMentions(originalNews.getOriginalBody(), spaceService.getSpaceById(news.getSpaceId()));
     if (publish != news.isPublished() && news.isCanPublish()) {
       news.setPublished(publish);
       if (news.isPublished()) {
@@ -646,7 +646,8 @@ public class NewsServiceImpl implements NewsService {
   }
   
   private void sendMentionInNewsNotification(String newsId, String contentAuthor, String currentUser, String contentTitle, String contentBody, String contentSpaceId, String illustrationURL, String authorAvatarUrl, String activityLink, String contentSpaceName) {
-    Set<String> mentionedIds = NewsUtils.processMentions(contentBody);
+    Space space = spaceService.getSpaceById(contentSpaceId);
+    Set<String> mentionedIds = NewsUtils.processMentions(contentBody, space);
     NotificationContext mentionNotificationCtx = NotificationContextImpl.cloneInstance()
             .append(MentionInNewsNotificationPlugin.CONTEXT, NotificationConstants.NOTIFICATION_CONTEXT.MENTION_IN_NEWS)
             .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)

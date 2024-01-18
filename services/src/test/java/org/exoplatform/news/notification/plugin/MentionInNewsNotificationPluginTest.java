@@ -45,7 +45,7 @@ public class MentionInNewsNotificationPluginTest {
 
   private static MockedStatic<WCMCoreUtils>        WCM_CORE_UTILS;
 
-  private static final MockedStatic<Utils> SOCIAL_UTILS = mockStatic(Utils.class);
+  private static MockedStatic<Utils> SOCIAL_UTILS;
 
 
   private static MockedStatic<IdGenerator>         ID_GENERATOR;
@@ -72,6 +72,7 @@ public class MentionInNewsNotificationPluginTest {
     WCM_CORE_UTILS = mockStatic(WCMCoreUtils.class);
     ID_GENERATOR = mockStatic(IdGenerator.class);
     PLUGIN_KEY = mockStatic(PluginKey.class);
+    SOCIAL_UTILS = mockStatic(Utils.class);
     EXO_CONTAINER_CONTEXT = mockStatic(ExoContainerContext.class);
   }
 
@@ -79,6 +80,7 @@ public class MentionInNewsNotificationPluginTest {
   public static void afterRunBare() throws Exception { // NOSONAR
     COMMONS_UTILS.close();
     WCM_CORE_UTILS.close();
+    SOCIAL_UTILS.close();
     ID_GENERATOR.close();
     PLUGIN_KEY.close();
     EXO_CONTAINER_CONTEXT.close();

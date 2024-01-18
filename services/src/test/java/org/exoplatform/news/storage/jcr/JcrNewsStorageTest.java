@@ -4,7 +4,10 @@ import static org.exoplatform.news.storage.jcr.JcrNewsStorage.EXO_PRIVILEGEABLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -28,7 +31,6 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
 
-import org.exoplatform.social.rest.api.RestUtils;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1163,7 +1165,7 @@ public class JcrNewsStorageTest {
     when(newsImageNode.canAddMixin(EXO_PRIVILEGEABLE)).thenReturn(true);
     // When
     jcrNewsStorageSpy.publishNews(news);
-    verify(newsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(newsImageNode, times(1)).setPermission("any", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
     verify(newsImageNode, times(1)).save();
 
     //
@@ -1181,7 +1183,7 @@ public class JcrNewsStorageTest {
     when(existingUploadedNewsImageNode.canAddMixin(EXO_PRIVILEGEABLE)).thenReturn(true);
     // When
     jcrNewsStorageSpy.publishNews(news);
-    verify(existingUploadedNewsImageNode, times(1)).setPermission("*:/platform/users", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
+    verify(existingUploadedNewsImageNode, times(1)).setPermission("any", JcrNewsStorage.SHARE_NEWS_PERMISSIONS);
     verify(existingUploadedNewsImageNode, times(1)).save();
   }
 

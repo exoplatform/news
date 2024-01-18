@@ -527,9 +527,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                   @Parameter(description = "News total size") @Schema(defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
     try {
       String authenticatedUser = request.getRemoteUser();
-      if (StringUtils.isBlank(authenticatedUser)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
       if (StringUtils.isBlank(targetName)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }

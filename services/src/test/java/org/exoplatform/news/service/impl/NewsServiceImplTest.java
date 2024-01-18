@@ -47,6 +47,7 @@ import org.exoplatform.upload.UploadService;
 public class NewsServiceImplTest {
 
     private static final MockedStatic<NewsUtils> NEWS_UTILS = mockStatic(NewsUtils.class);
+    private static final MockedStatic<Utils> SOCIAL_UTILS = mockStatic(Utils.class);
 
     @Mock
     private NewsStorage newsStorage;
@@ -80,6 +81,7 @@ public class NewsServiceImplTest {
     @AfterClass
     public static void afterRunBare() throws Exception { // NOSONAR
       NEWS_UTILS.close();
+      SOCIAL_UTILS.close();
     }
 
     @Before

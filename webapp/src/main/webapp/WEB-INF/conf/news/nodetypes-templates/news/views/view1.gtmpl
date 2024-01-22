@@ -152,7 +152,7 @@
         activityId: '${activityId}',
         hiddenSpace: ${news.hiddenSpace},
         isSpaceMember: ${news.isSpaceMember},
-        favorite: ${news.isFavorite}
+        favorite: ${news.favorite}
       },
     } """
     def notAuthorizedUserLabel = "";

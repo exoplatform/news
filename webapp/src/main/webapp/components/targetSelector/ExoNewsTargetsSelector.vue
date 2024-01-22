@@ -138,7 +138,8 @@ export default {
   data: () =>({
     selectedAudience: null,
     selectedTargets: [],
-    disableAudienceChoice: false
+    disableAudienceChoice: false,
+    isDataInitialized: false
   }),
   computed: {
     selectedAudienceDescription() {
@@ -175,6 +176,9 @@ export default {
     }
   },
   created() {
+    if (!this.audience && this.news?.audience) {
+      this.audience = this.news.audience;
+    }
     this.selectedAudience = !this.audience || this.audience === 'all' ? this.$t('news.composer.stepper.audienceSection.allUsers') : this.$t('news.composer.stepper.audienceSection.onlySpaceMembers');
     $(document).click(() => {
       if (this.$refs.chooseTargets && this.$refs.chooseTargets.isMenuActive) {
@@ -185,18 +189,21 @@ export default {
       }
     });
     this.selectedTargets = this.news.targets;
+    this.$nextTick(() => this.isDataInitialized = true);
   },
   watch: {
     selectedTargets() {
-      const selectedTargetForCurrentUser = this.selectedTargets.filter(item => this.targets.some(e => {
-        return e.name === item;
-      }));
-      if (!selectedTargetForCurrentUser.length > 0) {
-        this.disableAudienceChoice = false;
-        this.selectedAudience = this.audiences[0];
-        this.addAudience();
-      } else {
-        this.selectAudience(selectedTargetForCurrentUser);
+      if (this.isDataInitialized) {
+        const selectedTargetForCurrentUser = this.selectedTargets.filter(item => this.targets.some(e => {
+          return e.name === item;
+        }));
+        if (!selectedTargetForCurrentUser.length > 0) {
+          this.disableAudienceChoice = false;
+          this.selectedAudience = this.audiences[0];
+          this.addAudience();
+        } else {
+          this.selectAudience(selectedTargetForCurrentUser);
+        }
       }
     },
   },

@@ -339,7 +339,7 @@
       <module>suggester</module>
     </depends>
     <depends>
-      <module>filedrop</module>
+      <module>file_drop</module>
     </depends>
     <depends>
       <module>LegacyComposerAttachments</module>

@@ -20,7 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       :href="news.url"
       :style="{ 'background-image': 'url(' + illustrationUrl + ')' }"
       class="newsSmallIllustration"
-      :target="news.target"></a>
+      :target="news.target"
+      :aria-label="$t('news.illustration.link.title')"></a>
     <div class="newsItemContent">
       <div class="newsItemContentHeader">
         <h3>

@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       :style="{ 'background-image': 'url(' + illustrationUrl + ')' }"
       class="newsSmallIllustration"
       :target="news.target"
-      :aria-label="$t('news.illustration.link.title')"></a>
+      :aria-label="$t('news.illustration.link.title', {0: news.title})"></a>
     <div class="newsItemContent">
       <div class="newsItemContentHeader">
         <h3>

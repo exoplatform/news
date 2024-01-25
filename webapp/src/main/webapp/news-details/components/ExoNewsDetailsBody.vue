@@ -28,7 +28,7 @@
           </div>
           <div class="newsInformationBackground center">
             <div :class="[showUpdateInfo ? 'news-update-details-header' : 'news-details-header']" class="news-header-content  d-inline-flex align-center">
-              <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']">
+              <div :class="[ showUpdateInfo ? 'newsUpdateInfo' : '']" v-if="currentUser"> 
                 <exo-user-avatar 
                   :profile-id="authorProfile"
                   :size="50"
@@ -39,15 +39,16 @@
               <div id="informationNews" class="newsInformation pa-1">
                 <div class="newsPosted d-flex align-center">
                   <exo-user-avatar
+                    v-if="currentUser"
                     :profile-id="authorProfile"
                     extra-class="me-1"
                     fullname
                     small-font-size
                     link-style
                     popover />
-                  <span v-if="!hiddenSpace" class="text-light-color caption"> {{ $t('news.activity.in') }} </span>
+                  <span v-if="!hiddenSpace && currentUser" class="text-light-color caption"> {{ $t('news.activity.in') }} </span>
                   <exo-space-avatar
-                    v-if="!hiddenSpace"
+                    v-if="!hiddenSpace && currentUser"
                     :space-id="spaceId"
                     fullname
                     extra-class="mx-1"
@@ -55,7 +56,7 @@
                     link-style
                     popover />
                   <template v-if="publicationDate">
-                    -
+                    <span v-if="currentUser"> - </span>
                     <date-format
                       :value="publicationDate"
                       :format="dateFormat"
@@ -93,7 +94,7 @@
                         :format="dateTimeFormat"
                         class="newsInformationValue newsUpdatedDate ml-1 me-1" />
                     </template>
-                    <div v-if="notSameUpdater && showUpdateInfo">
+                    <div v-if="notSameUpdater && showUpdateInfo && currentUser">
                       <span class="text-light-color"> {{ $t('news.activity.by') }} </span>
                       <exo-user-avatar
                         :profile-id="newsUpdater"
@@ -149,6 +150,11 @@ export default {
   props: {
     news: {
       type: Object,
+      required: false,
+      default: null
+    },
+    currentUser: {
+      type: String,
       required: false,
       default: null
     },

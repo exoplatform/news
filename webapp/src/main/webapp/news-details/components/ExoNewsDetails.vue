@@ -4,6 +4,7 @@
       v-if="!isMobile"
       :news="news"
       :news-id="newsId"
+      :current-user="currentUser"
       :activity-id="activityId"
       :show-edit-button="showEditButton"
       :show-delete-button="showDeleteButton"
@@ -15,9 +16,11 @@
       :show-delete-button="showDeleteButton"
       :show-publish-button="showPublishButton" />
     <schedule-news-drawer
+      v-if="currentUser"
       @post-article="postNews"
       :news-id="newsId" />
     <exo-confirm-dialog
+      v-if="currentUser"
       ref="deleteConfirmDialog"
       :message="$t('news.message.confirmDeleteNews')"
       :title="$t('news.title.confirmDeleteNews')"
@@ -26,6 +29,7 @@
       @ok="deleteNews" />
     <exo-news-details-body
       v-if="!isMobile"
+      :current-user="currentUser"
       :news="news" />
     <exo-news-details-body-mobile
       v-if="isMobile"
@@ -33,7 +37,7 @@
       :news-id="newsId"
       :space="currentSpace" />
     <exo-news-edit-publishing-drawer
-      v-if="news"
+      v-if="news && currentUser"
       :news="news"
       @refresh-news="getNewsById(newsId)" />
   </div>
@@ -77,6 +81,7 @@ export default {
   data() {
     return {
       currentSpace: null,
+      currentUser: `${eXo.env.portal.userName}`,
       spaceId: null,
       BYTES_IN_MB: 1048576,
       dateFormat: {

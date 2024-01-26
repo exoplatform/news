@@ -65,7 +65,7 @@ export default {
   },
   data: () => ({
     newsHeader: '',
-    seeAllUrl: 'news?filter=pinned',
+    seeAllUrl: '',
     showHeader: false,
     showSeeAll: false,
     canPublishNews: false,
@@ -98,7 +98,8 @@ export default {
       this.$root.$emit('news-settings-drawer-open');
     },
     seeAllNews() {
-      window.location.href = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}${this.seeAllUrl}`;
+      const target = this.seeAllUrl.startsWith(`${eXo.env.portal.context}/`) ? '_self' : '_blank';
+      window.open(this.seeAllUrl, target);
     }
   },
 };

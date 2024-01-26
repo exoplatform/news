@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               </div>
               <a
                   v-if="showArticleTitle"
-                  :href="item.url"
+                  :href="articleUrl(item)"
                   class="flex flex-row flex-grow-1 align-center justify-center headLinesTruncate"
                   :class="extraClass.concat(canPublishNews && !hover ? 'mt-12' : '')">
               <span class="text-h4 font-weight-medium white--text text-truncate-2">
@@ -127,6 +127,11 @@ export default {
     },
     extraClass() {
       return this.$vuetify.breakpoint.width > 550 && (!this.canPublishNews && 'mt-7' || ' ') ;
+    },
+    articleUrl() {
+      return (item) => {
+        return eXo.env.portal.userName !== '' ? item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${item.id}`;
+      };
     }
   },
   created() {

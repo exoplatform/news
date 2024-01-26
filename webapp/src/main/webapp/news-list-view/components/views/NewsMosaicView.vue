@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <a
               class="articleLink d-block"
               target="_self"
-              :href="item.url">
+              :href="articleUrl(item)">
             <img :src="showArticleImage && item.illustrationURL !== null ? illustrationURL(item,index) : '/news/images/news.png'" :alt="$t('news.latest.alt.articleImage')">
             <div class="titleArea">
               <div v-if="showArticleDate" class="articleDate">
@@ -108,6 +108,11 @@ export default {
     smallHeightClass() {
       return this.isMobile && this.news && this.news.length === 1 && 'small-mosaic-container';
     },
+    articleUrl() {
+      return (item) => {
+        return eXo.env.portal.userName !== '' ? item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${item.id}`;
+      };
+    }
   },
   methods: {
     getNewsList() {

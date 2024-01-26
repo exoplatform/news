@@ -282,7 +282,7 @@ export default {
       this.showArticleSpace = this.viewTemplate === 'NewsStories' ? false : this.$root.showArticleSpace;
       this.showArticleDate = this.$root.showArticleDate;
       this.showArticleReactions = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleReactions;
-      this.seeAllUrl = this.$root.seeAllUrl || `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news?filter=pinned`;
+      this.seeAllUrl = this.$root.seeAllUrl;
     },
   }
 };

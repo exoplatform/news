@@ -690,7 +690,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   @GET
   @Path("attachments/{attachmentId}")
-  @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get a news attachment", method = "GET", description = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),

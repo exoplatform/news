@@ -3,7 +3,7 @@
     <div :title="newsTitle" class="newsDetailsTitle mt-2 pl-2 pr-2 ms-2 font-weight-bold subtitle-1">
       {{ newsTitle }}
     </div>
-    <div class="d-flex flex-row pa-2 ms-2">
+    <div v-if="currentUser" class="d-flex flex-row pa-2 ms-2">
       <div v-if="news" class="flex-column newsAuthor">
         <exo-user-avatar
           :profile-id="newsAuthor"
@@ -68,6 +68,11 @@ export default {
     },
     space: {
       type: Object,
+      required: false,
+      default: null
+    },
+    currentUser: {
+      type: String,
       required: false,
       default: null
     },

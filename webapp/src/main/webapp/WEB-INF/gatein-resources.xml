@@ -345,6 +345,9 @@
       <module>LegacyComposerAttachments</module>
       <as>attachmentsApp</as>
     </depends>
+    <depends>
+      <module>AttachmentIntegration</module>
+    </depends>
   </module>
 
   <module>

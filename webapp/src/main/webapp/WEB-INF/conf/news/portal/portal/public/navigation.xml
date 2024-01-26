@@ -26,7 +26,7 @@
   xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_11">
   <priority>3</priority>
   <page-nodes>
-	<node>
+    <node>
       <name>news-detail</name>
       <label>newsDetail</label>
       <visibility>SYSTEM</visibility>

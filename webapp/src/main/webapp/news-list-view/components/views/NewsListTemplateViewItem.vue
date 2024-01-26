@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <a
     class="article-item-link"
     target="_self"
-    :href="item.url">
+    :href="articleUrl">
     <div v-if="showArticleImage" class="article-item-image">
       <img :src="articleImage" :alt="$t('news.latest.alt.articleImage')">
     </div>
@@ -119,6 +119,9 @@ export default {
     },
     extraClass() {
       return (!this.showArticleSummary || !this.showArticleTitle) && 'text-truncate-2' || 'article-title' ;
+    },
+    articleUrl() {
+      return eXo.env.portal.userName !== '' ? this.item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${this.item.id}`;
     }
   },
 };

@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <v-carousel-item
               v-for="(item,i) in news"
               :key="i">
-            <a :href="item.url" class="article-link flex-grow-1">
+            <a :href="articleUrl(item)" class="article-link flex-grow-1">
               <div class="alerts-article">
               <span v-if="showArticleDate" class="alerts-article-date">
                 <date-format
@@ -117,6 +117,11 @@ export default {
     emptyTemplate() {
       return !(this.news && this.news.length);
     },
+    articleUrl() {
+      return (item) => {
+        return eXo.env.portal.userName !== '' ? item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${item.id}`;
+      };
+    }
   },
   created() {
     this.$newsServices.canPublishNews().then(canPublishNews => {

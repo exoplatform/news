@@ -76,6 +76,35 @@
                     </field>
                   </object>
                 </value>
+                <value>
+                  <object type="org.exoplatform.application.registry.Application">
+                    <field name="displayName">
+                      <string>News Details</string>
+                    </field>
+                    <field name="contentId">
+                      <string>news/NewsDetail</string>
+                    </field>
+                    <field name="description">
+                      <string>Allows to display the detail of a news article</string>
+                    </field>
+                    <field name="type">
+                      <string>portlet</string>
+                    </field>
+                    <field name="categoryName">
+                      <string>content</string>
+                    </field>
+                    <field name="applicationName">
+                      <string>NewsDetail</string>
+                    </field>
+                    <field name="accessPermissions">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string>*:/platform/users</string>
+                        </value>
+                      </collection>
+                    </field>
+                  </object>
+                </value>
               </collection>
             </field>
           </object>

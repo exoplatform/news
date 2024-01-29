@@ -28,7 +28,7 @@
     <title>News detail</title>
     <access-permissions>Everyone</access-permissions>
     <edit-permission>*:/platform/administrators</edit-permission>
-    <container id="NewsDetailContainer" template="system:/groovy/portal/webui/container/UIContainer.gtmpl">
+    <container id="NewsDetailContainer" template="system:/groovy/portal/webui/container/UIContainer.gtmpl" cssClass="singlePageApplication">
       <access-permissions>Everyone</access-permissions>
       <portlet-application>
         <portlet>

@@ -37,7 +37,7 @@ export function init() {
           newsId: getURLQueryParam('newsId'),
         };
       },
-      template: `<v-app id="${appId}">
+      template: `<v-app class="singlePageApplication" id="${appId}">
                    <exo-news-details-app :news-id="newsId"></exo-news-details-app>
                  </v-app>`,
       i18n,

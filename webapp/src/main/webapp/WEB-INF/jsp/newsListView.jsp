@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         saveSettingsURL: <%= "'" + saveSettingsURL + "'" %>,
         viewTemplate: <%= viewTemplate == null ? null : "'" + viewTemplate + "'" %>,
         newsTarget: <%= newsTarget == null ? null : "'" + newsTarget + "'" %>,
-        header: <%= header == null ? null : "'" + header + "'" %>,
+        header: <%= header == null ? null : "'" + header.replace("'", "\\'") + "'" %>,
         showHeader: <%= showHeader == null ? null : "'" + showHeader + "'" %>,
         limit: <%= limit == null ? null : "'" + limit + "'" %>,
         showSeeAll: <%= showSeeAll == null ? null : "'" + showSeeAll + "'" %>,

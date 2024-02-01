@@ -691,7 +691,7 @@ public class JcrNewsStorage implements NewsStorage {
             if (!node.isCheckedOut()) {
               node.checkout();
             }
-            publicationService.changeState(node, PublicationDefaultStates.PUBLISHED, new HashMap<>());
+            publicationService.changeState(node, PublicationDefaultStates.PUBLISHED, new HashMap<>(){{ put("context.action", "delete"); }});
             return;
           }
         }

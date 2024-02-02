@@ -28,7 +28,7 @@
   <page-nodes>
     <node>
       <name>news-detail</name>
-      <label>newsDetail</label>
+      <label>#{portal.public.newsDetail}</label>
       <visibility>SYSTEM</visibility>
       <page-reference>portal::public::newsDetail</page-reference>
     </node>

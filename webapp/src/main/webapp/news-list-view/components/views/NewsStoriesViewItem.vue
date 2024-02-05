@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <a
       class="articleLink"
       target="_self"
-      :href="item.url">
+      :href="articleUrl">
       <img
         class="article-img"
         :src="articleImage"
@@ -41,7 +41,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <a
       class="articleLink"
       target="_self"
-      :href="item.url">
+      :href="articleUrl">
       <div class="title-container">
         <div v-if="showArticleTitle" class="article-title">{{ item.title }}</div>
         <div v-if="showArticleReactions" class="article-counters d-flex">
@@ -109,6 +109,9 @@ export default {
     },
     articleImage() {
       return this.showArticleImage && this.item.illustrationURL !== null ? this.item.illustrationURL.concat('&size=140x210').toString() : '/news/images/news.png';
+    },
+    articleUrl() {
+      return eXo.env.portal.userName !== '' ? this.item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${this.item.id}`;
     }
   }
 };

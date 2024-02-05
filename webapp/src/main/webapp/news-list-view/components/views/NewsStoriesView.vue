@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           <a
               class="see-all-link"
               target="_self"
-              :href="seeAllArticles">
+              :href="seeAllUrl">
             <div class="card" id="see-all">
               <div class="see-all-icon">
                 <svg
@@ -86,11 +86,6 @@ export default {
     this.reset();
     this.$root.$on('saved-news-settings', this.refreshNewsViews);
     this.getNewsList();
-  },
-  computed: {
-    seeAllArticles() {
-      return this.seeAllUrl && `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}${this.seeAllUrl}`;
-    },
   },
   methods: {
     getNewsList() {

@@ -593,12 +593,12 @@ public class JcrNewsStorage implements NewsStorage {
       if (newsNode.canAddMixin("exo:privilegeable")) {
         newsNode.addMixin("exo:privilegeable");
       }
-      ((ExtendedNode) newsNode).setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
+      ((ExtendedNode) newsNode).setPermission("any", SHARE_NEWS_PERMISSIONS);
       newsAttachmentsService.makeAttachmentsPublic(newsNode);
     }
     else {
       if(newsNode.isNodeType("exo:privilegeable")) {
-        ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+        ((ExtendedNode) newsNode).removePermission("any");
       }
       newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
     }
@@ -1018,7 +1018,7 @@ public class JcrNewsStorage implements NewsStorage {
     }
     newsNode.setProperty("exo:pinned", false);
     if(newsNode.isNodeType("exo:privilegeable")) {
-      ((ExtendedNode) newsNode).removePermission("*:/platform/users");
+      ((ExtendedNode) newsNode).removePermission("any");
     }
     newsNode.getProperty(NEWS_AUDIENCE_PROP).remove();
     newsNode.save();
@@ -1208,7 +1208,7 @@ public class JcrNewsStorage implements NewsStorage {
           image.save();
         } else {
           // make news images public
-          image.setPermission("*:/platform/users", SHARE_NEWS_PERMISSIONS);
+          image.setPermission("any", SHARE_NEWS_PERMISSIONS);
           image.save();
         }
       }

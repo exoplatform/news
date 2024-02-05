@@ -361,7 +361,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   
   @GET
   @Path("{id}")
-  @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get a news", method = "GET", description = "This gets the news with the given id if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
@@ -524,7 +523,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   @GET
   @Path("byTarget/{targetName}")
-  @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get news list", method = "GET", description = "This gets the list of news by the given target.")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News list returned"),
@@ -538,9 +536,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                   @Parameter(description = "News total size") @Schema(defaultValue = "false") @QueryParam("returnSize") boolean returnSize) {
     try {
       String authenticatedUser = request.getRemoteUser();
-      if (StringUtils.isBlank(authenticatedUser)) {
-          return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
       if (StringUtils.isBlank(targetName)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
@@ -695,7 +690,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   @GET
   @Path("attachments/{attachmentId}")
-  @RolesAllowed("users")
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get a news attachment", method = "GET", description = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
@@ -772,7 +766,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
 
   @GET
   @Path("{id}/illustration")
-  @RolesAllowed("users")
   @Operation(summary = "Get a news illustration", method = "GET", description = "This gets the news illustration with the given id if the authenticated user is a member of the space or a spaces super manager.")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
       @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),

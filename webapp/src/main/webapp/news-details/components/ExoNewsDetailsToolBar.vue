@@ -36,6 +36,11 @@ export default {
       required: false,
       default: null
     },
+    currentUser: {
+      type: String,
+      required: false,
+      default: null
+    },
     activityId: {
       type: String,
       required: false,
@@ -93,7 +98,7 @@ export default {
       return history && history.length && history.length > 2;
     },
     displayFavoriteButton() {
-      return this.publicationState !== 'staged';
+      return this.currentUser !== '' && this.publicationState !== 'staged';
     }
   },
   methods: {

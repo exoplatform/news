@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   <a
     class="articleLink"
     target="_self"
-    :href="item.url"
+    :href="articleUrl"
     :arial-label="$t('news.space.icon.title',{ 0:item.spaceDisplayName })">
     <div class="articleImage" v-if="showImage">
       <img 
@@ -117,6 +117,9 @@ export default {
     },
     isHiddenSpace() {
       return this.item && !this.item.spaceMember && this.item.hiddenSpace;
+    },
+    articleUrl() {
+      return eXo.env.portal.userName !== '' ? this.item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${this.item.id}`;
     }
   },
   created() {

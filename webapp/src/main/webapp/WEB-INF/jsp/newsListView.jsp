@@ -56,7 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     String showArticleDate = showArticleDateParams == null || showArticleDateParams.length == 0 ? "true": showArticleDateParams[0];
     String showArticleSpace = showArticleSpaceParams == null || showArticleSpaceParams.length == 0 ? "true": showArticleSpaceParams[0];
     String showArticleReactions = showArticleReactionsParams == null || showArticleReactionsParams.length == 0 ? "true": showArticleReactionsParams[0];
-    String seeAllUrl = seeAllUrlParams == null || seeAllUrlParams.length == 0 ? "/news?filter=pinned": seeAllUrlParams[0];
+    String seeAllUrl = seeAllUrlParams == null || seeAllUrlParams.length == 0 ? "": seeAllUrlParams[0];
 
     ConversationState conversationState = ConversationState.getCurrent();
     Identity currentIdentity = null;

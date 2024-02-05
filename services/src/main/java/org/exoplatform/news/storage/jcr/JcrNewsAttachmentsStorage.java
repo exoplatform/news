@@ -302,7 +302,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
         if (attachmentNode.canAddMixin("exo:privilegeable")) {
           attachmentNode.addMixin("exo:privilegeable");
         }
-        ((ExtendedNode)attachmentNode).setPermission("*:/platform/users", new String[] { PermissionType.READ });
+        ((ExtendedNode)attachmentNode).setPermission("any", new String[] { PermissionType.READ });
         attachmentNode.save();
       } catch (Exception e) {
         LOG.error("Cannot make News attachment " + attachmentNode.getUUID() + " of News " + newsNode.getUUID() + " public", e);
@@ -315,7 +315,7 @@ public class JcrNewsAttachmentsStorage implements NewsAttachmentsStorage {
     for (Node attachmentNode : getAttachmentsNodesOfNews(newsNode)) {
       try {
         if (attachmentNode.isNodeType("exo:privilegeable")) {
-          ((ExtendedNode)attachmentNode).removePermission("*:/platform/users");
+          ((ExtendedNode)attachmentNode).removePermission("any");
           attachmentNode.save();
         }
       } catch (Exception e) {

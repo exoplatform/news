@@ -483,11 +483,11 @@ public class JcrNewsAttachmentsStorageTest {
     newsAttachmentsService.makeAttachmentsPublic(node);
 
     // Then
-    verify(attachmentNode1, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode1, times(1)).setPermission(eq("any"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
     verify(attachmentNode1, times(1)).addMixin(eq("exo:privilegeable"));
-    verify(attachmentNode2, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode2, times(1)).setPermission(eq("any"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
     verify(attachmentNode2, times(0)).addMixin(eq("exo:privilegeable"));
-    verify(attachmentNode3, times(1)).setPermission(eq("*:/platform/users"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
+    verify(attachmentNode3, times(1)).setPermission(eq("any"), AdditionalMatchers.aryEq(new String[] { PermissionType.READ }));
     verify(attachmentNode3, times(1)).addMixin(eq("exo:privilegeable"));
   }
 
@@ -535,9 +535,9 @@ public class JcrNewsAttachmentsStorageTest {
     newsAttachmentsService.unmakeAttachmentsPublic(node);
 
     // Then
-    verify(attachmentNode1, times(1)).removePermission(eq("*:/platform/users"));
-    verify(attachmentNode2, times(0)).removePermission(eq("*:/platform/users"));
-    verify(attachmentNode3, times(1)).removePermission(eq("*:/platform/users"));
+    verify(attachmentNode1, times(1)).removePermission(eq("any"));
+    verify(attachmentNode2, times(0)).removePermission(eq("any"));
+    verify(attachmentNode3, times(1)).removePermission(eq("any"));
   }
 
   @Test

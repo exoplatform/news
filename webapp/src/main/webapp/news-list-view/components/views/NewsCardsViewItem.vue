@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <a
       class="articleLink"
       target="_self"
-      :href="item.url">
+      :href="articleUrl">
       <div class="imgContainer">
         <img
           class="article-illustration-img"
@@ -48,7 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <a
           class="articleLink"
           target="_self"
-          :href="item.url">
+          :href="articleUrl">
           <div v-if="showArticleTitle" class="article-title">{{ item.title }}</div>
           <div class="article-author-date">
             <div v-if="showArticleAuthor" class="author-name">{{ item.authorDisplayName }}</div>
@@ -158,6 +158,9 @@ export default {
     },
     activityReactionsLink() {
       return this.item && `${this.item.url}#activityReactions`;
+    },
+    articleUrl() {
+      return eXo.env.portal.userName !== '' ? this.item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${this.item.id}`;
     }
   }
 };

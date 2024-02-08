@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.notification.Utils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -76,6 +77,9 @@ public class NewsServiceImplTest {
     @Mock
     private UploadService uploadService;
 
+    @Mock
+    private MetadataService metadataService;
+
     private NewsService newsService;
 
     @AfterClass
@@ -87,7 +91,7 @@ public class NewsServiceImplTest {
     @Before
     public void setUp() {
         this.newsService = new NewsServiceImpl(spaceService, activityManager, identityManager, uploadService,
-                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService);
+                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService, metadataService);
     }
 
     @Test

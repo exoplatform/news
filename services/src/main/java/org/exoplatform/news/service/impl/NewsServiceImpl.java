@@ -45,7 +45,9 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.MetadataItem;
+import org.exoplatform.social.metadata.model.MetadataObject;
 import org.exoplatform.social.notification.LinkProviderUtils;
 import org.exoplatform.upload.UploadService;
 
@@ -74,7 +76,9 @@ public class NewsServiceImpl implements NewsService {
 
   private UserACL               userACL;
 
-  private NewsTargetingService               newsTargetingService;
+  private NewsTargetingService  newsTargetingService;
+
+  private MetadataService       metadataService;
 
   private static final Log      LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
 
@@ -86,7 +90,8 @@ public class NewsServiceImpl implements NewsService {
                          IndexingService indexingService,
                          NewsStorage newsStorage,
                          UserACL userACL,
-                         NewsTargetingService newsTargetingService) {
+                         NewsTargetingService newsTargetingService,
+                         MetadataService metadataService) {
     this.spaceService = spaceService;
     this.activityManager = activityManager;
     this.identityManager = identityManager;
@@ -95,6 +100,7 @@ public class NewsServiceImpl implements NewsService {
     this.newsStorage = newsStorage;
     this.userACL = userACL;
     this.newsTargetingService = newsTargetingService;
+    this.metadataService = metadataService;
   }
 
   /**
@@ -214,11 +220,16 @@ public class NewsServiceImpl implements NewsService {
     }
 
     List<String> newsTargets = newsTargetingService.getTargetsByNewsId(newsId);
-    if(newsTargets != null) {
+    if (newsTargets != null) {
       newsTargetingService.deleteNewsTargets(newsId);
     }
     newsStorage.deleteNews(newsId, isDraft);
     indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+    MetadataObject newsMetadataObject = new MetadataObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
+    List<MetadataItem> metadataItems = metadataService.getMetadataItemsByObject(newsMetadataObject);
+    for (MetadataItem metadataItem : metadataItems) {
+      metadataService.deleteMetadataItem(metadataItem.getId(), true);
+    }
     NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);
   }
   

@@ -68,39 +68,6 @@
         </object-param>
       </init-params>
     </component-plugin>
-    <component-plugin>
-      <name>new.portal.config.user.listener</name>
-      <set-method>initListener</set-method>
-      <type>org.exoplatform.portal.config.NewPortalConfigListener</type>
-      <description>This listener creates news Page</description>
-      <init-params>
-        <object-param>
-          <name>portal.configuration</name>
-          <description>description</description>
-          <object type="org.exoplatform.portal.config.NewPortalConfig">
-            <field name="ownerType">
-              <string>portal</string>
-            </field>
-            <field name="predefinedOwner">
-              <collection type="java.util.HashSet">
-                <value>
-                  <string>public</string>
-                </value>
-              </collection>
-            </field>
-            <field name="location">
-              <string>war:/conf/news/portal</string>
-            </field>
-            <field name="override">
-              <boolean>${exo.news.portalConfig.public.override:true}</boolean>
-            </field>
-            <field name="importMode">
-              <string>${exo.news.portalConfig.public.importmode:insert}</string>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
   </external-component-plugins>
   <external-component-plugins>
     <target-component>org.exoplatform.portal.page.PageTemplateService</target-component>

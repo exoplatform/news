@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 import java.util.*;
 
 import org.exoplatform.social.metadata.MetadataService;
-import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataObject;
 import org.exoplatform.social.notification.Utils;
 import org.junit.AfterClass;

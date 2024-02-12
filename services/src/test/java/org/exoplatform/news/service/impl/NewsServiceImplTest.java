@@ -12,11 +12,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.MetadataObject;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +73,9 @@ public class NewsServiceImplTest {
     @Mock
     private UploadService uploadService;
 
+    @Mock
+    private MetadataService metadataService;
+
     private NewsService newsService;
 
     @AfterClass
@@ -84,7 +86,7 @@ public class NewsServiceImplTest {
     @Before
     public void setUp() {
         this.newsService = new NewsServiceImpl(spaceService, activityManager, identityManager, uploadService,
-                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService);
+                newsESSearchConnector,indexingService, newsStorage, userACL, newsTargetingService, metadataService);
     }
 
     @Test
@@ -201,4 +203,36 @@ public class NewsServiceImplTest {
         verify(newsTargetingService, times(3)).deleteNewsTargets(any(News.class), anyString());
         verify(newsTargetingService, times(2)).saveNewsTarget(any(News.class), anyBoolean(), anyList(), anyString());
     }
+
+  @Test
+  public void testDeleteNews() throws Exception {
+    News news = new News();
+    news.setId("id123");
+    news.setSpaceId("1");
+
+    org.exoplatform.services.security.Identity identity = new Identity("1");
+    org.exoplatform.social.core.identity.model.Identity rootIdentity =
+                                                                     new org.exoplatform.social.core.identity.model.Identity("1");
+    Profile currentProfile = new Profile();
+    currentProfile.setProperty(Profile.FULL_NAME, "root");
+    rootIdentity.setProfile(currentProfile);
+    when(identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, "root")).thenReturn(rootIdentity);
+    NEWS_UTILS.when(() -> NewsUtils.getUserIdentity(anyString())).thenReturn(identity);
+    Space space = new Space();
+    space.setId(news.getSpaceId());
+    space.setGroupId("/spaces/test_space");
+    space.setPrettyName("space_test");
+    when(spaceService.getSpaceById(news.getSpaceId())).thenReturn(space);
+    when(newsStorage.getNewsById(news.getId(), false)).thenReturn(news);
+
+    assertThrows(IllegalArgumentException.class, () -> newsService.deleteNews(news.getId(), identity, false));
+    verify(newsStorage, times(1)).getNewsById(anyString(), anyBoolean());
+    verify(metadataService, times(0)).deleteMetadataItemsByObject(any(MetadataObject.class));
+
+    news.setAuthor(identity.getUserId());
+    when(newsStorage.getNewsById(news.getId(), false)).thenReturn(news);
+    newsService.deleteNews(news.getId(), identity, false);
+    verify(newsStorage, times(2)).getNewsById(anyString(), anyBoolean());
+    verify(metadataService, times(1)).deleteMetadataItemsByObject(any(MetadataObject.class));
+  }
 }

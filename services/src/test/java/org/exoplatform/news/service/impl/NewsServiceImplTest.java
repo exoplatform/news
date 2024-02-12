@@ -231,19 +231,12 @@ public class NewsServiceImplTest {
 
     assertThrows(IllegalArgumentException.class, () -> newsService.deleteNews(news.getId(), identity, false));
     verify(newsStorage, times(1)).getNewsById(anyString(), anyBoolean());
-    verify(metadataService, times(0)).getMetadataItemsByObject(any(MetadataObject.class));
-    verify(metadataService, times(0)).deleteMetadataItem(any(Long.class), anyBoolean());
+    verify(metadataService, times(0)).deleteMetadataItemsByObject(any(MetadataObject.class));
 
     news.setAuthor(identity.getUserId());
     when(newsStorage.getNewsById(news.getId(), false)).thenReturn(news);
-    MetadataItem metadataItem = new MetadataItem();
-    metadataItem.setId(1L);
-    List<MetadataItem> metadataItems = new ArrayList<>();
-    metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByObject(any(MetadataObject.class))).thenReturn(metadataItems);
     newsService.deleteNews(news.getId(), identity, false);
     verify(newsStorage, times(2)).getNewsById(anyString(), anyBoolean());
-    verify(metadataService, times(1)).getMetadataItemsByObject(any(MetadataObject.class));
-    verify(metadataService, times(1)).deleteMetadataItem(any(Long.class), anyBoolean());
+    verify(metadataService, times(1)).deleteMetadataItemsByObject(any(MetadataObject.class));
   }
 }

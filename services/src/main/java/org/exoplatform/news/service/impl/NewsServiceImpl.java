@@ -221,10 +221,7 @@ public class NewsServiceImpl implements NewsService {
     newsStorage.deleteNews(newsId, isDraft);
     indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
     MetadataObject newsMetadataObject = new MetadataObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId, null);
-    List<MetadataItem> metadataItems = metadataService.getMetadataItemsByObject(newsMetadataObject);
-    for (MetadataItem metadataItem : metadataItems) {
-      metadataService.deleteMetadataItem(metadataItem.getId(), true);
-    }
+    metadataService.deleteMetadataItemsByObject(newsMetadataObject);
     NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);
   }
   

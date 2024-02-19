@@ -855,10 +855,12 @@ export default {
       }
     },
     saveNewsDraft: function () {
+      this.news.body = this.replaceImagesURLs(this.news.body);
+      const newsBody = this.replaceImagesURLs(this.getBody());
       const news = {
         title: this.news.title,
         summary: this.news.summary,
-        body: this.replaceImagesURLs(this.news.body),
+        body: this.getBody() ? newsBody : this.news.body,
         author: this.currentUser,
         attachments: [],
         published: false,

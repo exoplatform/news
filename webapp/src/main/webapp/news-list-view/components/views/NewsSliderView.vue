@@ -126,7 +126,7 @@ export default {
       return this.newsList && this.newsList.filter(news => !!news);
     },
     extraClass() {
-      return this.$vuetify.breakpoint.width > 550 && (!this.canPublishNews && 'mt-7' || ' ') ;
+      return this.$vuetify.breakpoint.width > 550 ? (!this.canPublishNews && 'mt-7' || '') : '' ;
     },
     articleUrl() {
       return (item) => {

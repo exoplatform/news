@@ -34,6 +34,5 @@
   <import>war:/conf/news/activity-listener-configuration.xml</import>
   <import>war:/conf/news/application-registry-configuration.xml</import>
   <import profiles="app-center">war:/conf/news/app-center-configuration.xml</import>
-  <import>war:/conf/news/navigation-categories-configuration.xml</import>
   <import>war:/conf/news/ckeditor-configuration.xml</import>
 </configuration>

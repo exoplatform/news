@@ -218,7 +218,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     disabled() {
-      return (this.newsHeader && this.newsHeader.length === 0) || (this.showSeeAll && this.seeAllUrl && this.seeAllUrl.length === 0);
+      return !this.newsHeader.length || (this.showSeeAll && !this.seeAllUrl?.length);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
@@ -299,7 +299,7 @@ export default {
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
       this.showHeader = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showHeader;
-      this.showSeeAll = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showSeeAll;
+      this.showSeeAll = false;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showArticleSummary;
@@ -423,7 +423,7 @@ export default {
     },
     initDefaultValue() {
       this.showHeader = true;
-      this.showSeeAll = true;
+      this.showSeeAll = false;
       this.showArticleTitle = true;
       this.showArticleSummary = true;
       this.showArticleImage = true;
@@ -437,10 +437,8 @@ export default {
         if ( this.viewTemplate === 'NewsAlert') {
           this.showArticleImage = false;
           this.showArticleReactions = false;
-          this.showSeeAll = false;
         }
       } else if ( this.viewTemplate === 'NewsSlider') {
-        this.showSeeAll = false;
         this.showHeader = false;
       } else if ( this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ) {
         this.showArticleSummary = false;

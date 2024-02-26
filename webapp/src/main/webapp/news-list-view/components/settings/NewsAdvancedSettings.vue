@@ -68,30 +68,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showSeeAll"
           dense
-          :disabled="displaySliderButton || displayAlertsButtons"
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="displayHeaderTitle my-auto" />
       </v-list-item-action>
     </v-list-item>
 
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
-          {{ $t('news.list.settings.drawer.advancedSettings.seeAllButton') }}
-        </v-list-item-title>
+    <v-list-item v-if="showSeeAll">
+      <v-list-item-content class="py-0">
+        <v-list-item-action>
+          <input
+            v-model="seeAllUrl"
+            :placeholder="$t('news.list.settings.drawer.advancedSettings.enterUrl')"
+            type="url"
+            id="seeLink"
+            name="seeLink"
+            required
+            @keyup="$emit('see-all-url', seeAllUrl)"
+            @change="$emit('see-all-url', seeAllUrl)"
+            class="seeLink input-block-level ignore-vuetify-classes my-0">
+        </v-list-item-action>
       </v-list-item-content>
-      <v-list-item-action>
-        <input
-          v-model="seeAllUrl"
-          :disabled="disableSeeAllLink"
-          type="url"
-          id="seeLink"
-          name="seeLink"
-          required
-          @keyup="$emit('see-all-url', seeAllUrl)"
-          @change="$emit('see-all-url', seeAllUrl)"
-          class="seeLink input-block-level ignore-vuetify-classes">
-      </v-list-item-action>
     </v-list-item>
 
     <v-list-item>
@@ -244,9 +240,6 @@ export default {
   computed: {
     displaySliderButton() {
       return this.viewTemplate === 'NewsSlider';
-    },
-    disableSeeAllLink() {
-      return this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
     },
     displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';

@@ -76,16 +76,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <v-list-item v-if="showSeeAll">
       <v-list-item-content class="py-0">
         <v-list-item-action>
-          <input
+          <v-text-field
             v-model="seeAllUrl"
             :placeholder="$t('news.list.settings.drawer.advancedSettings.enterUrl')"
+            :rules="[urlRules.required]"
             type="url"
             id="seeLink"
             name="seeLink"
             required
+            outlined
+            dense
             @keyup="$emit('see-all-url', seeAllUrl)"
             @change="$emit('see-all-url', seeAllUrl)"
-            class="seeLink input-block-level ignore-vuetify-classes my-0">
+            class="seeLink input-block-level ignore-vuetify-classes my-0" />
         </v-list-item-action>
       </v-list-item-content>
     </v-list-item>
@@ -235,7 +238,10 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
-    limit: null
+    limit: null,
+    urlRules: {
+      required: value => value == null || !!(value?.length),
+    },
   }),
   computed: {
     displaySliderButton() {
@@ -267,7 +273,7 @@ export default {
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
       this.showHeader = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showHeader;
-      this.showSeeAll = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showSeeAll;
+      this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showArticleSummary;

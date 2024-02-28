@@ -145,7 +145,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           :show-article-author="showArticleAuthor"
           :view-template="viewTemplate"
           @limit-value="limit = $event"
-          @see-all-url="seeAllUrl = $event"
+          @see-all-url="setSeeAllUrl"
           @selected-option="selectedOption" />
       </form>
       <div class="d-flex flex-row mt-4 mx-8 justify-end advancedSettings">
@@ -198,6 +198,7 @@ export default {
     showArticleReactions: false,
     showTooltip: false,
     seeAllUrl: '',
+    isValidSeeAllUrl: false,
     saveSettingsURL: '',
     canManageNewsPublishTargets: eXo.env.portal.canManageNewsPublishTargets
   }),
@@ -218,7 +219,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     disabled() {
-      return !this.newsHeader.length || (this.showSeeAll && !this.seeAllUrl?.length);
+      return !this.newsHeader.length || !this.isValidSeeAllUrl;
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {
@@ -257,6 +258,9 @@ export default {
         this.$refs.newsSettingsDrawer.endLoading();
       }
     },
+    seeAllUrl(){
+      this.isValidSeeAllUrl = !!this.seeAllUrl?.length;
+    }
   },
   created() {
     this.disabled = true;
@@ -299,7 +303,7 @@ export default {
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
       this.showHeader = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showHeader;
-      this.showSeeAll = false;
+      this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showArticleSummary;
@@ -463,6 +467,9 @@ export default {
     },
     createNewTarget() {
       this.$root.$emit('open-news-publish-targets-management-drawer');
+    },
+    setSeeAllUrl(newUrl) {
+      this.seeAllUrl = newUrl;
     }
   },
 };

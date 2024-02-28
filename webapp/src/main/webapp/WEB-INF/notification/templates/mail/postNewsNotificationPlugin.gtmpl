@@ -39,7 +39,7 @@ $title
 <tr>
 <td align="left" bgcolor="#ffffff" style="background-color: #ffffff;padding: 20px 0 10px;">
 <p style="margin: 0 0 10px; color: #333333; font-size: 13px; line-height: 18px;">
-<%=_ctx.appRes("Notification.label.SayHello=Hi")%> $FIRST_NAME,
+<%=_ctx.appRes("Notification.label.SayHello")%> $FIRST_NAME,
 </p>
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="background-color: #ffffff; font-size: 13px;color:#333333;line-height: 18px;"><tbody><tr><td align="left" style="padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" align="center" style="width: 100%; background-color: #ffffff; font-size: 13px; color:#333333;line-height: 18px;">
 	<tr>

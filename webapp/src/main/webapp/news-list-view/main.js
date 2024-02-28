@@ -64,7 +64,7 @@ export function init(params) {
   const header = params.header;
   const limit = params.limit === '' ? '4' : params.limit;
   const showHeader = viewTemplate === 'NewsSlider' ? false: params.showHeader === 'true';
-  const showSeeAll = viewTemplate === 'NewsSlider' ? false: params.showSeeAll === 'true';
+  const showSeeAll = params.showSeeAll === 'true' && !!params.seeAllUrl?.length;
   const showArticleTitle = params.showArticleTitle === '' ? true : params.showArticleTitle === 'true';
   const showArticleSummary = viewTemplate === 'NewsLatest' ? false: params.showArticleSummary === 'true';
   const showArticleImage = params.showArticleImage === '' ? true : params.showArticleImage === 'true';

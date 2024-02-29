@@ -80,6 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             v-model="seeAllUrl"
             :placeholder="$t('news.list.settings.drawer.advancedSettings.enterUrl')"
             :rules="[urlRules.required]"
+            autofocus
             type="url"
             id="seeLink"
             name="seeLink"

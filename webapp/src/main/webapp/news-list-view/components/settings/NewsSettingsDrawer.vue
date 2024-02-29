@@ -219,7 +219,7 @@ export default {
       return this.viewTemplates.filter(e=> !e.name.includes('EmptyTemplate'));
     },
     disabled() {
-      return !this.newsHeader.length || !this.isValidSeeAllUrl;
+      return !this.newsHeader.length || (this.showSeeAll && !this.isValidSeeAllUrl);
     },
     previewTemplate() {
       if ( this.viewTemplate === 'NewsLatest') {

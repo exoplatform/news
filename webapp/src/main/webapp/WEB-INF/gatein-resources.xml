@@ -150,36 +150,6 @@
     </module>
   </portlet>
 
-  <!--FIXME: We should use the load-group for all declared news extensions-->
-  <portlet>
-    <name>NewsExtensions</name>
-    <module>
-      <script>
-        <minify>false</minify>
-        <path>/js/newsExtensions.bundle.js</path>
-      </script>
-      <depends>
-        <module>vue</module>
-      </depends>
-      <depends>
-        <module>eXoVueI18n</module>
-      </depends>
-      <depends>
-        <module>commonVueComponents</module>
-      </depends>
-      <depends>
-        <module>newsDetails</module>
-      </depends>
-      <depends>
-        <module>extensionRegistry</module>
-      </depends>
-      <depends>
-        <module>jquery</module>
-        <as>$</as>
-      </depends>
-    </module>
-  </portlet>
-
   <portlet>
     <name>NewsDetail</name>
     <module>
@@ -461,7 +431,7 @@
     <load-group>ActivityStreamGRP</load-group>
     <script>
       <minify>false</minify>
-      <path>/js/newsActivityExtensions.bundle.js</path>
+      <path>/js/newsActivityStreamExtensions.bundle.js</path>
     </script>
     <depends>
       <module>vue</module>
@@ -482,33 +452,8 @@
     <depends>
       <module>commonVueComponents</module>
     </depends>
-  </module>
-
-  <module>
-    <name>NewsComposerActivityStreamExtensions</name>
-    <load-group>ActivityStreamGRP</load-group>
-    <script>
-      <minify>false</minify>
-      <path>/js/newsComposerActionExtensions.bundle.js</path>
-    </script>
     <depends>
-      <module>vue</module>
-    </depends>
-    <depends>
-      <module>vuetify</module>
-    </depends>
-    <depends>
-      <module>eXoVueI18n</module>
-    </depends>
-    <depends>
-      <module>jquery</module>
-      <as>$</as>
-    </depends>
-    <depends>
-      <module>extensionRegistry</module>
-    </depends>
-    <depends>
-      <module>commonVueComponents</module>
+      <module>newsDetails</module>
     </depends>
   </module>
 
@@ -539,12 +484,40 @@
       <module>commonVueComponents</module>
     </depends>
   </module>
+  
+  <module>
+    <name>NewsAnalyticsTableExtensions</name>
+    <load-group>AnalyticsTablePortletGroup</load-group>
+    <script>
+      <minify>false</minify>
+      <path>/js/newsAnalyticsExtensions.bundle.js</path>
+    </script>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>jquery</module>
+      <as>$</as>
+    </depends>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+  </module>
 
   <module>
-    <name>newsNotificationExtension</name>
+    <name>NewsNotificationExtensions</name>
     <load-group>notificationGRP</load-group>
     <script>
-      <path>/js/newsNotificationsExtension.bundle.js</path>
+      <path>/js/newsNotificationExtensions.bundle.js</path>
     </script>
     <depends>
       <module>vue</module>

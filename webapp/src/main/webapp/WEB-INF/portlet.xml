@@ -51,30 +51,6 @@
   </portlet>
 
   <portlet>
-    <portlet-name>NewsExtensions</portlet-name>
-    <display-name>News UI Extensions</display-name>
-    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
-    <init-param>
-      <name>portlet-view-dispatched-file-path</name>
-      <value>/news-extensions/newsExtensions.html</value>
-    </init-param>
-    <init-param>
-      <name>preload.resource.bundles</name>
-      <value>locale.portlet.news.News|locale.social.Webui</value>
-    </init-param>
-    <expiration-cache>-1</expiration-cache>
-    <cache-scope>PUBLIC</cache-scope>
-    <supports>
-      <mime-type>text/html</mime-type>
-    </supports>
-    <supported-locale>en</supported-locale>
-    <portlet-info>
-      <title>News UI Extensions</title>
-      <keywords>News UI Extensions</keywords>
-    </portlet-info>
-  </portlet>
-
-  <portlet>
     <portlet-name>NewsDetail</portlet-name>
     <display-name>News Details</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
@@ -120,32 +96,32 @@
     </portlet-info>
   </portlet>
 
-    <portlet>
-        <portlet-name>newsPublishTargetsManagement</portlet-name>
-        <display-name xml:lang="EN">Manage news publication targets</display-name>
-        <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
-        <init-param>
-            <name>portlet-view-dispatched-file-path</name>
-            <value>/news-publish-targets-management/newsPublishTargetsManagement.html</value>
-        </init-param>
-        <init-param>
-            <name>preload.resource.bundles</name>
-            <value>locale.portlet.news.News</value>
-        </init-param>
-        <expiration-cache>-1</expiration-cache>
-        <cache-scope>PUBLIC</cache-scope>
-        <supports>
-            <mime-type>text/html</mime-type>
-        </supports>
-        <supported-locale>en</supported-locale>
-        <portlet-info>
-            <title>Manage news publication targets</title>
-            <keywords>Manage news publication targets</keywords>
-        </portlet-info>
-        <security-role-ref>
-            <role-name>admin</role-name>
-            <role-link>admin</role-link>
-        </security-role-ref>
-    </portlet>
+  <portlet>
+    <portlet-name>newsPublishTargetsManagement</portlet-name>
+    <display-name xml:lang="EN">Manage news publication targets</display-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/news-publish-targets-management/newsPublishTargetsManagement.html</value>
+    </init-param>
+    <init-param>
+      <name>preload.resource.bundles</name>
+      <value>locale.portlet.news.News</value>
+    </init-param>
+    <expiration-cache>-1</expiration-cache>
+    <cache-scope>PUBLIC</cache-scope>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+    <supported-locale>en</supported-locale>
+    <portlet-info>
+      <title>Manage news publication targets</title>
+      <keywords>Manage news publication targets</keywords>
+    </portlet-info>
+    <security-role-ref>
+      <role-name>admin</role-name>
+      <role-link>admin</role-link>
+    </security-role-ref>
+  </portlet>
 
 </portlet-app>

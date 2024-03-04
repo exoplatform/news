@@ -76,20 +76,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <v-list-item v-if="showSeeAll">
       <v-list-item-content class="py-0">
         <v-list-item-action>
-          <v-text-field
+          <input
             v-model="seeAllUrl"
-            :placeholder="$t('news.list.settings.drawer.advancedSettings.enterUrl')"
-            :rules="[urlRules.required]"
-            autofocus
             type="url"
             id="seeLink"
             name="seeLink"
+            autofocus
             required
-            outlined
-            dense
             @keyup="$emit('see-all-url', seeAllUrl)"
             @change="$emit('see-all-url', seeAllUrl)"
-            class="seeLink input-block-level ignore-vuetify-classes my-0" />
+            class="seeLink input-block-level ignore-vuetify-classes">
         </v-list-item-action>
       </v-list-item-content>
     </v-list-item>

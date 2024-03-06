@@ -764,6 +764,7 @@ public class JcrNewsStorage implements NewsStorage {
         newsNode.setProperty("exo:activities", updatedNewsActivities);
         newsNode.save();
         news.setActivities(updatedNewsActivities);
+        news.setActivityId(newsActivityId);
       }
     }
   }

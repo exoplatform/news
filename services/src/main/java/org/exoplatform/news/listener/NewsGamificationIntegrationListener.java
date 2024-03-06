@@ -25,6 +25,13 @@ public class NewsGamificationIntegrationListener extends Listener<String, News> 
 
   public static final String GAMIFICATION_PUBLISH_NEWS_ARTICLE_RULE_TITLE = "PublishArticle";
 
+  String ACTIVITY_OBJECT_TYPE                                       = "news";
+
+  String OBJECT_ID_PARAM                                            = "objectId";
+
+  String OBJECT_TYPE_PARAM                                          = "objectType";
+
+
   private PortalContainer    container;
 
   private ListenerService    listenerService;
@@ -53,6 +60,8 @@ public class NewsGamificationIntegrationListener extends Listener<String, News> 
         gamificationMap.put("object", news.getUrl());
         gamificationMap.put("senderId", news.getAuthor()); // matches the gamification's earner id
         gamificationMap.put("receiverId", news.getAuthor());
+        gamificationMap.put(OBJECT_ID_PARAM, news.getActivityId());
+        gamificationMap.put(OBJECT_TYPE_PARAM, ACTIVITY_OBJECT_TYPE);
         listenerService.broadcast(GAMIFICATION_GENERIC_EVENT, gamificationMap, news.getId());
       } catch (Exception e) {
         LOG.error("Cannot broadcast gamification event");

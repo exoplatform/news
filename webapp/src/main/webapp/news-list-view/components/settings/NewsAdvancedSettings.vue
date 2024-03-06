@@ -68,30 +68,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-switch
           v-model="showSeeAll"
           dense
-          :disabled="displaySliderButton || displayAlertsButtons"
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="displayHeaderTitle my-auto" />
       </v-list-item-action>
     </v-list-item>
 
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="advancedSettingsLabel font-weight-regular">
-          {{ $t('news.list.settings.drawer.advancedSettings.seeAllButton') }}
-        </v-list-item-title>
+    <v-list-item v-if="showSeeAll">
+      <v-list-item-content class="py-0">
+        <v-list-item-action>
+          <input
+            v-model="seeAllUrl"
+            type="url"
+            id="seeLink"
+            name="seeLink"
+            autofocus
+            required
+            @keyup="$emit('see-all-url', seeAllUrl)"
+            @change="$emit('see-all-url', seeAllUrl)"
+            class="seeLink input-block-level ignore-vuetify-classes">
+        </v-list-item-action>
       </v-list-item-content>
-      <v-list-item-action>
-        <input
-          v-model="seeAllUrl"
-          :disabled="disableSeeAllLink"
-          type="url"
-          id="seeLink"
-          name="seeLink"
-          required
-          @keyup="$emit('see-all-url', seeAllUrl)"
-          @change="$emit('see-all-url', seeAllUrl)"
-          class="seeLink input-block-level ignore-vuetify-classes">
-      </v-list-item-action>
     </v-list-item>
 
     <v-list-item>
@@ -239,14 +235,14 @@ export default {
     showArticleSpace: false,
     showArticleDate: false,
     showArticleReactions: false,
-    limit: null
+    limit: null,
+    urlRules: {
+      required: value => value == null || !!(value?.length),
+    },
   }),
   computed: {
     displaySliderButton() {
       return this.viewTemplate === 'NewsSlider';
-    },
-    disableSeeAllLink() {
-      return this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' || (this.viewTemplate === 'NewsLatest' && !this.showSeeAll);
     },
     displayLatestButton() {
       return this.viewTemplate === 'NewsLatest';
@@ -274,7 +270,7 @@ export default {
       this.newsHeader = this.$root.header;
       this.limit = this.$root.limit;
       this.showHeader = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showHeader;
-      this.showSeeAll = this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert' ? false : this.$root.showSeeAll;
+      this.showSeeAll = this.$root.showSeeAll;
       this.showArticleTitle = this.$root.showArticleTitle;
       this.showArticleImage = this.viewTemplate === 'NewsAlert' ? false : this.$root.showArticleImage;
       this.showArticleSummary = this.viewTemplate === 'NewsLatest' || this.viewTemplate === 'NewsAlert' || this.viewTemplate === 'NewsMosaic' || this.viewTemplate === 'NewsStories' ? false : this.$root.showArticleSummary;

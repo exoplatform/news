@@ -67,6 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       <v-list-item-action>
         <v-switch
           v-model="showSeeAll"
+          :disabled="disableSeeAll"
           dense
           @change="selectedOption('showSeeAll', showSeeAll)"
           class="displayHeaderTitle my-auto" />
@@ -255,6 +256,9 @@ export default {
     },
     displayStoriesButtons() {
       return this.viewTemplate === 'NewsStories';
+    },
+    disableSeeAll() {
+      return this.viewTemplate === 'NewsSlider' || this.viewTemplate === 'NewsAlert';
     },
   },
   created() {

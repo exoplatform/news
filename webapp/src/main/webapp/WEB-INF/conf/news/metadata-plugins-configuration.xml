@@ -47,6 +47,57 @@
         </object-param>
       </init-params>
     </component-plugin>
+    <component-plugin>
+      <name>NewsMetadataTypePlugin</name>
+      <set-method>addMetadataTypePlugin</set-method>
+      <type>org.exoplatform.social.metadata.MetadataTypePlugin</type>
+      <init-params>
+        <value-param>
+          <name>shareable</name>
+          <value>true</value>
+        </value-param>
+        <value-param>
+          <name>allowMultipleItemsPerObject</name>
+          <value>true</value>
+        </value-param>
+        <object-param>
+          <name>metadataType</name>
+          <object type="org.exoplatform.social.metadata.model.MetadataType">
+            <field name="id">
+              <int>1000</int>
+            </field>
+            <field name="name">
+              <string>news</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+    <component-plugin>
+      <name>NewsMetadataPlugin</name>
+      <set-method>addMetadataPlugin</set-method>
+      <type>org.exoplatform.social.metadata.MetadataInitPlugin</type>
+      <init-params>
+        <object-param>
+          <name>metadata</name>
+          <object type="org.exoplatform.social.metadata.model.Metadata">
+            <field name="type">
+              <object type="org.exoplatform.social.metadata.model.MetadataType">
+                <field name="id">
+                  <int>1000</int>
+                </field>
+                <field name="name">
+                  <string>news</string>
+                </field>
+              </object>
+            </field>
+            <field name="name">
+              <string>news</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
   </external-component-plugins>
 
   <external-component-plugins>

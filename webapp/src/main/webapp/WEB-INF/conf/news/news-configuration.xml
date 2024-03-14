@@ -29,7 +29,7 @@
   
   <component>
     <key>org.exoplatform.news.service.NewsService</key>
-    <type>org.exoplatform.news.service.impl.NewsServiceImpl</type>
+    <type>org.exoplatform.news.service.impl.NewsServiceImplV2</type>
   </component>
   
   <component>

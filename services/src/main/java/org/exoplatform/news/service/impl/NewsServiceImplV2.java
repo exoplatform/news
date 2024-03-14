@@ -19,6 +19,8 @@ package org.exoplatform.news.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
@@ -26,8 +28,16 @@ import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.core.space.model.Space;
+import org.exoplatform.social.core.space.spi.SpaceService;
 
 public class NewsServiceImplV2 implements NewsService {
+
+  public SpaceService spaceService;
+
+  public NewsServiceImplV2(SpaceService spaceService) {
+    this.spaceService = spaceService;
+  }
+
   @Override
   public News createNews(News news, Identity currentIdentity) throws Exception {
     return null;
@@ -38,9 +48,15 @@ public class NewsServiceImplV2 implements NewsService {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public boolean canCreateNews(Space space, Identity currentIdentity) throws Exception {
-    return false;
+  public boolean canCreateNews(Space space, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
+    return space != null
+        && (spaceService.isSuperManager(currentIdentity.getUserId()) || spaceService.isManager(space, currentIdentity.getUserId())
+            || spaceService.isRedactor(space, currentIdentity.getUserId())
+            || spaceService.isMember(space, currentIdentity.getUserId()) && ArrayUtils.isEmpty(space.getRedactors()));
   }
 
   @Override

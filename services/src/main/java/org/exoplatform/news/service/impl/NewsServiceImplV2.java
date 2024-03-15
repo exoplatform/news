@@ -16,31 +16,91 @@
  */
 package org.exoplatform.news.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.exoplatform.portal.branding.BrandingServiceImpl.FILE_API_NAME_SPACE;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.file.model.FileItem;
+import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
+import org.exoplatform.news.model.NewsDraftObject;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
+import org.exoplatform.services.wcm.publication.PublicationDefaultStates;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
+import org.exoplatform.social.metadata.MetadataService;
+import org.exoplatform.social.metadata.model.MetadataKey;
+import org.exoplatform.social.metadata.model.MetadataType;
+import org.exoplatform.upload.UploadResource;
+import org.exoplatform.upload.UploadService;
+import org.exoplatform.wiki.WikiException;
+import org.exoplatform.wiki.model.DraftPage;
+import org.exoplatform.wiki.model.Page;
+import org.exoplatform.wiki.service.NoteService;
 
 public class NewsServiceImplV2 implements NewsService {
 
-  public SpaceService spaceService;
+  public static final String       ARTICLES_ROOT_PAGE_NAME         = "Articles";
 
-  public NewsServiceImplV2(SpaceService spaceService) {
+  public static final MetadataType METADATA_TYPE                   = new MetadataType(1000, "news");
+
+  public static final String       NEWS_METADATA_DRAFT_OBJECT_TYPE = "newsDraftPage";
+
+  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
+
+  private final SpaceService       spaceService;
+
+  private final NoteService        noteService;
+
+  private final MetadataService    metadataService;
+
+  private final FileService        fileService;
+
+  private final UploadService      uploadService;
+
+  public NewsServiceImplV2(SpaceService spaceService,
+                           NoteService noteService,
+                           MetadataService metadataService,
+                           FileService fileService,
+                           UploadService uploadService) {
     this.spaceService = spaceService;
+    this.noteService = noteService;
+    this.metadataService = metadataService;
+    this.fileService = fileService;
+    this.uploadService = uploadService;
   }
 
   @Override
   public News createNews(News news, Identity currentIdentity) throws Exception {
-    return null;
+    Space space = spaceService.getSpaceById(news.getSpaceId());
+    try {
+      if (!canCreateNews(space, currentIdentity)) {
+        throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news");
+      }
+      Page rootPage = getArticlesRootPage(space.getGroupId());
+      if (rootPage == null) {
+        throw new WikiException("Articles root page not exist");
+      }
+      News createdNews = null;
+      if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState()) && news.getId() == null) {
+        createdNews = createDraftArticleForNewPage(news, rootPage);
+      }
+      return createdNews;
+    } catch (Exception e) {
+      LOG.error("Error when creating the news " + news.getTitle(), e);
+      return null;
+    }
   }
 
   @Override
@@ -166,5 +226,86 @@ public class NewsServiceImplV2 implements NewsService {
   @Override
   public boolean canArchiveNews(Identity currentIdentity, String newsAuthor) {
     return false;
+  }
+
+  protected News createDraftArticleForNewPage(News news, Page rootPage) throws Exception {
+    DraftPage draftArticle = new DraftPage();
+    draftArticle.setNewPage(true);
+    draftArticle.setTargetPageId(null);
+    draftArticle.setTitle(news.getTitle());
+    draftArticle.setContent(news.getBody());
+    draftArticle.setParentPageId(rootPage.getId());
+    draftArticle.setAuthor(news.getAuthor());
+    draftArticle.setActivityId(news.getActivityId());
+    // created and updated date set by default during the draft creation process
+    draftArticle = noteService.createDraftForNewPage(draftArticle, System.currentTimeMillis());
+    if (draftArticle != null) {
+      // save illustration
+      Long illustrationId = -1L;
+      if (news.getUploadId() != null && !news.getUploadId().isBlank()) {
+        illustrationId = saveNewsIllustration(news.getUploadId(), null);
+      }
+      Map<String, String> properties = buildNewsMetaDataProperties(news);
+      properties.put("illustrationId", illustrationId >= 0 ? String.valueOf(illustrationId) : null);
+      NewsDraftObject newsDraftMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE, draftArticle.getId(), null);
+      MetadataKey newsDraftMetadataKey = new MetadataKey(METADATA_TYPE.getName(), "news", 0);
+      metadataService.createMetadataItem(newsDraftMetaDataObject, newsDraftMetadataKey, properties);
+    }
+    news.setId(draftArticle.getId());
+    return news;
+  }
+
+  protected Page getArticlesRootPage(String ownerId) {
+    return noteService.getNotesOfWiki("group", ownerId)
+                      .stream()
+                      .filter(page -> page.getName().equals(ARTICLES_ROOT_PAGE_NAME) && page.getParentPageId() == null)
+                      .toList()
+                      .get(0);
+  }
+
+  protected Map<String, String> buildNewsMetaDataProperties(News news) {
+    Map<String, String> newsProperties = new HashMap<>();
+    newsProperties.put("summary", news.getSummary());
+    newsProperties.put("viewsCount", String.valueOf(news.getViewsCount()));
+    newsProperties.put("activities", news.getActivities());
+    newsProperties.put("spaceId", news.getSpaceId());
+    newsProperties.put("favorite", String.valueOf(news.isFavorite()));
+    newsProperties.put("archived", String.valueOf(news.isArchived()));
+    newsProperties.put("draftVisible", String.valueOf(news.isDraftVisible()));
+    newsProperties.put("publicationState", news.getPublicationState());
+    newsProperties.put("published", String.valueOf(news.isPublished()));
+    newsProperties.put("uploadId", news.getUploadId());
+    return newsProperties;
+  }
+
+  private Long saveNewsIllustration(String uploadId, Long oldFileId) {
+    if (uploadId == null || uploadId.isBlank()) {
+      throw new IllegalArgumentException("uploadId is mandatory");
+    }
+    if (oldFileId != null && oldFileId != 0) {
+      fileService.deleteFile(oldFileId);
+    }
+    UploadResource uploadResource = uploadService.getUploadResource(uploadId);
+    if (uploadResource == null) {
+      throw new IllegalStateException("Can't find uploaded resource with id : " + uploadId);
+    }
+    try {
+      InputStream inputStream = new FileInputStream(uploadResource.getStoreLocation());
+      FileItem fileItem = new FileItem(null,
+                                       uploadResource.getFileName(),
+                                       uploadResource.getMimeType(),
+                                       FILE_API_NAME_SPACE,
+                                       (long) uploadResource.getUploadedSize(),
+                                       new Date(),
+                                       IdentityConstants.SYSTEM,
+                                       false,
+                                       inputStream);
+      fileItem = fileService.writeFile(fileItem);
+      return fileItem != null && fileItem.getFileInfo() != null ? fileItem.getFileInfo().getId() : null;
+    } catch (Exception e) {
+      throw new IllegalStateException("Error while saving news image file", e);
+    } finally {
+      uploadService.removeUploadResource(uploadResource.getUploadId());
+    }
   }
 }

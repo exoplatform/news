@@ -16,13 +16,16 @@
  */
 package org.exoplatform.news.service.impl;
 
-import static org.exoplatform.portal.branding.BrandingServiceImpl.FILE_API_NAME_SPACE;
-
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Date;
+import java.util.List;
+import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.gatein.api.EntityNotFoundException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.file.model.FileItem;
@@ -44,21 +47,27 @@ import org.exoplatform.social.metadata.model.MetadataKey;
 import org.exoplatform.social.metadata.model.MetadataType;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
-import org.exoplatform.wiki.WikiException;
 import org.exoplatform.wiki.model.DraftPage;
 import org.exoplatform.wiki.model.Page;
 import org.exoplatform.wiki.service.NoteService;
 
 public class NewsServiceImplV2 implements NewsService {
 
-  public static final String       ARTICLES_ROOT_PAGE_NAME         = "Articles";
+  public static final String       NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME = "Articles";
 
-  public static final MetadataType METADATA_TYPE                   = new MetadataType(1000, "news");
+  public static final MetadataType NEWS_META_DATA_TYPE               = new MetadataType(1000, "news");
 
-  public static final String       NEWS_METADATA_DRAFT_OBJECT_TYPE = "newsDraftPage";
+  public static final String       NEWS_META_DATA_NAME               = "news";
 
-  private static final Log         LOG                             = ExoLogger.getLogger(NewsServiceImpl.class);
+  public static final String       NEWS_METADATA_DRAFT_OBJECT_TYPE   = "newsDraftPage";
 
+  public static final String       FILE_API_NAME_SPACE               = "news";
+
+  public static final String       NEWS_SUMMARY                      = "summary";
+
+  public static final String       NEWS_ILLUSTRATION_ID              = "illustrationId";
+
+  private static final Log         LOG                               = ExoLogger.getLogger(NewsServiceImplV2.class);
   private final SpaceService       spaceService;
 
   private final NoteService        noteService;
@@ -88,13 +97,13 @@ public class NewsServiceImplV2 implements NewsService {
       if (!canCreateNews(space, currentIdentity)) {
         throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " not authorized to create news");
       }
-      Page rootPage = getArticlesRootPage(space.getGroupId());
-      if (rootPage == null) {
-        throw new WikiException("Articles root page not exist");
-      }
-      News createdNews = null;
-      if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState()) && news.getId() == null) {
-        createdNews = createDraftArticleForNewPage(news, rootPage);
+      News createdNews;
+      if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState()) && recreateIfDraftDeleted(news) != null) {
+        createdNews = postNews(news, currentIdentity.getUserId());
+      } else if (news.getSchedulePostDate() != null) {
+        createdNews = unScheduleNews(news, currentIdentity);
+      } else {
+        createdNews = createDraftArticleForNewPage(news, space.getGroupId());
       }
       return createdNews;
     } catch (Exception e) {
@@ -228,54 +237,54 @@ public class NewsServiceImplV2 implements NewsService {
     return false;
   }
 
-  protected News createDraftArticleForNewPage(News news, Page rootPage) throws Exception {
-    DraftPage draftArticle = new DraftPage();
-    draftArticle.setNewPage(true);
-    draftArticle.setTargetPageId(null);
-    draftArticle.setTitle(news.getTitle());
-    draftArticle.setContent(news.getBody());
-    draftArticle.setParentPageId(rootPage.getId());
-    draftArticle.setAuthor(news.getAuthor());
-    draftArticle.setActivityId(news.getActivityId());
-    // created and updated date set by default during the draft creation process
-    draftArticle = noteService.createDraftForNewPage(draftArticle, System.currentTimeMillis());
-    if (draftArticle != null) {
-      // save illustration
-      Long illustrationId = -1L;
-      if (news.getUploadId() != null && !news.getUploadId().isBlank()) {
-        illustrationId = saveNewsIllustration(news.getUploadId(), null);
+  public News createDraftArticleForNewPage(News news, String pageOwnerId) throws Exception {
+    Page rootPage = getArticlesRootPage(pageOwnerId);
+    if (rootPage != null) {
+      DraftPage draftArticle = new DraftPage();
+      draftArticle.setNewPage(true);
+      draftArticle.setTargetPageId(null);
+      draftArticle.setTitle(news.getTitle());
+      draftArticle.setContent(news.getBody());
+      draftArticle.setParentPageId(rootPage.getId());
+      draftArticle.setAuthor(news.getAuthor());
+      draftArticle.setActivityId(news.getActivityId());
+      // created and updated date set by default during the draft creation process
+      draftArticle = noteService.createDraftForNewPage(draftArticle, System.currentTimeMillis());
+      if (draftArticle != null) {
+        // save illustration
+        Long illustrationId = -1L;
+        if (news.getUploadId() != null && !news.getUploadId().isBlank()) {
+          illustrationId = saveNewsIllustration(news.getUploadId(), null);
+        }
+        Map<String, String> properties = new HashMap<>();
+        properties.put(NEWS_SUMMARY, news.getSummary());
+        properties.put(NEWS_ILLUSTRATION_ID, illustrationId >= 0 ? String.valueOf(illustrationId) : null);
+        NewsDraftObject newsDraftMetaDataObject =
+                                                new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE, draftArticle.getId(), null);
+        MetadataKey newsDraftMetadataKey = new MetadataKey(NEWS_META_DATA_TYPE.getName(), NEWS_META_DATA_NAME, 0);
+        metadataService.createMetadataItem(newsDraftMetaDataObject, newsDraftMetadataKey, properties);
+        news.setId(draftArticle.getId());
+        news.setCreationDate(draftArticle.getCreatedDate());
+        news.setUpdateDate(draftArticle.getUpdatedDate());
+        if (illustrationId != null) {
+          FileItem fileItem = fileService.getFile(illustrationId);
+          if (fileItem != null) {
+            news.setIllustration(fileItem.getAsByte());
+          }
+        }
+        return news;
       }
-      Map<String, String> properties = buildNewsMetaDataProperties(news);
-      properties.put("illustrationId", illustrationId >= 0 ? String.valueOf(illustrationId) : null);
-      NewsDraftObject newsDraftMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE, draftArticle.getId(), null);
-      MetadataKey newsDraftMetadataKey = new MetadataKey(METADATA_TYPE.getName(), "news", 0);
-      metadataService.createMetadataItem(newsDraftMetaDataObject, newsDraftMetadataKey, properties);
     }
-    news.setId(draftArticle.getId());
-    return news;
+    throw new EntityNotFoundException("News articles root note parent not found");
   }
 
   protected Page getArticlesRootPage(String ownerId) {
-    return noteService.getNotesOfWiki("group", ownerId)
-                      .stream()
-                      .filter(page -> page.getName().equals(ARTICLES_ROOT_PAGE_NAME) && page.getParentPageId() == null)
-                      .toList()
-                      .get(0);
-  }
-
-  protected Map<String, String> buildNewsMetaDataProperties(News news) {
-    Map<String, String> newsProperties = new HashMap<>();
-    newsProperties.put("summary", news.getSummary());
-    newsProperties.put("viewsCount", String.valueOf(news.getViewsCount()));
-    newsProperties.put("activities", news.getActivities());
-    newsProperties.put("spaceId", news.getSpaceId());
-    newsProperties.put("favorite", String.valueOf(news.isFavorite()));
-    newsProperties.put("archived", String.valueOf(news.isArchived()));
-    newsProperties.put("draftVisible", String.valueOf(news.isDraftVisible()));
-    newsProperties.put("publicationState", news.getPublicationState());
-    newsProperties.put("published", String.valueOf(news.isPublished()));
-    newsProperties.put("uploadId", news.getUploadId());
-    return newsProperties;
+    List<Page> notes =
+                     noteService.getNotesOfWiki("group", ownerId)
+                                .stream()
+                                .filter(e -> e.getName().equals(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME) && e.getParentPageId() == null)
+                                .toList();
+    return notes.isEmpty() ? null : notes.get(0);
   }
 
   private Long saveNewsIllustration(String uploadId, Long oldFileId) {
@@ -307,5 +316,9 @@ public class NewsServiceImplV2 implements NewsService {
     } finally {
       uploadService.removeUploadResource(uploadResource.getUploadId());
     }
+  }
+
+  private News recreateIfDraftDeleted(News news) throws Exception {
+    return null;
   }
 }

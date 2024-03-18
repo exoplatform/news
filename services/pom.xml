@@ -55,6 +55,11 @@
       <artifactId>ecms-core-services</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.exoplatform.addons.notes</groupId>
+      <artifactId>notes-service</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.exoplatform.ecms</groupId>
       <artifactId>ecms-social-integration</artifactId>
     </dependency>

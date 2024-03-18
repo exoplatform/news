@@ -55,19 +55,20 @@ public class NewsServiceImplV2 implements NewsService {
 
   public static final String       NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME = "Articles";
 
-  public static final MetadataType NEWS_META_DATA_TYPE               = new MetadataType(1000, "news");
+  public static final MetadataType NEWS_METADATA_TYPE                = new MetadataType(1000, "news");
 
-  public static final String       NEWS_META_DATA_NAME               = "news";
+  public static final String       NEWS_METADATA_NAME                = "news";
 
   public static final String       NEWS_METADATA_DRAFT_OBJECT_TYPE   = "newsDraftPage";
 
-  public static final String       FILE_API_NAME_SPACE               = "news";
+  public static final String       NEWS_FILE_API_NAME_SPACE          = "news";
 
   public static final String       NEWS_SUMMARY                      = "summary";
 
   public static final String       NEWS_ILLUSTRATION_ID              = "illustrationId";
 
   private static final Log         LOG                               = ExoLogger.getLogger(NewsServiceImplV2.class);
+
   private final SpaceService       spaceService;
 
   private final NoteService        noteService;
@@ -247,8 +248,8 @@ public class NewsServiceImplV2 implements NewsService {
       draftArticle.setContent(news.getBody());
       draftArticle.setParentPageId(rootPage.getId());
       draftArticle.setAuthor(news.getAuthor());
-      draftArticle.setActivityId(news.getActivityId());
-      // created and updated date set by default during the draft creation process
+      // created and updated date set by default during the draft creation
+      // process
       draftArticle = noteService.createDraftForNewPage(draftArticle, System.currentTimeMillis());
       if (draftArticle != null) {
         // save illustration
@@ -261,7 +262,7 @@ public class NewsServiceImplV2 implements NewsService {
         properties.put(NEWS_ILLUSTRATION_ID, illustrationId >= 0 ? String.valueOf(illustrationId) : null);
         NewsDraftObject newsDraftMetaDataObject =
                                                 new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE, draftArticle.getId(), null);
-        MetadataKey newsDraftMetadataKey = new MetadataKey(NEWS_META_DATA_TYPE.getName(), NEWS_META_DATA_NAME, 0);
+        MetadataKey newsDraftMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
         metadataService.createMetadataItem(newsDraftMetaDataObject, newsDraftMetadataKey, properties);
         news.setId(draftArticle.getId());
         news.setCreationDate(draftArticle.getCreatedDate());
@@ -312,7 +313,7 @@ public class NewsServiceImplV2 implements NewsService {
       fileItem = fileService.writeFile(fileItem);
       return fileItem != null && fileItem.getFileInfo() != null ? fileItem.getFileInfo().getId() : null;
     } catch (Exception e) {
-      throw new IllegalStateException("Error while saving news image file", e);
+      throw new IllegalStateException("Error while saving news illustration file", e);
     } finally {
       uploadService.removeUploadResource(uploadResource.getUploadId());
     }

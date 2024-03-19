@@ -64,16 +64,13 @@ public class NewsQueryBuilderTest {
     currentIdentity.setMemberships(memberships);
     ConversationState state = new ConversationState(currentIdentity);
     ConversationState.setCurrent(state);
-    IdentityManager identityMock = mock(IdentityManager.class);
-    COMMONS_UTILS.when(() -> CommonsUtils.getService(IdentityManager.class)).thenReturn(identityMock);
-    when(identityMock.getOrCreateIdentity(anyString(), anyString())).thenReturn(identity);
 
     // when
     StringBuilder query = queryBuilder.buildQuery(filter);
 
     // then
     assertNotNull(query);
-    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%'))AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND publication:currentState = 'draft' AND (('null' IN exo:newsModifiersIds AND exo:activities <> '') OR ( exo:author = 'john' AND exo:activities = '')OR (exo:spaceId = '1') AND exo:draftVisible = 'true') AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
+    assertEquals("SELECT * FROM exo:news WHERE ( exo:archived IS NULL OR exo:archived = 'false' OR ( exo:archived = 'true' AND  exo:author = 'john')) AND (CONTAINS(.,'text~0.6') OR (exo:body LIKE '%text%'))AND exo:pinned = 'true' AND ( exo:spaceId = '1') AND publication:currentState = 'draft' AND (exo:author = 'john' OR (exo:spaceId = '1')) AND jcr:path LIKE '/Groups/spaces/%' ORDER BY jcr:score DESC",
                  query.toString());
   }
 

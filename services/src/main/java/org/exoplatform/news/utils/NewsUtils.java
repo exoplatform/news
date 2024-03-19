@@ -138,12 +138,12 @@ public class NewsUtils {
     return identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
   }
 
-  public static List<Space> getAllowedDraftNewsSpaces(String userId) throws Exception {
+  public static List<Space> getAllowedDraftNewsSpaces(org.exoplatform.services.security.Identity userIdentity) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
-    ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userId);
+    ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userIdentity.getUserId());
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return memberSpaces.stream()
-                 .filter(space -> (spaceService.isManager(space, userId) || spaceService.isRedactor(space, userId)))
+                 .filter(space -> (spaceService.canRedactOnSpace(space, userIdentity)))
                  .toList();
   }
   

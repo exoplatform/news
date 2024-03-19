@@ -241,7 +241,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setAttachments(updatedNews.getAttachments());
       news.setPublicationState(updatedNews.getPublicationState());
       news.setUpdaterFullName(updatedNews.getUpdaterFullName());
-      news.setDraftVisible(updatedNews.isDraftVisible());
       news.setActivityPosted(updatedNews.isActivityPosted());
       news.setTargets(updatedNews.getTargets());
       news.setAudience(updatedNews.getAudience());

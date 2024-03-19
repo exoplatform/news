@@ -44,8 +44,6 @@ public class News {
 
   private Date                            draftUpdateDate;
 
-  private boolean                         draftVisible;
-
   private String                          uploadId;
 
   private byte[]                          illustration;

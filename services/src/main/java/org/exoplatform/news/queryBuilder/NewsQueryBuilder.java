@@ -85,18 +85,13 @@ public class NewsQueryBuilder {
           sqlQuery.append(EXO_SPACE_ID).append(" = '").append(spaces.get(spaces.size() - 1)).append("') AND ");
         }
         if (filter.isDraftNews()) {
-          IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
-          Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username);
-          String currentIdentityId = identity.getId();
           sqlQuery.append("publication:currentState = 'draft'");
-          sqlQuery.append(" AND (('");
-          sqlQuery.append(currentIdentityId).append("' IN exo:newsModifiersIds AND exo:activities <> '')");
-          sqlQuery.append(" OR ");
-          sqlQuery.append("( exo:author = '").append(filter.getAuthor()).append("' AND exo:activities = '')");
-          List<Space> allowedDraftNewsSpaces = NewsUtils.getAllowedDraftNewsSpaces(currentIdentity.getUserId());
+          sqlQuery.append(" AND (");
+          sqlQuery.append("exo:author = '").append(filter.getAuthor()).append("'");
+          List<Space> allowedDraftNewsSpaces = NewsUtils.getAllowedDraftNewsSpaces(currentIdentity);
           int allowedDraftNewsSpacesSize = allowedDraftNewsSpaces.size();
           if(allowedDraftNewsSpacesSize > 0) {
-            sqlQuery.append("OR (");
+            sqlQuery.append(" OR (");
             for (int i= 0; i < allowedDraftNewsSpacesSize; i++) {
               sqlQuery.append(EXO_SPACE_ID).append(" = '").append(allowedDraftNewsSpaces.get(i).getId()).append("'");
               if( i != allowedDraftNewsSpacesSize - 1) {
@@ -104,10 +99,8 @@ public class NewsQueryBuilder {
               }
             }
             sqlQuery.append(")");
-            sqlQuery.append(" AND exo:draftVisible = 'true')");
-          } else {
-            sqlQuery.append(")");
-          }
+          } 
+          sqlQuery.append(")");
         } else if (filter.isScheduledNews()) {
           List<Space> allowedScheduledNewsSpaces = NewsUtils.getAllowedScheduledNewsSpaces(currentIdentity);
           sqlQuery.append("publication:currentState = 'staged'");

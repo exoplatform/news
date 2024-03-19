@@ -164,7 +164,8 @@ public class NewsServiceImplTest {
         when(spaceService.getSpaceById(news.getSpaceId())).thenReturn(null);
         assertThrows(IllegalArgumentException.class, () -> newsService.updateNews(news, "root", false, false));
         when(spaceService.getSpaceById(news.getSpaceId())).thenReturn(space);
-
+        when(spaceService.canRedactOnSpace(any(Space.class), any(org.exoplatform.services.security.Identity.class))).thenReturn(true);
+        
         newsService.updateNews(news, "root", false, false);
         verify(newsStorage, times(1)).updateNews(any(News.class), anyString());
         verify(newsTargetingService, times(0)).deleteNewsTargets(any(News.class), anyString());

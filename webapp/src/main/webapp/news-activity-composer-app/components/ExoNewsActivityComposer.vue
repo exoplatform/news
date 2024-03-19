@@ -61,103 +61,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
           <div class="d-flex d-flex flex-grow-0 my-auto">
             <span v-if="!isMobile" class="my-auto me-4 flex-shrink-0">{{ draftSavingStatus }}</span>
-            <div v-if="canUpdateNewVisibilty && !isMobile">
-              <v-select
-                ref="selectVisibility"
-                v-model="news.draftVisible"
-                v-if="isNewsAuthor"
-                :items="items"
-                item-value="value"
-                label="text"
-                item-text="text"
-                hide-selected
-                class="selectMenuClass mr-7"
-                color="black"
-                item-color="black"
-                attach
-                solo
-                dense
-                @change="updateDraftVisibility()">
-                <template #selection="{ item }">
-                  <v-icon
-                    v-if="!item.value"
-                    size="16"
-                    color="black"
-                    class="mr-3 mb-1">
-                    mdi-lock
-                  </v-icon>
-                  <v-icon
-                    v-else
-                    size="16"
-                    color="black"
-                    class="mr-3 mb-1">
-                    mdi-account-edit
-                  </v-icon>
-                  {{ item.text }}
-                </template>
-                <template slot="item" slot-scope="{ item }">
-                  <v-icon
-                    v-if="!item.value"
-                    size="16"
-                    color="black"
-                    class="mr-3 mb-1">
-                    mdi-lock
-                  </v-icon>
-                  <v-icon
-                    v-else
-                    size="16"
-                    color="black"
-                    class="mr-3 mb-1">
-                    mdi-account-edit
-                  </v-icon>
-                  {{ item.text }}
-                </template>
-              </v-select>
-              <div v-else class="d-flex mr-5 mt-1">
-                <v-icon
-                  v-if="!this.news.draftVisible"
-                  size="16"
-                  color="black"
-                  class="mr-2">
-                  mdi-lock
-                </v-icon>
-                <v-icon
-                  v-else
-                  size="16"
-                  color="black"
-                  class="mr-2">
-                  mdi-account-edit
-                </v-icon>
-                <div
-                  id="newsDraftVisible1"
-                  class="font-weight-bold pa-0 mt-1"
-                  disabled
-                  v-text="newsLabel"></div>
-              </div>
-            </div>
-            <div v-if="canUpdateNewVisibilty && isMobile" class="d-flex mr-2 mt-1">
-              <v-btn
-                primary
-                icon
-                text
-                :disabled="!isNewsAuthor"
-                @click="$root.$emit('open-draft-visibility', news.draftVisible)">
-                <v-icon
-                  v-if="!this.news.draftVisible"
-                  size="20"
-                  color="black"
-                  class="mr-1">
-                  mdi-lock
-                </v-icon>
-                <v-icon
-                  v-else
-                  size="20"
-                  color="black"
-                  class="mr-1">
-                  mdi-account-edit
-                </v-icon>
-              </v-btn>
-            </div>
             <v-btn
               v-show="!editMode"
               id="newsPost"
@@ -288,9 +191,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-model="news.attachments"
         @HideAttachmentsDrawer="onHideAttachmentsDrawer"
         @uploadingCountChanged="setUploadingCount" />
-      <exo-news-draft-visibility-mobile
-        ref="selectVisibilityDialog"
-        :items="items" />
     </div>
 
     <div v-show="(!canCreateNews && !loading) || unAuthorizedAccess" class="newsComposer">
@@ -338,7 +238,6 @@ export default {
         spaceId: '',
         published: false,
         archived: false,
-        draftVisible: false,
         audience: null,
       },
       originalNews: {
@@ -388,10 +287,6 @@ export default {
         hour: '2-digit',
         minute: '2-digit',
       },
-      items: [
-        {key: 'private',value: false, text: this.$t('news.composer.private'), align: 'center', sortable: false},
-        {key: 'shared',value: true, text: this.$t('news.composer.shared'), align: 'center', sortable: false},
-      ],
       canScheduleNews: false,
       scheduleMode: '',
       switchView: false,
@@ -464,23 +359,12 @@ export default {
     isMobile() {
       return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
     },
-    canUpdateNewVisibilty() {
-      return !this.editMode && this.news.id !== '' && this.currentSpace && this.currentSpace.redactorsCount > 0;
-    },
-    isNewsAuthor() {
-      return this.news.author === this.currentUser;
-    },
-    newsLabel() {
-      return  this.news.draftVisible ?  this.$t('news.composer.shared') : this.$t('news.composer.private');
-    },
   },
   watch: {
     'news.title': function() {
       if (this.news.title !== this.originalNews.title) {
         this.autoSave();
-      } },
-    'news.draftVisible': function() {
-      this.autoSave();
+      } 
     },
     'news.summary': function() {
       if (this.news.summary !== this.originalNews.summary) {
@@ -525,7 +409,6 @@ export default {
             } else {
               this.initCKEditor();
               this.setToolBarEffect();
-              this.news.draftVisible = false;
               const message = localStorage.getItem('exo-activity-composer-message');
               if (message) {
                 this.initCKEditorData(message);
@@ -566,7 +449,6 @@ export default {
     document.addEventListener('attach-file-plugins', () => {
       this.openApp();
     });
-    this.$root.$on('update-visibility', this.updateVisibility);
     this.$root.$on('news-space-url', (spaceUrl)=>this.spaceUrl = spaceUrl);
   },
   methods: {
@@ -707,8 +589,6 @@ export default {
             this.news.draftUpdaterDisplayName = fetchedNode.draftUpdaterDisplayName;
             this.news.draftUpdaterUserName = fetchedNode.draftUpdaterUserName;
             this.news.draftUpdateDate = fetchedNode.draftUpdateDate;
-            this.news.author = fetchedNode.author;
-            this.news.draftVisible = fetchedNode.draftVisible;
             this.news.activityPosted = fetchedNode.activityPosted;
             this.news.audience = fetchedNode.audience;
             this.initCKEditor();
@@ -810,7 +690,6 @@ export default {
         author: this.currentUser,
         attachments: this.news.attachments,
         published: this.news.published,
-        draftVisible: this.news.draftVisible,
         targets: this.news.targets,
         spaceId: this.spaceId,
         publicationState: 'published',
@@ -864,7 +743,6 @@ export default {
         author: this.currentUser,
         attachments: [],
         published: false,
-        draftVisible: this.news.draftVisible,
         spaceId: this.spaceId,
         publicationState: ''
       };
@@ -914,7 +792,6 @@ export default {
           if (!this.newsId) {
             this.newsId = createdNews.id;
           }
-          this.news.author = createdNews.author;
           this.savingDraft = false;
           this.$emit('draftCreated');
         });
@@ -981,7 +858,6 @@ export default {
         attachments: this.news.attachments,
         published: this.news.published,
         publicationState: publicationState,
-        draftVisible: this.news.draftVisible,
         activityPosted: this.news.activityPosted,
         audience: this.news.audience,
       };
@@ -1147,24 +1023,6 @@ export default {
     },
     getString(body) {
       return new DOMParser().parseFromString(body, 'text/html').documentElement.textContent.replace(/&nbsp;/g, '').trim();
-    },
-    updateDraftVisibility(){
-      if (this.news.draftVisible) {
-        const message = this.$t('news.composer.alert.share.draft.success');
-        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
-          alertType: 'info',
-          alertMessage: message}}));
-      } else {
-        const message = this.$t('news.composer.alert.unshare.draft.success');
-        document.dispatchEvent(new CustomEvent('alert-message', {detail: {
-          alertType: 'info',
-          alertMessage: message}}));      }
-    },
-    updateVisibility(visibility){
-      if (visibility !== this.news.draftVisible) {
-        this.news.draftVisible = visibility;
-        this.updateDraftVisibility();
-      }
     },
     changeView() {
       const elementNewTop = document.getElementById('newsTop');

@@ -14,7 +14,7 @@
     </init-param>
     <init-param>
       <name>preload.resource.bundles</name>
-      <value>locale.portlet.news.News|locale.attachmentsSelector.attachments</value>
+      <value>locale.portlet.news.News</value>
     </init-param>
     <supports>
       <mime-type>text/html</mime-type>
@@ -60,7 +60,7 @@
     </init-param>
     <init-param>
       <name>preload.resource.bundles</name>
-      <value>locale.portlet.news.News|locale.attachmentsSelector.attachments</value>
+      <value>locale.portlet.news.News</value>
     </init-param>
     <supports>
       <mime-type>text/html</mime-type>

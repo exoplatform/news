@@ -238,7 +238,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setSummary(updatedNews.getSummary());
       news.setBody(updatedNews.getBody());
       news.setUploadId(updatedNews.getUploadId());
-      news.setAttachments(updatedNews.getAttachments());
       news.setPublicationState(updatedNews.getPublicationState());
       news.setUpdaterFullName(updatedNews.getUpdaterFullName());
       news.setActivityPosted(updatedNews.isActivityPosted());
@@ -685,82 +684,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                                       .collect(Collectors.toList());
 
     return Response.ok(results).build();
-  }
-
-  @GET
-  @Path("attachments/{attachmentId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "Get a news attachment", method = "GET", description = "This gets the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
-      @ApiResponse(responseCode = "404", description = "News not found"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getNewsAttachmentById(@Context HttpServletRequest request,
-                                        @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
-    try {
-      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
-      if (attachment == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      return Response.ok(attachment).build();
-    } catch (Exception e) {
-      LOG.error("Error when getting the news attachment " + attachmentId, e);
-      return Response.serverError().entity(e.getMessage()).build();
-    }
-  }
-
-  @GET
-  @Path("attachments/{attachmentId}/file")
-  @RolesAllowed("users")
-  @Operation(summary = "Download a news attachment", method = "GET", description = "This downloads the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
-      @ApiResponse(responseCode = "404", description = "News not found"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response getNewsAttachmentBinaryById(@Context HttpServletRequest request,
-                                              @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
-    try {
-      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
-      if (attachment == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      InputStream stream = newsAttachmentsService.getNewsAttachmentStream(attachmentId);
-
-      Response.ResponseBuilder responseBuilder = Response.ok(stream, attachment.getMimetype());
-      responseBuilder.header("Content-Disposition", "attachment; filename=\"" + attachment.getName() + "\"");
-
-      return responseBuilder.build();
-    } catch (Exception e) {
-      LOG.error("Error when getting the news attachment " + attachmentId, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @GET
-  @Path("attachments/{attachmentId}/open")
-  @RolesAllowed("users")
-  @Operation(summary = "Opens a news attachment", method = "GET", description = "This opens the news attachment with the given id if the authenticated user is a member of the space or a spaces super manager.")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "News returned"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to get the news"),
-      @ApiResponse(responseCode = "404", description = "News not found"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response openNewsAttachmentById(@Context HttpServletRequest request,
-                                         @Parameter(description = "News attachment id", required = true) @PathParam("attachmentId") String attachmentId) {
-    try {
-      NewsAttachment attachment = newsAttachmentsService.getNewsAttachment(attachmentId);
-      if (attachment == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-
-      String openUrl = newsAttachmentsService.getNewsAttachmentOpenUrl(attachmentId);
-
-      return Response.temporaryRedirect(URI.create(openUrl)).build();
-    } catch (Exception e) {
-      LOG.error("Error when getting the news attachment " + attachmentId, e);
-      return Response.serverError().entity(e.getMessage()).build();
-    }
   }
 
   @GET

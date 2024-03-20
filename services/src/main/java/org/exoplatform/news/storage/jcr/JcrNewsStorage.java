@@ -49,7 +49,6 @@ import org.exoplatform.news.storage.NewsStorage;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.cms.BasePath;
 import org.exoplatform.services.cms.impl.Utils;
-import org.exoplatform.services.cms.link.LinkManager;
 import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.access.PermissionType;
@@ -116,9 +115,7 @@ public class JcrNewsStorage implements NewsStorage {
 
   private IdentityManager        identityManager;
 
-  private LinkManager            linkManager;
-
-  private NewsAttachmentsStorage newsAttachmentsService;
+  private NewsAttachmentsStorage newsAttachmentsStorage;
 
   private NodeHierarchyCreator   nodeHierarchyCreator;
 
@@ -147,17 +144,15 @@ public class JcrNewsStorage implements NewsStorage {
                          UploadService uploadService,
                          PublicationService publicationService,
                          PublicationManager publicationManager,
-                         NewsAttachmentsStorage newsAttachmentsService,
+                         NewsAttachmentsStorage newsAttachmentsStorage,
                          IdentityManager identityManager,
-                         LinkManager linkManager,
                          NewsSearchConnector newsSearchConnector,
                          WCMPublicationService wCMPublicationService) {
     
     this.activityManager = activityManager;
     this.dataDistributionType = dataDistributionManager.getDataDistributionType(DataDistributionMode.NONE);
     this.identityManager = identityManager;
-    this.linkManager = linkManager;
-    this.newsAttachmentsService = newsAttachmentsService;
+    this.newsAttachmentsStorage = newsAttachmentsStorage;
     this.nodeHierarchyCreator = nodeHierarchyCreator;
     this.publicationManager = publicationManager;
     this.publicationService = publicationService;
@@ -461,7 +456,7 @@ public class JcrNewsStorage implements NewsStorage {
       news.setIllustrationURL("/portal/rest/v1/news/" + news.getId() + "/illustration?v=" + lastModified);
     }
 
-    news.setAttachments(newsAttachmentsService.getNewsAttachments(node));
+    news.setAttachments(newsAttachmentsStorage.getNewsAttachments(node));
 
     Space space = spaceService.getSpaceById(news.getSpaceId());
     if (space != null) {
@@ -545,13 +540,13 @@ public class JcrNewsStorage implements NewsStorage {
         newsNode.addMixin("exo:privilegeable");
       }
       ((ExtendedNode) newsNode).setPermission("any", SHARE_NEWS_PERMISSIONS);
-      newsAttachmentsService.makeAttachmentsPublic(newsNode);
+      newsAttachmentsStorage.makeAttachmentsPublic(newsNode);
     }
     else {
       if(newsNode.isNodeType("exo:privilegeable")) {
         ((ExtendedNode) newsNode).removePermission("any");
       }
-      newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
+      newsAttachmentsStorage.unmakeAttachmentsPublic(newsNode);
     }
   }
   
@@ -597,8 +592,6 @@ public class JcrNewsStorage implements NewsStorage {
         newsNode.setProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP, String.valueOf(news.isActivityPosted()));
       }
 
-      // attachments
-      news.setAttachments(newsAttachmentsService.updateNewsAttachments(news, newsNode));
       if (news.isPublished() && news.getAudience() != null) {
         updateNewAudience(newsNode, news);
       }
@@ -973,7 +966,7 @@ public class JcrNewsStorage implements NewsStorage {
     newsNode.getProperty(NEWS_AUDIENCE_PROP).remove();
     newsNode.save();
 
-    newsAttachmentsService.unmakeAttachmentsPublic(newsNode);
+    newsAttachmentsStorage.unmakeAttachmentsPublic(newsNode);
   }
 
   public News unScheduleNews(News news) throws Exception {
@@ -1100,7 +1093,7 @@ public class JcrNewsStorage implements NewsStorage {
         newsNode.addMixin(EXO_PRIVILEGEABLE);
       }
       if (newsNode.hasProperty("exo:attachmentsIds")) {
-        newsAttachmentsService.shareAttachments(newsNode, space);
+        newsAttachmentsStorage.shareAttachments(newsNode, space);
       }
       newsNode.setPermission("*:" + space.getGroupId(), SHARE_NEWS_PERMISSIONS);
       newsNode.save();

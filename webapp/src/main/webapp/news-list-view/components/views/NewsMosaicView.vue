@@ -100,7 +100,7 @@ export default {
   },
   computed: {
     isMobile() {
-      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm';
+      return this.$vuetify.breakpoint.name === 'xs' || this.$vuetify.breakpoint.name === 'sm' || this.$vuetify.breakpoint.name === 'md';
     },
     isSmallBreakpoint() {
       return this.$vuetify.breakpoint.width < 651;

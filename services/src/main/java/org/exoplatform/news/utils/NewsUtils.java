@@ -70,6 +70,12 @@ public class NewsUtils {
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+
+  public static enum NewsObjectType {
+    DRAFT,
+    LATEST_DRAFT,
+    ARTICLE;
+  }
   
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {

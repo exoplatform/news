@@ -59,6 +59,8 @@ public interface NewsService {
    * @throws Exception
    */
   News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception;
+
+  News updateNews(News news, String updater, Boolean post, boolean publish, String newsType) throws Exception;
   
   /**
    * Delete news
@@ -249,4 +251,7 @@ public interface NewsService {
    * @return boolean : true if user can archive the news
    */
   boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor);
+
+  News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsType) throws IllegalAccessException;
+
 }

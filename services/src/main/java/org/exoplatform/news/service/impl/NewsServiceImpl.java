@@ -693,6 +693,9 @@ public class NewsServiceImpl implements NewsService {
       LOG.warn("Can't find user with id {} when checking access on news with id {}", authenticatedUser, news.getId());
       return false;
     }
+    if (NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity) && news.getActivities() != null) {
+      return true;
+    }
     return spaceService.canRedactOnSpace(space, authenticatedUserIdentity);
   }
   

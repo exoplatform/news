@@ -71,40 +71,47 @@ import org.exoplatform.wiki.service.NoteService;
 public class NewsServiceImplV2Test {
 
   @Mock
-  private SpaceService    spaceService;
+  private SpaceService                               spaceService;
 
   @Mock
-  private NoteService     noteService;
+  private NoteService                                noteService;
 
   @Mock
-  private MetadataService metadataService;
+  private MetadataService                            metadataService;
 
   @Mock
-  private FileService     fileService;
+  private FileService                                fileService;
 
   @Mock
-  private UploadService   uploadService;
+  private UploadService                              uploadService;
 
   @Mock
-  private IndexingService indexingService;
+  private IndexingService                            indexingService;
 
   @Mock
-  NewsTargetingService newsTargetingService;
+  NewsTargetingService                               newsTargetingService;
 
   @Mock
-  IdentityManager identityManager;
+  IdentityManager                                    identityManager;
 
-  private NewsService     newsService;
+  private NewsService                                newsService;
 
   private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
 
   private static final MockedStatic<PortalContainer> PORTAL_CONTAINER = mockStatic(PortalContainer.class);
 
-  private static final MockedStatic<NewsUtils> NEWS_UTILS = mockStatic(NewsUtils.class);
+  private static final MockedStatic<NewsUtils>       NEWS_UTILS       = mockStatic(NewsUtils.class);
 
   @Before
   public void setUp() {
-    this.newsService = new NewsServiceImplV2(spaceService, noteService, metadataService, fileService, newsTargetingService, indexingService, identityManager, uploadService);
+    this.newsService = new NewsServiceImplV2(spaceService,
+                                             noteService,
+                                             metadataService,
+                                             fileService,
+                                             newsTargetingService,
+                                             indexingService,
+                                             identityManager,
+                                             uploadService);
   }
 
   @AfterClass
@@ -169,7 +176,7 @@ public class NewsServiceImplV2Test {
   }
 
   @Test
-  public void getNewsById() throws Exception {
+  public void testGetDraftNewsById() throws Exception {
     // case draft of non-existing page
     DraftPage draftPage = new DraftPage();
     draftPage.setContent("draft body");
@@ -190,7 +197,8 @@ public class NewsServiceImplV2Test {
     MetadataItem metadataItem = mock(MetadataItem.class);
     List<MetadataItem> metadataItems = new ArrayList<>();
     metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByMetadataAndObject(any(MetadataKey.class), any(MetadataObject.class))).thenReturn(metadataItems);
+    when(metadataService.getMetadataItemsByMetadataAndObject(any(MetadataKey.class),
+                                                             any(MetadataObject.class))).thenReturn(metadataItems);
     Map<String, String> properties = new HashMap<>();
     properties.put(NEWS_SUMMARY, draftPage.getContent());
     when(metadataItem.getProperties()).thenReturn(properties);
@@ -211,7 +219,7 @@ public class NewsServiceImplV2Test {
   }
 
   @Test
-  public void updateNews() throws Exception {
+  public void testUpdateDraftNews() throws Exception {
     // case draft of non-existing page
     DraftPage draftPage = new DraftPage();
     draftPage.setContent("draft body");
@@ -234,7 +242,8 @@ public class NewsServiceImplV2Test {
     MetadataItem metadataItem = mock(MetadataItem.class);
     List<MetadataItem> metadataItems = new ArrayList<>();
     metadataItems.add(metadataItem);
-    when(metadataService.getMetadataItemsByMetadataAndObject(any(MetadataKey.class), any(MetadataObject.class))).thenReturn(metadataItems);
+    when(metadataService.getMetadataItemsByMetadataAndObject(any(MetadataKey.class),
+                                                             any(MetadataObject.class))).thenReturn(metadataItems);
     Map<String, String> properties = new HashMap<>();
     when(metadataItem.getProperties()).thenReturn(properties);
     PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
@@ -264,10 +273,11 @@ public class NewsServiceImplV2Test {
     expecteddraftPage.setContent(news.getBody());
     expecteddraftPage.setId(news.getId());
     //
-    assertThrows(IllegalArgumentException.class, () ->newsService.updateNews(news, "john", false, false, "draft"));
+    assertThrows(IllegalArgumentException.class, () -> newsService.updateNews(news, "john", false, false, "draft"));
     //
     when(spaceService.canRedactOnSpace(space, identity)).thenReturn(true);
-    org.exoplatform.social.core.identity.model.Identity identity1 = mock(org.exoplatform.social.core.identity.model.Identity.class);
+    org.exoplatform.social.core.identity.model.Identity identity1 =
+                                                                  mock(org.exoplatform.social.core.identity.model.Identity.class);
     when(identityManager.getOrCreateUserIdentity(anyString())).thenReturn(identity1);
     when(identity1.getId()).thenReturn("1");
     when(noteService.updateDraftForNewPage(any(DraftPage.class), anyLong())).thenReturn(expecteddraftPage);

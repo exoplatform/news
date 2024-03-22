@@ -60,7 +60,20 @@ public interface NewsService {
    */
   News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception;
 
-  News updateNews(News news, String updater, Boolean post, boolean publish, String newsType) throws Exception;
+  /**
+   * Update a news If the uploadId of the news is null, the illustration is not
+   * updated. If the uploadId of the news is empty, the illustration is removed
+   * (if any).
+   *
+   * @param news
+   * @param updater user attempting to update news
+   * @param post
+   * @param publish
+   * @param newsObjectType
+   * @return updated News
+   * @throws Exception
+   */
+  News updateNews(News news, String updater, Boolean post, boolean publish, String newsObjectType) throws Exception;
   
   /**
    * Delete news
@@ -252,6 +265,16 @@ public interface NewsService {
    */
   boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor);
 
-  News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsType) throws IllegalAccessException;
+  /**
+   * Retrieves a news identified by its technical identifier
+   *
+   * @param newsId {@link News} identifier
+   * @param currentIdentity user attempting to access news
+   * @param editMode access mode to news: whether to edit news to to view it.
+   * @param newsObjectType news object type to be retrieved.
+   * @return {@link News} if found else null
+   * @throws IllegalAccessException when user doesn't have access to {@link News}
+   */
+  News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsObjectType) throws IllegalAccessException;
 
 }

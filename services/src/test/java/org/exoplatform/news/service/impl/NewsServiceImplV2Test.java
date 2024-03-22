@@ -176,7 +176,7 @@ public class NewsServiceImplV2Test {
   }
 
   @Test
-  public void testGetDraftNewsById() throws Exception {
+  public void testGetDraftArticleById() throws Exception {
     // case draft of non-existing page
     DraftPage draftPage = new DraftPage();
     draftPage.setContent("draft body");
@@ -205,7 +205,7 @@ public class NewsServiceImplV2Test {
     PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
     COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("dw");
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
-    when(identity.getUserId()).thenReturn("1");
+    when(identity.getUserId()).thenReturn("john");
     //
     News news = newsService.getNewsById("1", identity, false, NewsUtils.NewsObjectType.DRAFT.name().toLowerCase());
     assertNotNull(news);
@@ -219,7 +219,7 @@ public class NewsServiceImplV2Test {
   }
 
   @Test
-  public void testUpdateDraftNews() throws Exception {
+  public void testUpdateDraftArticle() throws Exception {
     // case draft of non-existing page
     DraftPage draftPage = new DraftPage();
     draftPage.setContent("draft body");
@@ -249,7 +249,7 @@ public class NewsServiceImplV2Test {
     PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
     COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("dw");
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
-    when(identity.getUserId()).thenReturn("1");
+    when(identity.getUserId()).thenReturn("john");
     //
     org.exoplatform.wiki.model.Page rootPage = mock(org.exoplatform.wiki.model.Page.class);
     when(rootPage.getName()).thenReturn(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);

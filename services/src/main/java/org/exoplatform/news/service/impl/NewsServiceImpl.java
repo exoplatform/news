@@ -128,17 +128,6 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  private News recreateIfDraftDeleted(News news) throws Exception {
-    News existNews;
-    try {
-      existNews = newsStorage.getNewsById(news.getId(), false);
-    } catch (ItemNotFoundException e) {
-      existNews = newsStorage.createNews(news);
-    }
-    return existNews;
-  }
-
-
   /**
    * {@inheritDoc}
    */
@@ -158,6 +147,9 @@ public class NewsServiceImpl implements NewsService {
     return updateNews(news, updater, post, publish, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public News updateNews(News news, String updater, Boolean post, boolean publish, String newsType) throws Exception {
 
     if (!canEditNews(news, updater)) {
@@ -233,10 +225,26 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
+  public News getNewsById(String newsId, boolean editMode) throws Exception {
+    try {
+      News news = newsStorage.getNewsById(newsId, editMode);
+      return news;
+    } catch (Exception e) {
+      throw new Exception("An error occurred while retrieving news with id " + newsId, e);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
    return getNewsById(newsId, currentIdentity, editMode, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsType) throws IllegalAccessException {
     News news = null;
@@ -271,19 +279,6 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     return news;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public News getNewsById(String newsId, boolean editMode) throws Exception {
-    try {
-      News news = newsStorage.getNewsById(newsId, editMode);
-      return news;
-    } catch (Exception e) {
-      throw new Exception("An error occurred while retrieving news with id " + newsId, e);
-    }
   }
   
   /**
@@ -726,5 +721,15 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     return false;
+  }
+  
+  private News recreateIfDraftDeleted(News news) throws Exception {
+    News existNews;
+    try {
+      existNews = newsStorage.getNewsById(news.getId(), false);
+    } catch (ItemNotFoundException e) {
+      existNews = newsStorage.createNews(news);
+    }
+    return existNews;
   }
 }

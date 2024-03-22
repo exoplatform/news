@@ -452,10 +452,7 @@ public class NewsServiceImplV2 implements NewsService {
       // save illustration
       if (StringUtils.isNotEmpty(draftArticle.getUploadId())) {
         Long draftArticleIllustrationId = saveArticleIllustration(draftArticle.getUploadId(), null);
-        FileItem draftArticleIllustrationFileItem = fileService.getFile(draftArticleIllustrationId);
-        if (draftArticleIllustrationFileItem != null) {
-          draftArticle.setIllustration(draftArticleIllustrationFileItem.getAsByte());
-        }
+        setArticleIllustration(draftArticle, draftArticleIllustrationId, DRAFT.name());
         draftArticleMetadataItemProperties.put(NEWS_ILLUSTRATION_ID, String.valueOf(draftArticleIllustrationId));
         draftArticleMetadataItemProperties.put(NEWS_UPLOAD_ID, draftArticle.getUploadId());
       }
@@ -512,19 +509,33 @@ public class NewsServiceImplV2 implements NewsService {
         if (StringUtils.isNotEmpty(draftArticle.getUploadId())) {
           if (draftArticleMetadataItemProperties.containsKey(NEWS_UPLOAD_ID)
               && draftArticleMetadataItemProperties.get(NEWS_UPLOAD_ID) != null
-              && !draftArticleMetadataItemProperties.get(NEWS_UPLOAD_ID).equals(draftArticle.getUploadId())) {
-            FileItem draftArticleIllustrationFileItem =
-                                                      fileService.getFile(Long.parseLong(draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID)));
-            Long draftArticleIllustrationId = saveArticleIllustration(draftArticle.getUploadId(),
-                                                                      draftArticleIllustrationFileItem.getFileInfo().getId());
-            draftArticleMetadataItemProperties.put(NEWS_ILLUSTRATION_ID, String.valueOf(draftArticleIllustrationId));
-            setArticleIllustration(draftArticle, draftArticleIllustrationId, DRAFT.name());
+              && draftArticleMetadataItemProperties.containsKey(NEWS_ILLUSTRATION_ID)
+              && draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID) != null) {
+            if (!draftArticleMetadataItemProperties.get(NEWS_UPLOAD_ID).equals(draftArticle.getUploadId())) {
+              FileItem draftArticleIllustrationFileItem =
+                                                        fileService.getFile(Long.parseLong(draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID)));
+              Long draftArticleIllustrationId = saveArticleIllustration(draftArticle.getUploadId(),
+                                                                        draftArticleIllustrationFileItem.getFileInfo().getId());
+              draftArticleMetadataItemProperties.put(NEWS_ILLUSTRATION_ID, String.valueOf(draftArticleIllustrationId));
+              setArticleIllustration(draftArticle, draftArticleIllustrationId, DRAFT.name());
+            }
           } else {
             Long draftArticleIllustrationId = saveArticleIllustration(draftArticle.getUploadId(), null);
             draftArticleMetadataItemProperties.put(NEWS_ILLUSTRATION_ID, String.valueOf(draftArticleIllustrationId));
             setArticleIllustration(draftArticle, draftArticleIllustrationId, DRAFT.name());
           }
           draftArticleMetadataItemProperties.put(NEWS_UPLOAD_ID, draftArticle.getUploadId());
+        } else {
+          if (draftArticleMetadataItemProperties.containsKey(NEWS_UPLOAD_ID)
+              && draftArticleMetadataItemProperties.get(NEWS_UPLOAD_ID) != null
+              && draftArticleMetadataItemProperties.containsKey(NEWS_ILLUSTRATION_ID)
+              && draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID) != null) {
+            draftArticleMetadataItemProperties.remove(NEWS_UPLOAD_ID);
+            draftArticleMetadataItemProperties.remove(NEWS_ILLUSTRATION_ID);
+            FileItem draftArticleIllustrationFileItem =
+                                                      fileService.getFile(Long.parseLong(draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID)));
+            fileService.deleteFile(draftArticleIllustrationFileItem.getFileInfo().getId());
+          }
         }
         if (StringUtils.isNotEmpty(draftArticle.getSummary())) {
           draftArticleMetadataItemProperties.put(NEWS_SUMMARY, draftArticle.getSummary());

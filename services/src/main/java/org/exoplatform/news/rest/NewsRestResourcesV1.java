@@ -214,7 +214,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response updateNews(@Parameter(description = "News id", required = true) @PathParam("id") String id,
                              @Parameter(description = "Post news", required = false) @QueryParam("post") boolean post,
-                             @Parameter(description = "News type to be updated", required = false) @QueryParam("type") String newsObjectType,
+                             @Parameter(description = "News object type to be updated", required = false) @QueryParam("type") String newsObjectType,
                              @RequestBody(description = "News object to be updated", required = true) News updatedNews) {
 
     if (updatedNews == null) {
@@ -361,7 +361,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response getNewsById(@Context HttpServletRequest request,
                               @Parameter(description = "News id", required = true) @PathParam("id") String id,
                               @Parameter(description = "fields", required = true) @QueryParam("fields") String fields,
-                              @Parameter(description = "News type to be fetched", required = false) @QueryParam("type") String newsObjectType,
+                              @Parameter(description = "News object type to be fetched", required = false) @QueryParam("type") String newsObjectType,
                               @Parameter(description = "Is edit mode") @Schema(defaultValue = "false") @QueryParam("editMode") boolean editMode) {
     String authenticatedUser = request.getRemoteUser();
     try {
@@ -691,7 +691,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                       @Context HttpServletRequest request,
                                       @Parameter(description = "News id", required = true) @PathParam("id") String id,
                                       @Parameter(description = "last modified date") @QueryParam("v") long lastModified,
-                                      @Parameter(description = "news type to be fetched", required = false) @QueryParam("type") String newsObjectType,
+                                      @Parameter(description = "News object type to be fetched", required = false) @QueryParam("type") String newsObjectType,
                                       @Parameter(description = "resized image size") @QueryParam("size") String size) {
     try {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();

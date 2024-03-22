@@ -102,6 +102,15 @@ public interface NewsService {
    */
   void unpublishNews(String newsId, String publisher) throws Exception;
   
+  /**
+   * Retrives a news identified by its technical identifier
+   * 
+   * @param newsId {@link News} identifier
+   * @param editMode access mode to news: whether to edit news to to view it.
+   * @return {@link News} if found else null
+   * @throws Exception when user doesn't have access to {@link News}
+   */
+  News getNewsById(String newsId, boolean editMode) throws Exception;
   
   /**
    * Retrives a news identified by its technical identifier
@@ -115,14 +124,16 @@ public interface NewsService {
   News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException;
   
   /**
-   * Retrives a news identified by its technical identifier
-   * 
+   * Retrieves a news identified by its technical identifier
+   *
    * @param newsId {@link News} identifier
+   * @param currentIdentity user attempting to access news
    * @param editMode access mode to news: whether to edit news to to view it.
+   * @param newsObjectType news object type to be retrieved.
    * @return {@link News} if found else null
-   * @throws Exception when user doesn't have access to {@link News}
+   * @throws IllegalAccessException when user doesn't have access to {@link News}
    */
-  News getNewsById(String newsId, boolean editMode) throws Exception;
+  News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsObjectType) throws IllegalAccessException;
   
   /**
    * Get all news
@@ -264,17 +275,4 @@ public interface NewsService {
    * @return boolean : true if user can archive the news
    */
   boolean canArchiveNews(org.exoplatform.services.security.Identity currentIdentity, String newsAuthor);
-
-  /**
-   * Retrieves a news identified by its technical identifier
-   *
-   * @param newsId {@link News} identifier
-   * @param currentIdentity user attempting to access news
-   * @param editMode access mode to news: whether to edit news to to view it.
-   * @param newsObjectType news object type to be retrieved.
-   * @return {@link News} if found else null
-   * @throws IllegalAccessException when user doesn't have access to {@link News}
-   */
-  News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsObjectType) throws IllegalAccessException;
-
 }

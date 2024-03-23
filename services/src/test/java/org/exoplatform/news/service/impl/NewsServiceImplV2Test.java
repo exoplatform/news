@@ -17,16 +17,16 @@
 package org.exoplatform.news.service.impl;
 
 import static org.exoplatform.news.service.impl.NewsServiceImplV2.NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +43,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsDraftObject;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.MetadataService;
@@ -69,19 +70,28 @@ public class NewsServiceImplV2Test {
   @Mock
   private UploadService   uploadService;
 
+  @Mock
+  IdentityManager         identityManager;
+
   private NewsService     newsService;
 
   @Before
   public void setUp() {
-    this.newsService = new NewsServiceImplV2(spaceService, noteService, metadataService, fileService, uploadService);
+    this.newsService = new NewsServiceImplV2(spaceService,
+                                             noteService,
+                                             metadataService,
+                                             fileService,
+                                             identityManager,
+                                             uploadService);
   }
 
   @Test
-  public void createNews() throws Exception {
+  public void testCreateDraftArticle() throws Exception {
 
     News draftArticle = new News();
     draftArticle.setAuthor("john");
     draftArticle.setTitle("draft article for new page");
+    draftArticle.setSummary("draft article summary for new page");
     draftArticle.setBody("draft body");
     draftArticle.setPublicationState("draft");
 
@@ -96,7 +106,7 @@ public class NewsServiceImplV2Test {
     draftPage.setAuthor("john");
 
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
-    when(identity.getUserId()).thenReturn("2");
+    when(identity.getUserId()).thenReturn("john");
 
     when(spaceService.isSuperManager(anyString())).thenReturn(true);
     org.exoplatform.wiki.model.Page rootPage = mock(org.exoplatform.wiki.model.Page.class);
@@ -110,11 +120,18 @@ public class NewsServiceImplV2Test {
     when(noteService.getNotesOfWiki("group", space.getGroupId())).thenReturn(Arrays.asList(rootPage));
     when(noteService.createDraftForNewPage(any(DraftPage.class), anyLong())).thenReturn(draftPage);
     when(rootPage.getId()).thenReturn("1");
+    org.exoplatform.social.core.identity.model.Identity identity1 =
+                                                                  mock(org.exoplatform.social.core.identity.model.Identity.class);
+    when(identityManager.getOrCreateUserIdentity(anyString())).thenReturn(identity1);
+    when(identity1.getId()).thenReturn("1");
     //
     savedDraftArticle = newsService.createNews(draftArticle, identity);
     //
     assertNotNull(savedDraftArticle);
-    verify(metadataService, times(1)).createMetadataItem(any(NewsDraftObject.class), any(MetadataKey.class), any(Map.class));
+    verify(metadataService, times(1)).createMetadataItem(any(NewsDraftObject.class),
+                                                         any(MetadataKey.class),
+                                                         any(Map.class),
+                                                         anyLong());
     assertNotNull(savedDraftArticle.getId());
     assertEquals(draftPage.getId(), savedDraftArticle.getId());
     assertEquals(draftPage.getTitle(), savedDraftArticle.getTitle());

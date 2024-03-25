@@ -48,7 +48,7 @@ export default {
     link() {
       const baseUrl = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor`;
       if (eXo.env.portal.spaceId) {
-        return `${baseUrl}?spaceId=${eXo.env.portal.spaceId}`;
+        return `${baseUrl}?spaceId=${eXo.env.portal.spaceId}&type=draft`;
       } else {
         return baseUrl;
       }

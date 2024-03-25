@@ -222,6 +222,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       @ApiResponse(responseCode = "500", description = "Internal server error") })
   public Response updateNews(@Parameter(description = "News id", required = true) @PathParam("id") String id,
                              @Parameter(description = "Post news", required = false) @QueryParam("post") boolean post,
+                             @Parameter(description = "News object type to be updated", required = false) @QueryParam("type") String newsObjectType,
                              @RequestBody(description = "News object to be updated", required = true) News updatedNews) {
 
     if (updatedNews == null) {
@@ -229,7 +230,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
     }
     org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
     try {
-      News news = newsService.getNewsById(id, currentIdentity, false);
+      News news = newsService.getNewsById(id, currentIdentity, false, newsObjectType);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -246,7 +247,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       news.setAudience(updatedNews.getAudience());
 
 
-      news = newsService.updateNews(news, currentIdentity.getUserId(), post, updatedNews.isPublished());
+      news = newsService.updateNews(news, currentIdentity.getUserId(), post, updatedNews.isPublished(), newsObjectType);
 
       return Response.ok(news).build();
     } catch (IllegalAccessException e) {
@@ -369,6 +370,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
   public Response getNewsById(@Context HttpServletRequest request,
                               @Parameter(description = "News id", required = true) @PathParam("id") String id,
                               @Parameter(description = "fields", required = true) @QueryParam("fields") String fields,
+                              @Parameter(description = "News object type to be fetched", required = false) @QueryParam("type") String newsObjectType,
                               @Parameter(description = "Is edit mode") @Schema(defaultValue = "false") @QueryParam("editMode") boolean editMode) {
     String authenticatedUser = request.getRemoteUser();
     try {
@@ -376,7 +378,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-      News news = newsService.getNewsById(id, currentIdentity, editMode);
+      News news = newsService.getNewsById(id, currentIdentity, editMode, newsObjectType);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -774,10 +776,11 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                                       @Context HttpServletRequest request,
                                       @Parameter(description = "News id", required = true) @PathParam("id") String id,
                                       @Parameter(description = "last modified date") @QueryParam("v") long lastModified,
+                                      @Parameter(description = "News object type to be fetched", required = false) @QueryParam("type") String newsObjectType,
                                       @Parameter(description = "resized image size") @QueryParam("size") String size) {
     try {
       org.exoplatform.services.security.Identity currentIdentity = ConversationState.getCurrent().getIdentity();
-      News news = newsService.getNewsById(id, currentIdentity, false);
+      News news = newsService.getNewsById(id, currentIdentity, false, newsObjectType);
       if (news == null || news.getIllustration() == null || news.getIllustration().length == 0) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }

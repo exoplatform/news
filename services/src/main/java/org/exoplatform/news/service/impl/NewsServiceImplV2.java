@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -64,6 +63,7 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.MetadataService;
 import org.exoplatform.social.metadata.model.MetadataItem;
 import org.exoplatform.social.metadata.model.MetadataKey;
+import org.exoplatform.social.metadata.model.MetadataObject;
 import org.exoplatform.social.metadata.model.MetadataType;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
@@ -117,7 +117,7 @@ public class NewsServiceImplV2 implements NewsService {
   private final ActivityManager      activityManager;
 
   private final WikiService          wikiService;
-
+  
   public NewsServiceImplV2(SpaceService spaceService,
                            NoteService noteService,
                            MetadataService metadataService,
@@ -257,8 +257,28 @@ public class NewsServiceImplV2 implements NewsService {
    * {@inheritDoc}
    */
   @Override
-  public void deleteNews(String id, Identity currentIdentity, boolean isDraft) throws Exception {
+  public void deleteNews(String newsId, Identity currentIdentity, boolean isDraft) throws Exception {
 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void deleteNews(String newsId, Identity currentIdentity, boolean isDraft, String newsObjectType) throws Exception {
+    News news = getNewsById(newsId, currentIdentity, false, newsObjectType);
+    if (!news.isCanDelete()) {
+      throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");
+    }
+    if (isDraft) {
+      deleteDraftArticle(newsId, currentIdentity.getUserId());
+    } else {
+      // TODO delete article
+      indexingService.unindex(NewsIndexingServiceConnector.TYPE, String.valueOf(news.getId()));
+      MetadataObject newsMetadataObject = new MetadataObject(NewsUtils.NEWS_METADATA_OBJECT_TYPE, newsId);
+      metadataService.deleteMetadataItemsByObject(newsMetadataObject);
+      NewsUtils.broadcastEvent(NewsUtils.DELETE_NEWS, currentIdentity.getUserId(), news);
+    }
   }
 
   /**
@@ -302,20 +322,19 @@ public class NewsServiceImplV2 implements NewsService {
                           boolean editMode,
                           String newsObjectType) throws IllegalAccessException {
     News news = null;
-    if (newsObjectType == null) {
-      throw new IllegalArgumentException("required argument news type could not be null");
-    }
-    if (DRAFT.name().toLowerCase().equals(newsObjectType)) {
-      try {
+    try {
+      if (newsObjectType == null) {
+        throw new IllegalArgumentException("Required argument news object type could not be null");
+      }
+      if (DRAFT.name().toLowerCase().equals(newsObjectType)) {
         news = buildDraftArticle(newsId, currentIdentity.getUserId());
+      } else if (LATEST_DRAFT.name().toLowerCase().equals(newsObjectType)) {
+        // TODO
+      } else if (ARTICLE.name().toLowerCase().equals(newsObjectType)) {
+        // TODO
       }
-      catch (WikiException wikiException) {
-        return null;
-      }
-    } else if (LATEST_DRAFT.name().toLowerCase().equals(newsObjectType)) {
-      // TODO
-    } else if (ARTICLE.name().toLowerCase().equals(newsObjectType)) {
-      // TODO
+    } catch (Exception exception) {
+      LOG.error("An error occurred while retrieving news with id {}", newsId, exception);
     }
     if (news != null) {
       if (editMode) {
@@ -438,18 +457,17 @@ public class NewsServiceImplV2 implements NewsService {
         LOG.warn("Can't find space with id {} when checking access on news with id {}", spaceId, news.getId());
         return false;
       }
-      if (!news.isPublished()
-              && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
-              && !(spaceService.isSuperManager(authenticatedUser)
-              || spaceService.isMember(space, authenticatedUser)
+      if (!news.isPublished() && StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.PUBLISHED)
+          && !(spaceService.isSuperManager(authenticatedUser) || spaceService.isMember(space, authenticatedUser)
               || isMemberOfsharedInSpaces(news, authenticatedUser))) {
         return false;
       }
-      if (news.isPublished() && news.getAudience().equals(NewsUtils.SPACE_NEWS_AUDIENCE) && !spaceService.isMember(space, authenticatedUser)) {
+      if (news.isPublished() && news.getAudience().equals(NewsUtils.SPACE_NEWS_AUDIENCE)
+          && !spaceService.isMember(space, authenticatedUser)) {
         return false;
       }
       if (StringUtils.equals(news.getPublicationState(), PublicationDefaultStates.STAGED)
-              && !canScheduleNews(space, NewsUtils.getUserIdentity(authenticatedUser))) {
+          && !canScheduleNews(space, NewsUtils.getUserIdentity(authenticatedUser))) {
         return false;
       }
     } catch (Exception e) {
@@ -498,7 +516,9 @@ public class NewsServiceImplV2 implements NewsService {
     Wiki wiki = wikiService.getWikiByTypeAndOwner(WikiType.GROUP.name().toLowerCase(), pageOwnerId);
     Page newsArticlesRootNotePage = null;
     if (wiki != null) {
-      newsArticlesRootNotePage = noteService.getNoteOfNoteBookByName(WikiType.GROUP.name().toLowerCase(), pageOwnerId, NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
+      newsArticlesRootNotePage = noteService.getNoteOfNoteBookByName(WikiType.GROUP.name().toLowerCase(),
+                                                                     pageOwnerId,
+                                                                     NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
       // create the news root page if the wiki exist
       if (newsArticlesRootNotePage == null) {
         newsArticlesRootNotePage = createNewsArticlesNoteRootPage(wiki);
@@ -686,6 +706,30 @@ public class NewsServiceImplV2 implements NewsService {
       return draftArticle;
     }
     return null;
+  }
+
+  private void deleteDraftArticle(String draftArticleId, String draftArticleCreator) throws Exception {
+    DraftPage draftArticlePage = noteService.getDraftNoteById(draftArticleId, draftArticleCreator);
+    if (draftArticlePage != null) {
+      noteService.removeDraftById(draftArticlePage.getId());
+      NewsDraftObject draftArticleMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE,
+                                                                       draftArticlePage.getId(),
+                                                                       null);
+      MetadataKey draftArticleMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
+      List<MetadataItem> draftArticleMetadataItems =
+                                                   metadataService.getMetadataItemsByMetadataAndObject(draftArticleMetadataKey,
+                                                                                                       draftArticleMetaDataObject);
+      if (draftArticleMetadataItems != null && !draftArticleMetadataItems.isEmpty()) {
+        Map<String, String> draftArticleMetadataItemProperties = draftArticleMetadataItems.get(0).getProperties();
+        if (draftArticleMetadataItemProperties != null && draftArticleMetadataItemProperties.containsKey(NEWS_ILLUSTRATION_ID)
+            && draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID) != null) {
+          FileItem draftArticleIllustrationFileItem =
+                                                    fileService.getFile(Long.parseLong(draftArticleMetadataItemProperties.get(NEWS_ILLUSTRATION_ID)));
+          fileService.deleteFile(draftArticleIllustrationFileItem.getFileInfo().getId());
+        }
+        metadataService.deleteMetadataItem(draftArticleMetadataItems.get(0).getId(), false);
+      }
+    }
   }
 
   private boolean canEditNews(News news, String authenticatedUser) {

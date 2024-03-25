@@ -263,6 +263,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                              @Parameter(description = "News id", required = true)
                              @PathParam("id") String id,
                              @Parameter(description = "Is draft to delete") @Schema(defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
+                             @Parameter(description = "News object type to be updated", required = false) @QueryParam("type") String newsObjectType,
                              @Parameter(description = "Time to effectively delete news", required = false)
                              @QueryParam(
                                      "delay"
@@ -272,7 +273,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      News news = newsService.getNewsById(id, currentIdentity, false);
+      News news = newsService.getNewsById(id, currentIdentity, false, newsObjectType);
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -285,7 +286,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             RequestLifeCycle.begin(container);
             try {
               newsToDeleteQueue.remove(id);
-              newsService.deleteNews(id, currentIdentity, isDraft);
+              newsService.deleteNews(id, currentIdentity, isDraft, newsObjectType);
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", currentIdentity.getUserId(), e);
             } catch (Exception e) {
@@ -297,7 +298,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }, delay, TimeUnit.SECONDS);
       } else {
         newsToDeleteQueue.remove(id);
-        newsService.deleteNews(id, currentIdentity, isDraft);
+        newsService.deleteNews(id, currentIdentity, isDraft, newsObjectType);
       }
       return Response.ok().build();
     } catch (IllegalAccessException e) {

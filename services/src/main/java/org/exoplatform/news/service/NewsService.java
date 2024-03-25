@@ -86,6 +86,17 @@ public interface NewsService {
   void deleteNews(String id, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft) throws Exception;
   
   /**
+   * Delete news
+   * 
+   * @param id the news id to delete
+   * @param currentIdentity user attempting to delete news
+   * @param isDraft if the News is still draft
+   * @param newsObjectType news object type to be deleted.
+   * @throws Exception when error
+   */
+  void deleteNews(String id, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft, String newsObjectType) throws Exception;
+  
+  /**
    * Publish a news
    *
    * @param news to be published

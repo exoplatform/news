@@ -1056,7 +1056,7 @@ public class NewsRestResourcesV1Test {
     news.setSpaceId("1");
     news.setCanDelete(true);
 
-    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
+    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean(), anyString())).thenReturn(news);
     Space space1 = new Space();
     space1.setId("1");
     space1.setPrettyName("space1");
@@ -1065,11 +1065,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, "draft", 0L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", currentIdentity, false);
+    verify(newsService).deleteNews("1", currentIdentity, false, "draft");
   }
 
   @Test
@@ -1085,7 +1085,7 @@ public class NewsRestResourcesV1Test {
     news.setSpaceId("1");
     news.setCanDelete(true);
 
-    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
+    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean(), anyString())).thenReturn(news);
     Space space1 = new Space();
     space1.setId("1");
     space1.setPrettyName("space1");
@@ -1094,11 +1094,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, "draft", 0L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", currentIdentity, false);
+    verify(newsService).deleteNews("1", currentIdentity, false, "draft");
   }
 
   @Test
@@ -1109,17 +1109,17 @@ public class NewsRestResourcesV1Test {
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     lenient().when(request.getRemoteUser()).thenReturn(JOHN);
-    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
+    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean(), nullable(String.class))).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, null, 0L);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", currentIdentity, false);
+    verify(newsService, never()).deleteNews("1", currentIdentity, false, null);
   }
 
   @Test
@@ -1131,17 +1131,17 @@ public class NewsRestResourcesV1Test {
     ConversationState.setCurrent(new ConversationState(currentIdentity));
 
     lenient().when(request.getRemoteUser()).thenReturn(JOHN);
-    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(null);
+    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean(), nullable(String.class))).thenReturn(null);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, null, false, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, null, false, null, 0L);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", currentIdentity, false);
+    verify(newsService, never()).deleteNews("1", currentIdentity, false, null);
   }
 
   @Test
@@ -1721,12 +1721,12 @@ public class NewsRestResourcesV1Test {
     News news = new News();
     news.setId("1");
     news.setCanDelete(true);
-    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean())).thenReturn(news);
+    lenient().when(newsService.getNewsById(anyString(), any(), anyBoolean(), anyString())).thenReturn(news);
     lenient().when(spaceService.getSpaceById(anyString())).thenReturn(new Space());
     lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, news.getId(), false, 0);
+    Response response = newsRestResourcesV1.deleteNews(request, news.getId(), false, "draft", 0);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

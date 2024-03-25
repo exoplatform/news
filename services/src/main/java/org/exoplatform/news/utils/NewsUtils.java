@@ -60,17 +60,21 @@ public class NewsUtils {
   public static final String  DISPLAYED_STATUS                = "displayed";
 
   public static final String  TARGET_PERMISSIONS              = "permissions";
-  
-  public static final String SPACE_NEWS_AUDIENCE = "space";
-  
-  public static final String ALL_NEWS_AUDIENCE = "all";
-  
+
+  public static final String  SPACE_NEWS_AUDIENCE             = "space";
+
+  public static final String  ALL_NEWS_AUDIENCE               = "all";
+
   private static final String PUBLISHER_MEMBERSHIP_NAME       = "publisher";
 
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
-  
+
+  public enum NewsObjectType {
+    DRAFT, LATEST_DRAFT, ARTICLE;
+  }
+
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {
       ListenerService listenerService = CommonsUtils.getService(ListenerService.class);
@@ -87,62 +91,60 @@ public class NewsUtils {
    * @param space : the space of the news (for group mentioning)
    * @return set of mentioned users
    */
-  public static Set<String> processMentions(String content,Space space) {
-      Set<String> mentions = new HashSet<>();
-      mentions.addAll(MentionUtils.getMentionedUsernames(content));
+  public static Set<String> processMentions(String content, Space space) {
+    Set<String> mentions = new HashSet<>();
+    mentions.addAll(MentionUtils.getMentionedUsernames(content));
 
-      if (space != null) {
-        IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
-        String spaceIdentityId = identityStorage.findIdentityId(SpaceIdentityProvider.NAME, space.getPrettyName());
-        Set<String> mentionedRoles = MentionUtils.getMentionedRoles(content, spaceIdentityId);
-        mentionedRoles.forEach(role -> {
-          if (StringUtils.equals("member", role) && space.getMembers() != null) {
-            mentions.addAll(Arrays.asList(space.getMembers()));
-          } else if (StringUtils.equals("manager", role) && space.getManagers() != null) {
-            mentions.addAll(Arrays.asList(space.getManagers()));
-          } else if (StringUtils.equals("redactor", role) && space.getRedactors() != null) {
-            mentions.addAll(Arrays.asList(space.getRedactors()));
-          } else if (StringUtils.equals("publisher", role) && space.getPublishers() != null) {
-            mentions.addAll(Arrays.asList(space.getPublishers()));
-          }
-        });
-      }
+    if (space != null) {
+      IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
+      String spaceIdentityId = identityStorage.findIdentityId(SpaceIdentityProvider.NAME, space.getPrettyName());
+      Set<String> mentionedRoles = MentionUtils.getMentionedRoles(content, spaceIdentityId);
+      mentionedRoles.forEach(role -> {
+        if (StringUtils.equals("member", role) && space.getMembers() != null) {
+          mentions.addAll(Arrays.asList(space.getMembers()));
+        } else if (StringUtils.equals("manager", role) && space.getManagers() != null) {
+          mentions.addAll(Arrays.asList(space.getManagers()));
+        } else if (StringUtils.equals("redactor", role) && space.getRedactors() != null) {
+          mentions.addAll(Arrays.asList(space.getRedactors()));
+        } else if (StringUtils.equals("publisher", role) && space.getPublishers() != null) {
+          mentions.addAll(Arrays.asList(space.getPublishers()));
+        }
+      });
+    }
 
-      return mentions.stream()
-                     .map(remoteId -> {
-                       IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
+    return mentions.stream().map(remoteId -> {
+      IdentityStorage identityStorage = CommonsUtils.getService(IdentityStorage.class);
 
-                       Identity identity = identityStorage.findIdentity(OrganizationIdentityProvider.NAME, remoteId);
-                       return identity == null ? null : identity.getId();
-                     })
-                     .filter(Objects::nonNull)
-                     .collect(Collectors.toSet());
+      Identity identity = identityStorage.findIdentity(OrganizationIdentityProvider.NAME, remoteId);
+      return identity == null ? null : identity.getId();
+    }).filter(Objects::nonNull).collect(Collectors.toSet());
   }
-
 
   public static List<Space> getAllowedDraftNewsSpaces(org.exoplatform.services.security.Identity userIdentity) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userIdentity.getUserId());
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
-    return memberSpaces.stream()
-                 .filter(space -> (spaceService.canRedactOnSpace(space, userIdentity)))
-                 .toList();
+    return memberSpaces.stream().filter(space -> (spaceService.canRedactOnSpace(space, userIdentity))).toList();
   }
-  
+
   public static List<Space> getAllowedScheduledNewsSpaces(org.exoplatform.services.security.Identity currentIdentity) throws Exception {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(currentIdentity.getUserId());
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
     return memberSpaces.stream()
-                 .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId()) || spaceService.isRedactor(space, currentIdentity.getUserId()) || canPublishNews(space.getId(), currentIdentity)))
-                 .toList();
+                       .filter(space -> (spaceService.isManager(space, currentIdentity.getUserId())
+                           || spaceService.isRedactor(space, currentIdentity.getUserId())
+                           || canPublishNews(space.getId(), currentIdentity)))
+                       .toList();
   }
 
   public static boolean canPublishNews(String spaceId, org.exoplatform.services.security.Identity currentIdentity) {
     if (!StringUtils.isBlank(spaceId)) {
       SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
       Space space = spaceService.getSpaceById(spaceId);
-      return currentIdentity != null && space != null && spaceService.isMember(space, currentIdentity.getUserId()) && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME) || spaceService.isPublisher(space, currentIdentity.getUserId()));
+      return currentIdentity != null && space != null && spaceService.isMember(space, currentIdentity.getUserId())
+          && (currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME)
+              || spaceService.isPublisher(space, currentIdentity.getUserId()));
     }
     return currentIdentity != null && currentIdentity.isMemberOf(PLATFORM_WEB_CONTRIBUTORS_GROUP, PUBLISHER_MEMBERSHIP_NAME);
   }
@@ -169,5 +171,4 @@ public class NewsUtils {
     }
     return identity;
   }
-
 }

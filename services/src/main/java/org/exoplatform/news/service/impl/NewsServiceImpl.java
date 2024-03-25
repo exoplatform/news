@@ -128,17 +128,6 @@ public class NewsServiceImpl implements NewsService {
     }
   }
 
-  private News recreateIfDraftDeleted(News news) throws Exception {
-    News existNews;
-    try {
-      existNews = newsStorage.getNewsById(news.getId(), false);
-    } catch (ItemNotFoundException e) {
-      existNews = newsStorage.createNews(news);
-    }
-    return existNews;
-  }
-
-
   /**
    * {@inheritDoc}
    */
@@ -155,8 +144,15 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public News updateNews(News news, String updater, Boolean post, boolean publish) throws Exception {
+    return updateNews(news, updater, post, publish, null);
+  }
 
-    if (!canEditNews(news, updater)) {  
+  /**
+   * {@inheritDoc}
+   */
+  public News updateNews(News news, String updater, Boolean post, boolean publish, String newsType) throws Exception {
+
+    if (!canEditNews(news, updater)) {
       throw new IllegalArgumentException("User " + updater + " is not authorized to update news");
     }
     News originalNews = getNewsById(news.getId(), false);
@@ -185,7 +181,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     newsStorage.updateNews(news, updater);
-    
+
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
       // Send mention notifs
       if (StringUtils.isNotEmpty(news.getId()) && news.getCreationDate() != null) {
@@ -204,7 +200,7 @@ public class NewsServiceImpl implements NewsService {
       if (post != null) {
         updateNewsActivity(news, post);
       }
-      NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news); 
+      NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news);
     }
     return news;
   }
@@ -229,7 +225,28 @@ public class NewsServiceImpl implements NewsService {
    * {@inheritDoc}
    */
   @Override
+  public News getNewsById(String newsId, boolean editMode) throws Exception {
+    try {
+      News news = newsStorage.getNewsById(newsId, editMode);
+      return news;
+    } catch (Exception e) {
+      throw new Exception("An error occurred while retrieving news with id " + newsId, e);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode) throws IllegalAccessException {
+   return getNewsById(newsId, currentIdentity, editMode, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public News getNewsById(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean editMode, String newsType) throws IllegalAccessException {
     News news = null;
     try {
       news = getNewsById(newsId, editMode);
@@ -262,19 +279,6 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     return news;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public News getNewsById(String newsId, boolean editMode) throws Exception {
-    try {
-      News news = newsStorage.getNewsById(newsId, editMode);
-      return news;
-    } catch (Exception e) {
-      throw new Exception("An error occurred while retrieving news with id " + newsId, e);
-    }
   }
   
   /**
@@ -717,5 +721,15 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     return false;
+  }
+  
+  private News recreateIfDraftDeleted(News news) throws Exception {
+    News existNews;
+    try {
+      existNews = newsStorage.getNewsById(news.getId(), false);
+    } catch (ItemNotFoundException e) {
+      existNews = newsStorage.createNews(news);
+    }
+    return existNews;
   }
 }

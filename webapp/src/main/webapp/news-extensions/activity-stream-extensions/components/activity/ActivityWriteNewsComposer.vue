@@ -88,7 +88,7 @@ export default {
       if (!this.disableComposerButton) {
         let url = `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor`;
         if (eXo.env.portal.spaceId) {
-          url += `?spaceId=${eXo.env.portal.spaceId}`;
+          url += `?spaceId=${eXo.env.portal.spaceId}&type=draft`;
         }
         localStorage.setItem('exo-activity-composer-message', this.message || '');
         window.open(url, '_blank');

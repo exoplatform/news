@@ -133,10 +133,7 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public boolean canCreateNews(Space space, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    return space != null
-        && (spaceService.isSuperManager(currentIdentity.getUserId()) || spaceService.isManager(space, currentIdentity.getUserId())
-            || spaceService.isRedactor(space, currentIdentity.getUserId())
-            || spaceService.isMember(space, currentIdentity.getUserId()) && ArrayUtils.isEmpty(space.getRedactors()));
+    return space != null && (NewsUtils.canPublishNews(space.getId(), currentIdentity) || spaceService.canRedactOnSpace(space, currentIdentity));
   }
   
   /**
@@ -697,10 +694,7 @@ public class NewsServiceImpl implements NewsService {
       LOG.warn("Can't find user with id {} when checking access on news with id {}", authenticatedUser, news.getId());
       return false;
     }
-    if (NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity) && news.getActivities() != null) {
-      return true;
-    }
-    return spaceService.canRedactOnSpace(space, authenticatedUserIdentity);
+    return NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity) || spaceService.canRedactOnSpace(space, authenticatedUserIdentity);
   }
   
   private boolean canDeleteNews(org.exoplatform.services.security.Identity currentIdentity, String posterId, String spaceId) {

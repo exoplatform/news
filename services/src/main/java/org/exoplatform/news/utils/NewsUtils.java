@@ -124,7 +124,7 @@ public class NewsUtils {
     SpaceService spaceService = CommonsUtils.getService(SpaceService.class);
     ListAccess<Space> memberSpacesListAccess = spaceService.getMemberSpaces(userIdentity.getUserId());
     List<Space> memberSpaces = Arrays.asList(memberSpacesListAccess.load(0, memberSpacesListAccess.getSize()));
-    return memberSpaces.stream().filter(space -> (spaceService.canRedactOnSpace(space, userIdentity))).toList();
+    return memberSpaces.stream().filter(space -> (spaceService.canRedactOnSpace(space, userIdentity) || canPublishNews(space.getId(), userIdentity))).toList();
   }
 
   public static List<Space> getAllowedScheduledNewsSpaces(org.exoplatform.services.security.Identity currentIdentity) throws Exception {

@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -38,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.social.core.manager.ActivityManager;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +97,12 @@ public class NewsServiceImplV2Test {
   @Mock
   IdentityManager                                    identityManager;
 
+  @Mock
+  ActivityManager                                    activityManager;
+
   private NewsService                                newsService;
+
+  private UserACL                                    userACL;
 
   private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
 
@@ -104,6 +112,7 @@ public class NewsServiceImplV2Test {
 
   @Before
   public void setUp() {
+    userACL = CommonsUtils.getService(UserACL.class);
     this.newsService = new NewsServiceImplV2(spaceService,
                                              noteService,
                                              metadataService,
@@ -111,6 +120,8 @@ public class NewsServiceImplV2Test {
                                              newsTargetingService,
                                              indexingService,
                                              identityManager,
+                                             userACL,
+                                             activityManager,
                                              uploadService);
   }
 
@@ -143,7 +154,7 @@ public class NewsServiceImplV2Test {
 
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
     when(identity.getUserId()).thenReturn("john");
-
+    when(spaceService.getSpaceById(any())).thenReturn(space);
     when(spaceService.isSuperManager(anyString())).thenReturn(true);
     org.exoplatform.wiki.model.Page rootPage = mock(org.exoplatform.wiki.model.Page.class);
     when(rootPage.getName()).thenReturn(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
@@ -160,6 +171,8 @@ public class NewsServiceImplV2Test {
                                                                   mock(org.exoplatform.social.core.identity.model.Identity.class);
     when(identityManager.getOrCreateUserIdentity(anyString())).thenReturn(identity1);
     when(identity1.getId()).thenReturn("1");
+    NEWS_UTILS.when(() -> NewsUtils.canPublishNews(anyString(), any(Identity.class))).thenReturn(true);
+    when(spaceService.canRedactOnSpace(any(Space.class), any(Identity.class))).thenReturn(true);
     //
     savedDraftArticle = newsService.createNews(draftArticle, identity);
     //
@@ -191,6 +204,8 @@ public class NewsServiceImplV2Test {
     when(space.getAvatarUrl()).thenReturn("space/avatar/url");
     when(space.getDisplayName()).thenReturn("spaceDisplayName");
     when(space.getVisibility()).thenReturn("public");
+    when(space.getId()).thenReturn("1");
+    when(spaceService.getSpaceById("1")).thenReturn(space);
     when(spaceService.isSuperManager(anyString())).thenReturn(true);
 
     when(noteService.getDraftNoteById(anyString(), anyString())).thenReturn(draftPage);
@@ -206,6 +221,8 @@ public class NewsServiceImplV2Test {
     COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("dw");
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
     when(identity.getUserId()).thenReturn("john");
+    when(activityManager.getActivity(nullable(String.class))).thenReturn(null);
+    when(newsTargetingService.getTargetsByNewsId(anyString())).thenReturn(null);
     //
     News news = newsService.getNewsById("1", identity, false, NewsUtils.NewsObjectType.DRAFT.name().toLowerCase());
     assertNotNull(news);
@@ -250,6 +267,8 @@ public class NewsServiceImplV2Test {
     COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("dw");
     org.exoplatform.services.security.Identity identity = mock(Identity.class);
     when(identity.getUserId()).thenReturn("john");
+    when(activityManager.getActivity(nullable(String.class))).thenReturn(null);
+    when(newsTargetingService.getTargetsByNewsId(anyString())).thenReturn(null);
     //
     org.exoplatform.wiki.model.Page rootPage = mock(org.exoplatform.wiki.model.Page.class);
     when(rootPage.getName()).thenReturn(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);

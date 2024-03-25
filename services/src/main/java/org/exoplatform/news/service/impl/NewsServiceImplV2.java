@@ -23,6 +23,7 @@ import static org.exoplatform.news.utils.NewsUtils.NewsObjectType.LATEST_DRAFT;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,10 @@ import org.exoplatform.upload.UploadService;
 import org.exoplatform.wiki.WikiException;
 import org.exoplatform.wiki.model.DraftPage;
 import org.exoplatform.wiki.model.Page;
+import org.exoplatform.wiki.model.Wiki;
+import org.exoplatform.wiki.model.WikiType;
 import org.exoplatform.wiki.service.NoteService;
+import org.exoplatform.wiki.service.WikiService;
 
 public class NewsServiceImplV2 implements NewsService {
 
@@ -88,6 +92,7 @@ public class NewsServiceImplV2 implements NewsService {
   public static final String         NEWS_ILLUSTRATION_ID              = "illustrationId";
 
   public static final String         NEWS_UPLOAD_ID                    = "uploadId";
+
 
   private static final Log           LOG                               = ExoLogger.getLogger(NewsServiceImplV2.class);
 
@@ -111,6 +116,8 @@ public class NewsServiceImplV2 implements NewsService {
 
   private final ActivityManager      activityManager;
 
+  private final WikiService          wikiService;
+
   public NewsServiceImplV2(SpaceService spaceService,
                            NoteService noteService,
                            MetadataService metadataService,
@@ -120,6 +127,7 @@ public class NewsServiceImplV2 implements NewsService {
                            IdentityManager identityManager,
                            UserACL userACL,
                            ActivityManager activityManager,
+                           WikiService wikiService,
                            UploadService uploadService) {
     this.spaceService = spaceService;
     this.noteService = noteService;
@@ -131,6 +139,7 @@ public class NewsServiceImplV2 implements NewsService {
     this.identityManager = identityManager;
     this.userACL = userACL;
     this.activityManager = activityManager;
+    this.wikiService = wikiService;
   }
 
   /**
@@ -486,14 +495,28 @@ public class NewsServiceImplV2 implements NewsService {
   }
 
   private News createDraftArticleForNewPage(News draftArticle, String pageOwnerId, String draftArticleCreator) throws Exception {
-    Page articlesRootPage = getArticlesRootPage(pageOwnerId);
-    if (articlesRootPage != null) {
+    Wiki wiki = wikiService.getWikiByTypeAndOwner(WikiType.GROUP.name().toLowerCase(), pageOwnerId);
+    Page newsArticlesRootNotePage = null;
+    if (wiki != null) {
+      newsArticlesRootNotePage = noteService.getNoteOfNoteBookByName(WikiType.GROUP.name().toLowerCase(), pageOwnerId, NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
+      // create the news root page if the wiki exist
+      if (newsArticlesRootNotePage == null) {
+        newsArticlesRootNotePage = createNewsArticlesNoteRootPage(wiki);
+      }
+    } else {
+      // create the wiki
+      pageOwnerId = formatWikiOwnerToGroupId(pageOwnerId);
+      wiki = wikiService.createWiki(WikiType.GROUP.name().toLowerCase(), pageOwnerId);
+      // create the news root page
+      newsArticlesRootNotePage = createNewsArticlesNoteRootPage(wiki);
+    }
+    if (newsArticlesRootNotePage != null) {
       DraftPage draftArticlePage = new DraftPage();
       draftArticlePage.setNewPage(true);
       draftArticlePage.setTargetPageId(null);
       draftArticlePage.setTitle(draftArticle.getTitle());
       draftArticlePage.setContent(draftArticle.getBody());
-      draftArticlePage.setParentPageId(articlesRootPage.getId());
+      draftArticlePage.setParentPageId(newsArticlesRootNotePage.getId());
       draftArticlePage.setAuthor(draftArticle.getAuthor());
       draftArticlePage = noteService.createDraftForNewPage(draftArticlePage, System.currentTimeMillis());
 
@@ -525,15 +548,6 @@ public class NewsServiceImplV2 implements NewsService {
       return draftArticle;
     }
     return null;
-  }
-
-  private Page getArticlesRootPage(String ownerId) {
-    List<Page> notes =
-                     noteService.getNotesOfWiki("group", ownerId)
-                                .stream()
-                                .filter(e -> e.getName().equals(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME) && e.getParentPageId() == null)
-                                .toList();
-    return notes.isEmpty() ? null : notes.get(0);
   }
 
   private News recreateIfDraftDeleted(News news) throws Exception {
@@ -754,6 +768,37 @@ public class NewsServiceImplV2 implements NewsService {
       }
     }
     return false;
+  }
+
+  private Page createNewsArticlesNoteRootPage(Wiki wiki) throws WikiException {
+    if (wiki != null) {
+      Page newsArticlesRootNotePage = new Page();
+      newsArticlesRootNotePage.setWikiType(wiki.getType());
+      newsArticlesRootNotePage.setWikiOwner(wiki.getOwner());
+      newsArticlesRootNotePage.setName(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
+      newsArticlesRootNotePage.setTitle(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
+      Date now = Calendar.getInstance().getTime();
+      newsArticlesRootNotePage.setCreatedDate(now);
+      newsArticlesRootNotePage.setUpdatedDate(now);
+      newsArticlesRootNotePage.setContent("");
+      // inherit syntax from wiki
+      newsArticlesRootNotePage.setSyntax(wiki.getPreferences().getWikiPreferencesSyntax().getDefaultSyntax());
+      return noteService.createNote(wiki, null, newsArticlesRootNotePage);
+    }
+    return null;
+  }
+
+  private String formatWikiOwnerToGroupId(String wikiOwner) {
+    if (wikiOwner == null || wikiOwner.length() == 0) {
+      return null;
+    }
+    if (!wikiOwner.startsWith("/")) {
+      wikiOwner = "/" + wikiOwner;
+    }
+    if (wikiOwner.endsWith("/")) {
+      wikiOwner = wikiOwner.substring(0, wikiOwner.length() - 1);
+    }
+    return wikiOwner;
   }
 
   private void sendNotification(String currentUserId,

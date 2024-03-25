@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.exoplatform.wiki.model.Wiki;
+import org.exoplatform.wiki.service.WikiService;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,6 +96,9 @@ public class NewsServiceImplV2Test {
   @Mock
   IdentityManager                                    identityManager;
 
+  @Mock
+  WikiService                                        wikiService;
+
   private NewsService                                newsService;
 
   private static final MockedStatic<CommonsUtils>    COMMONS_UTILS    = mockStatic(CommonsUtils.class);
@@ -111,6 +116,7 @@ public class NewsServiceImplV2Test {
                                              newsTargetingService,
                                              indexingService,
                                              identityManager,
+                                             wikiService,
                                              uploadService);
   }
 
@@ -145,6 +151,8 @@ public class NewsServiceImplV2Test {
     when(identity.getUserId()).thenReturn("john");
 
     when(spaceService.isSuperManager(anyString())).thenReturn(true);
+    Wiki wiki = mock(Wiki.class);
+    when(wikiService.getWikiByTypeAndOwner(anyString(), anyString())).thenReturn(wiki);
     org.exoplatform.wiki.model.Page rootPage = mock(org.exoplatform.wiki.model.Page.class);
     when(rootPage.getName()).thenReturn(NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME);
     //
@@ -153,7 +161,7 @@ public class NewsServiceImplV2Test {
     //
     assertNull(savedDraftArticle);
     //
-    when(noteService.getNotesOfWiki("group", space.getGroupId())).thenReturn(Arrays.asList(rootPage));
+    when(noteService.getNoteOfNoteBookByName("group", space.getGroupId(), NEWS_ARTICLES_ROOT_NOTE_PAGE_NAME)).thenReturn(rootPage);
     when(noteService.createDraftForNewPage(any(DraftPage.class), anyLong())).thenReturn(draftPage);
     when(rootPage.getId()).thenReturn("1");
     org.exoplatform.social.core.identity.model.Identity identity1 =

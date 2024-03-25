@@ -200,6 +200,11 @@ export default {
       required: false,
       default: null
     },
+    newsType: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   data() {
     return {
@@ -519,7 +524,7 @@ export default {
 
     initNewsComposerData: function(newsId) {
       const self = this;
-      this.$newsServices.getNewsById(newsId, true)
+      this.$newsServices.getNewsById(newsId, true, this.newsType)
         .then(fetchedNode => {
           if (fetchedNode === UNAUTHORIZED_CODE){
             this.unAuthorizedAccess = true;
@@ -702,7 +707,7 @@ export default {
       if (this.news.id) {
         if (this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
           news.id = this.news.id;
-          this.$newsServices.updateNews(news, false)
+          this.$newsServices.updateNews(news, false, this.newsType)
             .then((updatedNews) => {
               if (this.news.body !== updatedNews.body) {
                 // Images URLs may have been updated in body to transform temporary URLs to permanent URLs.

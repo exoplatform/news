@@ -35,11 +35,12 @@ export function init(maxToUpload, maxFileSize) {
           newsId: getURLQueryParam('newsId'),
           spaceId: getURLQueryParam('spaceId'),
           activityId: getURLQueryParam('activityId'),
+          newsType: getURLQueryParam('type'),
           maxToUpload: maxToUpload,
           maxFileSize: maxFileSize
         };
       },
-      template: '<exo-news-activity-composer :news-id="newsId" :space-id="spaceId" :activity-id="activityId" :max-to-upload="maxToUpload" :max-file-size="maxFileSize"></exo-news-activity-composer>',
+      template: '<exo-news-activity-composer :news-id="newsId" :space-id="spaceId" :activity-id="activityId" :max-to-upload="maxToUpload" :max-file-size="maxFileSize" :news-type="newsType"></exo-news-activity-composer>',
       i18n,
       vuetify
     });

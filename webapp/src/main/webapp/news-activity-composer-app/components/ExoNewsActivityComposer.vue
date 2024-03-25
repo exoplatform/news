@@ -457,16 +457,9 @@ export default {
               const paragraph = document.getElementById('cke_20');
               const linkSection = document.getElementById('cke_25');
               const blockSection = document.getElementById('cke_28');
-              const attachFileButton = document.getElementById('cke_35');
               paragraph.style.borderRight = 'none';
               linkSection.style.display = 'none';
               blockSection.style.display = 'none';
-              attachFileButton.style.display = 'none';
-              const spanBadge = document.createElement('span');
-              spanBadge.setAttribute('class','badge');
-              spanBadge.setAttribute('id','badge');
-              spanBadge.innerHTML = '0';
-              attachFileButton.appendChild(spanBadge);
             }
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
@@ -962,14 +955,12 @@ export default {
       const switchViewButton = document.getElementById('cke_12');
       const linkSection = document.getElementById('cke_25');
       const blockSection = document.getElementById('cke_28');
-      const attachFileButton = document.getElementById('cke_35');
       if (this.switchView) {
         basicStyles.style.display = 'inline';
         paragraph.style.display = 'inline';
         switchViewButton.style.borderRight = '1px solid #b6b6b6';
         linkSection.style.display = 'none';
         blockSection.style.display = 'none';
-        attachFileButton.style.display = 'none';
         this.switchView = false;
       } else {
         basicStyles.style.display = 'none';
@@ -978,7 +969,6 @@ export default {
         switchViewButton.style.display = 'initial';
         linkSection.style.display = 'initial';
         blockSection.style.display = 'initial';
-        attachFileButton.style.display = 'initial';
         this.switchView = true;
       }
     }

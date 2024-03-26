@@ -1065,11 +1065,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, "draft", 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", currentIdentity, false, "draft");
+    verify(newsService).deleteNews("1", currentIdentity, false);
   }
 
   @Test
@@ -1094,11 +1094,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, "draft", 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    verify(newsService).deleteNews("1", currentIdentity, false, "draft");
+    verify(newsService).deleteNews("1", currentIdentity, false);
   }
 
   @Test
@@ -1115,11 +1115,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, "1", false, null, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, "1", false, 0L);
 
     // Then
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", currentIdentity, false, null);
+    verify(newsService, never()).deleteNews("1", currentIdentity, false);
   }
 
   @Test
@@ -1137,11 +1137,11 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isSuperManager(eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, null, false, null, 0L);
+    Response response = newsRestResourcesV1.deleteNews(request, null, false, 0L);
 
     // Then
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    verify(newsService, never()).deleteNews("1", currentIdentity, false, null);
+    verify(newsService, never()).deleteNews("1", currentIdentity, false);
   }
 
   @Test
@@ -1726,7 +1726,7 @@ public class NewsRestResourcesV1Test {
     lenient().when(spaceService.isMember(any(Space.class), eq(JOHN))).thenReturn(true);
 
     // When
-    Response response = newsRestResourcesV1.deleteNews(request, news.getId(), false, "draft", 0);
+    Response response = newsRestResourcesV1.deleteNews(request, news.getId(), false, 0);
 
     // Then
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

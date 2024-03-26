@@ -44,6 +44,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.news.utils.NewsUtils.NewsObjectType;
 import org.exoplatform.portal.application.localization.LocalizationFilter;
 import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.services.log.ExoLogger;
@@ -263,7 +264,6 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
                              @Parameter(description = "News id", required = true)
                              @PathParam("id") String id,
                              @Parameter(description = "Is draft to delete") @Schema(defaultValue = "false") @QueryParam("isDraft") boolean isDraft,
-                             @Parameter(description = "News object type to be updated", required = false) @QueryParam("type") String newsObjectType,
                              @Parameter(description = "Time to effectively delete news", required = false)
                              @QueryParam(
                                      "delay"
@@ -273,7 +273,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      News news = newsService.getNewsById(id, currentIdentity, false, newsObjectType);
+      News news = newsService.getNewsById(id, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name() : NewsObjectType.ARTICLE.name());
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -286,7 +286,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
             RequestLifeCycle.begin(container);
             try {
               newsToDeleteQueue.remove(id);
-              newsService.deleteNews(id, currentIdentity, isDraft, newsObjectType);
+              newsService.deleteNews(id, currentIdentity, isDraft);
             } catch (IllegalAccessException e) {
               LOG.error("User '{}' attempts to delete a non authorized news", currentIdentity.getUserId(), e);
             } catch (Exception e) {
@@ -298,7 +298,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
         }, delay, TimeUnit.SECONDS);
       } else {
         newsToDeleteQueue.remove(id);
-        newsService.deleteNews(id, currentIdentity, isDraft, newsObjectType);
+        newsService.deleteNews(id, currentIdentity, isDraft);
       }
       return Response.ok().build();
     } catch (IllegalAccessException e) {

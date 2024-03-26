@@ -207,14 +207,6 @@ public class NewsServiceImpl implements NewsService {
    */
   @Override
   public void deleteNews(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft) throws Exception {
-    deleteNews(newsId, currentIdentity, isDraft, null);
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void deleteNews(String newsId, org.exoplatform.services.security.Identity currentIdentity, boolean isDraft, String newsObjectType) throws Exception {
     News news = getNewsById(newsId, currentIdentity, false);
     if (!news.isCanDelete()) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");

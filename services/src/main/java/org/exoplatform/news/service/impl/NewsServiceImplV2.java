@@ -48,6 +48,7 @@ import org.exoplatform.news.search.NewsIndexingServiceConnector;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.service.NewsTargetingService;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.news.utils.NewsUtils.NewsObjectType;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -258,15 +259,7 @@ public class NewsServiceImplV2 implements NewsService {
    */
   @Override
   public void deleteNews(String newsId, Identity currentIdentity, boolean isDraft) throws Exception {
-
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void deleteNews(String newsId, Identity currentIdentity, boolean isDraft, String newsObjectType) throws Exception {
-    News news = getNewsById(newsId, currentIdentity, false, newsObjectType);
+    News news = getNewsById(newsId, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name() : NewsObjectType.ARTICLE.name());
     if (!news.isCanDelete()) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");
     }

@@ -1,7 +1,6 @@
 package org.exoplatform.news.storage.jcr;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -17,17 +16,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.jcr.*;
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -60,7 +61,6 @@ import org.exoplatform.services.jcr.ext.distribution.DataDistributionMode;
 import org.exoplatform.services.jcr.ext.distribution.DataDistributionType;
 import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
 import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
-import org.exoplatform.services.jcr.impl.core.value.StringValue;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -92,21 +92,11 @@ public class JcrNewsStorage implements NewsStorage {
 
   private static final Log       LOG                              = ExoLogger.getLogger(JcrNewsStorage.class);
 
-  private static final Pattern   MENTION_PATTERN                  = Pattern.compile("@([^\\s<]+)|@([^\\s<]+)$");
-
   private static final String    IMAGE_SRC_REGEX                  = "src=\"/portal/rest/images/?(.+)?\"";
-
-  public static final String     MIX_NEWS_MODIFIERS               = "mix:newsModifiers";
-
-  public static final String     MIX_NEWS_MODIFIERS_PROP          = "exo:newsModifiersIds";
 
   public static final String     NEWS_ACTIVITY_POSTING_MIXIN_TYPE = "mix:newsActivityPosting";
 
   public static final String     NEWS_ACTIVITY_POSTED_MIXIN_PROP  = "exo:newsActivityPosted";
-
-  public static final String     NEWS_DRAFT_VISIBILE_MIXIN_PROP   = "exo:draftVisible";
-
-  public static final String     NEWS_DRAFT_VISIBILITY_MIXIN_TYPE = "mix:draftVisibility";
 
   public static final String     NEWS_NODES_FOLDER                = "News";
 
@@ -228,10 +218,6 @@ public class JcrNewsStorage implements NewsStorage {
     newsDraftNode.setProperty("exo:pinned", false);
     newsDraftNode.setProperty("exo:archived", false);
     newsDraftNode.setProperty("exo:spaceId", news.getSpaceId());
-    if (newsDraftNode.canAddMixin(NEWS_DRAFT_VISIBILITY_MIXIN_TYPE) && !newsDraftNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
-      newsDraftNode.addMixin(NEWS_DRAFT_VISIBILITY_MIXIN_TYPE);
-    }
-    newsDraftNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
 
     if (newsDraftNode.canAddMixin(NEWS_ACTIVITY_POSTING_MIXIN_TYPE)
         && !newsDraftNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
@@ -411,12 +397,6 @@ public class JcrNewsStorage implements NewsStorage {
     if (originalNode.hasProperty("exo:spaceId")) {
       news.setSpaceId(node.getProperty("exo:spaceId").getString());
     }
-    if (originalNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
-      news.setDraftVisible(Boolean.valueOf(node.getProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP).getString()));
-    } 
-    else {
-      news.setDraftVisible(false);
-    }
     if (originalNode.hasProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP)) {
       news.setActivityPosted(Boolean.valueOf(node.getProperty(NEWS_ACTIVITY_POSTED_MIXIN_PROP).getString()));
     } 
@@ -549,40 +529,11 @@ public class JcrNewsStorage implements NewsStorage {
     return illustrationURL.toString();
   }
 
-  private void updateModifiers(Node newsNode, String currentIdentityId) throws RepositoryException, IOException {
-    boolean exist = false;
-    Value[] newsModifiers = new Value[0];
-    if (newsNode.hasProperty(MIX_NEWS_MODIFIERS_PROP)) {
-      newsModifiers = newsNode.getProperty(MIX_NEWS_MODIFIERS_PROP).getValues();
-      exist = Arrays.stream(newsModifiers).map(value -> {
-        try {
-          return value.getString();
-        } catch (RepositoryException e) {
-          return null;
-        }
-      }).filter(Objects::nonNull).anyMatch(newsModifier -> newsModifier.equals(currentIdentityId));
-    }
-    if (!exist) {
-      newsNode.setProperty(MIX_NEWS_MODIFIERS_PROP, ArrayUtils.add(newsModifiers, new StringValue(currentIdentityId)));
-      newsNode.save();
-    }
-  }
-  
   private void updateNewsPublicationState(Node newsNode, News news) throws Exception {
     if (PublicationDefaultStates.PUBLISHED.equals(news.getPublicationState())) {
       publicationService.changeState(newsNode, PublicationDefaultStates.PUBLISHED, new HashMap<>());
-      if (newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-        newsNode.removeMixin(MIX_NEWS_MODIFIERS);
-        newsNode.save();
-      }
     } else if (PublicationDefaultStates.DRAFT.equals(news.getPublicationState())) {
       publicationService.changeState(newsNode, PublicationDefaultStates.DRAFT, new HashMap<>());
-      Identity currentIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, getCurrentUserId());
-      String currentIdentityId = currentIdentity.getId();
-      if (!newsNode.isNodeType(MIX_NEWS_MODIFIERS)) {
-        newsNode.addMixin(MIX_NEWS_MODIFIERS);
-      }
-      updateModifiers(newsNode, currentIdentityId);
     }
   }
   
@@ -639,10 +590,6 @@ public class JcrNewsStorage implements NewsStorage {
         attachIllustration(newsNode, news.getUploadId());
       }  else if ("".equals(news.getUploadId())) {
         removeIllustration(newsNode);
-      }
-      //draft visible
-      if (newsNode.hasProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP)) {
-        newsNode.setProperty(NEWS_DRAFT_VISIBILE_MIXIN_PROP, String.valueOf(news.isDraftVisible()));
       }
 
       //news activity

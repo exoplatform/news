@@ -49,20 +49,6 @@
       </childNodeDefinition>
     </childNodeDefinitions>
   </nodeType>
-  <nodeType name="mix:newsModifiers" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
-    <propertyDefinitions>
-    <propertyDefinition name="exo:newsModifiersIds" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
-      <valueConstraints/>
-    </propertyDefinition>
-    </propertyDefinitions>
-  </nodeType>
-  <nodeType name="mix:draftVisibility" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
-    <propertyDefinitions>
-      <propertyDefinition name="exo:draftVisible" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
-        <valueConstraints/>
-      </propertyDefinition>
-    </propertyDefinitions>
-  </nodeType>
   <nodeType name="mix:newsActivityPosting" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
     <propertyDefinitions>
       <propertyDefinition name="exo:newsActivityPosted" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">

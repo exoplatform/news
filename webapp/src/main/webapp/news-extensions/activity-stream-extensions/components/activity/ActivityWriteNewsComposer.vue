@@ -91,7 +91,6 @@ export default {
           url += `?spaceId=${eXo.env.portal.spaceId}&type=draft`;
         }
         localStorage.setItem('exo-activity-composer-message', this.message || '');
-        localStorage.setItem('exo-activity-composer-attachments', JSON.stringify(this.files || []));
         window.open(url, '_blank');
       }
     },

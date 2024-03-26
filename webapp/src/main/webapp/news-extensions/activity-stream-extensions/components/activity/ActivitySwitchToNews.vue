@@ -60,7 +60,6 @@ export default {
   methods: {
     switchToNews() {
       localStorage.setItem('exo-activity-composer-message', this.message || '');
-      localStorage.setItem('exo-activity-composer-attachments', JSON.stringify(this.files || []));
     },
   },
 };

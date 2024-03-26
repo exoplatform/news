@@ -22,7 +22,6 @@ export function init(params) {
   // should expose the locale resources as REST API
   const urls = [
     `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.portlet.news.News-${lang}.json`,
-    `${newsConstants.PORTAL}/${newsConstants.PORTAL_REST}/i18n/bundle/locale.attachmentsSelector.attachments-${lang}.json`
   ];
 
   const appId = 'newsDetailsApp';

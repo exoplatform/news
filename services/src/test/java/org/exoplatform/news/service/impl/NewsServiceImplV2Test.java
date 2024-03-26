@@ -150,8 +150,10 @@ public class NewsServiceImplV2Test {
 
     Space space = mock(Space.class);
     when(spaceService.getSpaceById(draftArticle.getSpaceId())).thenReturn(space);
+    when(spaceService.getSpaceByGroupId(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("/space/groupId");
-
+    when(space.getId()).thenReturn("1");
+    
     DraftPage draftPage = new DraftPage();
     draftPage.setContent(draftArticle.getBody());
     draftPage.setTitle(draftArticle.getTitle());
@@ -255,14 +257,14 @@ public class NewsServiceImplV2Test {
 
     Space space = mock(Space.class);
     when(space.getId()).thenReturn("1");
-    when(spaceService.getSpaceByGroupId(anyString())).thenReturn(space);
     when(space.getGroupId()).thenReturn("/space/groupId");
     when(space.getAvatarUrl()).thenReturn("space/avatar/url");
     when(space.getDisplayName()).thenReturn("spaceDisplayName");
     when(space.getVisibility()).thenReturn("public");
     when(spaceService.isSuperManager(anyString())).thenReturn(true);
     when(spaceService.getSpaceById(any())).thenReturn(space);
-
+    when(spaceService.getSpaceByGroupId(anyString())).thenReturn(space);
+    
     when(noteService.getDraftNoteById(anyString(), anyString())).thenReturn(draftPage);
     MetadataItem metadataItem = mock(MetadataItem.class);
     List<MetadataItem> metadataItems = new ArrayList<>();

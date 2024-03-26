@@ -265,6 +265,7 @@ export default {
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
           target: this.newsFilter === 'drafts' ? '_blank' : '_self',
+          type: this.newsFilter === 'drafts' ? 'draft' : 'article'
         });
       });
       if (append) {

@@ -169,28 +169,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
           </div>
         </div>
       </form>
-      <v-btn
-        v-if="!isMobile"
-        class="attachmentsButton"
-        fixed
-        bottom
-        right
-        fab
-        x-large
-        @click="openApp()">
-        <i class="uiIconAttachment"></i>
-        <v-progress-circular
-          :class="uploading ? 'uploading' : ''"
-          indeterminate>
-          {{ news.attachments.length }}
-        </v-progress-circular>
-      </v-btn>
-      <exo-attachments
-        ref="attachmentsComponent"
-        :space-id="news.spaceId"
-        v-model="news.attachments"
-        @HideAttachmentsDrawer="onHideAttachmentsDrawer"
-        @uploadingCountChanged="setUploadingCount" />
     </div>
 
     <div v-show="(!canCreateNews && !loading) || unAuthorizedAccess" class="newsComposer">
@@ -233,7 +211,6 @@ export default {
         body: '',
         summary: '',
         illustration: [],
-        attachments: [],
         targets: [],
         spaceId: '',
         published: false,
@@ -247,7 +224,6 @@ export default {
         body: '',
         summary: '',
         illustration: [],
-        attachments: [],
         spaceId: '',
         published: false,
       },
@@ -273,7 +249,6 @@ export default {
       illustrationChanged: false,
       attachmentsChanged: false,
       imagesURLs: new Map(),
-      uploading: false,
       canCreateNews: false,
       loading: true,
       currentSpace: {},
@@ -292,7 +267,6 @@ export default {
       switchView: false,
       spaceDisplayName: '',
       unAuthorizedAccess: false,
-      endUplodingFileTimeout: 50,
       newsBody: null,
       desktopToolbar: null,
       oembedMinWidth: 300,
@@ -331,18 +305,14 @@ export default {
       return  originalNewsBody.length === currentNewsBody.length && originalNewsBody.every((node, index) => node.isEqualNode(currentNewsBody[index]));
     },
     postDisabled: function () {
-      return this.uploading || !this.news.title || !this.news.title.trim() || this.isEmptyNewsBody;
+      return !this.news.title || !this.news.title.trim() || this.isEmptyNewsBody;
     },
     updateDisabled: function () {
-      // disable update button while uploading an attachment
-      if (this.uploading) {
-        return true;
-      }
       if (!this.news.title.trim() || this.isEmptyNewsBody ) {
         return true;
       }
       // disable update button nothing has changed
-      if (!this.illustrationChanged && !this.attachmentsChanged
+      if (!this.illustrationChanged
                  && this.news.title === this.originalNews.title
                  && this.news.summary === this.originalNews.summary
                  && this.isSameNewsBody
@@ -369,17 +339,12 @@ export default {
     'news.summary': function() {
       if (this.news.summary !== this.originalNews.summary) {
         this.autoSave();
-      } },
+      } 
+    },
     'news.body': function() {
       if (this.getContent(this.news.body) !== this.getContent(this.originalNews.body)) {
         this.autoSave();
-      } },
-    'news.attachments': function() {
-      if (this.initDone && this.news.attachments !== this.originalNews.attachments) {
-        this.attachmentsChanged = true;
-        this.waitForEndUploding();
-      }
-
+      } 
     },
     'news.illustration': function() {
       if (this.initIllustrationDone) {
@@ -424,15 +389,6 @@ export default {
         this.canScheduleNews = canScheduleNews;
       });
     });
-
-    this.$nextTick(() => {
-      const attachmentsComposer = JSON.parse(localStorage.getItem('exo-activity-composer-attachments'));
-      if (attachmentsComposer) {
-        this.news.attachments = attachmentsComposer;
-        localStorage.removeItem('exo-activity-composer-attachments');
-      }
-    });
-    $('[rel="tooltip"]').tooltip();
   },
   beforeDestroy() {
     const textarea = document.querySelector('#activityComposerTextarea');
@@ -501,16 +457,9 @@ export default {
               const paragraph = document.getElementById('cke_20');
               const linkSection = document.getElementById('cke_25');
               const blockSection = document.getElementById('cke_28');
-              const attachFileButton = document.getElementById('cke_35');
               paragraph.style.borderRight = 'none';
               linkSection.style.display = 'none';
               blockSection.style.display = 'none';
-              attachFileButton.style.display = 'none';
-              const spanBadge = document.createElement('span');
-              spanBadge.setAttribute('class','badge');
-              spanBadge.setAttribute('id','badge');
-              spanBadge.innerHTML = '0';
-              attachFileButton.appendChild(spanBadge);
             }
             self.news.body = evt.editor.getData();
             $(CKEDITOR.instances['newsContent'].document.$)
@@ -616,7 +565,6 @@ export default {
             } else {
               this.initIllustrationDone = true;
             }
-            this.news.attachments = fetchedNode.attachments;
             this.originalNews = JSON.parse(JSON.stringify(this.news));
             Vue.nextTick(() => {
               autosize.update(document.querySelector('#newsSummary'));
@@ -688,7 +636,6 @@ export default {
         summary: this.news.summary,
         body: this.getBody() ? newsBody : this.news.body,
         author: this.currentUser,
-        attachments: this.news.attachments,
         published: this.news.published,
         targets: this.news.targets,
         spaceId: this.spaceId,
@@ -741,7 +688,6 @@ export default {
         summary: this.news.summary,
         body: this.getBody() ? newsBody : this.news.body,
         author: this.currentUser,
-        attachments: [],
         published: false,
         spaceId: this.spaceId,
         publicationState: ''
@@ -752,16 +698,6 @@ export default {
         news.uploadId = '';
       }
 
-      const uploadedPercent = 100;
-      this.news.attachments.forEach(attachment => {
-        if (attachment.id || attachment.uploadProgress === uploadedPercent) {
-          news.attachments.push({
-            id: attachment.id,
-            uploadId: attachment.uploadId,
-            name: attachment.name
-          });
-        }
-      });
 
       if (this.news.id) {
         if (this.news.title || this.news.summary || this.news.body || this.news.illustration.length > 0) {
@@ -855,7 +791,6 @@ export default {
         title: this.news.title,
         summary: this.news.summary != null ? this.news.summary : '',
         body: this.getBody() ? newsBody : this.news.body,
-        attachments: this.news.attachments,
         published: this.news.published,
         publicationState: publicationState,
         activityPosted: this.news.activityPosted,
@@ -885,19 +820,6 @@ export default {
       } else {
         window.open('/', '_self');
       }
-    },
-    openApp() {
-      this.$refs.attachmentsComponent.toggleAttachmentsDrawer();
-    },
-    onHideAttachmentsDrawer: function(){
-      const spanBadge = document.getElementById('badge');
-      if (spanBadge) {
-        const attachmentsLength = this.news && this.news.attachments && this.news.attachments.length || 0;
-        spanBadge.innerHTML = `${attachmentsLength}`;
-      }
-    },
-    setUploadingCount: function(uploadingCount) {
-      this.uploading = uploadingCount > 0;
     },
     getContentToEdit(content) {
       const domParser = new DOMParser();
@@ -1033,14 +955,12 @@ export default {
       const switchViewButton = document.getElementById('cke_12');
       const linkSection = document.getElementById('cke_25');
       const blockSection = document.getElementById('cke_28');
-      const attachFileButton = document.getElementById('cke_35');
       if (this.switchView) {
         basicStyles.style.display = 'inline';
         paragraph.style.display = 'inline';
         switchViewButton.style.borderRight = '1px solid #b6b6b6';
         linkSection.style.display = 'none';
         blockSection.style.display = 'none';
-        attachFileButton.style.display = 'none';
         this.switchView = false;
       } else {
         basicStyles.style.display = 'none';
@@ -1049,20 +969,9 @@ export default {
         switchViewButton.style.display = 'initial';
         linkSection.style.display = 'initial';
         blockSection.style.display = 'initial';
-        attachFileButton.style.display = 'initial';
         this.switchView = true;
       }
-    },
-    waitForEndUploding() {
-      window.setTimeout(() => {
-        if (this.uploading) {
-          this.waitForEndUploding();
-        }
-        else {
-          this.autoSave();
-        }
-      }, this.endUplodingFileTimeout);
-    },
+    }
   }
 };
 </script>

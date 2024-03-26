@@ -12,7 +12,6 @@ CKEDITOR.editorConfig = function (config) {
   config.contentsCss.push('/news/ckeditorCustom/contents.css'); // load last
 
   CKEDITOR.plugins.addExternal('switchView','/news/js/ckeditor/plugins/switchView/','plugin.js');
-  CKEDITOR.plugins.addExternal('attachFile','/news/js/ckeditor/plugins/attachment/','plugin.js');
 
   const toolbar = [
     {name: 'accessibility', items: ['A11ychecker']},
@@ -52,10 +51,9 @@ CKEDITOR.editorConfig = function (config) {
       name: 'blocks',
       items: ['Blockquote', 'tagSuggester', 'emoji', 'selectImage', 'Table', 'EmbedSemantic', 'InsertOptions']
     },
-    {name: 'attachFile', items: ['attachFile']},
   ];
 
-  let extraPlugins = 'a11ychecker,balloonpanel,indent,switchView,attachFile,googleDocPastePlugin,copyformatting,indentblock,indentlist,sharedspace,' +
+  let extraPlugins = 'a11ychecker,balloonpanel,indent,switchView,googleDocPastePlugin,copyformatting,indentblock,indentlist,sharedspace,' +
         'autolink,colordialog,tagSuggester,emoji,link,font,justify,widget,contextmenu,table,codesnippet,tabletools,tableresize,embedsemantic,suggester';
 
   let removePlugins = 'image,confirmBeforeReload,maximize,resize,autoembed';

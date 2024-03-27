@@ -273,7 +273,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      News news = newsService.getNewsById(id, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name() : NewsObjectType.ARTICLE.name());
+      News news = newsService.getNewsById(id, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name().toLowerCase() : NewsObjectType.ARTICLE.name().toLowerCase());
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }

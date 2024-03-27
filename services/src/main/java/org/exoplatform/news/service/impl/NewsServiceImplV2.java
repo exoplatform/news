@@ -94,7 +94,6 @@ public class NewsServiceImplV2 implements NewsService {
 
   public static final String         NEWS_UPLOAD_ID                    = "uploadId";
 
-
   private static final Log           LOG                               = ExoLogger.getLogger(NewsServiceImplV2.class);
 
   private final SpaceService         spaceService;
@@ -118,7 +117,7 @@ public class NewsServiceImplV2 implements NewsService {
   private final ActivityManager      activityManager;
 
   private final WikiService          wikiService;
-  
+
   public NewsServiceImplV2(SpaceService spaceService,
                            NoteService noteService,
                            MetadataService metadataService,
@@ -178,8 +177,10 @@ public class NewsServiceImplV2 implements NewsService {
    */
   @Override
   public boolean canCreateNews(Space space, org.exoplatform.services.security.Identity currentIdentity) throws Exception {
-    return space != null && (NewsUtils.canPublishNews(space.getId(), currentIdentity) || spaceService.canRedactOnSpace(space, currentIdentity));
+    return space != null
+        && (NewsUtils.canPublishNews(space.getId(), currentIdentity) || spaceService.canRedactOnSpace(space, currentIdentity));
   }
+
   /**
    * {@inheritDoc}
    */
@@ -259,7 +260,10 @@ public class NewsServiceImplV2 implements NewsService {
    */
   @Override
   public void deleteNews(String newsId, Identity currentIdentity, boolean isDraft) throws Exception {
-    News news = getNewsById(newsId, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name() : NewsObjectType.ARTICLE.name());
+    News news = getNewsById(newsId,
+                            currentIdentity,
+                            false,
+                            isDraft ? NewsObjectType.DRAFT.name().toLowerCase() : NewsObjectType.ARTICLE.name().toLowerCase());
     if (!news.isCanDelete()) {
       throw new IllegalArgumentException("User " + currentIdentity.getUserId() + " is not authorized to delete news");
     }
@@ -653,11 +657,11 @@ public class NewsServiceImplV2 implements NewsService {
           draftArticle.setSpaceAvatarUrl(draftArticleSpace.getAvatarUrl());
           draftArticle.setSpaceDisplayName(draftArticleSpace.getDisplayName());
           boolean hiddenSpace = draftArticleSpace.getVisibility().equals(Space.HIDDEN)
-                  && !spaceService.isMember(draftArticleSpace, draftArticleCreator)
-                  && !spaceService.isSuperManager(draftArticleCreator);
+              && !spaceService.isMember(draftArticleSpace, draftArticleCreator)
+              && !spaceService.isSuperManager(draftArticleCreator);
           draftArticle.setHiddenSpace(hiddenSpace);
           boolean isSpaceMember = spaceService.isSuperManager(draftArticleCreator)
-                  || spaceService.isMember(draftArticleSpace, draftArticleCreator);
+              || spaceService.isMember(draftArticleSpace, draftArticleCreator);
           draftArticle.setSpaceMember(isSpaceMember);
           if (StringUtils.isNotEmpty(draftArticleSpace.getGroupId())) {
             String spaceGroupId = draftArticleSpace.getGroupId().split("/")[2];
@@ -668,12 +672,12 @@ public class NewsServiceImplV2 implements NewsService {
       }
       StringBuilder draftArticleUrl = new StringBuilder("");
       draftArticleUrl.append("/")
-              .append(PortalContainer.getCurrentPortalContainerName())
-              .append("/")
-              .append(CommonsUtils.getCurrentPortalOwner())
-              .append("/news/detail?newsId=")
-              .append(draftArticle.getId())
-              .append("&type=draft");
+                     .append(PortalContainer.getCurrentPortalContainerName())
+                     .append("/")
+                     .append(CommonsUtils.getCurrentPortalOwner())
+                     .append("/news/detail?newsId=")
+                     .append(draftArticle.getId())
+                     .append("&type=draft");
       draftArticle.setUrl(draftArticleUrl.toString());
 
       NewsDraftObject draftArticleMetaDataObject =
@@ -736,7 +740,8 @@ public class NewsServiceImplV2 implements NewsService {
       LOG.warn("Can't find user with id {} when checking access on news with id {}", authenticatedUser, news.getId());
       return false;
     }
-    return NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity) || spaceService.canRedactOnSpace(space, authenticatedUserIdentity);
+    return NewsUtils.canPublishNews(news.getSpaceId(), authenticatedUserIdentity)
+        || spaceService.canRedactOnSpace(space, authenticatedUserIdentity);
   }
 
   private void setArticleIllustration(News article, Long articleIllustrationId, String newsObjectType) {
@@ -794,13 +799,13 @@ public class NewsServiceImplV2 implements NewsService {
     String authenticatedUser = currentIdentity.getUserId();
     Space currentSpace = spaceService.getSpaceById(spaceId);
     return authenticatedUser.equals(posterId) || userACL.isSuperUser() || spaceService.isSuperManager(authenticatedUser)
-            || spaceService.isManager(currentSpace, authenticatedUser);
+        || spaceService.isManager(currentSpace, authenticatedUser);
   }
 
   private boolean isMemberOfsharedInSpaces(News news, String username) {
     for (String sharedInSpaceId : news.getSharedInSpacesList()) {
       Space sharedInSpace = spaceService.getSpaceById(sharedInSpaceId);
-      if(sharedInSpace != null && spaceService.isMember(sharedInSpace, username)) {
+      if (sharedInSpace != null && spaceService.isMember(sharedInSpace, username)) {
         return true;
       }
     }

@@ -44,6 +44,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.search.NewsESSearchResult;
 import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.news.utils.NewsUtils.NewsObjectType;
 import org.exoplatform.portal.application.localization.LocalizationFilter;
 import org.exoplatform.services.cms.thumbnail.ThumbnailService;
 import org.exoplatform.services.log.ExoLogger;
@@ -272,7 +273,7 @@ public class NewsRestResourcesV1 implements ResourceContainer, Startable {
       if (StringUtils.isBlank(id)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      News news = newsService.getNewsById(id, currentIdentity, false);
+      News news = newsService.getNewsById(id, currentIdentity, false, isDraft ? NewsObjectType.DRAFT.name().toLowerCase() : NewsObjectType.ARTICLE.name().toLowerCase());
       if (news == null) {
         return Response.status(Response.Status.NOT_FOUND).build();
       }

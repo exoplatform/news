@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.commons.search.index.IndexingService;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.news.filter.NewsFilter;
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.model.NewsDraftObject;
 import org.exoplatform.news.service.NewsService;
@@ -377,5 +380,63 @@ public class NewsServiceImplV2Test {
     // Then
     verify(noteService, times(1)).removeDraftById(draftPage.getId());
     verify(metadataService, times(1)).deleteMetadataItem(any(Long.class), anyBoolean());
+  }
+
+  @Test
+  public void testGetDraftArticles() throws Exception {
+
+    // Given
+    DraftPage draftPage = new DraftPage();
+    draftPage.setContent("draft body");
+    draftPage.setTitle("draft article for new page");
+    draftPage.setId("1");
+    draftPage.setAuthor("john");
+    draftPage.setWikiOwner("/space/groupId");
+
+    Space space1 = mock(Space.class);
+    when(space1.getId()).thenReturn("1");
+    when(spaceService.getSpaceByGroupId(anyString())).thenReturn(space1);
+    when(space1.getGroupId()).thenReturn("/space/groupId");
+    when(space1.getAvatarUrl()).thenReturn("space/avatar/url");
+    when(space1.getDisplayName()).thenReturn("spaceDisplayName");
+    when(space1.getVisibility()).thenReturn("public");
+    when(spaceService.getSpaceById("1")).thenReturn(space1);
+    when(spaceService.isSuperManager(anyString())).thenReturn(true);
+    when(noteService.getDraftNoteById(anyString(), anyString())).thenReturn(draftPage);
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put(NEWS_SUMMARY, draftPage.getContent());
+    MetadataItem metadataItem = mock(MetadataItem.class);
+    List<MetadataItem> metadataItems = Arrays.asList(metadataItem);
+    when(metadataItem.getObjectId()).thenReturn("1");
+    when(metadataItem.getProperties()).thenReturn(properties);
+    when(metadataService.getMetadataItemsByMetadataAndObject(any(MetadataKey.class),
+                                                             any(MetadataObject.class))).thenReturn(metadataItems);
+    PORTAL_CONTAINER.when(() -> PortalContainer.getCurrentPortalContainerName()).thenReturn("portal");
+    COMMONS_UTILS.when(() -> CommonsUtils.getCurrentPortalOwner()).thenReturn("dw");
+    Identity identity = mock(Identity.class);
+    when(identity.getUserId()).thenReturn("john");
+    List<Space> allowedDraftNewsSpaces = Arrays.asList(space1);
+    NEWS_UTILS.when(() -> NewsUtils.getAllowedDraftNewsSpaces(identity)).thenReturn(allowedDraftNewsSpaces);
+    when(metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndSpaceIds(anyString(),
+                                                                                   anyString(),
+                                                                                   anyString(),
+                                                                                   anyList(),
+                                                                                   anyLong(),
+                                                                                   anyLong())).thenReturn(metadataItems);
+
+    when(activityManager.getActivity(nullable(String.class))).thenReturn(null);
+    when(newsTargetingService.getTargetsByNewsId(anyString())).thenReturn(null);
+
+    // When
+    NewsFilter newsFilter = new NewsFilter();
+    newsFilter.setDraftNews(true);
+    newsFilter.setOffset(0);
+    newsFilter.setLimit(10);
+    List<News> newsList = newsService.getNews(newsFilter, identity);
+
+    // Then
+    assertNotNull(newsList);
+    assertEquals(newsList.size(), 1);
   }
 }

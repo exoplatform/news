@@ -246,7 +246,7 @@ export default {
           updatedDate: this.isDraftsFilter ? newsPublicationDate : newsUpdateDate,
           spaceDisplayName: item.spaceDisplayName,
           spaceUrl: item.spaceUrl,
-          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}` : item.url,
+          url: this.isDraftsFilter ? `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/editor?spaceId=${item.spaceId}&newsId=${item.id}&activityId=${activityId}&type=draft` : item.url,
           authorFullName: item.authorDisplayName,
           authorProfileURL: `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/profile/${item.author}`,
           viewsCount: item.viewsCount == null ? 0 : item.viewsCount,
@@ -265,6 +265,7 @@ export default {
           hiddenSpace: item.hiddenSpace,
           spaceId: item.spaceId,
           target: this.newsFilter === 'drafts' ? '_blank' : '_self',
+          type: this.newsFilter === 'drafts' ? 'draft' : 'article'
         });
       });
       if (append) {

@@ -366,7 +366,41 @@ public class NewsServiceImplV2 implements NewsService {
    */
   @Override
   public List<News> getNews(NewsFilter filter, Identity currentIdentity) throws Exception {
-    return new ArrayList<>();
+    List<News> newsList = new ArrayList<>();
+    if (filter != null) {
+      if (filter.isArchivedNews()) {
+        // TODO
+      }
+      if (filter.getSearchText() != null && !filter.getSearchText().equals("")) {
+        // TODO
+      } else {
+        // TODO
+      }
+      if (filter.isPublishedNews()) {
+        // TODO
+      }
+
+      List<String> spaces = filter.getSpaces();
+      if (spaces != null && spaces.size() != 0) {
+        // TODO
+      }
+      if (filter.isDraftNews()) {
+        newsList = buildDraftArticles(filter, currentIdentity);
+      } else if (filter.isScheduledNews()) {
+        // TODO
+      } else {
+        // TODO
+      }
+    } else {
+      throw new Exception("Unable to build query, filter is null");
+    }
+    newsList.stream().forEach(news -> {
+      news.setCanEdit(canEditNews(news, currentIdentity.getUserId()));
+      news.setCanDelete(canDeleteNews(currentIdentity, news.getAuthor(), news.getSpaceId()));
+      news.setCanPublish(NewsUtils.canPublishNews(news.getSpaceId(), currentIdentity));
+      news.setCanArchive(canArchiveNews(currentIdentity, news.getAuthor()));
+    });
+    return newsList;
   }
 
   /**
@@ -540,10 +574,11 @@ public class NewsServiceImplV2 implements NewsService {
       draftArticle.setId(draftArticlePage.getId());
       draftArticle.setCreationDate(draftArticlePage.getCreatedDate());
       draftArticle.setUpdateDate(draftArticlePage.getUpdatedDate());
-
+      Space draftArticleSpace = spaceService.getSpaceByGroupId(pageOwnerId);
       NewsDraftObject draftArticleMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE,
                                                                        draftArticlePage.getId(),
-                                                                       null);
+                                                                       null,
+                                                                       Long.parseLong(draftArticleSpace.getId()));
       MetadataKey draftArticleMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
       String draftArticleMetadataItemCreatorIdentityId = identityManager.getOrCreateUserIdentity(draftArticleCreator).getId();
       Map<String, String> draftArticleMetadataItemProperties = new HashMap<>();
@@ -581,9 +616,11 @@ public class NewsServiceImplV2 implements NewsService {
       // created and updated date set by default during the draft creation
       // process
       draftArticlePage = noteService.updateDraftForNewPage(draftArticlePage, System.currentTimeMillis());
+      Space draftArticleSpace = spaceService.getSpaceByGroupId(draftArticlePage.getWikiOwner());
       NewsDraftObject draftArticleMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE,
                                                                        draftArticlePage.getId(),
-                                                                       null);
+                                                                       null,
+                                                                       Long.parseLong(draftArticleSpace.getId()));
       MetadataKey draftArticleMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
       List<MetadataItem> draftArticleMetadataItems =
                                                    metadataService.getMetadataItemsByMetadataAndObject(draftArticleMetadataKey,
@@ -650,25 +687,20 @@ public class NewsServiceImplV2 implements NewsService {
       draftArticle.setUpdateDate(draftArticlePage.getUpdatedDate());
       draftArticle.setBody(draftArticlePage.getContent());
       draftArticle.setPublicationState(PublicationDefaultStates.DRAFT);
-      if (draftArticlePage.getWikiOwner() != null) {
-        Space draftArticleSpace = spaceService.getSpaceByGroupId(draftArticlePage.getWikiOwner());
-        if (draftArticleSpace != null) {
-          draftArticle.setSpaceId(draftArticleSpace.getId());
-          draftArticle.setSpaceAvatarUrl(draftArticleSpace.getAvatarUrl());
-          draftArticle.setSpaceDisplayName(draftArticleSpace.getDisplayName());
-          boolean hiddenSpace = draftArticleSpace.getVisibility().equals(Space.HIDDEN)
-              && !spaceService.isMember(draftArticleSpace, draftArticleCreator)
-              && !spaceService.isSuperManager(draftArticleCreator);
-          draftArticle.setHiddenSpace(hiddenSpace);
-          boolean isSpaceMember = spaceService.isSuperManager(draftArticleCreator)
-              || spaceService.isMember(draftArticleSpace, draftArticleCreator);
-          draftArticle.setSpaceMember(isSpaceMember);
-          if (StringUtils.isNotEmpty(draftArticleSpace.getGroupId())) {
-            String spaceGroupId = draftArticleSpace.getGroupId().split("/")[2];
-            String spaceUrl = "/portal/g/:spaces:" + spaceGroupId + "/" + draftArticleSpace.getPrettyName();
-            draftArticle.setSpaceUrl(spaceUrl);
-          }
-        }
+      Space draftArticleSpace = spaceService.getSpaceByGroupId(draftArticlePage.getWikiOwner());
+      draftArticle.setSpaceId(draftArticleSpace.getId());
+      draftArticle.setSpaceAvatarUrl(draftArticleSpace.getAvatarUrl());
+      draftArticle.setSpaceDisplayName(draftArticleSpace.getDisplayName());
+      boolean hiddenSpace = draftArticleSpace.getVisibility().equals(Space.HIDDEN)
+          && !spaceService.isMember(draftArticleSpace, draftArticleCreator) && !spaceService.isSuperManager(draftArticleCreator);
+      draftArticle.setHiddenSpace(hiddenSpace);
+      boolean isSpaceMember = spaceService.isSuperManager(draftArticleCreator)
+          || spaceService.isMember(draftArticleSpace, draftArticleCreator);
+      draftArticle.setSpaceMember(isSpaceMember);
+      if (StringUtils.isNotEmpty(draftArticleSpace.getGroupId())) {
+        String spaceGroupId = draftArticleSpace.getGroupId().split("/")[2];
+        String spaceUrl = "/portal/g/:spaces:" + spaceGroupId + "/" + draftArticleSpace.getPrettyName();
+        draftArticle.setSpaceUrl(spaceUrl);
       }
       StringBuilder draftArticleUrl = new StringBuilder("");
       draftArticleUrl.append("/")
@@ -680,8 +712,10 @@ public class NewsServiceImplV2 implements NewsService {
                      .append("&type=draft");
       draftArticle.setUrl(draftArticleUrl.toString());
 
-      NewsDraftObject draftArticleMetaDataObject =
-                                                 new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE, draftArticle.getId(), null);
+      NewsDraftObject draftArticleMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE,
+                                                                       draftArticle.getId(),
+                                                                       null,
+                                                                       Long.parseLong(draftArticleSpace.getId()));
       MetadataKey draftArticleMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
       List<MetadataItem> draftArticleMetadataItems =
                                                    metadataService.getMetadataItemsByMetadataAndObject(draftArticleMetadataKey,
@@ -705,13 +739,43 @@ public class NewsServiceImplV2 implements NewsService {
     return null;
   }
 
+  private List<News> buildDraftArticles(NewsFilter filter, Identity currentIdentity) throws Exception {
+    List<Long> allowedDraftNewsSpacesIds = NewsUtils.getAllowedDraftNewsSpaces(currentIdentity)
+                                                    .stream()
+                                                    .map(Space::getId)
+                                                    .map(spaceId -> Long.parseLong(spaceId))
+                                                    .toList();
+    List<News> draftArticles =
+                             metadataService.getMetadataItemsByMetadataNameAndTypeAndObjectAndSpaceIds(NEWS_METADATA_NAME,
+                                                                                                       NEWS_METADATA_TYPE.getName(),
+                                                                                                       NEWS_METADATA_DRAFT_OBJECT_TYPE,
+                                                                                                       allowedDraftNewsSpacesIds,
+                                                                                                       filter.getOffset(),
+                                                                                                       filter.getLimit())
+                                            .stream()
+                                            .map(draftArticle -> {
+                                              try {
+                                                return buildDraftArticle(draftArticle.getObjectId(), currentIdentity.getUserId());
+                                              } catch (IllegalAccessException | WikiException e) {
+                                                // TODO Auto-generated catch
+                                                // block
+                                                e.printStackTrace();
+                                                return null;
+                                              }
+                                            })
+                                            .toList();
+    return draftArticles;
+  }
+
   private void deleteDraftArticle(String draftArticleId, String draftArticleCreator) throws Exception {
     DraftPage draftArticlePage = noteService.getDraftNoteById(draftArticleId, draftArticleCreator);
     if (draftArticlePage != null) {
       noteService.removeDraftById(draftArticlePage.getId());
+      Space draftArticleSpace = spaceService.getSpaceByGroupId(draftArticlePage.getWikiOwner());
       NewsDraftObject draftArticleMetaDataObject = new NewsDraftObject(NEWS_METADATA_DRAFT_OBJECT_TYPE,
                                                                        draftArticlePage.getId(),
-                                                                       null);
+                                                                       null,
+                                                                       Long.parseLong(draftArticleSpace.getId()));
       MetadataKey draftArticleMetadataKey = new MetadataKey(NEWS_METADATA_TYPE.getName(), NEWS_METADATA_NAME, 0);
       List<MetadataItem> draftArticleMetadataItems =
                                                    metadataService.getMetadataItemsByMetadataAndObject(draftArticleMetadataKey,

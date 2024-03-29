@@ -622,7 +622,6 @@ public class NewsServiceImpl implements NewsService {
                                                      .append(PostNewsNotificationPlugin.CURRENT_USER, currentUser)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
                                                      .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-                                                     .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
                                                      .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
                                                      .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
                                                      .append(PostNewsNotificationPlugin.NEWS_ID, newsId);
@@ -659,7 +658,6 @@ public class NewsServiceImpl implements NewsService {
             .append(PostNewsNotificationPlugin.CONTENT_SPACE_ID, contentSpaceId)
             .append(PostNewsNotificationPlugin.CONTENT_TITLE, contentTitle)
             .append(PostNewsNotificationPlugin.CONTENT_SPACE, contentSpaceName)
-            .append(PostNewsNotificationPlugin.ILLUSTRATION_URL, illustrationURL)
             .append(PostNewsNotificationPlugin.AUTHOR_AVATAR_URL, authorAvatarUrl)
             .append(PostNewsNotificationPlugin.ACTIVITY_LINK, activityLink)
             .append(MentionInNewsNotificationPlugin.MENTIONED_IDS, mentionedIds)

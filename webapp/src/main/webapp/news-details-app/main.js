@@ -34,10 +34,11 @@ export function init() {
       data: function() {
         return {
           newsId: getURLQueryParam('newsId'),
+          newsType: getURLQueryParam('type'),
         };
       },
       template: `<v-app class="singlePageApplication" id="${appId}">
-                   <exo-news-details-app :news-id="newsId"></exo-news-details-app>
+                   <exo-news-details-app :news-id="newsId" :news-type="newsType"></exo-news-details-app>
                  </v-app>`,
       i18n,
       vuetify

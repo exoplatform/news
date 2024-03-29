@@ -8,6 +8,8 @@ import org.exoplatform.news.service.NewsService;
 import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.common.RealtimeListAccess;
 import org.exoplatform.social.core.BaseActivityProcessorPlugin;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
@@ -38,7 +40,8 @@ public class ActivityNewsProcessor extends BaseActivityProcessorPlugin {
     News news = (News) activity.getLinkedProcessedEntities().get("news");
     if (news == null) {
       try {
-        news = newsService.getNewsById(activity.getTemplateParams().get("newsId"), false);
+        Identity currentIdentity = ConversationState.getCurrent().getIdentity();
+        news = newsService.getNewsById(activity.getTemplateParams().get("newsId"), currentIdentity,false, NewsUtils.NewsObjectType.ARTICLE.name().toLowerCase());
 
         RealtimeListAccess<ExoSocialActivity> listAccess = activityManager.getCommentsWithListAccess(activity, true);
         news.setCommentsCount(listAccess.getSize());

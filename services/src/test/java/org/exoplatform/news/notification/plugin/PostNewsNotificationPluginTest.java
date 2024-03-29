@@ -1,6 +1,8 @@
 package org.exoplatform.news.notification.plugin;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -9,6 +11,8 @@ import java.io.Serializable;
 
 import org.exoplatform.news.model.News;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.manager.ActivityManager;
 import org.junit.AfterClass;
@@ -53,6 +57,8 @@ public class PostNewsNotificationPluginTest {
 
   private static MockedStatic<ExoContainerContext> EXO_CONTAINER_CONTEXT;
 
+  private static MockedStatic<NewsUtils>           NEWS_UTILS;
+
   @Mock
   private UserHandler         userhandler;
 
@@ -77,6 +83,7 @@ public class PostNewsNotificationPluginTest {
     ID_GENERATOR = mockStatic(IdGenerator.class);
     PLUGIN_KEY = mockStatic(PluginKey.class);
     EXO_CONTAINER_CONTEXT = mockStatic(ExoContainerContext.class);
+    NEWS_UTILS = mockStatic(NewsUtils.class);
   }
 
   @AfterClass
@@ -86,6 +93,7 @@ public class PostNewsNotificationPluginTest {
     ID_GENERATOR.close();
     PLUGIN_KEY.close();
     EXO_CONTAINER_CONTEXT.close();
+    NEWS_UTILS.close();
   }
 
   @Test
@@ -129,6 +137,7 @@ public class PostNewsNotificationPluginTest {
     ID_GENERATOR.when(() -> IdGenerator.generate()).thenReturn("123456");
     mockIdGeneratorService();
     COMMONS_UTILS.when(() -> CommonsUtils.getService(OrganizationService.class)).thenReturn(orgService);
+    NEWS_UTILS.when(()-> NewsUtils.getUserIdentity(anyString())).thenReturn(new Identity("root"));
     Space space = new Space();
     space.setId("1");
     space.setGroupId("space1");
@@ -140,7 +149,7 @@ public class PostNewsNotificationPluginTest {
 
     News news = mock(News.class);
     when(news.getActivityId()).thenReturn("12345");
-    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+    when(newsService.getNewsById(anyString(), any(Identity.class), Mockito.anyBoolean(), anyString())).thenReturn(news);
 
     ExoSocialActivity activity = mock(ExoSocialActivity.class);
     when(activity.isHidden()).thenReturn(false);
@@ -211,7 +220,8 @@ public class PostNewsNotificationPluginTest {
 
     News news = mock(News.class);
     when(news.getActivityId()).thenReturn("12345");
-    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+    NEWS_UTILS.when(()-> NewsUtils.getUserIdentity(anyString())).thenReturn(new Identity("root"));
+    when(newsService.getNewsById(anyString(), any(Identity.class), Mockito.anyBoolean(), anyString())).thenReturn(news);
 
     ExoSocialActivity activity = mock(ExoSocialActivity.class);
     when(activity.isHidden()).thenReturn(false);
@@ -284,7 +294,8 @@ public class PostNewsNotificationPluginTest {
 
     News news = mock(News.class);
     when(news.getActivityId()).thenReturn("12345");
-    when(newsService.getNewsById(Mockito.anyString(),Mockito.anyBoolean())).thenReturn(news);
+    NEWS_UTILS.when(()-> NewsUtils.getUserIdentity(anyString())).thenReturn(new Identity("root"));
+    when(newsService.getNewsById(anyString(), any(Identity.class), Mockito.anyBoolean(), anyString())).thenReturn(news);
 
     ExoSocialActivity activity = mock(ExoSocialActivity.class);
     when(activity.isHidden()).thenReturn(false);

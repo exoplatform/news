@@ -17,6 +17,7 @@ import org.exoplatform.news.model.News;
 import org.exoplatform.news.notification.utils.NotificationConstants;
 import org.exoplatform.news.notification.utils.NotificationUtils;
 import org.exoplatform.news.service.NewsService;
+import org.exoplatform.news.utils.NewsUtils;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.organization.OrganizationService;
@@ -27,6 +28,8 @@ import org.exoplatform.social.core.manager.ActivityManager;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.metadata.model.MetadataObject;
+
+import static org.exoplatform.news.utils.NewsUtils.NewsObjectType.ARTICLE;
 
 public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
   private static final Log                    LOG              = ExoLogger.getLogger(PostNewsNotificationPlugin.class);
@@ -105,7 +108,7 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     String activityLink = ctx.value(ACTIVITY_LINK);
     String newsId = ctx.value(NEWS_ID);
 
-    if (mustSendNotification(newsId)) {
+    if (mustSendNotification(newsId, currentUserName)) {
       List<String> receivers = new ArrayList<String>();
       try {
         receivers = getReceivers(contentSpaceId, currentUserName);
@@ -133,10 +136,10 @@ public class PostNewsNotificationPlugin extends BaseNotificationPlugin {
     return null;
   }
 
-  private boolean mustSendNotification(String newsId) {
+  private boolean mustSendNotification(String newsId, String userName) {
     News news = null;
     try {
-      news = newsService.getNewsById(newsId, false);
+      news = newsService.getNewsById(newsId, NewsUtils.getUserIdentity(userName), false, ARTICLE.name().toLowerCase());
     } catch (Exception e) {
       LOG.warn("Error retrieving news by id {}", newsId, e);
       return false;

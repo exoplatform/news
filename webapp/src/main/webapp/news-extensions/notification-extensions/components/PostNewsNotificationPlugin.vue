@@ -41,7 +41,7 @@ export default {
   computed: {
     url() {
       return this.notification?.space?.isMember ? this.notification?.parameters?.ACTIVITY_LINK
-        : `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/detail?newsId=${this.notification?.parameters?.NEWS_ID}`;
+        : `${eXo.env.portal.context}/${eXo.env.portal.metaPortalName}/news/detail?newsId=${this.notification?.parameters?.NEWS_ID}&type=article`;
     },
     eventTitle() {
       return this.notification?.parameters?.CONTENT_TITLE;

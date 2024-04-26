@@ -21,6 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     id="newsSettingsDrawer"
     right
     fixed
+    detached
     @closed="close">
     <template slot="title">
       <div class="flex flex-row">

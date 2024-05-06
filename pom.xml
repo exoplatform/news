@@ -28,7 +28,7 @@
   </parent>
   <groupId>org.exoplatform.addons.news</groupId>
   <artifactId>news</artifactId>
-  <version>7.0.x-SNAPSHOT</version>
+  <version>7.0.0-20240506</version>
   <packaging>pom</packaging>
   <name>eXo Add-on:: News</name>
   <description>News</description>
@@ -148,4 +148,8 @@
       </build>
     </profile>
   </profiles>
+
+  <scm>
+    <tag>7.0.0-20240506</tag>
+  </scm>
 </project>

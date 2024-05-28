@@ -64,12 +64,13 @@ export default {
     showArticleDate: true,
     showArticleReactions: true,
     canPublishNews: false,
-    parentWidth: 0
+    parentWidth: 0,
+    widthItemNews: 270
   }),
   computed: {
     numberOfColumns(){
-      const thresholds = this.$vuetify.breakpoint?.thresholds;
-      return this.parentWidth < thresholds.sm ? 12 : this.parentWidth < thresholds.md ? 6 : this.parentWidth < thresholds.lg ? 4 : 3;
+      const nomberOfItem = Math.floor(this.parentWidth / this.widthItemNews);
+      return (nomberOfItem > 0) ? (12 / nomberOfItem) : 12;
     }
   },
   created() {

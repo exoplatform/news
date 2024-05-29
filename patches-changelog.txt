@@ -1,0 +1,5 @@
+              2024-05-29 eXo Support <support@exoplatform.org> 
+
+   # 2.5.2 Patches changelog: 
+
+

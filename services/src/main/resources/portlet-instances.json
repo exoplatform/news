@@ -1,0 +1,39 @@
+{
+  "descriptors":[
+    {
+      "nameId":"NewsListView",
+      "categoryNameId":"content",
+      "portletName":"NewsListView",
+      "names":{
+        "en":"layout.portletInstance.NewsListView.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.NewsListView.description"
+      },
+      "illustrationPath":"war:/../skin/DefaultSkin/portletIcons/NewsListView.png",
+      "preferences":[
+        
+      ],
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"NewsDetail",
+      "categoryNameId":"tools",
+      "portletName":"NewsDetail",
+      "names":{
+        "en":"layout.portletInstance.NewsDetail.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.NewsDetail.description"
+      },
+      "permissions":[
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
+      ],
+      "system":true
+    }
+  ]
+}

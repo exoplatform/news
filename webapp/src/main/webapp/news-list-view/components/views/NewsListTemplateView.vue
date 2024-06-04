@@ -69,7 +69,7 @@ export default {
   computed: {
     numberOfColumns(){
       const thresholds = this.$vuetify.breakpoint?.thresholds;
-      return this.parentWidth < thresholds.sm ? 12 : this.parentWidth < thresholds.md ? 6 : this.parentWidth < thresholds.lg ? 4 : 3;
+      return this.parentWidth <= thresholds.xs ? 12 : this.parentWidth <= thresholds.md ? 6 : 4;
     }
   },
   created() {

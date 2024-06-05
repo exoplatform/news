@@ -24,7 +24,7 @@
   <parent>
     <artifactId>news</artifactId>
     <groupId>org.exoplatform.addons.news</groupId>
-    <version>7.0.x-SNAPSHOT</version>
+    <version>7.0.0-20240605</version>
   </parent>
   <artifactId>news-webapp</artifactId>
   <packaging>war</packaging>

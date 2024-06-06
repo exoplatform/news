@@ -40,7 +40,7 @@
   </modules>
 
   <properties>
-    <addon.exo.ecms.version>7.0.x-SNAPSHOT</addon.exo.ecms.version>
+    <addon.exo.ecms.version>7.0.0-20240606</addon.exo.ecms.version>
     <pitest.version>1.4.10</pitest.version>
 
     <sonar.organization>exoplatform</sonar.organization>

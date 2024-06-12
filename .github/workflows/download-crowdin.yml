@@ -11,6 +11,7 @@ jobs:
     uses: exoplatform/swf-scripts/.github/workflows/download-crowdin-exoplatform.yml@master
     with:
       CROWDIN_MAINTENANCE_EXO_VERSION: ${{ vars.CROWDIN_MAINTENANCE_EXO_VERSION }}
+      CROWDIN_ALLOW_DEVELOP_DOWNLOAD: "false"
     secrets:
       CROWDIN_GITHUB_TOKEN: ${{ secrets.CROWDIN_GITHUB_TOKEN }}
       CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}

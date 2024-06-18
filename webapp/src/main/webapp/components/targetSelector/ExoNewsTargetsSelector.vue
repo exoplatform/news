@@ -190,7 +190,7 @@ export default {
     });
     this.selectedTargets = this.news.targets;
     if (this.selectedTargets.length > 0) {
-          this.selectAudience(this.selectedTargets);
+      this.selectAudience(this.selectedTargets);
     }
     this.$nextTick(() => this.isDataInitialized = true);
   },

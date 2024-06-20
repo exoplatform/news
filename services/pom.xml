@@ -41,7 +41,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-core</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -55,7 +55,7 @@
       <artifactId>ecms-core-services</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.exoplatform.addons.notes</groupId>
+      <groupId>io.meeds.addons.notes</groupId>
       <artifactId>notes-service</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -65,7 +65,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-core</artifactId>
       <type>test-jar</type>
       <scope>test</scope>

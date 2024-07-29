@@ -95,7 +95,7 @@ export default {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      showAll:false,
+      showSeeAll: false
     },
   }),
   computed: {

@@ -1833,6 +1833,9 @@ p.caption-title:after {
     div:has(> .button-open-settings) {
       margin-right: 0 !important;
     }
+    div:has(> .settingNewsButton) {
+      margin-right: 0 !important;
+    }
     .button-see-all-news {
       height: 18px !important;
       padding: 0 9px !important;
@@ -1844,12 +1847,17 @@ p.caption-title:after {
     .button-open-settings {
       height: 18px;
       width: 18px;
-      .mdi-cog {
-        height: 18px !important;
-        font-size: 18px !important;
-        width: 18px !important;
-        color: white !important;
-        text-shadow: 2px 2px 4px black;
+    }
+    .settingNewsButton {
+      height: 18px !important;
+      font-size: 18px !important;
+      width: 18px !important;
+      color: white !important;
+      text-shadow: 2px 2px 4px @blackColorDefault !important;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.3)!important;
+        box-shadow: 0px 0px 0px 4px rgba(255, 255, 255, 0.3) !important;
+        border-radius: 50% !important;
       }
     }
     &:hover {

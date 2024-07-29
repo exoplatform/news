@@ -15,56 +15,61 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 <template>
-  <div class="card">
-    <news-settings :hide-open-setting-button="true" />
-    <a
-      class="articleLink"
-      target="_self"
-      :href="articleUrl">
-      <img
-        class="article-img"
-        :src="articleImage"
-        :alt="$t('news.latest.alt.articleImage')">
-      <div class="author-date-container">
+  <v-hover v-slot="{ hover }">
+    <div class="card">
+      <news-settings
+        v-if="!showSeeAll && lastItem && hover"
+        hide-see-all-button
+        class-button-open-settings="settingNewsButton"/>
+      <a
+        class="articleLink"
+        target="_self"
+        :href="articleUrl">
         <img
-          v-if="showArticleAuthor"
-          class="author-photo"
-          :src="item.authorAvatarUrl"
-          :alt="$t('news.avatar.author.alt',{0:item.authorDisplayName})">
-        <div v-if="showArticleDate" class="author-date">
-          <date-format
-            :value="displayDate"
-            :format="dateFormat" />
-        </div>
-      </div>
-    </a>
-    <a
-      class="articleLink"
-      target="_self"
-      :href="articleUrl">
-      <div class="title-container">
-        <div v-if="showArticleTitle" class="article-title">{{ item.title }}</div>
-        <div v-if="showArticleReactions" class="article-counters d-flex">
-          <div class="likes-container mb-1">
-            <v-icon class="counters-icons" size="14">mdi-thumb-up</v-icon>
-            <span class="counterStyle ml-1">{{ item.likesCount }}</span>
-          </div>
-          <div class="comments-container ml-2">
-            <v-icon
-              class="counters-icons mt-1"
-              size="14">
-              mdi-comment
-            </v-icon>
-            <span class="counterStyle ml-1">{{ item.commentsCount }}</span>
-          </div>
-          <div class="views-container ml-2">
-            <v-icon class="counters-icons" size="16">mdi-eye</v-icon>
-            <span class="counterStyle">{{ item.viewsCount }}</span>
+          class="article-img"
+          :src="articleImage"
+          :alt="$t('news.latest.alt.articleImage')">
+        <div class="author-date-container">
+          <img
+            v-if="showArticleAuthor"
+            class="author-photo"
+            :src="item.authorAvatarUrl"
+            :alt="$t('news.avatar.author.alt',{0:item.authorDisplayName})">
+          <div v-if="showArticleDate" class="author-date">
+            <date-format
+              :value="displayDate"
+              :format="dateFormat" />
           </div>
         </div>
-      </div>
-    </a>
-  </div>
+      </a>
+      <a
+        class="articleLink"
+        target="_self"
+        :href="articleUrl">
+        <div class="title-container">
+          <div v-if="showArticleTitle" class="article-title">{{ item.title }}</div>
+          <div v-if="showArticleReactions" class="article-counters d-flex">
+            <div class="likes-container mb-1">
+              <v-icon class="counters-icons" size="14">mdi-thumb-up</v-icon>
+              <span class="counterStyle ml-1">{{ item.likesCount }}</span>
+            </div>
+            <div class="comments-container ml-2">
+              <v-icon
+                class="counters-icons mt-1"
+                size="14">
+                mdi-comment
+              </v-icon>
+              <span class="counterStyle ml-1">{{ item.commentsCount }}</span>
+            </div>
+            <div class="views-container ml-2">
+              <v-icon class="counters-icons" size="16">mdi-eye</v-icon>
+              <span class="counterStyle">{{ item.viewsCount }}</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </v-hover>
 </template>
 
 <script>
@@ -80,12 +85,17 @@ export default {
       required: false,
       default: null
     },
+    lastItem: {
+      type: Boolean,
+      default: false
+    },
   },
   data: ()=> ({
     dateFormat: {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      showAll:false,
     },
   }),
   computed: {
@@ -113,6 +123,9 @@ export default {
     articleUrl() {
       return eXo.env.portal.userName !== '' ? this.item.url : `${eXo.env.portal.context}/${eXo.env.portal.portalName}/news-detail?newsId=${this.item.id}`;
     }
+  },
+  created() {
+    this.showSeeAll = this.$root.showSeeAll;
   }
 };
 </script>

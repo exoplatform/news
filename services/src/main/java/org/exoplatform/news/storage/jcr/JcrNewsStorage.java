@@ -1233,6 +1233,9 @@ public class JcrNewsStorage implements NewsStorage {
       ExtendedNode image = null;
       if (imageSrcRegex.equals(IMAGE_SRC_REGEX)) {
         String imageUUID = match.substring(match.lastIndexOf("/") + 1);
+        if (imageUUID.contains("width") || imageUUID.contains("height")) {
+          imageUUID = imageUUID.substring(0,imageUUID.lastIndexOf(" ")-1);
+        }
         image = (ExtendedNode) getNodeById(imageUUID, sessionProvider);
       } else {
         String imagePath = match.substring(match.indexOf("/Groups"));

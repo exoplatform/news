@@ -69,6 +69,8 @@ public class NewsUtils {
   private static final String MANAGER_MEMBERSHIP_NAME         = "manager";
 
   private static final String PLATFORM_WEB_CONTRIBUTORS_GROUP = "/platform/web-contributors";
+
+  public static final String UPDATE_CONTENT_PERMISSIONS      = "content.update.permissions";
   
   public static void broadcastEvent(String eventName, Object source, Object data) {
     try {

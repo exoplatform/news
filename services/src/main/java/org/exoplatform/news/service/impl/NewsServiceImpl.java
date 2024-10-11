@@ -62,6 +62,12 @@ public class NewsServiceImpl implements NewsService {
 
   private static final String   NEWS_ID                         = "newsId";
 
+  public static final String       NEWS_ATTACHMENTS_IDS                   = "attachmentsIds";
+
+  public static final String       ARTICLE_CONTENT                        = "content";
+
+  public static final String       NEWS_AUDIENCE                          = "audience";
+
   public SpaceService           spaceService;
 
   private ActivityManager       activityManager;
@@ -204,7 +210,9 @@ public class NewsServiceImpl implements NewsService {
       if (post != null) {
         updateNewsActivity(news, post);
       }
-      NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news); 
+      NewsUtils.broadcastEvent(NewsUtils.UPDATE_NEWS, updater, news);
+      Space space = spaceService.getSpaceById(news.getSpaceId());
+      updateArticlePermissions(List.of(space), news, null);
     }
     return news;
   }
@@ -729,5 +737,17 @@ public class NewsServiceImpl implements NewsService {
       }
     }
     return false;
+  }
+  private void updateArticlePermissions(List<Space> spaces, News article, List<String> articleAttachmentIds) {
+    Map<String, Object> updateContentPermissionEventListenerData = new HashMap<>();
+    updateContentPermissionEventListenerData.putAll(Map.of("spaces", spaces, ARTICLE_CONTENT, article.getBody()));
+    if (articleAttachmentIds != null) {
+      updateContentPermissionEventListenerData.put(NEWS_ATTACHMENTS_IDS, articleAttachmentIds);
+    }
+
+    if (article.getAudience() != null) {
+      updateContentPermissionEventListenerData.put(NEWS_AUDIENCE, article.getAudience());
+    }
+    NewsUtils.broadcastEvent(NewsUtils.UPDATE_CONTENT_PERMISSIONS, this, updateContentPermissionEventListenerData);
   }
 }

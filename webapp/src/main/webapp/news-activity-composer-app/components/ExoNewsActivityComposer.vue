@@ -609,6 +609,7 @@ export default {
         colorButton_enableMore: true,
         enterMode: CKEDITOR.ENTER_P,
         shiftEnterMode: CKEDITOR.ENTER_BR,
+        autoParagraph: false,
         sharedSpaces: {
           top: 'newsTop'
         },
